@@ -1,3 +1,4 @@
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,8 +8,7 @@ import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { getLoginUrl } from "@/const";
+import { Zap, Heart, Sparkles, Check } from "lucide-react";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -51,21 +51,45 @@ export default function Home() {
     }));
   };
 
+  const scrollToPreorder = () => {
+    document.getElementById("preorder-form")?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
       <header className="border-b border-[#c8ff00]/20 bg-black/50 backdrop-blur-sm fixed top-0 w-full z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-[#c8ff00]">NEON</h1>
-          {user && user.role === "admin" && (
-            <Button
-              variant="outline"
-              className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00] hover:text-black"
-              onClick={() => setLocation("/admin")}
+          <nav className="flex gap-6 items-center">
+            <button
+              onClick={() => setLocation("/")}
+              className="text-[#c8ff00] font-semibold"
             >
-              Admin Dashboard
-            </Button>
-          )}
+              Home
+            </button>
+            <button
+              onClick={() => setLocation("/about")}
+              className="text-gray-300 hover:text-[#c8ff00] transition-colors"
+            >
+              Our Story
+            </button>
+            <button
+              onClick={() => setLocation("/products")}
+              className="text-gray-300 hover:text-[#c8ff00] transition-colors"
+            >
+              Products
+            </button>
+            {user && user.role === "admin" && (
+              <Button
+                variant="outline"
+                className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00] hover:text-black"
+                onClick={() => setLocation("/admin")}
+              >
+                Admin Dashboard
+              </Button>
+            )}
+          </nav>
         </div>
       </header>
 
@@ -106,13 +130,135 @@ export default function Home() {
                   <div className="text-sm text-gray-400">Per Case</div>
                 </div>
               </div>
+              <Button
+                onClick={scrollToPreorder}
+                className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold text-lg py-6 px-8"
+              >
+                Pre-Order Now
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why NEON Section */}
+      <section className="py-16 px-4 bg-gradient-to-b from-black to-[#0a0a0a]">
+        <div className="container mx-auto max-w-6xl">
+          <h3 className="text-4xl md:text-5xl font-black text-center mb-12">
+            WHY <span className="text-[#c8ff00]">NEON?</span>
+          </h3>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 mx-auto bg-[#c8ff00]/10 rounded-full flex items-center justify-center">
+                <Zap className="w-8 h-8 text-[#c8ff00]" />
+              </div>
+              <h4 className="text-2xl font-bold text-[#c8ff00]">
+                Energy That Lasts
+              </h4>
+              <p className="text-gray-300">
+                100mg of natural caffeine from green tea provides sustained
+                energy without the crash. No jitters, just pure focus.
+              </p>
+            </div>
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 mx-auto bg-[#c8ff00]/10 rounded-full flex items-center justify-center">
+                <Heart className="w-8 h-8 text-[#c8ff00]" />
+              </div>
+              <h4 className="text-2xl font-bold text-[#c8ff00]">
+                All Natural
+              </h4>
+              <p className="text-gray-300">
+                Made with real fruit juice and natural ingredients. No artificial
+                colors, flavors, or sweeteners. Just pure, clean energy.
+              </p>
+            </div>
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 mx-auto bg-[#c8ff00]/10 rounded-full flex items-center justify-center">
+                <Sparkles className="w-8 h-8 text-[#c8ff00]" />
+              </div>
+              <h4 className="text-2xl font-bold text-[#c8ff00]">
+                It Actually Glows
+              </h4>
+              <p className="text-gray-300">
+                Thanks to a naturally occurring element from the Cinchona tree,
+                NEON glows under blacklight. Energy never looked so good.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="py-16 px-4 bg-[#0a0a0a]">
+        <div className="container mx-auto max-w-6xl">
+          <h3 className="text-4xl font-black text-center mb-12">
+            EVERYTHING YOU <span className="text-[#c8ff00]">NEED</span>
+          </h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="flex gap-4 items-start">
+              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1" />
+              <div>
+                <h4 className="text-lg font-bold text-white mb-1">
+                  Only 100 calories
+                </h4>
+                <p className="text-gray-400">
+                  Low calorie energy without compromising on taste
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-4 items-start">
+              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1" />
+              <div>
+                <h4 className="text-lg font-bold text-white mb-1">
+                  100mg natural caffeine
+                </h4>
+                <p className="text-gray-400">From Green Tea for smooth energy</p>
+              </div>
+            </div>
+            <div className="flex gap-4 items-start">
+              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1" />
+              <div>
+                <h4 className="text-lg font-bold text-white mb-1">
+                  Over 100% of 6 B Vitamins
+                </h4>
+                <p className="text-gray-400">
+                  Essential vitamins for energy metabolism
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-4 items-start">
+              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1" />
+              <div>
+                <h4 className="text-lg font-bold text-white mb-1">
+                  Natural sugar from fruit juice
+                </h4>
+                <p className="text-gray-400">24% real fruit juice blend</p>
+              </div>
+            </div>
+            <div className="flex gap-4 items-start">
+              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1" />
+              <div>
+                <h4 className="text-lg font-bold text-white mb-1">
+                  Proprietary antioxidant blend
+                </h4>
+                <p className="text-gray-400">For overall health support</p>
+              </div>
+            </div>
+            <div className="flex gap-4 items-start">
+              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1" />
+              <div>
+                <h4 className="text-lg font-bold text-white mb-1">
+                  Supports healthy metabolism
+                </h4>
+                <p className="text-gray-400">Designed for active lifestyles</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Pre-Order Form Section */}
-      <section className="py-12 px-4 bg-gradient-to-b from-black to-[#0a0a0a]">
+      <section id="preorder-form" className="py-12 px-4 bg-gradient-to-b from-[#0a0a0a] to-black">
         <div className="container mx-auto max-w-2xl">
           <Card className="bg-[#0a0a0a] border-[#c8ff00]/30">
             <CardHeader>
