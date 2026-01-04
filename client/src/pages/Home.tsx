@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { Zap, Heart, Sparkles, Check } from "lucide-react";
@@ -13,6 +13,7 @@ import { Zap, Heart, Sparkles, Check } from "lucide-react";
 export default function Home() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
+  const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -25,6 +26,10 @@ export default function Home() {
     country: "USA",
     notes: "",
   });
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
 
   const submitPreorder = trpc.preorder.submit.useMutation({
     onSuccess: () => {
@@ -58,32 +63,34 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="border-b border-[#c8ff00]/20 bg-black/50 backdrop-blur-sm fixed top-0 w-full z-50">
+      <header className="border-b border-[#c8ff00]/20 bg-black/80 backdrop-blur-md fixed top-0 w-full z-50 transition-smooth">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-[#c8ff00]">NEON</h1>
+          <h1 className="text-2xl font-bold text-[#c8ff00] neon-text cursor-pointer" onClick={() => setLocation("/")}>
+            NEON
+          </h1>
           <nav className="flex gap-6 items-center">
             <button
               onClick={() => setLocation("/")}
-              className="text-[#c8ff00] font-semibold"
+              className="text-[#c8ff00] font-semibold transition-smooth hover:neon-text"
             >
               Home
             </button>
             <button
               onClick={() => setLocation("/about")}
-              className="text-gray-300 hover:text-[#c8ff00] transition-colors"
+              className="text-gray-300 hover:text-[#c8ff00] transition-smooth"
             >
               Our Story
             </button>
             <button
               onClick={() => setLocation("/products")}
-              className="text-gray-300 hover:text-[#c8ff00] transition-colors"
+              className="text-gray-300 hover:text-[#c8ff00] transition-smooth"
             >
               Products
             </button>
             {user && user.role === "admin" && (
               <Button
                 variant="outline"
-                className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00] hover:text-black"
+                className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00] hover:text-black transition-smooth neon-border"
                 onClick={() => setLocation("/admin")}
               >
                 Admin Dashboard
@@ -94,25 +101,25 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-24 pb-12 px-4">
+      <section className="pt-24 pb-12 px-4 animated-bg relative overflow-hidden">
         <div className="container mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Left: Product Image */}
-            <div className="flex justify-center">
+            <div className={`flex justify-center ${isVisible ? 'animate-slide-in-left' : 'opacity-0'}`}>
               <div className="relative">
-                <div className="absolute inset-0 bg-[#c8ff00] blur-[100px] opacity-30 rounded-full"></div>
+                <div className="absolute inset-0 bg-[#c8ff00] blur-[120px] opacity-40 rounded-full animate-float"></div>
                 <img
                   src="/neon-can.png"
                   alt="NEON Energy Drink"
-                  className="relative z-10 max-w-md w-full h-auto drop-shadow-2xl"
+                  className="relative z-10 max-w-md w-full h-auto neon-glow animate-float"
                 />
               </div>
             </div>
 
             {/* Right: Hero Text */}
-            <div className="space-y-6">
+            <div className={`space-y-6 ${isVisible ? 'animate-slide-in-right' : 'opacity-0'}`}>
               <h2 className="text-5xl md:text-7xl font-black leading-tight">
-                THE <span className="text-[#c8ff00]">ENERGY</span> IS BACK
+                THE <span className="text-[#c8ff00] neon-text">ENERGY</span> IS BACK
               </h2>
               <p className="text-xl text-gray-300 leading-relaxed">
                 NEON Energy Drink is relaunching. Experience the legendary taste
@@ -121,18 +128,18 @@ export default function Home() {
               </p>
               <div className="flex gap-4 items-center">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-[#c8ff00]">8.4 fl oz</div>
+                  <div className="text-3xl font-bold text-[#c8ff00] neon-text">8.4 fl oz</div>
                   <div className="text-sm text-gray-400">Per Can</div>
                 </div>
                 <div className="h-12 w-px bg-[#c8ff00]/30"></div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-[#c8ff00]">24 Cans</div>
+                  <div className="text-3xl font-bold text-[#c8ff00] neon-text">24 Cans</div>
                   <div className="text-sm text-gray-400">Per Case</div>
                 </div>
               </div>
               <Button
                 onClick={scrollToPreorder}
-                className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold text-lg py-6 px-8"
+                className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold text-lg py-6 px-8 neon-pulse transition-smooth"
               >
                 Pre-Order Now
               </Button>
@@ -142,15 +149,15 @@ export default function Home() {
       </section>
 
       {/* Why NEON Section */}
-      <section className="py-16 px-4 bg-gradient-to-b from-black to-[#0a0a0a]">
+      <section className="py-16 px-4 bg-gradient-to-b from-black to-[#0a0a0a] animated-bg">
         <div className="container mx-auto max-w-6xl">
-          <h3 className="text-4xl md:text-5xl font-black text-center mb-12">
-            WHY <span className="text-[#c8ff00]">NEON?</span>
+          <h3 className="text-4xl md:text-5xl font-black text-center mb-12 animate-fade-in-up">
+            WHY <span className="text-[#c8ff00] neon-text">NEON?</span>
           </h3>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-[#c8ff00]/10 rounded-full flex items-center justify-center">
-                <Zap className="w-8 h-8 text-[#c8ff00]" />
+            <div className="text-center space-y-4 hover-lift animate-fade-in-up stagger-1">
+              <div className="w-16 h-16 mx-auto bg-[#c8ff00]/10 rounded-full flex items-center justify-center neon-border">
+                <Zap className="w-8 h-8 text-[#c8ff00] neon-glow" />
               </div>
               <h4 className="text-2xl font-bold text-[#c8ff00]">
                 Energy That Lasts
@@ -160,9 +167,9 @@ export default function Home() {
                 energy without the crash. No jitters, just pure focus.
               </p>
             </div>
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-[#c8ff00]/10 rounded-full flex items-center justify-center">
-                <Heart className="w-8 h-8 text-[#c8ff00]" />
+            <div className="text-center space-y-4 hover-lift animate-fade-in-up stagger-2">
+              <div className="w-16 h-16 mx-auto bg-[#c8ff00]/10 rounded-full flex items-center justify-center neon-border">
+                <Heart className="w-8 h-8 text-[#c8ff00] neon-glow" />
               </div>
               <h4 className="text-2xl font-bold text-[#c8ff00]">
                 All Natural
@@ -172,9 +179,9 @@ export default function Home() {
                 colors, flavors, or sweeteners. Just pure, clean energy.
               </p>
             </div>
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-[#c8ff00]/10 rounded-full flex items-center justify-center">
-                <Sparkles className="w-8 h-8 text-[#c8ff00]" />
+            <div className="text-center space-y-4 hover-lift animate-fade-in-up stagger-3">
+              <div className="w-16 h-16 mx-auto bg-[#c8ff00]/10 rounded-full flex items-center justify-center neon-border">
+                <Sparkles className="w-8 h-8 text-[#c8ff00] neon-glow" />
               </div>
               <h4 className="text-2xl font-bold text-[#c8ff00]">
                 It Actually Glows
@@ -189,14 +196,14 @@ export default function Home() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-16 px-4 bg-[#0a0a0a]">
+      <section className="py-16 px-4 bg-[#0a0a0a] animated-bg">
         <div className="container mx-auto max-w-6xl">
-          <h3 className="text-4xl font-black text-center mb-12">
-            EVERYTHING YOU <span className="text-[#c8ff00]">NEED</span>
+          <h3 className="text-4xl font-black text-center mb-12 animate-fade-in-up">
+            EVERYTHING YOU <span className="text-[#c8ff00] neon-text">NEED</span>
           </h3>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="flex gap-4 items-start">
-              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1" />
+            <div className="flex gap-4 items-start hover-lift neon-border rounded-lg p-6 bg-black/50 animate-fade-in-up stagger-1">
+              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1 neon-glow" />
               <div>
                 <h4 className="text-lg font-bold text-white mb-1">
                   Only 100 calories
@@ -206,8 +213,8 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <div className="flex gap-4 items-start">
-              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1" />
+            <div className="flex gap-4 items-start hover-lift neon-border rounded-lg p-6 bg-black/50 animate-fade-in-up stagger-2">
+              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1 neon-glow" />
               <div>
                 <h4 className="text-lg font-bold text-white mb-1">
                   100mg natural caffeine
@@ -215,8 +222,8 @@ export default function Home() {
                 <p className="text-gray-400">From Green Tea for smooth energy</p>
               </div>
             </div>
-            <div className="flex gap-4 items-start">
-              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1" />
+            <div className="flex gap-4 items-start hover-lift neon-border rounded-lg p-6 bg-black/50 animate-fade-in-up stagger-3">
+              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1 neon-glow" />
               <div>
                 <h4 className="text-lg font-bold text-white mb-1">
                   Over 100% of 6 B Vitamins
@@ -226,8 +233,8 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <div className="flex gap-4 items-start">
-              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1" />
+            <div className="flex gap-4 items-start hover-lift neon-border rounded-lg p-6 bg-black/50 animate-fade-in-up stagger-4">
+              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1 neon-glow" />
               <div>
                 <h4 className="text-lg font-bold text-white mb-1">
                   Natural sugar from fruit juice
@@ -235,8 +242,8 @@ export default function Home() {
                 <p className="text-gray-400">24% real fruit juice blend</p>
               </div>
             </div>
-            <div className="flex gap-4 items-start">
-              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1" />
+            <div className="flex gap-4 items-start hover-lift neon-border rounded-lg p-6 bg-black/50 animate-fade-in-up stagger-5">
+              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1 neon-glow" />
               <div>
                 <h4 className="text-lg font-bold text-white mb-1">
                   Proprietary antioxidant blend
@@ -244,8 +251,8 @@ export default function Home() {
                 <p className="text-gray-400">For overall health support</p>
               </div>
             </div>
-            <div className="flex gap-4 items-start">
-              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1" />
+            <div className="flex gap-4 items-start hover-lift neon-border rounded-lg p-6 bg-black/50 animate-fade-in-up stagger-6">
+              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1 neon-glow" />
               <div>
                 <h4 className="text-lg font-bold text-white mb-1">
                   Supports healthy metabolism
@@ -258,11 +265,11 @@ export default function Home() {
       </section>
 
       {/* Pre-Order Form Section */}
-      <section id="preorder-form" className="py-12 px-4 bg-gradient-to-b from-[#0a0a0a] to-black">
+      <section id="preorder-form" className="py-12 px-4 bg-gradient-to-b from-[#0a0a0a] to-black animated-bg">
         <div className="container mx-auto max-w-2xl">
-          <Card className="bg-[#0a0a0a] border-[#c8ff00]/30">
+          <Card className="bg-[#0a0a0a] border-[#c8ff00]/30 neon-border hover-lift">
             <CardHeader>
-              <CardTitle className="text-3xl font-bold text-[#c8ff00]">
+              <CardTitle className="text-3xl font-bold text-[#c8ff00] neon-text">
                 Pre-Order Now
               </CardTitle>
               <CardDescription className="text-gray-400">
@@ -286,7 +293,7 @@ export default function Home() {
                         required
                         value={formData.name}
                         onChange={handleChange}
-                        className="bg-black border-[#c8ff00]/30 text-white"
+                        className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
                       />
                     </div>
                     <div className="space-y-2">
@@ -298,7 +305,7 @@ export default function Home() {
                         required
                         value={formData.email}
                         onChange={handleChange}
-                        className="bg-black border-[#c8ff00]/30 text-white"
+                        className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
                       />
                     </div>
                   </div>
@@ -310,7 +317,7 @@ export default function Home() {
                       type="tel"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="bg-black border-[#c8ff00]/30 text-white"
+                      className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
                     />
                   </div>
                 </div>
@@ -330,7 +337,7 @@ export default function Home() {
                       required
                       value={formData.quantity}
                       onChange={handleChange}
-                      className="bg-black border-[#c8ff00]/30 text-white"
+                      className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
                     />
                     <p className="text-sm text-gray-400">
                       Each case contains 24 cans (8.4 fl oz each)
@@ -351,7 +358,7 @@ export default function Home() {
                       required
                       value={formData.address}
                       onChange={handleChange}
-                      className="bg-black border-[#c8ff00]/30 text-white"
+                      className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
                     />
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
@@ -363,7 +370,7 @@ export default function Home() {
                         required
                         value={formData.city}
                         onChange={handleChange}
-                        className="bg-black border-[#c8ff00]/30 text-white"
+                        className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
                       />
                     </div>
                     <div className="space-y-2">
@@ -374,7 +381,7 @@ export default function Home() {
                         required
                         value={formData.state}
                         onChange={handleChange}
-                        className="bg-black border-[#c8ff00]/30 text-white"
+                        className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
                       />
                     </div>
                   </div>
@@ -387,7 +394,7 @@ export default function Home() {
                         required
                         value={formData.postalCode}
                         onChange={handleChange}
-                        className="bg-black border-[#c8ff00]/30 text-white"
+                        className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
                       />
                     </div>
                     <div className="space-y-2">
@@ -398,7 +405,7 @@ export default function Home() {
                         required
                         value={formData.country}
                         onChange={handleChange}
-                        className="bg-black border-[#c8ff00]/30 text-white"
+                        className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
                       />
                     </div>
                   </div>
@@ -412,7 +419,7 @@ export default function Home() {
                     name="notes"
                     value={formData.notes}
                     onChange={handleChange}
-                    className="bg-black border-[#c8ff00]/30 text-white min-h-[100px]"
+                    className="bg-black border-[#c8ff00]/30 text-white min-h-[100px] focus:border-[#c8ff00] transition-smooth"
                     placeholder="Any special instructions or comments..."
                   />
                 </div>
@@ -421,7 +428,7 @@ export default function Home() {
                 <Button
                   type="submit"
                   disabled={submitPreorder.isPending}
-                  className="w-full bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold text-lg py-6"
+                  className="w-full bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold text-lg py-6 neon-pulse transition-smooth"
                 >
                   {submitPreorder.isPending ? "Submitting..." : "Submit Pre-Order"}
                 </Button>
