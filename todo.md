@@ -59,3 +59,20 @@
 - [x] Test all crowdfunding functionality
 - [x] Test territory licensing map interactions
 - [x] Test pricing calculations
+
+## World-Class Design & Payment Integration
+
+- [ ] Set up Stripe integration using webdev_add_feature
+- [ ] Create Stripe payment endpoints for crowdfunding contributions
+- [ ] Create Stripe payment endpoints for franchise deposits
+- [x] Build dedicated crowdfunding contribution page with tier selection
+- [x] Add backend tRPC procedures for franchise applications
+- [x] Save franchise applications to database
+- [x] Send admin notifications for new franchise applications
+- [x] Elevate homepage design to world-class marketing standards
+- [x] Enhance typography and spacing throughout
+- [x] Add premium micro-interactions and animations
+- [x] Improve visual hierarchy and contrast
+- [x] Polish all pages to marketing agency quality
+- [x] Write vitest tests for new procedures
+- [ ] Test Stripe payment flow end-to-end

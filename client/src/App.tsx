@@ -11,6 +11,7 @@ import Success from "./pages/Success";
 import Admin from "./pages/Admin";
 import About from "./pages/About";
 import Products from "./pages/Products";
+import Crowdfund from "./pages/Crowdfund";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -23,6 +24,7 @@ function Router() {
       <Route path={"/admin"} component={Admin} />
       <Route path={"/franchise"} component={Franchise} />
       <Route path={"/celebrities"} component={Celebrities} />
+      <Route path={"/crowdfund"} component={Crowdfund} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
