@@ -61,3 +61,71 @@ export const preorders = mysqlTable("preorders", {
 
 export type Preorder = typeof preorders.$inferSelect;
 export type InsertPreorder = typeof preorders.$inferInsert;
+
+/**
+ * Crowdfunding contributions table.
+ * Tracks user contributions to the NEON relaunch campaign.
+ */
+export const crowdfunding = mysqlTable("crowdfunding", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Contributor name */
+  name: varchar("name", { length: 255 }).notNull(),
+  /** Contributor email */
+  email: varchar("email", { length: 320 }).notNull(),
+  /** Contribution amount in USD */
+  amount: int("amount").notNull(),
+  /** Reward tier selected */
+  rewardTier: varchar("rewardTier", { length: 100 }),
+  /** Payment status */
+  status: mysqlEnum("status", ["pending", "completed", "refunded"]).default("pending").notNull(),
+  /** Additional message from contributor */
+  message: text("message"),
+  /** Contribution timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Crowdfunding = typeof crowdfunding.$inferSelect;
+export type InsertCrowdfunding = typeof crowdfunding.$inferInsert;
+
+/**
+ * Territory licensing applications table.
+ * Stores franchise territory licensing requests for vending machines.
+ */
+export const territoryLicenses = mysqlTable("territory_licenses", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User ID (foreign key to users table) */
+  userId: int("userId"),
+  /** Applicant name */
+  name: varchar("name", { length: 255 }).notNull(),
+  /** Applicant email */
+  email: varchar("email", { length: 320 }).notNull(),
+  /** Applicant phone */
+  phone: varchar("phone", { length: 50 }),
+  /** Territory description (e.g., "Los Angeles County, CA") */
+  territory: text("territory").notNull(),
+  /** Territory coordinates (GeoJSON or similar) */
+  coordinates: text("coordinates"),
+  /** Territory size in square miles */
+  squareMiles: int("squareMiles").notNull(),
+  /** License term in months */
+  termMonths: int("termMonths").notNull(),
+  /** Price per square mile per month */
+  pricePerSqMile: int("pricePerSqMile").notNull(),
+  /** Total licensing cost */
+  totalCost: int("totalCost").notNull(),
+  /** Deposit amount paid */
+  depositAmount: int("depositAmount"),
+  /** Financing selected */
+  financing: mysqlEnum("financing", ["full", "deposit", "monthly"]).default("full").notNull(),
+  /** Application status */
+  status: mysqlEnum("status", ["pending", "approved", "rejected", "active"]).default("pending").notNull(),
+  /** Additional notes */
+  notes: text("notes"),
+  /** Application timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Last update timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TerritoryLicense = typeof territoryLicenses.$inferSelect;
+export type InsertTerritoryLicense = typeof territoryLicenses.$inferInsert;

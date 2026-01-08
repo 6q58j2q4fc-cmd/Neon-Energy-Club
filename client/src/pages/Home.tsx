@@ -1,64 +1,46 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { trpc } from "@/lib/trpc";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { toast } from "sonner";
-import { Zap, Heart, Sparkles, Check } from "lucide-react";
+import { Zap, MapPin, DollarSign, Clock, TrendingUp, Users } from "lucide-react";
 
 export default function Home() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    quantity: 1,
-    address: "",
-    city: "",
-    state: "",
-    postalCode: "",
-    country: "USA",
-    notes: "",
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
   });
 
+  // Countdown to relaunch date (example: 90 days from now)
   useEffect(() => {
     setIsVisible(true);
+    
+    const calculateTimeLeft = () => {
+      const launchDate = new Date();
+      launchDate.setDate(launchDate.getDate() + 90); // 90 days from now
+      
+      const difference = launchDate.getTime() - new Date().getTime();
+      
+      if (difference > 0) {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+          seconds: Math.floor((difference / 1000) % 60),
+        });
+      }
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 1000);
+
+    return () => clearInterval(timer);
   }, []);
-
-  const submitPreorder = trpc.preorder.submit.useMutation({
-    onSuccess: () => {
-      toast.success("Pre-order submitted successfully!");
-      setLocation("/success");
-    },
-    onError: (error) => {
-      toast.error(`Failed to submit pre-order: ${error.message}`);
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    submitPreorder.mutate(formData);
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "quantity" ? parseInt(value) || 1 : value,
-    }));
-  };
-
-  const scrollToPreorder = () => {
-    document.getElementById("preorder-form")?.scrollIntoView({ behavior: "smooth" });
-  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -87,6 +69,18 @@ export default function Home() {
             >
               Products
             </button>
+            <button
+              onClick={() => setLocation("/celebrities")}
+              className="text-gray-300 hover:text-[#c8ff00] transition-smooth"
+            >
+              Celebrity Fans
+            </button>
+            <button
+              onClick={() => setLocation("/franchise")}
+              className="text-gray-300 hover:text-[#c8ff00] transition-smooth"
+            >
+              Franchise
+            </button>
             {user && user.role === "admin" && (
               <Button
                 variant="outline"
@@ -100,341 +94,256 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="pt-24 pb-12 px-4 animated-bg relative overflow-hidden">
-        <div className="container mx-auto">
+      {/* Hero Section with Countdown */}
+      <section className="pt-32 pb-16 px-4 animated-bg relative overflow-hidden">
+        <div className="container mx-auto text-center">
+          <div className={`space-y-8 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
+            <h2 className="text-6xl md:text-8xl font-black leading-tight">
+              THE <span className="text-[#c8ff00] neon-text">ENERGY</span>
+              <br />
+              IS COMING BACK
+            </h2>
+            
+            {/* Countdown Timer */}
+            <div className="max-w-4xl mx-auto">
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <Clock className="w-6 h-6 text-[#c8ff00] neon-glow" />
+                <p className="text-xl text-gray-300">Official Relaunch In:</p>
+              </div>
+              <div className="grid grid-cols-4 gap-4 md:gap-8">
+                <div className="bg-[#0a0a0a] border-2 border-[#c8ff00] rounded-xl p-6 neon-border hover-lift">
+                  <div className="text-5xl md:text-7xl font-black text-[#c8ff00] neon-text">{timeLeft.days}</div>
+                  <div className="text-sm md:text-lg text-gray-400 mt-2">DAYS</div>
+                </div>
+                <div className="bg-[#0a0a0a] border-2 border-[#c8ff00] rounded-xl p-6 neon-border hover-lift">
+                  <div className="text-5xl md:text-7xl font-black text-[#c8ff00] neon-text">{timeLeft.hours}</div>
+                  <div className="text-sm md:text-lg text-gray-400 mt-2">HOURS</div>
+                </div>
+                <div className="bg-[#0a0a0a] border-2 border-[#c8ff00] rounded-xl p-6 neon-border hover-lift">
+                  <div className="text-5xl md:text-7xl font-black text-[#c8ff00] neon-text">{timeLeft.minutes}</div>
+                  <div className="text-sm md:text-lg text-gray-400 mt-2">MINUTES</div>
+                </div>
+                <div className="bg-[#0a0a0a] border-2 border-[#c8ff00] rounded-xl p-6 neon-border hover-lift">
+                  <div className="text-5xl md:text-7xl font-black text-[#c8ff00] neon-text">{timeLeft.seconds}</div>
+                  <div className="text-sm md:text-lg text-gray-400 mt-2">SECONDS</div>
+                </div>
+              </div>
+            </div>
+
+            {/* New Can Design Showcase */}
+            <div className="relative max-w-2xl mx-auto mt-12">
+              <div className="absolute inset-0 bg-[#c8ff00] blur-[120px] opacity-40 rounded-full animate-float"></div>
+              <img
+                src="/neon-can.png"
+                alt="New NEON Can Design"
+                className="relative z-10 max-w-md mx-auto w-full h-auto neon-glow animate-float"
+              />
+              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-[#c8ff00] text-black px-6 py-2 rounded-full font-bold text-lg neon-pulse">
+                NEW DESIGN
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Crowdfunding Section */}
+      <section className="py-16 px-4 bg-gradient-to-b from-black to-[#0a0a0a] animated-bg">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-12 animate-fade-in-up">
+            <h3 className="text-5xl font-black mb-4">
+              HELP FUND THE <span className="text-[#c8ff00] neon-text">RELAUNCH</span>
+            </h3>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Be part of the NEON revolution. Support our crowdfunding campaign and get exclusive rewards.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            {/* Funding Progress */}
+            <Card className="bg-[#0a0a0a] border-[#c8ff00]/30 neon-border hover-lift col-span-full animate-fade-in-up stagger-1">
+              <CardHeader>
+                <CardTitle className="text-3xl font-bold text-[#c8ff00] flex items-center gap-3">
+                  <TrendingUp className="w-8 h-8 neon-glow" />
+                  Campaign Progress
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-2xl font-bold text-white">$487,350</span>
+                    <span className="text-gray-400">of $1,000,000 goal</span>
+                  </div>
+                  <div className="w-full bg-gray-800 rounded-full h-6 overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-[#c8ff00] to-[#a8d600] rounded-full transition-all duration-1000 gradient-animate"
+                      style={{ width: '48.7%' }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-400">
+                    <span className="flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      2,847 Backers
+                    </span>
+                    <span>{timeLeft.days} Days Left</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Reward Tiers */}
+            <Card className="bg-[#0a0a0a] border-[#c8ff00]/30 neon-border hover-lift animate-fade-in-up stagger-2">
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold text-[#c8ff00]">SUPPORTER</CardTitle>
+                <CardDescription className="text-3xl font-black text-white">$25</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <ul className="space-y-2 text-gray-300">
+                  <li>• 1 Limited Edition Can</li>
+                  <li>• Digital Thank You Card</li>
+                  <li>• Campaign Updates</li>
+                  <li>• Backer Badge</li>
+                </ul>
+                <Button 
+                  onClick={() => setLocation("/crowdfund")}
+                  className="w-full bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold neon-pulse"
+                >
+                  Back This Tier
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-[#0a0a0a] border-[#c8ff00]/30 neon-border hover-lift animate-fade-in-up stagger-3 transform scale-105">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#c8ff00] text-black px-4 py-1 rounded-full text-sm font-bold">
+                MOST POPULAR
+              </div>
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold text-[#c8ff00]">ENERGIZER</CardTitle>
+                <CardDescription className="text-3xl font-black text-white">$100</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <ul className="space-y-2 text-gray-300">
+                  <li>• 1 Case (24 Cans)</li>
+                  <li>• Limited Edition T-Shirt</li>
+                  <li>• Exclusive Poster</li>
+                  <li>• VIP Backer Status</li>
+                  <li>• Early Access to Products</li>
+                </ul>
+                <Button 
+                  onClick={() => setLocation("/crowdfund")}
+                  className="w-full bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold neon-pulse"
+                >
+                  Back This Tier
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-[#0a0a0a] border-[#c8ff00]/30 neon-border hover-lift animate-fade-in-up stagger-4">
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold text-[#c8ff00]">VIP INSIDER</CardTitle>
+                <CardDescription className="text-3xl font-black text-white">$500</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <ul className="space-y-2 text-gray-300">
+                  <li>• 5 Cases (120 Cans)</li>
+                  <li>• Limited Edition Merchandise Pack</li>
+                  <li>• Your Name on Website</li>
+                  <li>• Exclusive Virtual Event Access</li>
+                  <li>• Lifetime 20% Discount</li>
+                </ul>
+                <Button 
+                  onClick={() => setLocation("/crowdfund")}
+                  className="w-full bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold neon-pulse"
+                >
+                  Back This Tier
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Vending Machine Franchise Section */}
+      <section className="py-16 px-4 bg-gradient-to-b from-[#0a0a0a] to-black animated-bg">
+        <div className="container mx-auto max-w-7xl">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Left: Product Image */}
-            <div className={`flex justify-center ${isVisible ? 'animate-slide-in-left' : 'opacity-0'}`}>
+            {/* Vending Machine Image */}
+            <div className={`${isVisible ? 'animate-slide-in-left' : 'opacity-0'}`}>
               <div className="relative">
-                <div className="absolute inset-0 bg-[#c8ff00] blur-[120px] opacity-40 rounded-full animate-float"></div>
+                <div className="absolute inset-0 bg-[#c8ff00] blur-[100px] opacity-30 rounded-full"></div>
                 <img
-                  src="/neon-can.png"
-                  alt="NEON Energy Drink"
-                  className="relative z-10 max-w-md w-full h-auto neon-glow animate-float"
+                  src="/vending-machine.jpg"
+                  alt="NEON AI Vending Machine"
+                  className="relative z-10 rounded-2xl neon-border hover-glow"
                 />
               </div>
             </div>
 
-            {/* Right: Hero Text */}
+            {/* Franchise Info */}
             <div className={`space-y-6 ${isVisible ? 'animate-slide-in-right' : 'opacity-0'}`}>
-              <h2 className="text-5xl md:text-7xl font-black leading-tight">
-                THE <span className="text-[#c8ff00] neon-text">ENERGY</span> IS BACK
-              </h2>
+              <h3 className="text-5xl font-black">
+                EXCLUSIVE <span className="text-[#c8ff00] neon-text">FRANCHISE</span> OPPORTUNITY
+              </h3>
               <p className="text-xl text-gray-300 leading-relaxed">
-                NEON Energy Drink is relaunching. Experience the legendary taste
-                and energy boost that defined a generation. Pre-order now and be
-                among the first to get your hands on the new NEON.
+                Be the first to bring NEON's revolutionary AI-powered vending machines to your territory. 
+                Lock in exclusive licensing rights and build a profitable business with the energy drink 
+                that's taking the world by storm.
               </p>
-              <div className="flex gap-4 items-center">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-[#c8ff00] neon-text">8.4 fl oz</div>
-                  <div className="text-sm text-gray-400">Per Can</div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-[#0a0a0a] border border-[#c8ff00]/20 rounded-lg p-6 neon-border hover-lift">
+                  <Zap className="w-8 h-8 text-[#c8ff00] mb-3 neon-glow" />
+                  <div className="text-2xl font-bold text-[#c8ff00]">AI-Powered</div>
+                  <div className="text-sm text-gray-400">Smart inventory & sales</div>
                 </div>
-                <div className="h-12 w-px bg-[#c8ff00]/30"></div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-[#c8ff00] neon-text">24 Cans</div>
-                  <div className="text-sm text-gray-400">Per Case</div>
+                <div className="bg-[#0a0a0a] border border-[#c8ff00]/20 rounded-lg p-6 neon-border hover-lift">
+                  <MapPin className="w-8 h-8 text-[#c8ff00] mb-3 neon-glow" />
+                  <div className="text-2xl font-bold text-[#c8ff00]">Territory</div>
+                  <div className="text-sm text-gray-400">Exclusive rights</div>
+                </div>
+                <div className="bg-[#0a0a0a] border border-[#c8ff00]/20 rounded-lg p-6 neon-border hover-lift">
+                  <DollarSign className="w-8 h-8 text-[#c8ff00] mb-3 neon-glow" />
+                  <div className="text-2xl font-bold text-[#c8ff00]">Flexible</div>
+                  <div className="text-sm text-gray-400">Financing options</div>
+                </div>
+                <div className="bg-[#0a0a0a] border border-[#c8ff00]/20 rounded-lg p-6 neon-border hover-lift">
+                  <TrendingUp className="w-8 h-8 text-[#c8ff00] mb-3 neon-glow" />
+                  <div className="text-2xl font-bold text-[#c8ff00]">High ROI</div>
+                  <div className="text-sm text-gray-400">Proven model</div>
                 </div>
               </div>
+
               <Button
-                onClick={scrollToPreorder}
-                className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold text-lg py-6 px-8 neon-pulse transition-smooth"
+                onClick={() => setLocation("/franchise")}
+                className="w-full bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold text-xl py-8 neon-pulse"
               >
-                Pre-Order Now
+                Explore Territory Map & Pricing
               </Button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Why NEON Section */}
-      <section className="py-16 px-4 bg-gradient-to-b from-black to-[#0a0a0a] animated-bg">
+      {/* Quick Stats */}
+      <section className="py-16 px-4 animated-bg">
         <div className="container mx-auto max-w-6xl">
-          <h3 className="text-4xl md:text-5xl font-black text-center mb-12 animate-fade-in-up">
-            WHY <span className="text-[#c8ff00] neon-text">NEON?</span>
-          </h3>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center space-y-4 hover-lift animate-fade-in-up stagger-1">
-              <div className="w-16 h-16 mx-auto bg-[#c8ff00]/10 rounded-full flex items-center justify-center neon-border">
-                <Zap className="w-8 h-8 text-[#c8ff00] neon-glow" />
-              </div>
-              <h4 className="text-2xl font-bold text-[#c8ff00]">
-                Energy That Lasts
-              </h4>
-              <p className="text-gray-300">
-                100mg of natural caffeine from green tea provides sustained
-                energy without the crash. No jitters, just pure focus.
-              </p>
+          <div className="grid md:grid-cols-4 gap-6">
+            <div className="text-center space-y-2 hover-lift animate-fade-in-up stagger-1">
+              <div className="text-5xl font-black text-[#c8ff00] neon-text">48</div>
+              <div className="text-gray-400">States Covered</div>
             </div>
-            <div className="text-center space-y-4 hover-lift animate-fade-in-up stagger-2">
-              <div className="w-16 h-16 mx-auto bg-[#c8ff00]/10 rounded-full flex items-center justify-center neon-border">
-                <Heart className="w-8 h-8 text-[#c8ff00] neon-glow" />
-              </div>
-              <h4 className="text-2xl font-bold text-[#c8ff00]">
-                All Natural
-              </h4>
-              <p className="text-gray-300">
-                Made with real fruit juice and natural ingredients. No artificial
-                colors, flavors, or sweeteners. Just pure, clean energy.
-              </p>
+            <div className="text-center space-y-2 hover-lift animate-fade-in-up stagger-2">
+              <div className="text-5xl font-black text-[#c8ff00] neon-text">14</div>
+              <div className="text-gray-400">Countries</div>
             </div>
-            <div className="text-center space-y-4 hover-lift animate-fade-in-up stagger-3">
-              <div className="w-16 h-16 mx-auto bg-[#c8ff00]/10 rounded-full flex items-center justify-center neon-border">
-                <Sparkles className="w-8 h-8 text-[#c8ff00] neon-glow" />
-              </div>
-              <h4 className="text-2xl font-bold text-[#c8ff00]">
-                It Actually Glows
-              </h4>
-              <p className="text-gray-300">
-                Thanks to a naturally occurring element from the Cinchona tree,
-                NEON glows under blacklight. Energy never looked so good.
-              </p>
+            <div className="text-center space-y-2 hover-lift animate-fade-in-up stagger-3">
+              <div className="text-5xl font-black text-[#c8ff00] neon-text">15%</div>
+              <div className="text-gray-400">Global Reach</div>
+            </div>
+            <div className="text-center space-y-2 hover-lift animate-fade-in-up stagger-4">
+              <div className="text-5xl font-black text-[#c8ff00] neon-text">100+</div>
+              <div className="text-gray-400">Celebrity Fans</div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section className="py-16 px-4 bg-[#0a0a0a] animated-bg">
-        <div className="container mx-auto max-w-6xl">
-          <h3 className="text-4xl font-black text-center mb-12 animate-fade-in-up">
-            EVERYTHING YOU <span className="text-[#c8ff00] neon-text">NEED</span>
-          </h3>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="flex gap-4 items-start hover-lift neon-border rounded-lg p-6 bg-black/50 animate-fade-in-up stagger-1">
-              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1 neon-glow" />
-              <div>
-                <h4 className="text-lg font-bold text-white mb-1">
-                  Only 100 calories
-                </h4>
-                <p className="text-gray-400">
-                  Low calorie energy without compromising on taste
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-4 items-start hover-lift neon-border rounded-lg p-6 bg-black/50 animate-fade-in-up stagger-2">
-              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1 neon-glow" />
-              <div>
-                <h4 className="text-lg font-bold text-white mb-1">
-                  100mg natural caffeine
-                </h4>
-                <p className="text-gray-400">From Green Tea for smooth energy</p>
-              </div>
-            </div>
-            <div className="flex gap-4 items-start hover-lift neon-border rounded-lg p-6 bg-black/50 animate-fade-in-up stagger-3">
-              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1 neon-glow" />
-              <div>
-                <h4 className="text-lg font-bold text-white mb-1">
-                  Over 100% of 6 B Vitamins
-                </h4>
-                <p className="text-gray-400">
-                  Essential vitamins for energy metabolism
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-4 items-start hover-lift neon-border rounded-lg p-6 bg-black/50 animate-fade-in-up stagger-4">
-              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1 neon-glow" />
-              <div>
-                <h4 className="text-lg font-bold text-white mb-1">
-                  Natural sugar from fruit juice
-                </h4>
-                <p className="text-gray-400">24% real fruit juice blend</p>
-              </div>
-            </div>
-            <div className="flex gap-4 items-start hover-lift neon-border rounded-lg p-6 bg-black/50 animate-fade-in-up stagger-5">
-              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1 neon-glow" />
-              <div>
-                <h4 className="text-lg font-bold text-white mb-1">
-                  Proprietary antioxidant blend
-                </h4>
-                <p className="text-gray-400">For overall health support</p>
-              </div>
-            </div>
-            <div className="flex gap-4 items-start hover-lift neon-border rounded-lg p-6 bg-black/50 animate-fade-in-up stagger-6">
-              <Check className="w-6 h-6 text-[#c8ff00] flex-shrink-0 mt-1 neon-glow" />
-              <div>
-                <h4 className="text-lg font-bold text-white mb-1">
-                  Supports healthy metabolism
-                </h4>
-                <p className="text-gray-400">Designed for active lifestyles</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pre-Order Form Section */}
-      <section id="preorder-form" className="py-12 px-4 bg-gradient-to-b from-[#0a0a0a] to-black animated-bg">
-        <div className="container mx-auto max-w-2xl">
-          <Card className="bg-[#0a0a0a] border-[#c8ff00]/30 neon-border hover-lift">
-            <CardHeader>
-              <CardTitle className="text-3xl font-bold text-[#c8ff00] neon-text">
-                Pre-Order Now
-              </CardTitle>
-              <CardDescription className="text-gray-400">
-                Reserve your cases of NEON Energy Drink. Limited quantities
-                available for the relaunch.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Contact Information */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-[#c8ff00]">
-                    Contact Information
-                  </h3>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Full Name *</Label>
-                      <Input
-                        id="name"
-                        name="name"
-                        required
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email *</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
-                    />
-                  </div>
-                </div>
-
-                {/* Order Details */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-[#c8ff00]">
-                    Order Details
-                  </h3>
-                  <div className="space-y-2">
-                    <Label htmlFor="quantity">Number of Cases *</Label>
-                    <Input
-                      id="quantity"
-                      name="quantity"
-                      type="number"
-                      min="1"
-                      required
-                      value={formData.quantity}
-                      onChange={handleChange}
-                      className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
-                    />
-                    <p className="text-sm text-gray-400">
-                      Each case contains 24 cans (8.4 fl oz each)
-                    </p>
-                  </div>
-                </div>
-
-                {/* Shipping Address */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-[#c8ff00]">
-                    Shipping Address
-                  </h3>
-                  <div className="space-y-2">
-                    <Label htmlFor="address">Street Address *</Label>
-                    <Input
-                      id="address"
-                      name="address"
-                      required
-                      value={formData.address}
-                      onChange={handleChange}
-                      className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
-                    />
-                  </div>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="city">City *</Label>
-                      <Input
-                        id="city"
-                        name="city"
-                        required
-                        value={formData.city}
-                        onChange={handleChange}
-                        className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="state">State/Province *</Label>
-                      <Input
-                        id="state"
-                        name="state"
-                        required
-                        value={formData.state}
-                        onChange={handleChange}
-                        className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="postalCode">Postal/ZIP Code *</Label>
-                      <Input
-                        id="postalCode"
-                        name="postalCode"
-                        required
-                        value={formData.postalCode}
-                        onChange={handleChange}
-                        className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="country">Country *</Label>
-                      <Input
-                        id="country"
-                        name="country"
-                        required
-                        value={formData.country}
-                        onChange={handleChange}
-                        className="bg-black border-[#c8ff00]/30 text-white focus:border-[#c8ff00] transition-smooth"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Additional Notes */}
-                <div className="space-y-2">
-                  <Label htmlFor="notes">Additional Notes</Label>
-                  <Textarea
-                    id="notes"
-                    name="notes"
-                    value={formData.notes}
-                    onChange={handleChange}
-                    className="bg-black border-[#c8ff00]/30 text-white min-h-[100px] focus:border-[#c8ff00] transition-smooth"
-                    placeholder="Any special instructions or comments..."
-                  />
-                </div>
-
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  disabled={submitPreorder.isPending}
-                  className="w-full bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold text-lg py-6 neon-pulse transition-smooth"
-                >
-                  {submitPreorder.isPending ? "Submitting..." : "Submit Pre-Order"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
         </div>
       </section>
 

@@ -38,3 +38,24 @@
 -- [x] Add pulsing neon effects on CTAsAs
 - [ ] Add gradient animations and color shifts
 - [x] Implement scroll-triggered animations throughout
+
+## Crowdfunding & Franchise Platform Features
+
+- [x] Copy vending machine image to project assets
+- [x] Add countdown timer to homepage for relaunch date
+- [x] Create crowdfunding section with funding goals and progress
+- [x] Design database schema for territory licensing
+- [x] Build interactive map for territory selection
+- [x] Implement dynamic pricing based on territory size and demand
+- [x] Add short-term and long-term licensing options
+- [x] Create pricing calculator that adjusts with territory changes
+- [x] Implement deposit and financing options
+- [ ] Add user authentication for franchise applications
+- [x] Create franchise application form
+- [x] Build celebrity fan page with music video features
+- [x] Add celebrity endorsements section
+- [x] Showcase new can design prominently
+- [x] Create professional Hollywood-style design aesthetic
+- [x] Test all crowdfunding functionality
+- [x] Test territory licensing map interactions
+- [x] Test pricing calculations
