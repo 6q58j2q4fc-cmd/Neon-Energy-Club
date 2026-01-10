@@ -4,6 +4,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { notifyOwner } from "./_core/notification";
+import { isStripeConfigured, createCrowdfundingCheckout, createFranchiseCheckout } from "./stripe";
 
 export const appRouter = router({
   system: systemRouter,
@@ -123,8 +124,79 @@ export const appRouter = router({
       }),
   }),
 
+  payment: router({
+    // Check if Stripe is configured
+    isConfigured: publicProcedure.query(() => {
+      return { configured: isStripeConfigured() };
+    }),
+
+    // Create Stripe checkout for crowdfunding
+    createCrowdfundingCheckout: publicProcedure
+      .input(
+        z.object({
+          amount: z.number().int().min(100, "Minimum $1"),
+          tierName: z.string(),
+          name: z.string().min(1),
+          email: z.string().email(),
+          message: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (!isStripeConfigured()) {
+          throw new Error("Stripe is not configured. Please contact support.");
+        }
+
+        const origin = `${ctx.req.protocol}://${ctx.req.headers.host}`;
+        const result = await createCrowdfundingCheckout({
+          amount: input.amount,
+          tierName: input.tierName,
+          customerEmail: input.email,
+          customerName: input.name,
+          userId: ctx.user?.id,
+          message: input.message,
+          origin,
+        });
+
+        return result;
+      }),
+
+    // Create Stripe checkout for franchise deposit
+    createFranchiseCheckout: publicProcedure
+      .input(
+        z.object({
+          depositAmount: z.number().int().min(1),
+          totalCost: z.number().int().min(1),
+          territory: z.string().min(1),
+          squareMiles: z.number().int().min(10),
+          termMonths: z.number().int().min(6),
+          name: z.string().min(1),
+          email: z.string().email(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (!isStripeConfigured()) {
+          throw new Error("Stripe is not configured. Please contact support.");
+        }
+
+        const origin = `${ctx.req.protocol}://${ctx.req.headers.host}`;
+        const result = await createFranchiseCheckout({
+          depositAmount: input.depositAmount,
+          totalCost: input.totalCost,
+          territory: input.territory,
+          squareMiles: input.squareMiles,
+          termMonths: input.termMonths,
+          customerEmail: input.email,
+          customerName: input.name,
+          userId: ctx.user?.id,
+          origin,
+        });
+
+        return result;
+      }),
+  }),
+
   crowdfunding: router({
-    // Submit a crowdfunding contribution
+    // Submit a crowdfunding contribution (for non-Stripe flow)
     submit: publicProcedure
       .input(
         z.object({

@@ -76,3 +76,16 @@
 - [x] Polish all pages to marketing agency quality
 - [x] Write vitest tests for new procedures
 - [ ] Test Stripe payment flow end-to-end
+
+## Final Platform Features
+
+- [x] Create Stripe payment integration structure (ready for API keys)
+- [x] Add Stripe checkout for crowdfunding contributions
+- [x] Add Stripe checkout for franchise deposits
+- [x] Create FAQ/Contact page with common questions
+- [x] Add contact form on FAQ page
+- [x] Implement real-time social proof notification system
+- [x] Show recent backer notifications
+- [x] Show recent franchise application notifications
+- [x] Write vitest tests for new features
+- [ ] Test complete payment flow (when keys available)

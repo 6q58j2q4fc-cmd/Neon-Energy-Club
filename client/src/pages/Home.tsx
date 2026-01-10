@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { Zap, MapPin, DollarSign, Clock, TrendingUp, Users, Star, Play, ChevronDown, ArrowRight, Sparkles } from "lucide-react";
+import SocialProofNotifications from "@/components/SocialProofNotifications";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -47,9 +48,9 @@ export default function Home() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
+      <SocialProofNotifications />
       {/* Premium Header */}
       <header className="fixed top-0 w-full z-50 transition-all duration-500" style={{
         backgroundColor: scrollY > 50 ? 'rgba(0,0,0,0.95)' : 'transparent',

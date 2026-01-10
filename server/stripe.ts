@@ -1,0 +1,142 @@
+/**
+ * Stripe Integration
+ * 
+ * This module provides Stripe payment functionality.
+ * Requires STRIPE_SECRET_KEY to be configured in Settings → Payment.
+ */
+
+import { ENV } from "./_core/env";
+
+// Check if Stripe is configured
+export function isStripeConfigured(): boolean {
+  return !!(process.env.STRIPE_SECRET_KEY && process.env.VITE_STRIPE_PUBLISHABLE_KEY);
+}
+
+// Lazy-load Stripe only when configured
+let _stripe: any = null;
+
+async function getStripe() {
+  if (!isStripeConfigured()) {
+    throw new Error("Stripe is not configured. Please add your Stripe API keys in Settings → Payment.");
+  }
+
+  if (!_stripe) {
+    const Stripe = (await import("stripe")).default;
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+      apiVersion: "2025-12-15.clover",
+    });
+  }
+
+  return _stripe;
+}
+
+/**
+ * Create a Stripe Checkout Session for crowdfunding contributions
+ */
+export async function createCrowdfundingCheckout(params: {
+  amount: number;
+  tierName: string;
+  customerEmail: string;
+  customerName: string;
+  userId?: number;
+  message?: string;
+  origin: string;
+}): Promise<{ url: string }> {
+  const stripe = await getStripe();
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: [
+      {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: `NEON Crowdfunding - ${params.tierName}`,
+            description: "Support the NEON Energy Drink relaunch",
+            images: [`${params.origin}/neon-can.png`],
+          },
+          unit_amount: params.amount,
+        },
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    success_url: `${params.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${params.origin}/crowdfund`,
+    customer_email: params.customerEmail,
+    client_reference_id: params.userId?.toString(),
+    metadata: {
+      type: "crowdfunding",
+      tier_name: params.tierName,
+      customer_name: params.customerName,
+      customer_email: params.customerEmail,
+      user_id: params.userId?.toString() || "",
+      message: params.message || "",
+    },
+    allow_promotion_codes: true,
+  });
+
+  return { url: session.url! };
+}
+
+/**
+ * Create a Stripe Checkout Session for franchise deposits
+ */
+export async function createFranchiseCheckout(params: {
+  depositAmount: number;
+  totalCost: number;
+  territory: string;
+  squareMiles: number;
+  termMonths: number;
+  customerEmail: string;
+  customerName: string;
+  userId?: number;
+  origin: string;
+}): Promise<{ url: string }> {
+  const stripe = await getStripe();
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: [
+      {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: `NEON Franchise Deposit - ${params.territory}`,
+            description: `Territory: ${params.squareMiles} sq mi, Term: ${params.termMonths} months`,
+            images: [`${params.origin}/vending-machine.jpg`],
+          },
+          unit_amount: params.depositAmount * 100, // Convert to cents
+        },
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    success_url: `${params.origin}/success?session_id={CHECKOUT_SESSION_ID}&type=franchise`,
+    cancel_url: `${params.origin}/franchise`,
+    customer_email: params.customerEmail,
+    client_reference_id: params.userId?.toString(),
+    metadata: {
+      type: "franchise",
+      territory: params.territory,
+      square_miles: params.squareMiles.toString(),
+      term_months: params.termMonths.toString(),
+      total_cost: params.totalCost.toString(),
+      deposit_amount: params.depositAmount.toString(),
+      customer_name: params.customerName,
+      customer_email: params.customerEmail,
+      user_id: params.userId?.toString() || "",
+    },
+    allow_promotion_codes: true,
+  });
+
+  return { url: session.url! };
+}
+
+/**
+ * Retrieve a Checkout Session
+ */
+export async function getCheckoutSession(sessionId: string) {
+  const stripe = await getStripe();
+  return await stripe.checkout.sessions.retrieve(sessionId);
+}
