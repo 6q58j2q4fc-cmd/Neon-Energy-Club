@@ -182,3 +182,17 @@
 - [x] Add blog topics: NEON benefits, distributor success, micro-franchise system
 - [x] Integrate blog with main navigation
 
+
+## Bug Fixes & UX Improvements
+
+### Mobile Menu Fix
+- [x] Fix mobile hamburger menu not showing on iPhone
+- [x] Ensure mobile menu is accessible and functional on all devices
+
+### Popup UX Improvements
+- [x] Add "No thanks" link below popup form for easy dismissal
+- [x] Fix popup X button to properly close the dialog
+- [x] Implement frequency limiting (max 1 popup per session, max 3 per week)
+- [x] Add cookie to track if user has already subscribed
+- [x] Don't show popup to already subscribed users
+- [x] Store subscriber status in localStorage/cookie

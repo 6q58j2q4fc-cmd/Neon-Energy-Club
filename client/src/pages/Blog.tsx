@@ -2,6 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { Zap, Calendar, Eye, ArrowRight, Clock, Tag, Search, Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
 import { useState } from "react";
@@ -93,6 +94,33 @@ export default function Blog() {
             </div>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="lg:hidden bg-black/95 backdrop-blur-xl border-t border-white/10 fixed top-[72px] left-0 right-0 z-40"
+            >
+              <nav className="container mx-auto px-6 py-4 flex flex-col gap-2">
+                {navItems.map((item) => (
+                  <button
+                    key={item.path}
+                    onClick={() => {
+                      setLocation(item.path);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="py-3 px-4 text-left text-white/80 hover:text-[#b8e600] hover:bg-white/5 rounded-lg transition-all"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* Hero Section */}

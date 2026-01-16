@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { Zap, MapPin, DollarSign, Clock, TrendingUp, Users, Star, Sparkles, ArrowRight, Gift, Target, Trophy, Menu, X, ChevronDown, Play, Shield, Leaf, Heart } from "lucide-react";
 import SocialProofNotifications from "@/components/SocialProofNotifications";
-import ViralNewsletterPopup from "@/components/ViralNewsletterPopup";
+import ViralNewsletterPopup, { shouldShowPopup, markPopupShown } from "@/components/ViralNewsletterPopup";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
 import { motion, AnimatePresence } from "framer-motion";
@@ -30,7 +30,9 @@ export default function Home() {
     setIsVisible(true);
     
     const newsletterTimer = setTimeout(() => {
-      setShowNewsletter(true);
+      if (shouldShowPopup()) {
+        setShowNewsletter(true);
+      }
     }, 5000);
     
     const handleScroll = () => setScrollY(window.scrollY);
@@ -161,7 +163,7 @@ export default function Home() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-black/95 backdrop-blur-xl border-t border-white/10"
+              className="lg:hidden bg-black/95 backdrop-blur-xl border-t border-white/10 fixed top-[72px] left-0 right-0 z-40"
             >
               <nav className="container mx-auto px-6 py-4 flex flex-col gap-2">
                 {navItems.map((item) => (
