@@ -89,3 +89,24 @@
 - [x] Show recent franchise application notifications
 - [x] Write vitest tests for new features
 - [ ] Test complete payment flow (when keys available)
+
+## Viral Marketing & MLM System
+
+- [x] Design database schema for MLM/micro-franchising system
+- [x] Create viral newsletter referral component
+- [x] Implement 2-tier discount system (email + 3 friends)
+- [ ] Add premium fruit splash imagery and animations
+- [x] Enhance visual design to world-class beverage website standards
+- [x] Add high-definition product imagery with liquid effects
+- [x] Create distributor vs customer signup flow
+- [x] Build distributor dashboard with sales tracking
+- [x] Implement affiliate link generation system
+- [x] Create commission calculation engine
+- [x] Build team/downline management interface
+- [x] Add genealogy tree visualization
+- [x] Create custom sub-website generator for distributors
+- [x] Implement rank advancement system
+- [x] Add earnings/payout tracking
+- [ ] Create distributor training resources section
+- [x] Write vitest tests for MLM features
+- [x] Test complete viral referral flow

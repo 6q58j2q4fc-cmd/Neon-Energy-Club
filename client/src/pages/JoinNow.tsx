@@ -1,0 +1,313 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { getLoginUrl } from "@/const";
+import { useLocation } from "wouter";
+import { Check, Users, ShoppingCart, TrendingUp, DollarSign, Gift, Sparkles, ArrowRight, Zap } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
+
+export default function JoinNow() {
+  const { user, loading } = useAuth();
+  const [, setLocation] = useLocation();
+  const [accountType, setAccountType] = useState<"customer" | "distributor" | null>(null);
+  const [step, setStep] = useState<"choose" | "signup">("choose");
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-[#c8ff00] text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user && step === "signup") {
+    window.location.href = getLoginUrl();
+    return null;
+  }
+
+  const handleChooseType = (type: "customer" | "distributor") => {
+    setAccountType(type);
+    if (!user) {
+      window.location.href = getLoginUrl();
+    } else {
+      setStep("signup");
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-white">
+      {/* Header */}
+      <header className="border-b border-[#c8ff00]/20 py-4">
+        <div className="container px-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setLocation("/")}>
+              <div className="w-10 h-10 rounded-lg bg-[#c8ff00] flex items-center justify-center">
+                <Zap className="w-6 h-6 text-black" />
+              </div>
+              <span className="text-xl font-black neon-text">NEON®</span>
+            </div>
+            <Button variant="outline" onClick={() => setLocation("/")} className="border-[#c8ff00]/30 text-white">
+              Back to Home
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Choose Account Type */}
+      {step === "choose" && (
+        <section className="py-20">
+          <div className="container px-6">
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-16">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c8ff00]/10 border border-[#c8ff00]/30 mb-6">
+                  <Sparkles className="w-4 h-4 text-[#c8ff00]" />
+                  <span className="text-[#c8ff00] font-bold text-sm">JOIN THE MOVEMENT</span>
+                </div>
+                <h1 className="text-6xl font-black mb-4">
+                  CHOOSE YOUR <span className="text-[#c8ff00] neon-text">PATH</span>
+                </h1>
+                <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+                  Whether you're here to fuel your lifestyle or build a business, we've got you covered
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8">
+                {/* Customer Card */}
+                <Card className="bg-gradient-to-br from-[#0a0a0a] to-black border-[#c8ff00]/30 hover:border-[#c8ff00] transition-all duration-300 group cursor-pointer"
+                  onClick={() => handleChooseType("customer")}>
+                  <CardHeader className="text-center pb-8">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#c8ff00]/10 mb-6 mx-auto group-hover:bg-[#c8ff00]/20 transition-colors">
+                      <ShoppingCart className="w-10 h-10 text-[#c8ff00]" />
+                    </div>
+                    <CardTitle className="text-3xl font-black mb-2">CUSTOMER</CardTitle>
+                    <CardDescription className="text-gray-400 text-lg">
+                      Enjoy exclusive perks and member pricing
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                      {[
+                        "Member-only discounts",
+                        "Early access to new flavors",
+                        "Free shipping on orders $50+",
+                        "Exclusive merchandise",
+                        "VIP event invitations",
+                      ].map((benefit, index) => (
+                        <div key={index} className="flex items-center gap-3">
+                          <Check className="w-5 h-5 text-[#c8ff00] flex-shrink-0" />
+                          <span className="text-gray-300">{benefit}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <Button
+                      onClick={() => handleChooseType("customer")}
+                      className="w-full bg-[#c8ff00]/10 text-[#c8ff00] hover:bg-[#c8ff00]/20 border border-[#c8ff00]/30 font-bold h-12"
+                    >
+                      Join as Customer
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Distributor Card */}
+                <Card className="bg-gradient-to-br from-[#c8ff00]/10 via-[#0a0a0a] to-black border-2 border-[#c8ff00] relative overflow-hidden group cursor-pointer"
+                  onClick={() => handleChooseType("distributor")}>
+                  {/* Popular Badge */}
+                  <div className="absolute top-4 right-4 px-3 py-1 bg-[#c8ff00] text-black text-xs font-black rounded-full">
+                    MOST POPULAR
+                  </div>
+
+                  <CardHeader className="text-center pb-8">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#c8ff00]/20 mb-6 mx-auto group-hover:bg-[#c8ff00]/30 transition-colors neon-glow">
+                      <TrendingUp className="w-10 h-10 text-[#c8ff00]" />
+                    </div>
+                    <CardTitle className="text-3xl font-black mb-2 text-[#c8ff00]">DISTRIBUTOR</CardTitle>
+                    <CardDescription className="text-gray-300 text-lg">
+                      Build your business and earn unlimited income
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                      {[
+                        "Earn up to 40% commission",
+                        "Build your own team",
+                        "Custom branded website",
+                        "Marketing tools & training",
+                        "Passive income potential",
+                        "Exclusive distributor events",
+                      ].map((benefit, index) => (
+                        <div key={index} className="flex items-center gap-3">
+                          <Check className="w-5 h-5 text-[#c8ff00] flex-shrink-0" />
+                          <span className="text-white font-semibold">{benefit}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <Button
+                      onClick={() => handleChooseType("distributor")}
+                      className="w-full bg-[#c8ff00] text-black hover:bg-[#a8d600] font-black h-12 neon-pulse"
+                    >
+                      Become a Distributor
+                      <Sparkles className="w-5 h-5 ml-2" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Comparison Table */}
+              <div className="mt-16 bg-[#0a0a0a] border border-[#c8ff00]/30 rounded-2xl p-8">
+                <h3 className="text-2xl font-black text-center mb-8">FEATURE COMPARISON</h3>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div className="text-gray-500 font-bold">FEATURE</div>
+                  <div className="text-white font-bold">CUSTOMER</div>
+                  <div className="text-[#c8ff00] font-bold">DISTRIBUTOR</div>
+
+                  <div className="text-left text-gray-400">Member Discounts</div>
+                  <div><Check className="w-5 h-5 text-[#c8ff00] mx-auto" /></div>
+                  <div><Check className="w-5 h-5 text-[#c8ff00] mx-auto" /></div>
+
+                  <div className="text-left text-gray-400">Earn Commissions</div>
+                  <div className="text-gray-600">—</div>
+                  <div><Check className="w-5 h-5 text-[#c8ff00] mx-auto" /></div>
+
+                  <div className="text-left text-gray-400">Build Team</div>
+                  <div className="text-gray-600">—</div>
+                  <div><Check className="w-5 h-5 text-[#c8ff00] mx-auto" /></div>
+
+                  <div className="text-left text-gray-400">Custom Website</div>
+                  <div className="text-gray-600">—</div>
+                  <div><Check className="w-5 h-5 text-[#c8ff00] mx-auto" /></div>
+
+                  <div className="text-left text-gray-400">Training & Support</div>
+                  <div className="text-gray-400 text-sm">Basic</div>
+                  <div className="text-[#c8ff00] text-sm font-bold">Premium</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Signup Form (shown after choosing type and logging in) */}
+      {step === "signup" && user && accountType === "distributor" && (
+        <DistributorSignupForm user={user} />
+      )}
+    </div>
+  );
+}
+
+function DistributorSignupForm({ user }: { user: any }) {
+  const [, setLocation] = useLocation();
+  const [sponsorCode, setSponsorCode] = useState("");
+  
+  const enrollDistributor = trpc.distributor.enroll.useMutation({
+    onSuccess: () => {
+      toast.success("Welcome to the NEON family! Your distributor account is active.");
+      setLocation("/distributor/dashboard");
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to enroll");
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    enrollDistributor.mutate({ sponsorCode: sponsorCode || undefined });
+  };
+
+  return (
+    <section className="py-20">
+      <div className="container px-6">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-5xl font-black mb-4">
+              COMPLETE YOUR <span className="text-[#c8ff00] neon-text">ENROLLMENT</span>
+            </h2>
+            <p className="text-xl text-gray-400">
+              You're one step away from building your NEON business
+            </p>
+          </div>
+
+          <Card className="bg-gradient-to-br from-[#0a0a0a] to-black border-[#c8ff00]/30">
+            <CardHeader>
+              <CardTitle className="text-2xl font-black">Distributor Information</CardTitle>
+              <CardDescription>Your account details are pre-filled from your profile</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <Label>Name</Label>
+                  <Input
+                    value={user.name || ""}
+                    disabled
+                    className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input
+                    value={user.email || ""}
+                    disabled
+                    className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="sponsorCode">Sponsor Code (Optional)</Label>
+                  <Input
+                    id="sponsorCode"
+                    type="text"
+                    placeholder="Enter your sponsor's code"
+                    value={sponsorCode}
+                    onChange={(e) => setSponsorCode(e.target.value)}
+                    className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white placeholder:text-gray-500 focus:border-[#c8ff00]"
+                  />
+                  <p className="text-sm text-gray-500">
+                    If you were referred by someone, enter their code here
+                  </p>
+                </div>
+
+                <div className="bg-[#c8ff00]/10 border border-[#c8ff00]/30 rounded-lg p-6">
+                  <h4 className="font-bold text-[#c8ff00] mb-3">What happens next?</h4>
+                  <ul className="space-y-2 text-sm text-gray-300">
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-[#c8ff00] mt-0.5 flex-shrink-0" />
+                      <span>Instant access to your distributor dashboard</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-[#c8ff00] mt-0.5 flex-shrink-0" />
+                      <span>Unique distributor code and custom website</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-[#c8ff00] mt-0.5 flex-shrink-0" />
+                      <span>Complete training materials and marketing tools</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-[#c8ff00] mt-0.5 flex-shrink-0" />
+                      <span>Start earning commissions immediately</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={enrollDistributor.isPending}
+                  className="w-full bg-[#c8ff00] text-black hover:bg-[#a8d600] font-black h-14 text-lg neon-pulse"
+                >
+                  {enrollDistributor.isPending ? "Enrolling..." : "Activate My Distributor Account"}
+                  <Sparkles className="w-6 h-6 ml-2" />
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </section>
+  );
+}

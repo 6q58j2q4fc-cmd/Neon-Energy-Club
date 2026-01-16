@@ -13,6 +13,9 @@ import About from "./pages/About";
 import Products from "./pages/Products";
 import Crowdfund from "./pages/Crowdfund";
 import FAQ from "./pages/FAQ";
+import JoinNow from "./pages/JoinNow";
+import DistributorDashboard from "./pages/DistributorDashboard";
+import DistributorSite from "./pages/DistributorSite";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -27,6 +30,9 @@ function Router() {
       <Route path={"/celebrities"} component={Celebrities} />
       <Route path={"/crowdfund"} component={Crowdfund} />
       <Route path={"/faq"} component={FAQ} />
+      <Route path={"/join"} component={JoinNow} />
+      <Route path={"/distributor/dashboard"} component={DistributorDashboard} />
+      <Route path={"/d/:code"} component={DistributorSite} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -260,6 +260,97 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+
+  newsletter: router({
+    // Subscribe to newsletter with email
+    subscribe: publicProcedure
+      .input(
+        z.object({
+          email: z.string().email("Valid email is required"),
+          name: z.string().min(1, "Name is required"),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { subscribeNewsletter } = await import("./db");
+        const subscription = await subscribeNewsletter(input);
+        return subscription;
+      }),
+
+    // Add friend referrals
+    addReferrals: publicProcedure
+      .input(
+        z.object({
+          subscriptionId: z.number().int(),
+          friendEmails: z.array(z.string().email()),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { addNewsletterReferrals } = await import("./db");
+        await addNewsletterReferrals(input.subscriptionId, input.friendEmails);
+        return { success: true };
+      }),
+
+    // Get subscription stats
+    stats: publicProcedure.query(async () => {
+      const { getNewsletterStats } = await import("./db");
+      return await getNewsletterStats();
+    }),
+  }),
+
+  distributor: router({
+    // Enroll as distributor
+    enroll: protectedProcedure
+      .input(
+        z.object({
+          sponsorCode: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const { enrollDistributor } = await import("./db");
+        const distributor = await enrollDistributor({
+          userId: ctx.user.id,
+          sponsorCode: input.sponsorCode,
+        });
+        return distributor;
+      }),
+
+    // Get current distributor info
+    me: protectedProcedure.query(async ({ ctx }) => {
+      const { getDistributorByUserId } = await import("./db");
+      return await getDistributorByUserId(ctx.user.id);
+    }),
+
+    // Get distributor dashboard stats
+    stats: protectedProcedure.query(async ({ ctx }) => {
+      const { getDistributorStats } = await import("./db");
+      return await getDistributorStats(ctx.user.id);
+    }),
+
+    // Get team members (downline)
+    team: protectedProcedure.query(async ({ ctx }) => {
+      const { getDistributorTeam } = await import("./db");
+      return await getDistributorTeam(ctx.user.id);
+    }),
+
+    // Generate affiliate link
+    createAffiliateLink: protectedProcedure
+      .input(
+        z.object({
+          campaignName: z.string().optional(),
+          targetPath: z.string().default("/"),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const { createAffiliateLink } = await import("./db");
+        return await createAffiliateLink(ctx.user.id, input);
+      }),
+
+    // Get all affiliate links
+    affiliateLinks: protectedProcedure.query(async ({ ctx }) => {
+      const { getAffiliateLinks } = await import("./db");
+      return await getAffiliateLinks(ctx.user.id);
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

@@ -129,3 +129,145 @@ export const territoryLicenses = mysqlTable("territory_licenses", {
 
 export type TerritoryLicense = typeof territoryLicenses.$inferSelect;
 export type InsertTerritoryLicense = typeof territoryLicenses.$inferInsert;
+/**
+ * Distributors table for micro-franchising system.
+ * Tracks distributor accounts, ranks, and sponsor relationships.
+ */
+export const distributors = mysqlTable("distributors", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User ID (foreign key to users table) */
+  userId: int("userId").notNull().unique(),
+  /** Sponsor/upline distributor ID */
+  sponsorId: int("sponsorId"),
+  /** Unique distributor code for affiliate links */
+  distributorCode: varchar("distributorCode", { length: 50 }).notNull().unique(),
+  /** Current rank/level */
+  rank: mysqlEnum("rank", ["starter", "bronze", "silver", "gold", "platinum", "diamond"]).default("starter").notNull(),
+  /** Total personal sales volume */
+  personalSales: int("personalSales").default(0).notNull(),
+  /** Total team sales volume */
+  teamSales: int("teamSales").default(0).notNull(),
+  /** Total earnings */
+  totalEarnings: int("totalEarnings").default(0).notNull(),
+  /** Available balance for withdrawal */
+  availableBalance: int("availableBalance").default(0).notNull(),
+  /** Account status */
+  status: mysqlEnum("status", ["active", "inactive", "suspended"]).default("active").notNull(),
+  /** Enrollment timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Last update timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Distributor = typeof distributors.$inferSelect;
+export type InsertDistributor = typeof distributors.$inferInsert;
+
+/**
+ * Sales table for tracking all transactions.
+ * Records both retail and distributor purchases.
+ */
+export const sales = mysqlTable("sales", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Distributor ID who made the sale */
+  distributorId: int("distributorId"),
+  /** Customer user ID (if registered) */
+  customerId: int("customerId"),
+  /** Customer email */
+  customerEmail: varchar("customerEmail", { length: 320 }).notNull(),
+  /** Order total in cents */
+  orderTotal: int("orderTotal").notNull(),
+  /** Commission volume (BV - Business Volume) */
+  commissionVolume: int("commissionVolume").notNull(),
+  /** Sale type */
+  saleType: mysqlEnum("saleType", ["retail", "distributor", "autoship"]).default("retail").notNull(),
+  /** Payment status */
+  paymentStatus: mysqlEnum("paymentStatus", ["pending", "completed", "refunded"]).default("pending").notNull(),
+  /** Order details (JSON) */
+  orderDetails: text("orderDetails"),
+  /** Sale timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Sale = typeof sales.$inferSelect;
+export type InsertSale = typeof sales.$inferInsert;
+
+/**
+ * Commissions table for tracking earned commissions.
+ * Records all commission payouts across the genealogy tree.
+ */
+export const commissions = mysqlTable("commissions", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Distributor ID earning the commission */
+  distributorId: int("distributorId").notNull(),
+  /** Sale ID that generated this commission */
+  saleId: int("saleId").notNull(),
+  /** Source distributor ID (who made the sale) */
+  sourceDistributorId: int("sourceDistributorId"),
+  /** Commission type */
+  commissionType: mysqlEnum("commissionType", ["direct", "team", "rank_bonus", "leadership"]).notNull(),
+  /** Commission level (1 = direct, 2+ = downline levels) */
+  level: int("level").notNull(),
+  /** Commission amount in cents */
+  amount: int("amount").notNull(),
+  /** Commission percentage applied */
+  percentage: int("percentage").notNull(),
+  /** Payout status */
+  status: mysqlEnum("status", ["pending", "paid", "cancelled"]).default("pending").notNull(),
+  /** Commission earned timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Commission = typeof commissions.$inferSelect;
+export type InsertCommission = typeof commissions.$inferInsert;
+
+/**
+ * Newsletter subscriptions with viral referral tracking.
+ * Tracks email signups and friend referrals for discount tiers.
+ */
+export const newsletterSubscriptions = mysqlTable("newsletter_subscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Subscriber email */
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  /** Subscriber name */
+  name: varchar("name", { length: 255 }),
+  /** Referrer subscription ID (who referred this person) */
+  referrerId: int("referrerId"),
+  /** Discount tier earned (0 = base, 1 = email signup, 2 = 3 friends) */
+  discountTier: int("discountTier").default(1).notNull(),
+  /** Total referrals made */
+  referralCount: int("referralCount").default(0).notNull(),
+  /** Subscription status */
+  status: mysqlEnum("status", ["active", "unsubscribed"]).default("active").notNull(),
+  /** Subscription timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type NewsletterSubscription = typeof newsletterSubscriptions.$inferSelect;
+export type InsertNewsletterSubscription = typeof newsletterSubscriptions.$inferInsert;
+
+/**
+ * Affiliate links table for tracking custom distributor URLs.
+ * Stores generated affiliate links and click/conversion tracking.
+ */
+export const affiliateLinks = mysqlTable("affiliate_links", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Distributor ID who owns this link */
+  distributorId: int("distributorId").notNull(),
+  /** Unique link code */
+  linkCode: varchar("linkCode", { length: 50 }).notNull().unique(),
+  /** Campaign name/description */
+  campaignName: varchar("campaignName", { length: 255 }),
+  /** Target URL path */
+  targetPath: varchar("targetPath", { length: 500 }).default("/").notNull(),
+  /** Total clicks */
+  clicks: int("clicks").default(0).notNull(),
+  /** Total conversions */
+  conversions: int("conversions").default(0).notNull(),
+  /** Link status */
+  status: mysqlEnum("status", ["active", "inactive"]).default("active").notNull(),
+  /** Creation timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AffiliateLink = typeof affiliateLinks.$inferSelect;
+export type InsertAffiliateLink = typeof affiliateLinks.$inferInsert;
