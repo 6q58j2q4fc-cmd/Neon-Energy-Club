@@ -1,4 +1,4 @@
-import { desc, eq, sql } from "drizzle-orm";
+import { desc, eq, sql, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -625,4 +625,100 @@ export async function checkRankAdvancement(userId: number) {
   }
   
   return { advanced: false };
+}
+
+// ============ Blog Functions ============
+
+export async function getBlogPosts(category?: string, limit: number = 10) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { blogPosts } = await import("../drizzle/schema");
+  
+  let query = db.select().from(blogPosts).where(eq(blogPosts.status, "published"));
+  
+  if (category) {
+    const results = await db.select().from(blogPosts)
+      .where(and(eq(blogPosts.status, "published"), eq(blogPosts.category, category as any)))
+      .orderBy(desc(blogPosts.publishedAt))
+      .limit(limit);
+    return results;
+  }
+  
+  const results = await db.select().from(blogPosts)
+    .where(eq(blogPosts.status, "published"))
+    .orderBy(desc(blogPosts.publishedAt))
+    .limit(limit);
+  return results;
+}
+
+export async function getBlogPostBySlug(slug: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { blogPosts } = await import("../drizzle/schema");
+  
+  // Increment view count
+  await db.update(blogPosts)
+    .set({ views: sql`views + 1` })
+    .where(eq(blogPosts.slug, slug));
+  
+  const results = await db.select().from(blogPosts)
+    .where(eq(blogPosts.slug, slug))
+    .limit(1);
+  
+  return results[0] || null;
+}
+
+export async function createBlogPost(data: {
+  title: string;
+  slug: string;
+  excerpt?: string;
+  content: string;
+  category: "product" | "health" | "business" | "franchise" | "distributor" | "news" | "lifestyle";
+  metaTitle?: string;
+  metaDescription?: string;
+  keywords?: string;
+  featuredImage?: string;
+  status?: "draft" | "published";
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { blogPosts } = await import("../drizzle/schema");
+  
+  await db.insert(blogPosts).values({
+    ...data,
+    publishedAt: data.status === "published" ? new Date() : null,
+  });
+  
+  return { success: true };
+}
+
+export async function updateBlogPost(id: number, data: {
+  title?: string;
+  excerpt?: string;
+  content?: string;
+  category?: "product" | "health" | "business" | "franchise" | "distributor" | "news" | "lifestyle";
+  metaTitle?: string;
+  metaDescription?: string;
+  keywords?: string;
+  featuredImage?: string;
+  status?: "draft" | "published" | "archived";
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { blogPosts } = await import("../drizzle/schema");
+  
+  const updateData: any = { ...data };
+  if (data.status === "published") {
+    updateData.publishedAt = new Date();
+  }
+  
+  await db.update(blogPosts)
+    .set(updateData)
+    .where(eq(blogPosts.id, id));
+  
+  return { success: true };
 }

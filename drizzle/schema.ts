@@ -334,3 +334,50 @@ export const autoShipSubscriptions = mysqlTable("autoShipSubscriptions", {
 
 export type AutoShipSubscription = typeof autoShipSubscriptions.$inferSelect;
 export type InsertAutoShipSubscription = typeof autoShipSubscriptions.$inferInsert;
+
+/**
+ * Blog posts table for automated content generation.
+ * Stores AI-generated blog posts about NEON energy drink.
+ */
+export const blogPosts = mysqlTable("blog_posts", {
+  id: int("id").autoincrement().primaryKey(),
+  /** URL-friendly slug */
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  /** Post title */
+  title: varchar("title", { length: 500 }).notNull(),
+  /** Short excerpt/summary */
+  excerpt: text("excerpt"),
+  /** Full post content in markdown */
+  content: text("content").notNull(),
+  /** Featured image URL */
+  featuredImage: varchar("featuredImage", { length: 500 }),
+  /** Post category */
+  category: mysqlEnum("category", [
+    "product",
+    "health",
+    "business",
+    "franchise",
+    "distributor",
+    "news",
+    "lifestyle"
+  ]).default("product").notNull(),
+  /** SEO meta title */
+  metaTitle: varchar("metaTitle", { length: 255 }),
+  /** SEO meta description */
+  metaDescription: text("metaDescription"),
+  /** SEO keywords */
+  keywords: text("keywords"),
+  /** Post status */
+  status: mysqlEnum("status", ["draft", "published", "archived"]).default("draft").notNull(),
+  /** Author name */
+  author: varchar("author", { length: 255 }).default("NEON Team"),
+  /** View count */
+  views: int("views").default(0),
+  /** Published date */
+  publishedAt: timestamp("publishedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BlogPost = typeof blogPosts.$inferSelect;
+export type InsertBlogPost = typeof blogPosts.$inferInsert;

@@ -19,6 +19,7 @@ import DistributorSite from "./pages/DistributorSite";
 import Shop from "./pages/Shop";
 import Compensation from "./pages/Compensation";
 import DistributorPortal from "./pages/DistributorPortal";
+import Blog from "./pages/Blog";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -39,6 +40,8 @@ function Router() {
       <Route path={"/shop"} component={Shop} />
       <Route path={"/compensation"} component={Compensation} />
       <Route path={"/portal"} component={DistributorPortal} />
+      <Route path={"/blog"} component={Blog} />
+      <Route path={"/blog/:slug"} component={Blog} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -351,6 +351,86 @@ export const appRouter = router({
       return await getAffiliateLinks(ctx.user.id);
     }),
   }),
+
+  blog: router({
+    // List published blog posts
+    list: publicProcedure
+      .input(
+        z.object({
+          category: z.string().optional(),
+          limit: z.number().int().min(1).max(50).default(10),
+        }).optional()
+      )
+      .query(async ({ input }) => {
+        const { getBlogPosts } = await import("./db");
+        return await getBlogPosts(input?.category, input?.limit || 10);
+      }),
+
+    // Get single blog post by slug
+    get: publicProcedure
+      .input(z.object({ slug: z.string() }))
+      .query(async ({ input }) => {
+        const { getBlogPostBySlug } = await import("./db");
+        return await getBlogPostBySlug(input.slug);
+      }),
+
+    // Admin: Create blog post
+    create: protectedProcedure
+      .input(
+        z.object({
+          title: z.string().min(1),
+          slug: z.string().min(1),
+          excerpt: z.string().optional(),
+          content: z.string().min(1),
+          category: z.enum(["product", "health", "business", "franchise", "distributor", "news", "lifestyle"]),
+          metaTitle: z.string().optional(),
+          metaDescription: z.string().optional(),
+          keywords: z.string().optional(),
+          featuredImage: z.string().optional(),
+          status: z.enum(["draft", "published"]).default("draft"),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized: Admin access required");
+        }
+        const { createBlogPost } = await import("./db");
+        return await createBlogPost(input);
+      }),
+
+    // Admin: Update blog post
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number().int(),
+          title: z.string().optional(),
+          excerpt: z.string().optional(),
+          content: z.string().optional(),
+          category: z.enum(["product", "health", "business", "franchise", "distributor", "news", "lifestyle"]).optional(),
+          metaTitle: z.string().optional(),
+          metaDescription: z.string().optional(),
+          keywords: z.string().optional(),
+          featuredImage: z.string().optional(),
+          status: z.enum(["draft", "published", "archived"]).optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized: Admin access required");
+        }
+        const { updateBlogPost } = await import("./db");
+        return await updateBlogPost(input.id, input);
+      }),
+
+    // Admin: Generate blog post using AI
+    generate: protectedProcedure.mutation(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new Error("Unauthorized: Admin access required");
+      }
+      const { generateBlogPost } = await import("./blogGenerator");
+      return await generateBlogPost();
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
