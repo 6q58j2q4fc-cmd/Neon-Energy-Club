@@ -79,9 +79,8 @@ export default function ViralNewsletterPopup({ open, onClose }: ViralNewsletterP
     setSubscriptionId(null);
     onClose();
   };
-
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="sm:max-w-[600px] bg-black border-2 border-[#c8ff00] p-0 overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-black via-[#0a0a0a] to-black opacity-95"></div>

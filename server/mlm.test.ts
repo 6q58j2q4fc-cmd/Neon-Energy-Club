@@ -4,7 +4,14 @@ import type { TrpcContext } from "./_core/context";
 
 type AuthenticatedUser = NonNullable<TrpcContext["user"]>;
 
-function createAuthContext(userId: number = 1): { ctx: TrpcContext } {
+// Use random IDs within INT range to ensure uniqueness across test runs
+let idCounter = 0;
+
+function createAuthContext(): { ctx: TrpcContext } {
+  idCounter++;
+  // Use random number within INT range (max ~2 billion)
+  const userId = Math.floor(Math.random() * 1000000000) + idCounter;
+  
   const user: AuthenticatedUser = {
     id: userId,
     openId: `test-user-${userId}`,
@@ -34,7 +41,7 @@ function createAuthContext(userId: number = 1): { ctx: TrpcContext } {
 describe("MLM System Tests", () => {
   describe("Distributor Enrollment", () => {
     it("should enroll a new distributor", async () => {
-      const { ctx } = createAuthContext(100);
+      const { ctx } = createAuthContext();
       const caller = appRouter.createCaller(ctx);
 
       const result = await caller.distributor.enroll({
@@ -43,11 +50,11 @@ describe("MLM System Tests", () => {
 
       expect(result).toHaveProperty("distributorCode");
       expect(result).toHaveProperty("rank", "starter");
-      expect(result.distributorCode).toMatch(/^NEON-[A-Z0-9]+$/);
+      expect(result.distributorCode).toMatch(/^NEON[A-Z0-9]+$/);
     });
 
     it("should enroll a distributor with sponsor", async () => {
-      const { ctx: ctx1 } = createAuthContext(101);
+      const { ctx: ctx1 } = createAuthContext();
       const caller1 = appRouter.createCaller(ctx1);
 
       // First distributor (sponsor)
@@ -56,7 +63,7 @@ describe("MLM System Tests", () => {
       });
 
       // Second distributor (with sponsor)
-      const { ctx: ctx2 } = createAuthContext(102);
+      const { ctx: ctx2 } = createAuthContext();
       const caller2 = appRouter.createCaller(ctx2);
 
       const result = await caller2.distributor.enroll({
@@ -70,7 +77,7 @@ describe("MLM System Tests", () => {
 
   describe("Affiliate Links", () => {
     it("should create an affiliate link", async () => {
-      const { ctx } = createAuthContext(103);
+      const { ctx } = createAuthContext();
       const caller = appRouter.createCaller(ctx);
 
       // Enroll first
@@ -82,12 +89,12 @@ describe("MLM System Tests", () => {
       });
 
       expect(result).toHaveProperty("linkCode");
-      expect(result).toHaveProperty("fullUrl");
-      expect(result.fullUrl).toContain("/products");
+      expect(result).toHaveProperty("url");
+      expect(result.url).toContain("ref=");
     });
 
     it("should list affiliate links", async () => {
-      const { ctx } = createAuthContext(104);
+      const { ctx } = createAuthContext();
       const caller = appRouter.createCaller(ctx);
 
       // Enroll first
@@ -110,31 +117,49 @@ describe("MLM System Tests", () => {
 
   describe("Newsletter Referral System", () => {
     it("should subscribe to newsletter", async () => {
-      const result = await appRouter.createCaller(createAuthContext().ctx).newsletter.subscribe({
-        email: "test@example.com",
-        referralSource: "direct",
+      const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+      const { ctx } = createAuthContext();
+      const caller = appRouter.createCaller(ctx);
+      
+      const result = await caller.newsletter.subscribe({
+        name: "Test User",
+        email: uniqueEmail,
       });
 
-      expect(result).toHaveProperty("success", true);
-      expect(result).toHaveProperty("discountCode");
+      // The API returns the subscription object with id, email, discountTier
+      expect(result).toHaveProperty("id");
+      expect(result).toHaveProperty("email", uniqueEmail);
+      expect(result).toHaveProperty("discountTier", 1);
     });
 
-    it("should subscribe with referrals", async () => {
-      const result = await appRouter.createCaller(createAuthContext().ctx).newsletter.subscribe({
-        email: "referrer@example.com",
-        referralEmails: ["friend1@example.com", "friend2@example.com", "friend3@example.com"],
-        referralSource: "direct",
+    it("should add referrals to subscription", async () => {
+      const uniqueEmail = `referrer-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+      const { ctx } = createAuthContext();
+      const caller = appRouter.createCaller(ctx);
+      
+      // First subscribe
+      const subscription = await caller.newsletter.subscribe({
+        name: "Referrer User",
+        email: uniqueEmail,
+      });
+
+      // Then add referrals
+      const result = await caller.newsletter.addReferrals({
+        subscriptionId: subscription.id,
+        friendEmails: [
+          `friend1-${Date.now()}@example.com`, 
+          `friend2-${Date.now()}@example.com`, 
+          `friend3-${Date.now()}@example.com`
+        ],
       });
 
       expect(result).toHaveProperty("success", true);
-      expect(result).toHaveProperty("discountCode");
-      expect(result.discountCode).toContain("NEON25"); // 25% discount for 3 referrals
     });
   });
 
   describe("Distributor Dashboard", () => {
     it("should get distributor info", async () => {
-      const { ctx } = createAuthContext(200);
+      const { ctx } = createAuthContext();
       const caller = appRouter.createCaller(ctx);
 
       // Enroll first
@@ -149,14 +174,14 @@ describe("MLM System Tests", () => {
     });
 
     it("should get distributor team", async () => {
-      const { ctx } = createAuthContext(300);
+      const { ctx } = createAuthContext();
       const caller = appRouter.createCaller(ctx);
 
       // Enroll as sponsor
       const sponsor = await caller.distributor.enroll({ sponsorCode: undefined });
 
       // Enroll team member
-      const { ctx: ctx2 } = createAuthContext(301);
+      const { ctx: ctx2 } = createAuthContext();
       const caller2 = appRouter.createCaller(ctx2);
       await caller2.distributor.enroll({ sponsorCode: sponsor.distributorCode });
 

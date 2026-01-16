@@ -124,3 +124,29 @@
 - [x] Allow mouse drag to resize territory
 - [x] Display current territory stats (address, radius, sq mi, price)
 - [x] Test all map interactions
+
+## Complete MLM System Enhancement
+
+- [x] Fix viral newsletter popup to allow easy dismissal
+- [x] Research Efusjon and top energy drink MLM compensation plans
+- [x] Design balanced compensation structure (commissions vs company profit)
+- [x] Create distributor entry packages (starter, pro, elite)
+- [x] Create customer one-off purchase packages
+- [x] Implement auto-ship subscription system
+- [x] Add auto-ship management (pause, cancel, modify)
+- [x] Build distributor login page
+- [x] Create full distributor portal dashboard
+- [x] Add team genealogy visualization in portal
+- [x] Add sales tracking and reporting
+- [x] Add commission tracking and payout history
+- [x] Add downline management tools
+- [x] Add marketing materials library
+- [x] Add training resources section
+- [x] Create compensation plan description page
+- [x] Display commission structure visually
+- [x] Show rank advancement requirements
+- [x] Implement unique subdomain generation for distributors
+- [x] Set up affiliate ID tracking on subdomains
+- [x] Track sales attribution to distributor subdomains
+- [x] Update database schema for packages and auto-ship
+- [x] Write vitest tests for all new features

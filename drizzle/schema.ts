@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { decimal, int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -271,3 +271,66 @@ export const affiliateLinks = mysqlTable("affiliate_links", {
 
 export type AffiliateLink = typeof affiliateLinks.$inferSelect;
 export type InsertAffiliateLink = typeof affiliateLinks.$inferInsert;
+
+/**
+ * Product packages table - defines available purchase packages
+ */
+export const packages = mysqlTable("packages", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  type: mysqlEnum("type", ["distributor", "customer"]).notNull(),
+  tier: mysqlEnum("tier", ["starter", "pro", "elite", "single", "12pack", "24pack"]).notNull(),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  pv: int("pv").notNull(), // Personal Volume for commission calculation
+  description: text("description"),
+  contents: text("contents"), // JSON string of what's included
+  active: int("active").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Package = typeof packages.$inferSelect;
+export type InsertPackage = typeof packages.$inferInsert;
+
+/**
+ * Orders table - tracks all product purchases
+ */
+export const orders = mysqlTable("orders", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"),
+  distributorId: int("distributorId"), // Referring distributor for commission tracking
+  packageId: int("packageId").notNull(),
+  orderNumber: varchar("orderNumber", { length: 50 }).notNull().unique(),
+  customerName: varchar("customerName", { length: 255 }).notNull(),
+  customerEmail: varchar("customerEmail", { length: 320 }).notNull(),
+  shippingAddress: text("shippingAddress").notNull(),
+  totalAmount: decimal("totalAmount", { precision: 10, scale: 2 }).notNull(),
+  pv: int("pv").notNull(),
+  status: mysqlEnum("status", ["pending", "paid", "shipped", "delivered", "cancelled"]).default("pending").notNull(),
+  stripePaymentId: varchar("stripePaymentId", { length: 255 }),
+  isAutoShip: int("isAutoShip").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Order = typeof orders.$inferSelect;
+export type InsertOrder = typeof orders.$inferInsert;
+
+/**
+ * Auto-ship subscriptions table
+ */
+export const autoShipSubscriptions = mysqlTable("autoShipSubscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  packageId: int("packageId").notNull(),
+  status: mysqlEnum("status", ["active", "paused", "cancelled"]).default("active").notNull(),
+  frequency: mysqlEnum("frequency", ["weekly", "biweekly", "monthly"]).default("monthly").notNull(),
+  nextShipDate: timestamp("nextShipDate").notNull(),
+  lastShipDate: timestamp("lastShipDate"),
+  shippingAddress: text("shippingAddress").notNull(),
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AutoShipSubscription = typeof autoShipSubscriptions.$inferSelect;
+export type InsertAutoShipSubscription = typeof autoShipSubscriptions.$inferInsert;
