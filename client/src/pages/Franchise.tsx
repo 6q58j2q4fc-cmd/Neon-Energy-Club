@@ -10,6 +10,8 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { MapPin, DollarSign, Calendar, TrendingUp, Check } from "lucide-react";
 import { toast } from "sonner";
+import TerritoryMapSelector from "@/components/TerritoryMapSelector";
+import type { TerritoryData } from "@/components/TerritoryMapSelector";
 
 // Territory pricing data (price per square mile per month)
 const territoryPricing = {
@@ -42,8 +44,7 @@ export default function Franchise() {
   const [isVisible, setIsVisible] = useState(false);
   
   // Territory selection state
-  const [selectedTerritory, setSelectedTerritory] = useState<string>("");
-  const [squareMiles, setSquareMiles] = useState<number>(100);
+  const [territory, setTerritory] = useState<TerritoryData | null>(null);
   const [termMonths, setTermMonths] = useState<number>(12);
   const [financing, setFinancing] = useState<string>("full");
   
@@ -59,18 +60,17 @@ export default function Franchise() {
     setIsVisible(true);
   }, []);
 
-  // Calculate pricing
-  const pricePerSqMile = selectedTerritory ? territoryPricing[selectedTerritory as keyof typeof territoryPricing] : 0;
-  const monthlyRate = pricePerSqMile * squareMiles;
-  const totalCost = monthlyRate * termMonths;
+  // Calculate pricing based on territory map selection
+  const baseCost = territory ? territory.totalPrice : 0;
+  const totalCost = baseCost * termMonths; // Multiply by term length
   const depositAmount = totalCost * 0.25; // 25% deposit
   const monthlyPayment = totalCost / termMonths;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedTerritory) {
-      toast.error("Please select a territory");
+    if (!territory) {
+      toast.error("Please select a territory on the map");
       return;
     }
 
@@ -78,8 +78,7 @@ export default function Franchise() {
     
     // Reset form
     setFormData({ name: "", email: "", phone: "", notes: "" });
-    setSelectedTerritory("");
-    setSquareMiles(100);
+    setTerritory(null);
     setTermMonths(12);
   };
 
@@ -140,58 +139,21 @@ export default function Franchise() {
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Territory Map */}
             <div className={`space-y-6 ${isVisible ? 'animate-slide-in-left' : 'opacity-0'}`}>
+              {/* Interactive Map Territory Selector */}
+              <TerritoryMapSelector onTerritoryChange={setTerritory} />
+
+              {/* Term Length Selector */}
               <Card className="bg-[#0a0a0a] border-[#c8ff00]/30 neon-border">
                 <CardHeader>
-                  <CardTitle className="text-3xl font-bold text-[#c8ff00] flex items-center gap-3">
-                    <MapPin className="w-8 h-8 neon-glow" />
-                    Territory Selection
+                  <CardTitle className="text-xl font-bold text-[#c8ff00] flex items-center gap-3">
+                    <Calendar className="w-6 h-6 neon-glow" />
+                    License Term
                   </CardTitle>
-                  <CardDescription className="text-gray-400">
-                    Select your desired territory and customize your licensing package
-                  </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Territory Selector */}
-                  <div className="space-y-2">
-                    <Label htmlFor="territory">Select Territory</Label>
-                    <Select value={selectedTerritory} onValueChange={setSelectedTerritory}>
-                      <SelectTrigger className="bg-black border-[#c8ff00]/30 text-white">
-                        <SelectValue placeholder="Choose a territory..." />
-                      </SelectTrigger>
-                      <SelectContent className="bg-black border-[#c8ff00]/30">
-                        {Object.keys(territoryPricing).map((territory) => (
-                          <SelectItem key={territory} value={territory} className="text-white hover:bg-[#c8ff00]/20">
-                            {territory} - ${territoryPricing[territory as keyof typeof territoryPricing]}/sq mi/month
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Square Miles Slider */}
+                <CardContent>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <Label>Territory Size</Label>
-                      <span className="text-2xl font-bold text-[#c8ff00]">{squareMiles} sq mi</span>
-                    </div>
-                    <Slider
-                      value={[squareMiles]}
-                      onValueChange={(value) => setSquareMiles(value[0])}
-                      min={10}
-                      max={1000}
-                      step={10}
-                      className="w-full"
-                    />
-                    <div className="flex justify-between text-sm text-gray-400">
-                      <span>10 sq mi</span>
-                      <span>1,000 sq mi</span>
-                    </div>
-                  </div>
-
-                  {/* Term Length Slider */}
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <Label>License Term</Label>
+                      <Label>Duration</Label>
                       <span className="text-2xl font-bold text-[#c8ff00]">{termMonths} months</span>
                     </div>
                     <Slider
@@ -206,17 +168,6 @@ export default function Franchise() {
                       <span>6 months (Short-term)</span>
                       <span>60 months (Long-term)</span>
                     </div>
-                  </div>
-
-                  {/* Map Visualization */}
-                  <div className="bg-black border border-[#c8ff00]/20 rounded-lg p-8 text-center neon-border">
-                    <MapPin className="w-16 h-16 text-[#c8ff00] mx-auto mb-4 neon-glow" />
-                    <p className="text-gray-400">Interactive territory map visualization</p>
-                    {selectedTerritory && (
-                      <div className="mt-4 text-[#c8ff00] font-bold">
-                        Selected: {selectedTerritory}
-                      </div>
-                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -238,12 +189,12 @@ export default function Franchise() {
                   {/* Pricing Breakdown */}
                   <div className="space-y-4">
                     <div className="flex justify-between items-center p-4 bg-black rounded-lg border border-[#c8ff00]/20">
-                      <span className="text-gray-400">Base Rate (per sq mi/month)</span>
-                      <span className="text-xl font-bold text-white">${pricePerSqMile}</span>
+                      <span className="text-gray-400">Base Territory Cost</span>
+                      <span className="text-xl font-bold text-white">${baseCost.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between items-center p-4 bg-black rounded-lg border border-[#c8ff00]/20">
-                      <span className="text-gray-400">Monthly Cost</span>
-                      <span className="text-xl font-bold text-white">${monthlyRate.toLocaleString()}</span>
+                      <span className="text-gray-400">Monthly Payment</span>
+                      <span className="text-xl font-bold text-white">${monthlyPayment.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between items-center p-4 bg-black rounded-lg border border-[#c8ff00]/20">
                       <span className="text-gray-400">License Term</span>
@@ -414,16 +365,16 @@ export default function Franchise() {
                 </div>
 
                 {/* Summary */}
-                {selectedTerritory && (
+                {territory && (
                   <div className="p-6 bg-black rounded-lg border border-[#c8ff00]/20 space-y-2">
                     <div className="font-bold text-[#c8ff00] mb-3">Application Summary:</div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Territory:</span>
-                      <span className="text-white font-semibold">{selectedTerritory}</span>
+                      <span className="text-white font-semibold">{territory.address}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Size:</span>
-                      <span className="text-white font-semibold">{squareMiles} sq mi</span>
+                      <span className="text-white font-semibold">{territory.squareMiles} sq mi</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Term:</span>
@@ -438,7 +389,7 @@ export default function Franchise() {
 
                 <Button
                   type="submit"
-                  disabled={!selectedTerritory}
+                  disabled={!territory}
                   className="w-full bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold text-lg py-6 neon-pulse transition-smooth"
                 >
                   Submit Application

@@ -110,3 +110,17 @@
 - [ ] Create distributor training resources section
 - [x] Write vitest tests for MLM features
 - [x] Test complete viral referral flow
+
+## Interactive Territory Map Enhancement
+
+- [x] Integrate Google Maps API with MapView component
+- [x] Add address/neighborhood search with autocomplete
+- [x] Implement draggable radius circle for territory selection
+- [x] Add cross-street intersection search
+- [x] Calculate square miles from radius dynamically
+- [x] Implement real-time price calculation based on territory size
+- [x] Add demand-based pricing multipliers for different areas
+- [x] Show visual neon green radius overlay on map
+- [x] Allow mouse drag to resize territory
+- [x] Display current territory stats (address, radius, sq mi, price)
+- [x] Test all map interactions
