@@ -128,8 +128,27 @@ export default function Home() {
               ))}
             </nav>
 
+            {/* Mobile Horizontal Scrollable Navigation */}
+            <div className="lg:hidden flex-1 mx-4 overflow-x-auto scrollbar-hide">
+              <nav className="flex items-center gap-2 min-w-max px-2">
+                {navItems.map((item) => (
+                  <button
+                    key={item.path}
+                    onClick={() => setLocation(item.path)}
+                    className={`whitespace-nowrap px-3 py-1.5 text-xs font-semibold rounded-full transition-all duration-300 ${
+                      item.path === "/"
+                        ? "bg-[#ff0080]/20 text-[#ff0080] border border-[#ff0080]/50"
+                        : "text-white/70 hover:text-[#00ffff] hover:bg-[#00ffff]/10"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </nav>
+            </div>
+
             {/* CTA Buttons - Vice City Style */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 flex-shrink-0">
               <Button
                 onClick={() => setLocation("/join")}
                 variant="outline"
@@ -139,61 +158,27 @@ export default function Home() {
               </Button>
               <Button
                 onClick={() => setLocation("/crowdfund")}
-                className="btn-vice-pink text-white font-bold px-6 h-10 rounded-lg tracking-wider"
+                className="btn-vice-pink text-white font-bold px-4 md:px-6 h-9 md:h-10 rounded-lg tracking-wider text-sm md:text-base"
               >
                 BACK US
               </Button>
-              
-              {/* Mobile Menu Toggle */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 text-white/80 hover:text-[#ff1493] transition-colors"
-              >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
             </div>
           </div>
         </div>
 
-        {/* Mobile Menu - GTA Vice City Style */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-gradient-to-b from-[#1a0a2e]/98 to-[#0d0620]/98 backdrop-blur-xl border-t border-[#ff0080]/25 fixed top-[72px] left-0 right-0 z-40"
-            >
-              <nav className="container mx-auto px-6 py-4 flex flex-col gap-2">
-                {navItems.map((item, index) => (
-                  <motion.button
-                    key={item.path}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    onClick={() => {
-                      setLocation(item.path);
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`py-3 px-4 text-left rounded-lg transition-all duration-300 font-semibold tracking-wider ${
-                      item.path === "/"
-                        ? "text-[#ff0080] bg-[#ff0080]/15 border-l-3 border-[#ff0080] shadow-[inset_0_0_20px_rgba(255,0,128,0.1)]"
-                        : "text-white/80 hover:text-[#00ffff] hover:bg-[#00ffff]/10 hover:border-l-3 hover:border-[#00ffff]"
-                    }`}
-                  >
-                    {item.label}
-                  </motion.button>
-                ))}
-              </nav>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </header>
 
       {/* Hero Section - GTA Vice City Style */}
       <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
+        {/* Vice City Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40"
+          style={{ backgroundImage: 'url(/vice-city-bg.png)' }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0d0620] via-[#0d0620]/70 to-transparent" />
+        
         {/* Vice City Animated Grid */}
-        <div className="absolute inset-0 animated-grid opacity-50" />
+        <div className="absolute inset-0 animated-grid opacity-30" />
         
         {/* Vice City Gradient Orbs - Hot Pink, Cyan, Purple */}
         <div className="absolute top-0 left-1/4 w-[700px] h-[700px] bg-gradient-to-br from-[#ff0080]/25 to-transparent rounded-full blur-[150px] animate-glow-pulse" />
@@ -299,12 +284,12 @@ export default function Home() {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-radial from-[#b8e600]/20 via-[#b8e600]/08 to-transparent rounded-full blur-[100px] pointer-events-none" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-[#b8e600]/10 rounded-full blur-[60px] pointer-events-none animate-glow-pulse" />
                 
-                {/* Main Can - Enhanced Glow */}
+                {/* Main Can - Enhanced Glow with Transparent Background */}
                 <img
-                  src="/neon-can.png"
+                  src="/neon-original-can.png"
                   alt="NEON Energy Drink Can"
                   className="h-[450px] md:h-[550px] object-contain product-glow animate-float relative z-10"
-                  style={{ filter: 'drop-shadow(0 0 40px rgba(184, 230, 0, 0.4)) drop-shadow(0 0 80px rgba(184, 230, 0, 0.2)) drop-shadow(0 30px 60px rgba(0, 0, 0, 0.5))' }}
+                  style={{ filter: 'drop-shadow(0 0 50px rgba(184, 230, 0, 0.5)) drop-shadow(0 0 100px rgba(184, 230, 0, 0.3)) drop-shadow(0 30px 60px rgba(0, 0, 0, 0.4))' }}
                 />
               </div>
 

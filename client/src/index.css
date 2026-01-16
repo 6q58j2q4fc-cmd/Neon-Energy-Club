@@ -812,6 +812,16 @@
       transparent 100%);
   }
 
+  /* ===== SCROLLBAR HIDE UTILITY ===== */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   /* ===== SCROLLBAR - Vice City Style ===== */
   ::-webkit-scrollbar {
     width: 10px;

@@ -46,13 +46,20 @@ export default function Products() {
 
       {/* Hero Section - Vice City Style */}
       <section className="pt-32 pb-16 px-4 relative overflow-hidden">
+        {/* Vice City Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30"
+          style={{ backgroundImage: 'url(/vice-city-bg.png)' }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0d0620] via-[#0d0620]/80 to-transparent" />
+        
         {/* Vice City Gradient Orbs */}
         <div className="absolute -left-40 top-1/4 w-96 h-96 bg-gradient-to-br from-[#ff0080]/15 to-transparent rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute -right-20 bottom-0 w-80 h-80 bg-gradient-to-tl from-[#00ffff]/12 to-transparent rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-b from-[#9d4edd]/10 to-transparent blur-[80px] pointer-events-none" />
         
         {/* Animated Grid */}
-        <div className="absolute inset-0 animated-grid opacity-40" />
+        <div className="absolute inset-0 animated-grid opacity-30" />
         
         <div className={`container mx-auto max-w-6xl text-center relative z-10 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
           <h2 className="text-5xl md:text-7xl font-black mb-6 font-vice">
@@ -76,14 +83,15 @@ export default function Products() {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-br from-[#b8e600]/15 to-[#00ffff]/08 rounded-full blur-[70px] pointer-events-none" />
                 
                 <div className="relative inline-block">
-                  <div className="absolute inset-0 bg-[#c8ff00] blur-[80px] opacity-40 rounded-full"></div>
+                  <div className="absolute inset-0 bg-[#b8e600] blur-[80px] opacity-50 rounded-full"></div>
                   <img
-                    src="/neon-can.png"
+                    src="/neon-original-can.png"
                     alt="NEON Original"
-                    className="w-48 h-auto mx-auto mb-6 drop-shadow-2xl neon-glow animate-float relative z-10"
+                    className="w-48 h-auto mx-auto mb-6 animate-float relative z-10"
+                    style={{ filter: 'drop-shadow(0 0 30px rgba(184, 230, 0, 0.5)) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3))' }}
                   />
                 </div>
-                <h3 className="text-4xl font-black text-[#c8ff00] mb-2 neon-text">
+                <h3 className="text-4xl font-black gradient-text-vice mb-2 font-vice">
                   NEON ORIGINAL
                 </h3>
                 <p className="text-gray-400 text-lg">
@@ -178,15 +186,21 @@ export default function Products() {
             </div>
 
             {/* NEON Organic */}
-            <div className={`bg-[#0a0a0a] border border-orange-500/30 rounded-xl overflow-hidden hover-lift neon-border ${isVisible ? 'animate-slide-in-right' : 'opacity-0'}`}>
-              <div className="bg-gradient-to-b from-orange-500/20 to-transparent p-8 text-center">
-                <div className="w-48 h-64 mx-auto mb-6 bg-gradient-to-b from-orange-400/20 to-transparent rounded-lg flex items-center justify-center hover-glow">
-                  <div className="text-6xl font-black text-orange-400">
-                    NEON
-                    <div className="text-2xl font-normal">ORGANIC</div>
-                  </div>
+            <div className={`glass-card-vice rounded-xl overflow-hidden hover-lift ${isVisible ? 'animate-slide-in-right' : 'opacity-0'}`}>
+              <div className="bg-gradient-to-b from-orange-500/15 via-[#ff0080]/05 to-transparent p-8 text-center relative overflow-hidden">
+                {/* Orange Ambient Glow */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-br from-orange-500/20 to-[#ff0080]/08 rounded-full blur-[70px] pointer-events-none" />
+                
+                <div className="relative inline-block">
+                  <div className="absolute inset-0 bg-orange-500 blur-[80px] opacity-50 rounded-full"></div>
+                  <img
+                    src="/neon-organic-can.png"
+                    alt="NEON Organic"
+                    className="w-48 h-auto mx-auto mb-6 animate-float relative z-10"
+                    style={{ filter: 'drop-shadow(0 0 30px rgba(255, 140, 0, 0.5)) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3))', animationDelay: '0.5s' }}
+                  />
                 </div>
-                <h3 className="text-4xl font-black text-orange-400 mb-2">
+                <h3 className="text-4xl font-black text-orange-400 mb-2 font-vice" style={{ textShadow: '0 0 20px rgba(255, 140, 0, 0.5)' }}>
                   NEON ORGANIC
                 </h3>
                 <p className="text-gray-400 text-lg">USDA Certified Organic</p>

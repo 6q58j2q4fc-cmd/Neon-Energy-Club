@@ -269,3 +269,21 @@
 - [x] Add synthwave grid background elements
 - [x] Update CTAs with vibrant Vice City colors
 - [x] Add subtle scanline/retro effects
+
+## Mobile Menu & Visual Enhancements (Jan 16)
+
+### Mobile Menu Fix
+- [x] Fix mobile menu to allow horizontal scrolling on iPhone
+- [x] Ensure menu items are accessible on small screens
+- [x] Add proper touch scrolling behavior
+
+### Vice City Background Images
+- [x] Generate Vice City themed background images (palm trees, sunset, neon skyline)
+- [x] Add background images to hero sections
+- [x] Ensure backgrounds blend with Vice City color scheme
+
+### Can Image Improvements
+- [x] Remove black background from NEON can image
+- [x] Create orange version of can for NEON Organic
+- [x] Update Products page with both can versions
+- [x] Ensure transparent backgrounds work on all pages
