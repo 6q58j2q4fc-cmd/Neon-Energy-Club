@@ -1,9 +1,11 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect } from "react";
 import Home from "./pages/Home";
 import Franchise from "./pages/Franchise";
 import Celebrities from "./pages/Celebrities";
@@ -21,10 +23,53 @@ import Compensation from "./pages/Compensation";
 import DistributorPortal from "./pages/DistributorPortal";
 import Blog from "./pages/Blog";
 
+// Scroll to top on route change
+function ScrollToTop() {
+  const [location] = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [location]);
+  
+  return null;
+}
+
+// Page transition wrapper
+const pageVariants = {
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 }
+};
+
+const pageTransition = {
+  type: "tween" as const,
+  ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+  duration: 0.4
+};
+
+function AnimatedPage({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+      transition={pageTransition}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 function Router() {
+  const [location] = useLocation();
+  
   // make sure to consider if you need authentication for certain routes
   return (
-    <Switch>
+    <>
+    <ScrollToTop />
+    <AnimatePresence mode="wait">
+    <Switch key={location}>
       <Route path={"/"} component={Home} />
       <Route path={"/about"} component={About} />
       <Route path={"/products"} component={Products} />
@@ -46,6 +91,8 @@ function Router() {
       {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>
+    </AnimatePresence>
+    </>
   );
 }
 

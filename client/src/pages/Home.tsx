@@ -118,13 +118,17 @@ export default function Home() {
                 <button
                   key={item.path}
                   onClick={() => setLocation(item.path)}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${
+                  className={`relative px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-400 ${
                     item.path === "/" 
-                      ? "text-[#b8e600] bg-[#b8e600]/10" 
-                      : "text-white/70 hover:text-white hover:bg-white/5"
+                      ? "text-[#b8e600]" 
+                      : "text-white/70 hover:text-white"
                   }`}
+                  style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
                 >
                   {item.label}
+                  {item.path === "/" && (
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-[#b8e600] rounded-full" />
+                  )}
                 </button>
               ))}
             </nav>
@@ -134,13 +138,13 @@ export default function Home() {
               <Button
                 onClick={() => setLocation("/join")}
                 variant="outline"
-                className="hidden md:flex border-[#b8e600]/30 text-[#b8e600] hover:bg-[#b8e600]/10 font-semibold h-10 px-5"
+                className="hidden md:flex border-[#b8e600]/40 text-[#b8e600] hover:bg-[#b8e600]/15 hover:border-[#b8e600]/60 font-semibold h-10 px-5 transition-all duration-300"
               >
                 JOIN NOW
               </Button>
               <Button
                 onClick={() => setLocation("/crowdfund")}
-                className="btn-primary-shiny text-black font-bold px-6 h-10 rounded-lg"
+                className="btn-primary-shiny text-black font-bold px-6 h-10 rounded-lg shadow-[0_4px_20px_rgba(184,230,0,0.4)]"
               >
                 BACK US
               </Button>
@@ -191,24 +195,9 @@ export default function Home() {
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#b8e600]/5 rounded-full blur-[100px] animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#9d4edd]/5 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
         
-        {/* Liquid Splash Effects */}
-        <img 
-          src="/images/green-splash-1.png" 
-          alt="" 
-          className="absolute -left-20 top-1/3 w-64 h-auto opacity-40 animate-float-slow pointer-events-none"
-          style={{ animationDelay: "0.5s" }}
-        />
-        <img 
-          src="/images/green-splash-2.png" 
-          alt="" 
-          className="absolute -right-10 bottom-1/4 w-48 h-auto opacity-30 animate-float pointer-events-none"
-          style={{ animationDelay: "1.5s" }}
-        />
-        <img 
-          src="/images/water-splash.png" 
-          alt="" 
-          className="absolute right-1/4 top-20 w-32 h-auto opacity-20 animate-pulse pointer-events-none"
-        />
+        {/* Subtle Ambient Glow Effects */}
+        <div className="absolute -left-40 top-1/3 w-80 h-80 bg-[#b8e600]/8 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute -right-20 bottom-1/4 w-60 h-60 bg-[#9d4edd]/6 rounded-full blur-[100px] pointer-events-none" />
         
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -299,34 +288,16 @@ export default function Home() {
                 <div className="w-80 h-80 bg-[#b8e600]/10 rounded-full blur-[80px] animate-pulse" />
               </div>
               
-              {/* Product Image with Splash Effect */}
+              {/* Product Image - Clean & Professional */}
               <div className="relative z-10 flex justify-center">
-                {/* Background Splash */}
-                <img 
-                  src="/images/energy-splash.png" 
-                  alt="" 
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-auto opacity-60 animate-pulse pointer-events-none"
-                />
-                
-                {/* Floating Fruits */}
-                <img 
-                  src="/images/lime-splash.jpg" 
-                  alt="Fresh limes" 
-                  className="absolute -left-8 top-1/4 w-24 h-24 object-cover rounded-full border-2 border-[#b8e600]/30 shadow-lg animate-float-slow"
-                  style={{ animationDelay: "0.3s" }}
-                />
-                <img 
-                  src="/images/apple-splash.jpg" 
-                  alt="Green apple" 
-                  className="absolute -right-4 bottom-1/3 w-20 h-20 object-cover rounded-full border-2 border-[#b8e600]/30 shadow-lg animate-float"
-                  style={{ animationDelay: "0.8s" }}
-                />
+                {/* Ambient Glow Behind Can */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#b8e600]/15 rounded-full blur-[80px] pointer-events-none" />
                 
                 {/* Main Can */}
                 <img
                   src="/neon-can.png"
                   alt="NEON Energy Drink Can"
-                  className="h-[500px] md:h-[600px] object-contain product-glow animate-float relative z-10"
+                  className="h-[450px] md:h-[550px] object-contain product-glow animate-float relative z-10"
                 />
               </div>
 
@@ -517,17 +488,9 @@ export default function Home() {
       <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#b8e600]/5 to-transparent" />
         
-        {/* Decorative Splashes */}
-        <img 
-          src="/images/green-splash-1.png" 
-          alt="" 
-          className="absolute -right-20 top-0 w-80 h-auto opacity-20 rotate-180 pointer-events-none"
-        />
-        <img 
-          src="/images/water-splash.png" 
-          alt="" 
-          className="absolute -left-10 bottom-0 w-60 h-auto opacity-15 pointer-events-none"
-        />
+        {/* Subtle Background Accents */}
+        <div className="absolute -right-40 top-1/4 w-80 h-80 bg-[#b8e600]/5 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute -left-40 bottom-1/4 w-60 h-60 bg-[#9d4edd]/4 rounded-full blur-[80px] pointer-events-none" />
         
         <div className="container mx-auto px-6 relative z-10">
           <div className="text-center mb-16">
@@ -580,9 +543,7 @@ export default function Home() {
                     />
                   </div>
                   
-                  {/* Floating Particles */}
-                  <div className="absolute -top-2 -right-2 w-4 h-4 bg-[#b8e600] rounded-full opacity-60 animate-ping" style={{ animationDuration: "2s" }} />
-                  <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-[#b8e600] rounded-full opacity-40 animate-ping" style={{ animationDuration: "3s", animationDelay: "0.5s" }} />
+
                 </div>
                 
                 <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#b8e600] transition-colors">

@@ -184,17 +184,9 @@ export default function Celebrities() {
         <div className="absolute inset-0 animated-grid opacity-20" />
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-[#b8e600]/10 rounded-full blur-[100px]" />
         
-        {/* Decorative Splashes */}
-        <img 
-          src="/images/green-splash-1.png" 
-          alt="" 
-          className="absolute -left-20 top-1/3 w-64 h-auto opacity-30 pointer-events-none"
-        />
-        <img 
-          src="/images/green-splash-2.png" 
-          alt="" 
-          className="absolute -right-10 bottom-0 w-48 h-auto opacity-20 pointer-events-none"
-        />
+        {/* Subtle Background Glow */}
+        <div className="absolute -left-40 top-1/3 w-80 h-80 bg-[#b8e600]/5 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute -right-20 bottom-0 w-60 h-60 bg-[#9d4edd]/4 rounded-full blur-[80px] pointer-events-none" />
         
         <div className={`container mx-auto max-w-6xl text-center relative z-10 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
           <span className="badge-neon mb-4 inline-block">AS SEEN IN MUSIC VIDEOS</span>
