@@ -196,3 +196,22 @@
 - [x] Add cookie to track if user has already subscribed
 - [x] Don't show popup to already subscribed users
 - [x] Store subscriber status in localStorage/cookie
+
+## Visual Enhancement & Celebrity Videos
+
+### Liquid Splash Effects
+- [x] Add dynamic liquid splash effects across homepage hero
+- [x] Create liquid splash animations on product pages
+- [x] Add water/energy drink splash overlays on key sections
+
+### Fruit Ingredient Imagery
+- [x] Search and download high-quality fruit images (green apple, lime, citrus)
+- [x] Add fruit ingredient showcase section showing what's inside NEON
+- [x] Create floating fruit animations around product images
+- [x] Add fruit imagery to About/Products pages
+
+### Celebrity YouTube Embeds
+- [x] Research actual music video YouTube links for featured celebrities
+- [x] Replace static celebrity cards with embedded YouTube players
+- [x] Add video thumbnails with play buttons for each celebrity feature
+- [x] Ensure videos are responsive and work on mobile

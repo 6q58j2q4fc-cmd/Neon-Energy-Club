@@ -191,6 +191,25 @@ export default function Home() {
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#b8e600]/5 rounded-full blur-[100px] animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#9d4edd]/5 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
         
+        {/* Liquid Splash Effects */}
+        <img 
+          src="/images/green-splash-1.png" 
+          alt="" 
+          className="absolute -left-20 top-1/3 w-64 h-auto opacity-40 animate-float-slow pointer-events-none"
+          style={{ animationDelay: "0.5s" }}
+        />
+        <img 
+          src="/images/green-splash-2.png" 
+          alt="" 
+          className="absolute -right-10 bottom-1/4 w-48 h-auto opacity-30 animate-float pointer-events-none"
+          style={{ animationDelay: "1.5s" }}
+        />
+        <img 
+          src="/images/water-splash.png" 
+          alt="" 
+          className="absolute right-1/4 top-20 w-32 h-auto opacity-20 animate-pulse pointer-events-none"
+        />
+        
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
@@ -280,12 +299,34 @@ export default function Home() {
                 <div className="w-80 h-80 bg-[#b8e600]/10 rounded-full blur-[80px] animate-pulse" />
               </div>
               
-              {/* Product Image */}
+              {/* Product Image with Splash Effect */}
               <div className="relative z-10 flex justify-center">
+                {/* Background Splash */}
+                <img 
+                  src="/images/energy-splash.png" 
+                  alt="" 
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-auto opacity-60 animate-pulse pointer-events-none"
+                />
+                
+                {/* Floating Fruits */}
+                <img 
+                  src="/images/lime-splash.jpg" 
+                  alt="Fresh limes" 
+                  className="absolute -left-8 top-1/4 w-24 h-24 object-cover rounded-full border-2 border-[#b8e600]/30 shadow-lg animate-float-slow"
+                  style={{ animationDelay: "0.3s" }}
+                />
+                <img 
+                  src="/images/apple-splash.jpg" 
+                  alt="Green apple" 
+                  className="absolute -right-4 bottom-1/3 w-20 h-20 object-cover rounded-full border-2 border-[#b8e600]/30 shadow-lg animate-float"
+                  style={{ animationDelay: "0.8s" }}
+                />
+                
+                {/* Main Can */}
                 <img
                   src="/neon-can.png"
                   alt="NEON Energy Drink Can"
-                  className="h-[500px] md:h-[600px] object-contain product-glow animate-float"
+                  className="h-[500px] md:h-[600px] object-contain product-glow animate-float relative z-10"
                 />
               </div>
 
@@ -468,6 +509,97 @@ export default function Home() {
                 <p className="text-white/60 leading-relaxed">{feature.description}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Natural Ingredients Section */}
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#b8e600]/5 to-transparent" />
+        
+        {/* Decorative Splashes */}
+        <img 
+          src="/images/green-splash-1.png" 
+          alt="" 
+          className="absolute -right-20 top-0 w-80 h-auto opacity-20 rotate-180 pointer-events-none"
+        />
+        <img 
+          src="/images/water-splash.png" 
+          alt="" 
+          className="absolute -left-10 bottom-0 w-60 h-auto opacity-15 pointer-events-none"
+        />
+        
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="text-center mb-16">
+            <span className="badge-neon mb-4 inline-block">WHAT'S INSIDE</span>
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+              NATURAL <span className="text-[#b8e600]">INGREDIENTS</span>
+            </h2>
+            <p className="text-white/60 max-w-2xl mx-auto">
+              Every can of NEON is packed with premium, natural ingredients for clean, sustained energy.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-8">
+            {[
+              {
+                image: "/images/lime-splash.jpg",
+                name: "Fresh Lime",
+                benefit: "Natural citrus flavor with vitamin C boost",
+              },
+              {
+                image: "/images/apple-splash.jpg",
+                name: "Green Apple",
+                benefit: "Crisp, refreshing taste with natural sweetness",
+              },
+              {
+                image: "/images/citrus-slices.png",
+                name: "Citrus Blend",
+                benefit: "Energizing citrus complex for mental clarity",
+              },
+              {
+                image: "/images/green-apple-splash.jpg",
+                name: "Natural Caffeine",
+                benefit: "150mg from green tea for smooth energy",
+              },
+            ].map((ingredient, i) => (
+              <div
+                key={i}
+                className="group text-center"
+              >
+                <div className="relative mb-6 mx-auto w-40 h-40">
+                  {/* Glow Effect */}
+                  <div className="absolute inset-0 bg-[#b8e600]/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  
+                  {/* Image Container */}
+                  <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-[#b8e600]/30 group-hover:border-[#b8e600] transition-all duration-300 shadow-lg">
+                    <img
+                      src={ingredient.image}
+                      alt={ingredient.name}
+                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                    />
+                  </div>
+                  
+                  {/* Floating Particles */}
+                  <div className="absolute -top-2 -right-2 w-4 h-4 bg-[#b8e600] rounded-full opacity-60 animate-ping" style={{ animationDuration: "2s" }} />
+                  <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-[#b8e600] rounded-full opacity-40 animate-ping" style={{ animationDuration: "3s", animationDelay: "0.5s" }} />
+                </div>
+                
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#b8e600] transition-colors">
+                  {ingredient.name}
+                </h3>
+                <p className="text-white/60 text-sm leading-relaxed">
+                  {ingredient.benefit}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom Tagline */}
+          <div className="text-center mt-16">
+            <p className="text-lg text-white/80 font-medium">
+              <span className="text-[#b8e600] font-bold">Zero artificial ingredients.</span> Just pure, natural energy.
+            </p>
           </div>
         </div>
       </section>

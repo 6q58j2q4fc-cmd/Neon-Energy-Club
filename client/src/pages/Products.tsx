@@ -45,8 +45,25 @@ export default function Products() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4 animated-bg">
-        <div className={`container mx-auto max-w-6xl text-center ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
+      <section className="pt-32 pb-16 px-4 animated-bg relative overflow-hidden">
+        {/* Decorative Splashes */}
+        <img 
+          src="/images/green-splash-1.png" 
+          alt="" 
+          className="absolute -left-20 top-1/4 w-64 h-auto opacity-30 pointer-events-none"
+        />
+        <img 
+          src="/images/green-splash-2.png" 
+          alt="" 
+          className="absolute -right-10 bottom-0 w-48 h-auto opacity-20 pointer-events-none"
+        />
+        <img 
+          src="/images/water-splash.png" 
+          alt="" 
+          className="absolute right-1/4 top-10 w-32 h-auto opacity-15 pointer-events-none"
+        />
+        
+        <div className={`container mx-auto max-w-6xl text-center relative z-10 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
           <h2 className="text-5xl md:text-7xl font-black mb-6">
             THE <span className="text-[#c8ff00] neon-text">PRODUCTS</span>
           </h2>
@@ -63,7 +80,22 @@ export default function Products() {
           <div className="grid md:grid-cols-2 gap-8">
             {/* NEON Original */}
             <div className={`bg-[#0a0a0a] border border-[#c8ff00]/30 rounded-xl overflow-hidden hover-lift neon-border ${isVisible ? 'animate-slide-in-left' : 'opacity-0'}`}>
-              <div className="bg-gradient-to-b from-[#c8ff00]/20 to-transparent p-8 text-center">
+              <div className="bg-gradient-to-b from-[#c8ff00]/20 to-transparent p-8 text-center relative overflow-hidden">
+                {/* Background Splash */}
+                <img 
+                  src="/images/energy-splash.png" 
+                  alt="" 
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-auto opacity-40 pointer-events-none"
+                />
+                
+                {/* Floating Fruit */}
+                <img 
+                  src="/images/lime-splash.jpg" 
+                  alt="Fresh lime" 
+                  className="absolute -left-4 top-1/3 w-16 h-16 object-cover rounded-full border-2 border-[#c8ff00]/30 shadow-lg animate-float-slow"
+                  style={{ animationDelay: "0.3s" }}
+                />
+                
                 <div className="relative inline-block">
                   <div className="absolute inset-0 bg-[#c8ff00] blur-[80px] opacity-40 rounded-full"></div>
                   <img
