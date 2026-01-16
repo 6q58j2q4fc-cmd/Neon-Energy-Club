@@ -11,12 +11,12 @@ export default function Products() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="border-b border-[#c8ff00]/20 bg-black/80 backdrop-blur-md fixed top-0 w-full z-50 transition-smooth">
+    <div className="min-h-screen vice-bg text-white">
+      {/* Header - Vice City Style */}
+      <header className="border-b border-[#ff0080]/20 bg-[#1a0a2e]/90 backdrop-blur-xl fixed top-0 w-full z-50 transition-smooth">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1
-            className="text-2xl font-bold text-[#c8ff00] neon-text cursor-pointer"
+            className="text-2xl font-bold font-vice gradient-text-vice cursor-pointer drop-shadow-[0_0_10px_rgba(255,0,128,0.5)]"
             onClick={() => setLocation("/")}
           >
             NEON
@@ -24,19 +24,19 @@ export default function Products() {
           <nav className="flex gap-6 items-center">
             <button
               onClick={() => setLocation("/")}
-              className="text-gray-300 hover:text-[#c8ff00] transition-smooth"
+              className="nav-btn"
             >
               Home
             </button>
             <button
               onClick={() => setLocation("/about")}
-              className="text-gray-300 hover:text-[#c8ff00] transition-smooth"
+              className="nav-btn"
             >
               Our Story
             </button>
             <button
               onClick={() => setLocation("/products")}
-              className="text-[#c8ff00] font-semibold neon-text"
+              className="nav-btn active"
             >
               Products
             </button>
@@ -44,32 +44,36 @@ export default function Products() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4 animated-bg relative overflow-hidden">
-        {/* Subtle Background Glow */}
-        <div className="absolute -left-40 top-1/4 w-80 h-80 bg-[#c8ff00]/5 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute -right-20 bottom-0 w-60 h-60 bg-[#c8ff00]/4 rounded-full blur-[80px] pointer-events-none" />
+      {/* Hero Section - Vice City Style */}
+      <section className="pt-32 pb-16 px-4 relative overflow-hidden">
+        {/* Vice City Gradient Orbs */}
+        <div className="absolute -left-40 top-1/4 w-96 h-96 bg-gradient-to-br from-[#ff0080]/15 to-transparent rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute -right-20 bottom-0 w-80 h-80 bg-gradient-to-tl from-[#00ffff]/12 to-transparent rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-b from-[#9d4edd]/10 to-transparent blur-[80px] pointer-events-none" />
+        
+        {/* Animated Grid */}
+        <div className="absolute inset-0 animated-grid opacity-40" />
         
         <div className={`container mx-auto max-w-6xl text-center relative z-10 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
-          <h2 className="text-5xl md:text-7xl font-black mb-6">
-            THE <span className="text-[#c8ff00] neon-text">PRODUCTS</span>
+          <h2 className="text-5xl md:text-7xl font-black mb-6 font-vice">
+            THE <span className="gradient-text-vice drop-shadow-[0_0_20px_rgba(255,0,128,0.5)]">PRODUCTS</span>
           </h2>
-          <p className="text-xl text-gray-300 leading-relaxed max-w-3xl mx-auto">
+          <p className="text-xl text-white/70 leading-relaxed max-w-3xl mx-auto">
             Two incredible flavors, both designed to give you energy that lasts
             without the crash. Finally, an energy drink that tastes good!
           </p>
         </div>
       </section>
 
-      {/* Products Comparison */}
-      <section className="py-16 px-4 animated-bg">
+      {/* Products Comparison - Vice City Style */}
+      <section className="py-16 px-4 relative">
         <div className="container mx-auto max-w-7xl">
           <div className="grid md:grid-cols-2 gap-8">
             {/* NEON Original */}
-            <div className={`bg-[#0a0a0a] border border-[#c8ff00]/30 rounded-xl overflow-hidden hover-lift neon-border ${isVisible ? 'animate-slide-in-left' : 'opacity-0'}`}>
-              <div className="bg-gradient-to-b from-[#c8ff00]/15 to-transparent p-8 text-center relative overflow-hidden">
-                {/* Ambient Glow */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#c8ff00]/10 rounded-full blur-[60px] pointer-events-none" />
+            <div className={`glass-card-vice rounded-xl overflow-hidden hover-lift ${isVisible ? 'animate-slide-in-left' : 'opacity-0'}`}>
+              <div className="bg-gradient-to-b from-[#b8e600]/15 via-[#00ffff]/05 to-transparent p-8 text-center relative overflow-hidden">
+                {/* Vice City Ambient Glow */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-br from-[#b8e600]/15 to-[#00ffff]/08 rounded-full blur-[70px] pointer-events-none" />
                 
                 <div className="relative inline-block">
                   <div className="absolute inset-0 bg-[#c8ff00] blur-[80px] opacity-40 rounded-full"></div>

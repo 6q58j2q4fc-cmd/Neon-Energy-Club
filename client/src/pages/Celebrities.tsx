@@ -107,15 +107,15 @@ export default function Celebrities() {
         url="/celebrities"
       />
 
-      {/* Header */}
-      <header className="fixed top-0 w-full z-50 bg-black/95 backdrop-blur-xl border-b border-white/10">
+      {/* Header - Vice City Style */}
+      <header className="fixed top-0 w-full z-50 bg-[#1a0a2e]/95 backdrop-blur-xl border-b border-[#ff0080]/20">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setLocation("/")}>
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#b8e600] to-[#8fb800] flex items-center justify-center">
-                <Zap className="w-5 h-5 text-black" />
+            <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setLocation("/")}>
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#ff0080] to-[#00ffff] flex items-center justify-center shadow-[0_0_20px_rgba(255,0,128,0.4)] group-hover:shadow-[0_0_30px_rgba(255,0,128,0.6)] transition-all duration-300">
+                <Zap className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-black font-vice text-[#b8e600]">NEON®</span>
+              <span className="text-xl font-black font-vice gradient-text-vice drop-shadow-[0_0_10px_rgba(255,0,128,0.5)]">NEON®</span>
             </div>
 
             <nav className="hidden lg:flex items-center gap-1">

@@ -10,12 +10,12 @@ export default function About() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="border-b border-[#c8ff00]/20 bg-black/80 backdrop-blur-md fixed top-0 w-full z-50 transition-smooth">
+    <div className="min-h-screen vice-bg text-white">
+      {/* Header - Vice City Style */}
+      <header className="border-b border-[#ff0080]/20 bg-[#1a0a2e]/90 backdrop-blur-xl fixed top-0 w-full z-50 transition-smooth">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1
-            className="text-2xl font-bold text-[#c8ff00] neon-text cursor-pointer"
+            className="text-2xl font-bold font-vice gradient-text-vice cursor-pointer drop-shadow-[0_0_10px_rgba(255,0,128,0.5)]"
             onClick={() => setLocation("/")}
           >
             NEON
@@ -23,19 +23,19 @@ export default function About() {
           <nav className="flex gap-6 items-center">
             <button
               onClick={() => setLocation("/")}
-              className="text-gray-300 hover:text-[#c8ff00] transition-smooth"
+              className="nav-btn"
             >
               Home
             </button>
             <button
               onClick={() => setLocation("/about")}
-              className="text-[#c8ff00] font-semibold neon-text"
+              className="nav-btn active"
             >
               Our Story
             </button>
             <button
               onClick={() => setLocation("/products")}
-              className="text-gray-300 hover:text-[#c8ff00] transition-smooth"
+              className="nav-btn"
             >
               Products
             </button>
@@ -43,24 +43,29 @@ export default function About() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4 bg-gradient-to-b from-black via-[#0a0a0a] to-black animated-bg">
-        <div className={`container mx-auto max-w-4xl text-center ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
-          <h2 className="text-5xl md:text-7xl font-black mb-6">
-            OUR <span className="text-[#c8ff00] neon-text">STORY</span>
+      {/* Hero Section - Vice City Style */}
+      <section className="pt-32 pb-16 px-4 relative overflow-hidden">
+        {/* Vice City Gradient Orbs */}
+        <div className="absolute -left-40 top-1/4 w-96 h-96 bg-gradient-to-br from-[#ff0080]/15 to-transparent rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute -right-20 bottom-0 w-80 h-80 bg-gradient-to-tl from-[#00ffff]/12 to-transparent rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute inset-0 animated-grid opacity-40" />
+        
+        <div className={`container mx-auto max-w-4xl text-center relative z-10 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
+          <h2 className="text-5xl md:text-7xl font-black mb-6 font-vice">
+            OUR <span className="gradient-text-vice drop-shadow-[0_0_20px_rgba(255,0,128,0.5)]">STORY</span>
           </h2>
-          <p className="text-xl text-gray-300 leading-relaxed">
+          <p className="text-xl text-white/70 leading-relaxed">
             A journey from the mountains of Oregon to the world
           </p>
         </div>
       </section>
 
-      {/* Story Content */}
-      <section className="py-16 px-4 animated-bg">
+      {/* Story Content - Vice City Style */}
+      <section className="py-16 px-4 relative">
         <div className="container mx-auto max-w-4xl space-y-12">
           {/* Origin */}
-          <div className={`space-y-4 hover-lift neon-border rounded-lg p-8 bg-black/50 ${isVisible ? 'animate-fade-in-up stagger-1' : 'opacity-0'}`}>
-            <h3 className="text-3xl font-bold text-[#c8ff00]">The Beginning</h3>
+          <div className={`space-y-4 hover-lift glass-card-vice rounded-xl p-8 ${isVisible ? 'animate-fade-in-up stagger-1' : 'opacity-0'}`}>
+            <h3 className="text-3xl font-bold gradient-text-vice font-vice">The Beginning</h3>
             <p className="text-lg text-gray-300 leading-relaxed">
               Originally founded in 2013 in the beautiful mountain city and
               microbrew mecca of Bend, Oregon, NEON Energy Drink emerged from a
@@ -73,11 +78,11 @@ export default function About() {
           </div>
 
           {/* Growth */}
-          <div className={`space-y-4 hover-lift neon-border rounded-lg p-8 bg-black/50 ${isVisible ? 'animate-fade-in-up stagger-2' : 'opacity-0'}`}>
-            <h3 className="text-3xl font-bold text-[#c8ff00]">
+          <div className={`space-y-4 hover-lift glass-card-vice rounded-xl p-8 ${isVisible ? 'animate-fade-in-up stagger-2' : 'opacity-0'}`}>
+            <h3 className="text-3xl font-bold gradient-text-vice font-vice">
               Explosive Growth
             </h3>
-            <p className="text-lg text-gray-300 leading-relaxed">
+            <p className="text-lg text-white/70 leading-relaxed">
               What started as a local Oregon brand quickly became a national and
               international phenomenon. NEON grew to 48 states in the US in its
               first year on the market and spread to 14 countries around the
@@ -86,13 +91,13 @@ export default function About() {
               forward and holistic beverage culture.
             </p>
             <div className="grid md:grid-cols-2 gap-6 mt-8">
-              <div className="bg-[#0a0a0a] border border-[#c8ff00]/20 rounded-lg p-6 text-center hover-lift neon-border">
-                <div className="text-5xl font-black text-[#c8ff00] mb-2 neon-text">48</div>
-                <div className="text-gray-400">States in Year One</div>
+              <div className="stat-card text-center">
+                <div className="text-5xl font-black text-[#00ffff] mb-2 vice-text-cyan font-vice">48</div>
+                <div className="text-white/60">States in Year One</div>
               </div>
-              <div className="bg-[#0a0a0a] border border-[#c8ff00]/20 rounded-lg p-6 text-center hover-lift neon-border">
-                <div className="text-5xl font-black text-[#c8ff00] mb-2 neon-text">14</div>
-                <div className="text-gray-400">Countries in 5 Years</div>
+              <div className="stat-card text-center">
+                <div className="text-5xl font-black text-[#ff0080] mb-2 vice-text-pink font-vice">14</div>
+                <div className="text-white/60">Countries in 5 Years</div>
               </div>
             </div>
           </div>

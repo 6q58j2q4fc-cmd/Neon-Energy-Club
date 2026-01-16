@@ -87,64 +87,59 @@ export default function Home() {
       <SocialProofNotifications />
       <ViralNewsletterPopup open={showNewsletter} onClose={() => setShowNewsletter(false)} />
 
-      {/* Premium Glass Header */}
+      {/* GTA Vice City Glass Header */}
       <header 
         className="fixed top-0 w-full z-50 transition-all duration-500"
         style={{
-          backgroundColor: scrollY > 50 ? 'rgba(10, 10, 18, 0.95)' : 'transparent',
+          backgroundColor: scrollY > 50 ? 'rgba(26, 10, 46, 0.95)' : 'transparent',
           backdropFilter: scrollY > 50 ? 'blur(20px)' : 'none',
-          borderBottom: scrollY > 50 ? '1px solid rgba(184, 230, 0, 0.1)' : 'none',
+          borderBottom: scrollY > 50 ? '1px solid rgba(255, 0, 128, 0.2)' : 'none',
+          boxShadow: scrollY > 50 ? '0 4px 30px rgba(255, 0, 128, 0.15)' : 'none',
         }}
       >
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo */}
+            {/* Logo - Vice City Style */}
             <div 
               className="flex items-center gap-3 cursor-pointer group"
               onClick={() => setLocation("/")}
             >
-              <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-[#b8e600] to-[#8fb800] flex items-center justify-center shadow-lg group-hover:shadow-[0_0_20px_rgba(184,230,0,0.3)] transition-all duration-300">
-                <Zap className="w-6 h-6 text-black" />
+              <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-[#ff0080] to-[#00ffff] flex items-center justify-center shadow-[0_0_20px_rgba(255,0,128,0.4)] group-hover:shadow-[0_0_30px_rgba(255,0,128,0.6)] transition-all duration-300">
+                <Zap className="w-6 h-6 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
               </div>
-              <span className="text-2xl font-black tracking-tight font-vice">
-                <span className="text-[#b8e600]">NEON</span>
-                <span className="text-white/80 text-sm ml-1">®</span>
+              <span className="text-2xl font-black tracking-wider font-vice">
+                <span className="gradient-text-vice drop-shadow-[0_0_10px_rgba(255,0,128,0.5)]">NEON</span>
+                <span className="text-[#00ffff]/80 text-sm ml-1">®</span>
               </span>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-1">
+            {/* Desktop Navigation - Fixed Menu Buttons */}
+            <nav className="hidden lg:flex items-center gap-2">
               {navItems.map((item) => (
                 <button
                   key={item.path}
                   onClick={() => setLocation(item.path)}
-                  className={`relative px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-400 ${
-                    item.path === "/" 
-                      ? "text-[#b8e600]" 
-                      : "text-white/70 hover:text-white"
+                  className={`nav-btn ${
+                    item.path === "/" ? "active" : ""
                   }`}
-                  style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
                 >
                   {item.label}
-                  {item.path === "/" && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-[#b8e600] rounded-full" />
-                  )}
                 </button>
               ))}
             </nav>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons - Vice City Style */}
             <div className="flex items-center gap-3">
               <Button
                 onClick={() => setLocation("/join")}
                 variant="outline"
-                className="hidden md:flex border-[#b8e600]/40 text-[#b8e600] hover:bg-[#b8e600]/15 hover:border-[#b8e600]/60 font-semibold h-10 px-5 transition-all duration-300"
+                className="hidden md:flex border-[#00ffff]/60 text-[#00ffff] hover:bg-[#00ffff]/15 hover:border-[#00ffff] hover:shadow-[0_0_25px_rgba(0,255,255,0.4)] font-bold h-10 px-5 transition-all duration-300 tracking-wider"
               >
                 JOIN NOW
               </Button>
               <Button
                 onClick={() => setLocation("/crowdfund")}
-                className="btn-primary-shiny text-black font-bold px-6 h-10 rounded-lg shadow-[0_4px_20px_rgba(184,230,0,0.4)]"
+                className="btn-vice-pink text-white font-bold px-6 h-10 rounded-lg tracking-wider"
               >
                 BACK US
               </Button>
@@ -152,7 +147,7 @@ export default function Home() {
               {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 text-white/80 hover:text-white"
+                className="lg:hidden p-2 text-white/80 hover:text-[#ff1493] transition-colors"
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -160,27 +155,34 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu - GTA Vice City Style */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-black/95 backdrop-blur-xl border-t border-white/10 fixed top-[72px] left-0 right-0 z-40"
+              className="lg:hidden bg-gradient-to-b from-[#1a0a2e]/98 to-[#0d0620]/98 backdrop-blur-xl border-t border-[#ff0080]/25 fixed top-[72px] left-0 right-0 z-40"
             >
               <nav className="container mx-auto px-6 py-4 flex flex-col gap-2">
-                {navItems.map((item) => (
-                  <button
+                {navItems.map((item, index) => (
+                  <motion.button
                     key={item.path}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
                     onClick={() => {
                       setLocation(item.path);
                       setMobileMenuOpen(false);
                     }}
-                    className="py-3 px-4 text-left text-white/80 hover:text-[#b8e600] hover:bg-white/5 rounded-lg transition-all"
+                    className={`py-3 px-4 text-left rounded-lg transition-all duration-300 font-semibold tracking-wider ${
+                      item.path === "/"
+                        ? "text-[#ff0080] bg-[#ff0080]/15 border-l-3 border-[#ff0080] shadow-[inset_0_0_20px_rgba(255,0,128,0.1)]"
+                        : "text-white/80 hover:text-[#00ffff] hover:bg-[#00ffff]/10 hover:border-l-3 hover:border-[#00ffff]"
+                    }`}
                   >
                     {item.label}
-                  </button>
+                  </motion.button>
                 ))}
               </nav>
             </motion.div>
@@ -188,16 +190,19 @@ export default function Home() {
         </AnimatePresence>
       </header>
 
-      {/* Hero Section */}
+      {/* Hero Section - GTA Vice City Style */}
       <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 animated-grid opacity-30" />
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#b8e600]/5 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#9d4edd]/5 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
+        {/* Vice City Animated Grid */}
+        <div className="absolute inset-0 animated-grid opacity-50" />
         
-        {/* Subtle Ambient Glow Effects */}
-        <div className="absolute -left-40 top-1/3 w-80 h-80 bg-[#b8e600]/8 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute -right-20 bottom-1/4 w-60 h-60 bg-[#9d4edd]/6 rounded-full blur-[100px] pointer-events-none" />
+        {/* Vice City Gradient Orbs - Hot Pink, Cyan, Purple */}
+        <div className="absolute top-0 left-1/4 w-[700px] h-[700px] bg-gradient-to-br from-[#ff0080]/25 to-transparent rounded-full blur-[150px] animate-glow-pulse" />
+        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-gradient-to-tl from-[#00ffff]/20 to-transparent rounded-full blur-[150px] animate-glow-pulse" style={{ animationDelay: "1s" }} />
+        <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-gradient-to-r from-[#9d4edd]/20 to-transparent rounded-full blur-[130px] animate-glow-pulse" style={{ animationDelay: "2s" }} />
+        
+        {/* Ambient Glow for Can Blending - Matches NEON green */}
+        <div className="absolute right-0 top-1/4 w-[600px] h-[800px] bg-gradient-to-l from-[#b8e600]/15 via-[#b8e600]/08 to-transparent blur-[120px] pointer-events-none" />
+        <div className="absolute right-1/4 top-1/3 w-[300px] h-[400px] bg-gradient-to-b from-[#b8e600]/10 to-transparent blur-[80px] pointer-events-none" />
         
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -281,31 +286,33 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right - Product Showcase */}
+            {/* Right - Product Showcase with Vice City Blending */}
             <div className={`relative ${isVisible ? 'animate-fade-in delay-300' : 'opacity-0'}`}>
-              {/* Glow Effect */}
+              {/* Vice City Glow Effect - Blends with can */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-80 h-80 bg-[#b8e600]/10 rounded-full blur-[80px] animate-pulse" />
+                <div className="w-96 h-96 bg-gradient-to-br from-[#b8e600]/15 via-[#00ffff]/05 to-[#ff0080]/05 rounded-full blur-[100px] animate-glow-pulse" />
               </div>
               
-              {/* Product Image - Clean & Professional */}
+              {/* Product Image - Seamless Background Blend */}
               <div className="relative z-10 flex justify-center">
-                {/* Ambient Glow Behind Can */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#b8e600]/15 rounded-full blur-[80px] pointer-events-none" />
+                {/* Multi-layer Ambient Glow for Seamless Blending */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-radial from-[#b8e600]/20 via-[#b8e600]/08 to-transparent rounded-full blur-[100px] pointer-events-none" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-[#b8e600]/10 rounded-full blur-[60px] pointer-events-none animate-glow-pulse" />
                 
-                {/* Main Can */}
+                {/* Main Can - Enhanced Glow */}
                 <img
                   src="/neon-can.png"
                   alt="NEON Energy Drink Can"
                   className="h-[450px] md:h-[550px] object-contain product-glow animate-float relative z-10"
+                  style={{ filter: 'drop-shadow(0 0 40px rgba(184, 230, 0, 0.4)) drop-shadow(0 0 80px rgba(184, 230, 0, 0.2)) drop-shadow(0 30px 60px rgba(0, 0, 0, 0.5))' }}
                 />
               </div>
 
-              {/* Floating Stats */}
-              <div className="absolute top-20 right-0 glass-card rounded-xl p-4 animate-float-slow" style={{ animationDelay: "0.5s" }}>
+              {/* Floating Stats - Vice City Style */}
+              <div className="absolute top-20 right-0 glass-card-vice rounded-xl p-4 animate-float-slow" style={{ animationDelay: "0.5s" }}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#b8e600]/20 flex items-center justify-center">
-                    <Zap className="w-5 h-5 text-[#b8e600]" />
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#00ffff]/30 to-[#00ffff]/10 flex items-center justify-center">
+                    <Zap className="w-5 h-5 text-[#00ffff]" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-white">150mg</p>
@@ -314,10 +321,10 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="absolute bottom-32 left-0 glass-card rounded-xl p-4 animate-float-slow" style={{ animationDelay: "1s" }}>
+              <div className="absolute bottom-32 left-0 glass-card-vice rounded-xl p-4 animate-float-slow" style={{ animationDelay: "1s" }}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
-                    <Leaf className="w-5 h-5 text-green-400" />
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#b8e600]/30 to-[#b8e600]/10 flex items-center justify-center">
+                    <Leaf className="w-5 h-5 text-[#b8e600]" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-white">0g</p>
@@ -336,9 +343,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Funding Progress Section */}
+      {/* Funding Progress Section - Vice City Style */}
       <section className="py-20 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#b8e600]/5 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#ff0080]/5 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#00ffff]/3 via-transparent to-[#9d4edd]/3" />
         <div className="container mx-auto px-6 relative z-10">
           <div className="glass-card-neon rounded-3xl p-8 md:p-12">
             <div className="grid md:grid-cols-2 gap-12 items-center">

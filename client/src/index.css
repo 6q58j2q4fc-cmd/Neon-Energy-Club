@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Bebas+Neue&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -79,16 +79,33 @@
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.623 0.214 259.815);
   
-  /* NEON Brand Palette - Clean & Professional */
+  /* ===== GTA VICE CITY COLOR PALETTE ===== */
+  /* NEON Green (from can) */
   --neon-green: #b8e600;
   --neon-green-rgb: 184, 230, 0;
   --neon-green-dark: #8fb800;
-  --neon-pink: #ff1493;
-  --neon-pink-rgb: 255, 20, 147;
-  --neon-cyan: #00e5ff;
-  --neon-cyan-rgb: 0, 229, 255;
-  --neon-purple: #9d4edd;
-  --neon-purple-rgb: 157, 78, 221;
+  
+  /* Vice City Hot Pink */
+  --vice-pink: #ff0080;
+  --vice-pink-rgb: 255, 0, 128;
+  --vice-pink-light: #ff69b4;
+  --vice-pink-light-rgb: 255, 105, 180;
+  
+  /* Vice City Electric Cyan */
+  --vice-cyan: #00ffff;
+  --vice-cyan-rgb: 0, 255, 255;
+  --vice-cyan-dark: #00d4d4;
+  
+  /* Vice City Purple/Magenta */
+  --vice-purple: #9d4edd;
+  --vice-purple-rgb: 157, 78, 221;
+  --vice-magenta: #e040fb;
+  --vice-magenta-rgb: 224, 64, 251;
+  
+  /* Vice City Sunset Orange */
+  --vice-orange: #ff6b35;
+  --vice-orange-rgb: 255, 107, 53;
+  --vice-gold: #ffd700;
   
   /* Professional Easing Curves */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -98,38 +115,38 @@
 }
 
 .dark {
-  --primary: oklch(0.85 0.2 125);
-  --primary-foreground: oklch(0.05 0 0);
-  --sidebar-primary: oklch(0.85 0.2 125);
-  --sidebar-primary-foreground: oklch(0.05 0 0);
-  --background: oklch(0.06 0.01 280);
+  --primary: oklch(0.75 0.3 330);
+  --primary-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.75 0.3 330);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --background: oklch(0.06 0.02 300);
   --foreground: oklch(0.95 0 0);
-  --card: oklch(0.08 0.01 280);
+  --card: oklch(0.08 0.02 300);
   --card-foreground: oklch(0.95 0 0);
-  --popover: oklch(0.1 0.01 280);
+  --popover: oklch(0.1 0.02 300);
   --popover-foreground: oklch(0.95 0 0);
-  --secondary: oklch(0.14 0.01 280);
+  --secondary: oklch(0.14 0.02 300);
   --secondary-foreground: oklch(0.95 0 0);
-  --muted: oklch(0.18 0.01 280);
+  --muted: oklch(0.18 0.02 300);
   --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.85 0.2 125);
-  --accent-foreground: oklch(0.05 0 0);
+  --accent: oklch(0.75 0.3 330);
+  --accent-foreground: oklch(0.98 0 0);
   --destructive: oklch(0.55 0.25 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.22 0.02 280);
-  --input: oklch(0.18 0.02 280);
-  --ring: oklch(0.85 0.2 125);
+  --border: oklch(0.22 0.03 300);
+  --input: oklch(0.18 0.03 300);
+  --ring: oklch(0.75 0.3 330);
   --chart-1: oklch(0.85 0.2 125);
-  --chart-2: oklch(0.7 0.15 330);
-  --chart-3: oklch(0.75 0.15 200);
-  --chart-4: oklch(0.65 0.2 290);
-  --chart-5: oklch(0.7 0.2 30);
-  --sidebar: oklch(0.07 0.01 280);
+  --chart-2: oklch(0.75 0.3 330);
+  --chart-3: oklch(0.8 0.25 190);
+  --chart-4: oklch(0.7 0.25 290);
+  --chart-5: oklch(0.75 0.2 30);
+  --sidebar: oklch(0.07 0.02 300);
   --sidebar-foreground: oklch(0.95 0 0);
-  --sidebar-accent: oklch(0.85 0.2 125);
-  --sidebar-accent-foreground: oklch(0.05 0 0);
-  --sidebar-border: oklch(0.22 0.02 280);
-  --sidebar-ring: oklch(0.85 0.2 125);
+  --sidebar-accent: oklch(0.75 0.3 330);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.22 0.03 300);
+  --sidebar-ring: oklch(0.75 0.3 330);
 }
 
 @layer base {
@@ -163,13 +180,12 @@
   }
 
   ::selection {
-    background: rgba(184, 230, 0, 0.3);
+    background: rgba(255, 0, 128, 0.4);
     color: white;
   }
   
-  /* Smooth focus states */
   :focus-visible {
-    outline: 2px solid rgba(var(--neon-green-rgb), 0.5);
+    outline: 2px solid rgba(var(--vice-cyan-rgb), 0.6);
     outline-offset: 2px;
     transition: outline-offset 0.2s var(--ease-out-expo);
   }
@@ -207,16 +223,22 @@
   /* ===== TYPOGRAPHY ===== */
   .font-vice {
     font-family: 'Orbitron', 'Inter', sans-serif;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.05em;
   }
 
-  /* ===== BACKGROUND STYLES ===== */
+  .font-bebas {
+    font-family: 'Bebas Neue', 'Inter', sans-serif;
+    letter-spacing: 0.1em;
+  }
+
+  /* ===== GTA VICE CITY BACKGROUNDS ===== */
   .vice-bg {
     background: linear-gradient(180deg, 
-      #050508 0%, 
-      #0a0a10 30%,
-      #08080c 60%,
-      #050508 100%);
+      #1a0a2e 0%,
+      #16082a 15%,
+      #0d0620 40%,
+      #0a0418 70%,
+      #050210 100%);
     position: relative;
   }
 
@@ -228,12 +250,24 @@
     right: 0;
     bottom: 0;
     background: 
-      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--neon-green-rgb), 0.03) 0%, transparent 50%),
-      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(var(--neon-purple-rgb), 0.02) 0%, transparent 50%);
+      radial-gradient(ellipse 120% 50% at 50% 0%, rgba(var(--vice-pink-rgb), 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse 80% 40% at 0% 30%, rgba(var(--vice-cyan-rgb), 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse 80% 40% at 100% 30%, rgba(var(--vice-purple-rgb), 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse 100% 50% at 50% 100%, rgba(var(--vice-orange-rgb), 0.05) 0%, transparent 40%);
     pointer-events: none;
   }
 
-  /* Subtle Grid - Very Light */
+  /* Vice City Sunset Gradient */
+  .vice-sunset {
+    background: linear-gradient(180deg,
+      #ff6b35 0%,
+      #ff0080 25%,
+      #9d4edd 50%,
+      #1a0a2e 75%,
+      #0a0418 100%);
+  }
+
+  /* Synthwave Grid - Vice City Style */
   .animated-grid {
     position: relative;
   }
@@ -246,35 +280,52 @@
     right: 0;
     bottom: 0;
     background-image: 
-      linear-gradient(rgba(var(--neon-green-rgb), 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(var(--neon-green-rgb), 0.02) 1px, transparent 1px);
-    background-size: 80px 80px;
+      linear-gradient(rgba(var(--vice-pink-rgb), 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(var(--vice-cyan-rgb), 0.04) 1px, transparent 1px);
+    background-size: 50px 50px;
     pointer-events: none;
-    opacity: 0.6;
+    opacity: 0.7;
+    mask-image: linear-gradient(180deg, transparent 0%, black 20%, black 80%, transparent 100%);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 20%, black 80%, transparent 100%);
   }
 
-  /* ===== GLASS CARDS ===== */
+  /* ===== GLASS CARDS - Vice City Style ===== */
   .glass-card {
-    background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(26, 10, 46, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(var(--vice-pink-rgb), 0.2);
     box-shadow: 
-      0 4px 32px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      0 0 60px rgba(var(--vice-pink-rgb), 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   .glass-card-neon {
-    background: rgba(var(--neon-green-rgb), 0.02);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(var(--neon-green-rgb), 0.08);
+    background: rgba(var(--neon-green-rgb), 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(var(--neon-green-rgb), 0.2);
     box-shadow: 
-      0 4px 32px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(var(--neon-green-rgb), 0.03);
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      0 0 40px rgba(var(--neon-green-rgb), 0.08),
+      inset 0 1px 0 rgba(var(--neon-green-rgb), 0.05);
   }
 
-  /* ===== BUTTONS - World Class Design ===== */
+  .glass-card-vice {
+    background: linear-gradient(135deg, 
+      rgba(var(--vice-pink-rgb), 0.1) 0%,
+      rgba(var(--vice-purple-rgb), 0.08) 50%,
+      rgba(var(--vice-cyan-rgb), 0.1) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(var(--vice-pink-rgb), 0.25);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      0 0 60px rgba(var(--vice-pink-rgb), 0.1);
+  }
+
+  /* ===== BUTTONS - GTA Vice City Style ===== */
   .btn-primary-shiny {
     position: relative;
     overflow: hidden;
@@ -283,13 +334,15 @@
       var(--neon-green-dark) 100%);
     color: #000;
     font-weight: 700;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.05em;
     border: none;
     box-shadow: 
-      0 4px 16px rgba(var(--neon-green-rgb), 0.35),
-      0 2px 4px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      0 0 20px rgba(var(--neon-green-rgb), 0.5),
+      0 0 40px rgba(var(--neon-green-rgb), 0.25),
+      0 4px 15px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
     transition: all 0.4s var(--ease-out-expo);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
   }
 
   .btn-primary-shiny::before {
@@ -302,10 +355,10 @@
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 255, 255, 0.25),
+      rgba(255, 255, 255, 0.4),
       transparent
     );
-    transition: left 0.6s var(--ease-out-expo);
+    transition: left 0.5s var(--ease-out-expo);
   }
 
   .btn-primary-shiny:hover::before {
@@ -314,42 +367,159 @@
 
   .btn-primary-shiny:hover {
     box-shadow: 
-      0 8px 32px rgba(var(--neon-green-rgb), 0.5),
-      0 4px 8px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    transform: translateY(-3px);
+      0 0 30px rgba(var(--neon-green-rgb), 0.7),
+      0 0 60px rgba(var(--neon-green-rgb), 0.4),
+      0 8px 25px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transform: translateY(-3px) scale(1.02);
   }
 
   .btn-primary-shiny:active {
-    transform: translateY(-1px);
+    transform: translateY(-1px) scale(1);
     transition-duration: 0.1s;
   }
 
+  /* Vice City Hot Pink Button */
+  .btn-vice-pink {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, 
+      var(--vice-pink) 0%, 
+      var(--vice-magenta) 100%);
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border: none;
+    box-shadow: 
+      0 0 20px rgba(var(--vice-pink-rgb), 0.5),
+      0 0 40px rgba(var(--vice-pink-rgb), 0.25),
+      0 4px 15px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: all 0.4s var(--ease-out-expo);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+
+  .btn-vice-pink::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    transition: left 0.5s var(--ease-out-expo);
+  }
+
+  .btn-vice-pink:hover::before {
+    left: 100%;
+  }
+
+  .btn-vice-pink:hover {
+    box-shadow: 
+      0 0 30px rgba(var(--vice-pink-rgb), 0.7),
+      0 0 60px rgba(var(--vice-pink-rgb), 0.4),
+      0 8px 25px rgba(0, 0, 0, 0.4);
+    transform: translateY(-3px) scale(1.02);
+  }
+
+  /* Vice City Cyan Button */
+  .btn-vice-cyan {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, 
+      var(--vice-cyan) 0%, 
+      var(--vice-cyan-dark) 100%);
+    color: #000;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border: none;
+    box-shadow: 
+      0 0 20px rgba(var(--vice-cyan-rgb), 0.5),
+      0 0 40px rgba(var(--vice-cyan-rgb), 0.25),
+      0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s var(--ease-out-expo);
+  }
+
+  .btn-vice-cyan:hover {
+    box-shadow: 
+      0 0 30px rgba(var(--vice-cyan-rgb), 0.7),
+      0 0 60px rgba(var(--vice-cyan-rgb), 0.4);
+    transform: translateY(-3px) scale(1.02);
+  }
+
+  /* Outline Button - Vice Style */
   .btn-shiny {
     position: relative;
     overflow: hidden;
-    background: rgba(var(--neon-green-rgb), 0.08);
-    border: 1.5px solid rgba(var(--neon-green-rgb), 0.4);
+    background: rgba(var(--vice-cyan-rgb), 0.08);
+    border: 2px solid rgba(var(--vice-cyan-rgb), 0.5);
     box-shadow: 
-      0 2px 8px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      0 0 15px rgba(var(--vice-cyan-rgb), 0.2),
+      inset 0 0 20px rgba(var(--vice-cyan-rgb), 0.05);
     transition: all 0.4s var(--ease-out-expo);
   }
 
   .btn-shiny:hover {
-    background: rgba(var(--neon-green-rgb), 0.15);
-    border-color: rgba(var(--neon-green-rgb), 0.6);
+    background: rgba(var(--vice-cyan-rgb), 0.15);
+    border-color: rgba(var(--vice-cyan-rgb), 0.8);
     box-shadow: 
-      0 4px 16px rgba(var(--neon-green-rgb), 0.2),
-      0 2px 4px rgba(0, 0, 0, 0.2);
+      0 0 25px rgba(var(--vice-cyan-rgb), 0.4),
+      0 0 50px rgba(var(--vice-cyan-rgb), 0.2),
+      inset 0 0 30px rgba(var(--vice-cyan-rgb), 0.08);
     transform: translateY(-2px);
   }
 
-  /* ===== PROFESSIONAL ANIMATIONS ===== */
+  /* ===== NAVIGATION - Vice City Style ===== */
+  .nav-btn {
+    position: relative;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.75);
+    background: transparent;
+    border: none;
+    border-radius: 0.5rem;
+    transition: all 0.3s var(--ease-out-expo);
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+
+  .nav-btn:hover {
+    color: var(--vice-cyan);
+    background: rgba(var(--vice-cyan-rgb), 0.1);
+    text-shadow: 0 0 10px rgba(var(--vice-cyan-rgb), 0.5);
+  }
+
+  .nav-btn.active {
+    color: var(--vice-pink);
+    background: rgba(var(--vice-pink-rgb), 0.15);
+    text-shadow: 0 0 15px rgba(var(--vice-pink-rgb), 0.6);
+  }
+
+  .nav-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--vice-pink), var(--vice-cyan), transparent);
+    border-radius: 1px;
+    box-shadow: 0 0 10px rgba(var(--vice-pink-rgb), 0.6);
+  }
+
+  /* ===== ANIMATIONS ===== */
   @keyframes fadeInUp {
     from {
       opacity: 0;
-      transform: translateY(24px);
+      transform: translateY(30px);
     }
     to {
       opacity: 1;
@@ -365,7 +535,7 @@
   @keyframes slideInLeft {
     from {
       opacity: 0;
-      transform: translateX(-32px);
+      transform: translateX(-40px);
     }
     to {
       opacity: 1;
@@ -376,7 +546,7 @@
   @keyframes slideInRight {
     from {
       opacity: 0;
-      transform: translateX(32px);
+      transform: translateX(40px);
     }
     to {
       opacity: 1;
@@ -387,7 +557,7 @@
   @keyframes scaleIn {
     from {
       opacity: 0;
-      transform: scale(0.96);
+      transform: scale(0.95);
     }
     to {
       opacity: 1;
@@ -395,21 +565,43 @@
     }
   }
 
-  /* Smooth, subtle float - no jarring movement */
   @keyframes float {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+    50% { transform: translateY(-12px); }
   }
 
   @keyframes float-slow {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+    50% { transform: translateY(-8px); }
   }
 
-  /* Gentle glow pulse */
   @keyframes glow-pulse {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 1; }
+    0%, 100% { opacity: 0.5; filter: brightness(1); }
+    50% { opacity: 1; filter: brightness(1.2); }
+  }
+
+  @keyframes neon-flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+      opacity: 1;
+      text-shadow: 
+        0 0 5px var(--vice-pink),
+        0 0 15px var(--vice-pink),
+        0 0 25px var(--vice-pink);
+    }
+    20%, 24%, 55% {
+      opacity: 0.7;
+      text-shadow: none;
+    }
+  }
+
+  @keyframes grid-scroll {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(50px); }
+  }
+
+  @keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
   }
 
   .animate-fade-in-up {
@@ -433,41 +625,75 @@
   }
 
   .animate-float {
-    animation: float 6s ease-in-out infinite;
+    animation: float 5s ease-in-out infinite;
   }
 
   .animate-float-slow {
-    animation: float-slow 8s ease-in-out infinite;
+    animation: float-slow 7s ease-in-out infinite;
   }
 
   .animate-glow-pulse {
     animation: glow-pulse 3s ease-in-out infinite;
   }
 
-  /* Animation Delays */
+  .animate-neon-flicker {
+    animation: neon-flicker 4s infinite;
+  }
+
   .delay-100 { animation-delay: 0.1s; }
   .delay-200 { animation-delay: 0.2s; }
   .delay-300 { animation-delay: 0.3s; }
   .delay-400 { animation-delay: 0.4s; }
   .delay-500 { animation-delay: 0.5s; }
 
-  /* ===== GLOW EFFECTS - Refined ===== */
+  /* ===== GLOW EFFECTS - Vice City Style ===== */
   .neon-glow {
-    filter: drop-shadow(0 0 3px rgba(var(--neon-green-rgb), 0.3));
+    filter: drop-shadow(0 0 5px rgba(var(--neon-green-rgb), 0.5));
   }
 
   .neon-glow-strong {
-    filter: drop-shadow(0 0 8px rgba(var(--neon-green-rgb), 0.4)) 
-            drop-shadow(0 0 16px rgba(var(--neon-green-rgb), 0.2));
+    filter: drop-shadow(0 0 10px rgba(var(--neon-green-rgb), 0.6)) 
+            drop-shadow(0 0 25px rgba(var(--neon-green-rgb), 0.4))
+            drop-shadow(0 0 40px rgba(var(--neon-green-rgb), 0.2));
+  }
+
+  .vice-glow-pink {
+    filter: drop-shadow(0 0 10px rgba(var(--vice-pink-rgb), 0.6)) 
+            drop-shadow(0 0 25px rgba(var(--vice-pink-rgb), 0.4))
+            drop-shadow(0 0 40px rgba(var(--vice-pink-rgb), 0.2));
+  }
+
+  .vice-glow-cyan {
+    filter: drop-shadow(0 0 10px rgba(var(--vice-cyan-rgb), 0.6)) 
+            drop-shadow(0 0 25px rgba(var(--vice-cyan-rgb), 0.4))
+            drop-shadow(0 0 40px rgba(var(--vice-cyan-rgb), 0.2));
   }
 
   .neon-text {
-    text-shadow: 0 0 6px rgba(var(--neon-green-rgb), 0.4);
+    text-shadow: 
+      0 0 7px rgba(var(--neon-green-rgb), 0.7),
+      0 0 15px rgba(var(--neon-green-rgb), 0.5),
+      0 0 30px rgba(var(--neon-green-rgb), 0.3);
+  }
+
+  .vice-text-pink {
+    text-shadow: 
+      0 0 7px rgba(var(--vice-pink-rgb), 0.7),
+      0 0 15px rgba(var(--vice-pink-rgb), 0.5),
+      0 0 30px rgba(var(--vice-pink-rgb), 0.3);
+  }
+
+  .vice-text-cyan {
+    text-shadow: 
+      0 0 7px rgba(var(--vice-cyan-rgb), 0.7),
+      0 0 15px rgba(var(--vice-cyan-rgb), 0.5),
+      0 0 30px rgba(var(--vice-cyan-rgb), 0.3);
   }
 
   .product-glow {
-    filter: drop-shadow(0 0 24px rgba(var(--neon-green-rgb), 0.2))
-            drop-shadow(0 16px 48px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 0 30px rgba(var(--neon-green-rgb), 0.4))
+            drop-shadow(0 0 60px rgba(var(--neon-green-rgb), 0.2))
+            drop-shadow(0 20px 50px rgba(0, 0, 0, 0.6));
   }
 
   /* ===== GRADIENT TEXT ===== */
@@ -478,9 +704,133 @@
     background-clip: text;
   }
 
-  /* ===== TRANSITIONS ===== */
-  .transition-smooth {
+  .gradient-text-vice {
+    background: linear-gradient(135deg, var(--vice-pink) 0%, var(--vice-cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-sunset {
+    background: linear-gradient(135deg, var(--vice-orange) 0%, var(--vice-pink) 50%, var(--vice-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ===== UI COMPONENTS ===== */
+  .badge-neon {
+    background: rgba(var(--neon-green-rgb), 0.15);
+    border: 1px solid rgba(var(--neon-green-rgb), 0.5);
+    color: var(--neon-green);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    padding: 0.375rem 1rem;
+    border-radius: 9999px;
+    box-shadow: 0 0 15px rgba(var(--neon-green-rgb), 0.2);
+    text-transform: uppercase;
+  }
+
+  .badge-vice {
+    background: linear-gradient(135deg, rgba(var(--vice-pink-rgb), 0.2) 0%, rgba(var(--vice-cyan-rgb), 0.2) 100%);
+    border: 1px solid rgba(var(--vice-pink-rgb), 0.5);
+    color: var(--vice-pink);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    padding: 0.375rem 1rem;
+    border-radius: 9999px;
+    box-shadow: 0 0 15px rgba(var(--vice-pink-rgb), 0.2);
+    text-transform: uppercase;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, 
+      rgba(var(--vice-pink-rgb), 0.08) 0%,
+      rgba(var(--vice-purple-rgb), 0.05) 50%,
+      rgba(var(--vice-cyan-rgb), 0.08) 100%);
+    border: 1px solid rgba(var(--vice-pink-rgb), 0.2);
+    border-radius: 16px;
+    padding: 1.5rem;
     transition: all 0.4s var(--ease-out-expo);
+  }
+
+  .stat-card:hover {
+    border-color: rgba(var(--vice-pink-rgb), 0.4);
+    transform: translateY(-4px);
+    box-shadow: 
+      0 15px 40px rgba(var(--vice-pink-rgb), 0.15),
+      0 0 30px rgba(var(--vice-cyan-rgb), 0.1);
+  }
+
+  .progress-neon {
+    background: rgba(var(--neon-green-rgb), 0.15);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .progress-neon-bar {
+    background: linear-gradient(90deg, var(--neon-green) 0%, #d4ff00 100%);
+    box-shadow: 0 0 20px rgba(var(--neon-green-rgb), 0.6);
+    border-radius: 9999px;
+    transition: width 0.8s var(--ease-out-expo);
+  }
+
+  .input-neon {
+    background: rgba(10, 4, 24, 0.8);
+    border: 1px solid rgba(var(--vice-pink-rgb), 0.25);
+    transition: all 0.3s var(--ease-out-expo);
+  }
+
+  .input-neon:focus {
+    border-color: rgba(var(--vice-cyan-rgb), 0.6);
+    box-shadow: 
+      0 0 0 3px rgba(var(--vice-cyan-rgb), 0.15),
+      0 0 20px rgba(var(--vice-cyan-rgb), 0.15);
+    outline: none;
+  }
+
+  .neon-border {
+    box-shadow: 
+      0 0 15px rgba(var(--neon-green-rgb), 0.25),
+      inset 0 0 15px rgba(var(--neon-green-rgb), 0.05);
+  }
+
+  .vice-border {
+    box-shadow: 
+      0 0 15px rgba(var(--vice-pink-rgb), 0.25),
+      0 0 30px rgba(var(--vice-cyan-rgb), 0.1);
+  }
+
+  .neon-divider {
+    height: 1px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(var(--vice-pink-rgb), 0.5) 20%,
+      rgba(var(--vice-cyan-rgb), 0.5) 80%,
+      transparent 100%);
+  }
+
+  /* ===== SCROLLBAR - Vice City Style ===== */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(26, 10, 46, 0.8);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--vice-pink), var(--vice-purple));
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--vice-pink-light), var(--vice-magenta));
   }
 
   /* ===== HOVER EFFECTS ===== */
@@ -489,126 +839,32 @@
   }
 
   .hover-lift:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    transform: translateY(-8px);
+    box-shadow: 
+      0 20px 50px rgba(0, 0, 0, 0.4),
+      0 0 40px rgba(var(--vice-pink-rgb), 0.15);
   }
 
-  /* ===== UI COMPONENTS ===== */
-  .badge-neon {
-    background: rgba(var(--neon-green-rgb), 0.1);
-    border: 1px solid rgba(var(--neon-green-rgb), 0.25);
-    color: var(--neon-green);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    padding: 0.375rem 1rem;
-    border-radius: 9999px;
-  }
-
-  .stat-card {
-    background: rgba(var(--neon-green-rgb), 0.03);
-    border: 1px solid rgba(var(--neon-green-rgb), 0.1);
-    border-radius: 16px;
-    padding: 1.5rem;
+  .transition-smooth {
     transition: all 0.4s var(--ease-out-expo);
   }
 
-  .stat-card:hover {
-    border-color: rgba(var(--neon-green-rgb), 0.2);
-    transform: translateY(-2px);
-    background: rgba(var(--neon-green-rgb), 0.05);
-  }
-
-  .progress-neon {
-    background: rgba(var(--neon-green-rgb), 0.1);
-    border-radius: 9999px;
-    overflow: hidden;
-  }
-
-  .progress-neon-bar {
-    background: linear-gradient(90deg, var(--neon-green) 0%, #d4ff00 100%);
-    box-shadow: 0 0 12px rgba(var(--neon-green-rgb), 0.4);
-    border-radius: 9999px;
-    transition: width 0.8s var(--ease-out-expo);
-  }
-
-  .input-neon {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(var(--neon-green-rgb), 0.15);
-    transition: all 0.3s var(--ease-out-expo);
-  }
-
-  .input-neon:focus {
-    border-color: rgba(var(--neon-green-rgb), 0.5);
-    box-shadow: 0 0 0 3px rgba(var(--neon-green-rgb), 0.1);
-    outline: none;
-  }
-
-  .neon-border {
-    box-shadow: 0 0 12px rgba(var(--neon-green-rgb), 0.15);
-  }
-
-  .neon-divider {
-    height: 1px;
-    background: linear-gradient(90deg, 
-      transparent 0%, 
-      rgba(var(--neon-green-rgb), 0.3) 50%,
-      transparent 100%);
-  }
-
-  /* ===== SCROLLBAR ===== */
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: rgba(var(--neon-green-rgb), 0.25);
-    border-radius: 5px;
-    border: 2px solid transparent;
-    background-clip: padding-box;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(var(--neon-green-rgb), 0.4);
-  }
-
-  /* ===== NAVIGATION ===== */
-  .nav-link {
-    position: relative;
-    color: rgba(255, 255, 255, 0.7);
-    transition: color 0.3s var(--ease-out-expo);
-  }
-
-  .nav-link:hover {
-    color: var(--neon-green);
-  }
-
-  .nav-link::after {
+  /* ===== SCANLINE EFFECT ===== */
+  .scanlines::after {
     content: '';
     position: absolute;
-    bottom: -4px;
-    left: 50%;
-    width: 0;
-    height: 2px;
-    background: var(--neon-green);
-    transition: all 0.3s var(--ease-out-expo);
-    transform: translateX(-50%);
-  }
-
-  .nav-link:hover::after {
-    width: 100%;
-  }
-
-  .nav-link.active {
-    color: var(--neon-green);
-  }
-
-  .nav-link.active::after {
-    width: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.1) 0px,
+      rgba(0, 0, 0, 0.1) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+    pointer-events: none;
+    opacity: 0.3;
   }
 }
