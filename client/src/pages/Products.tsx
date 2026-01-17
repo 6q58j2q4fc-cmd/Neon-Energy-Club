@@ -83,12 +83,12 @@ export default function Products() {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-br from-[#b8e600]/15 to-[#00ffff]/08 rounded-full blur-[70px] pointer-events-none" />
                 
                 <div className="relative inline-block">
-                  <div className="absolute inset-0 bg-[#b8e600] blur-[80px] opacity-50 rounded-full"></div>
+                  <div className="absolute inset-0 bg-[#b8e600] blur-[80px] opacity-60 rounded-full"></div>
                   <img
-                    src="/neon-can-official.png"
+                    src="/neon-can-transparent.png"
                     alt="NEON Original"
                     className="w-48 h-auto mx-auto mb-6 animate-float relative z-10"
-                    style={{ filter: 'drop-shadow(0 0 40px rgba(184, 230, 0, 0.6)) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.4))' }}
+                    style={{ filter: 'drop-shadow(0 0 50px rgba(184, 230, 0, 0.7)) drop-shadow(0 25px 50px rgba(0, 0, 0, 0.5))' }}
                   />
                 </div>
                 <h3 className="text-4xl font-black gradient-text-vice mb-2 font-vice">

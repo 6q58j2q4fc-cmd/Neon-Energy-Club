@@ -305,3 +305,18 @@
 - [x] Copy user's attached can image to project
 - [x] Update all can image references to use new image
 - [x] Ensure can displays correctly across all pages
+
+## Vice City Visual Enhancement (Jan 17)
+
+### Can Image Background Removal
+- [x] Remove black background from NEON can image
+- [x] Create transparent PNG version of can
+- [x] Update all can image references
+
+### Brighter Vice City Theme
+- [x] Make Vice City background more vibrant and visible
+- [x] Increase brightness of neon pink, cyan, and purple colors
+- [x] Enhance palm tree and skyline visibility
+- [x] Add more prominent GTA 6 style graphics
+- [x] Make sunset gradient more vivid
+- [x] Ensure background doesn't get lost behind content

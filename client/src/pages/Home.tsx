@@ -171,12 +171,12 @@ export default function Home() {
 
       {/* Hero Section - GTA Vice City Style */}
       <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-        {/* Vice City Background Image */}
+        {/* Vice City Background Image - Vibrant & Bold */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40"
-          style={{ backgroundImage: 'url(/vice-city-bg.png)' }}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-70"
+          style={{ backgroundImage: 'url(/vice-city-bg-vibrant.png)' }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0d0620] via-[#0d0620]/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0d0620] via-[#0d0620]/40 to-transparent" />
         
         {/* Vice City Animated Grid */}
         <div className="absolute inset-0 animated-grid opacity-30" />
@@ -288,12 +288,12 @@ export default function Home() {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-radial from-[#b8e600]/20 via-[#b8e600]/08 to-transparent rounded-full blur-[100px] pointer-events-none" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-[#b8e600]/10 rounded-full blur-[60px] pointer-events-none animate-glow-pulse" />
                 
-                {/* Main Can - Official NEON Can Image */}
+                {/* Main Can - Transparent Background */}
                 <img
-                  src="/neon-can-official.png"
+                  src="/neon-can-transparent.png"
                   alt="NEON Energy Drink Can"
                   className="h-[450px] md:h-[550px] object-contain product-glow animate-float relative z-10"
-                  style={{ filter: 'drop-shadow(0 0 60px rgba(184, 230, 0, 0.6)) drop-shadow(0 0 120px rgba(184, 230, 0, 0.3)) drop-shadow(0 30px 60px rgba(0, 0, 0, 0.5))' }}
+                  style={{ filter: 'drop-shadow(0 0 80px rgba(184, 230, 0, 0.7)) drop-shadow(0 0 150px rgba(184, 230, 0, 0.4)) drop-shadow(0 40px 80px rgba(0, 0, 0, 0.6))' }}
                 />
               </div>
 
