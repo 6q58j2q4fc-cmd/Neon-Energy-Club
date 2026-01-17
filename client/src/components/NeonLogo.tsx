@@ -51,59 +51,62 @@ export default function NeonLogo({ className = "", onClick }: NeonLogoProps) {
     >
       {/* Main NEON Text - SVG matching the PDF exactly */}
       <svg
-        viewBox="0 0 280 80"
-        className="w-[140px] sm:w-[180px] md:w-[220px] h-auto"
+        viewBox="0 0 320 70"
+        className="w-[120px] sm:w-[140px] md:w-[160px] h-auto"
         style={{
           opacity: getOpacity(),
           transition: flickerPhase < 10 ? 'opacity 0.05s' : 'opacity 0.3s',
         }}
       >
-        {/* N - Angular design with diagonal stroke */}
+        {/* N - Angular design matching PDF */}
         <g className="neon-letter" style={{ animationDelay: '0s' }}>
           <path
-            d="M8 8 L8 72 M8 8 L42 72 M42 8 L42 72"
+            d="M10 10 L10 60 M10 10 L50 60 M50 10 L50 60"
             fill="none"
-            stroke="#b8e600"
-            strokeWidth="8"
+            stroke="#c8ff00"
+            strokeWidth="7"
             strokeLinecap="round"
             strokeLinejoin="round"
             className="neon-stroke"
           />
         </g>
 
-        {/* E - Three horizontal bars */}
+        {/* E - Three horizontal bars matching PDF style */}
         <g className="neon-letter" style={{ animationDelay: '0.1s' }}>
           <path
-            d="M58 8 L58 72 M58 8 L92 8 M58 40 L85 40 M58 72 L92 72"
+            d="M70 10 L70 60 M70 10 L110 10 M70 35 L100 35 M70 60 L110 60"
             fill="none"
-            stroke="#b8e600"
-            strokeWidth="8"
+            stroke="#c8ff00"
+            strokeWidth="7"
             strokeLinecap="round"
             strokeLinejoin="round"
             className="neon-stroke"
           />
         </g>
 
-        {/* O - Rounded rectangle with gap at top-right */}
+        {/* O - Rounded rectangle matching PDF */}
         <g className="neon-letter" style={{ animationDelay: '0.2s' }}>
-          <path
-            d="M108 20 Q108 8 120 8 L160 8 Q172 8 172 20 L172 60 Q172 72 160 72 L120 72 Q108 72 108 60 Z"
+          <rect
+            x="130"
+            y="10"
+            width="50"
+            height="50"
+            rx="8"
+            ry="8"
             fill="none"
-            stroke="#b8e600"
-            strokeWidth="8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            stroke="#c8ff00"
+            strokeWidth="7"
             className="neon-stroke"
           />
         </g>
 
-        {/* N - Second N, angular design */}
+        {/* N - Second N matching PDF */}
         <g className="neon-letter" style={{ animationDelay: '0.3s' }}>
           <path
-            d="M188 8 L188 72 M188 8 L222 72 M222 8 L222 72"
+            d="M200 10 L200 60 M200 10 L240 60 M240 10 L240 60"
             fill="none"
-            stroke="#b8e600"
-            strokeWidth="8"
+            stroke="#c8ff00"
+            strokeWidth="7"
             strokeLinecap="round"
             strokeLinejoin="round"
             className="neon-stroke"
@@ -112,40 +115,42 @@ export default function NeonLogo({ className = "", onClick }: NeonLogoProps) {
 
         {/* Registered trademark symbol */}
         <text
-          x="232"
-          y="20"
-          fill="#b8e600"
-          fontSize="12"
+          x="252"
+          y="22"
+          fill="#c8ff00"
+          fontSize="14"
           fontFamily="Arial, sans-serif"
           className="neon-text-small"
-          style={{ opacity: 0.8 }}
+          style={{ opacity: 0.9 }}
         >
           ®
         </text>
       </svg>
 
-      {/* Horizontal line separator */}
+      {/* Horizontal line separator - matching PDF */}
       <motion.div
-        className="h-[2px] bg-gradient-to-r from-transparent via-[#b8e600] to-transparent mt-1"
+        className="bg-[#c8ff00] mt-0.5"
         initial={{ scaleX: 0 }}
         animate={{ scaleX: isOn ? 1 : 0 }}
         transition={{ delay: 0.6, duration: 0.4 }}
         style={{ 
           width: '100%',
-          opacity: getOpacity() * 0.7,
+          height: '2px',
+          opacity: getOpacity() * 0.9,
+          transformOrigin: 'left',
         }}
       />
 
-      {/* ENERGY DRINK text */}
+      {/* ENERGY DRINK text - matching PDF spacing */}
       <motion.span
-        className="text-[10px] sm:text-xs md:text-sm tracking-[0.35em] font-medium mt-1 text-center"
+        className="text-[8px] sm:text-[9px] md:text-[10px] tracking-[0.25em] font-medium mt-0.5"
         initial={{ opacity: 0 }}
-        animate={{ opacity: isOn ? 0.85 : 0.2 }}
+        animate={{ opacity: isOn ? 0.9 : 0.2 }}
         transition={{ delay: 0.7, duration: 0.3 }}
         style={{
-          color: '#b8e600',
+          color: '#c8ff00',
           fontFamily: 'Inter, system-ui, sans-serif',
-          letterSpacing: '0.35em',
+          letterSpacing: '0.25em',
         }}
       >
         ENERGY DRINK
@@ -163,16 +168,16 @@ export default function NeonLogo({ className = "", onClick }: NeonLogoProps) {
         
         @keyframes ambientColorShift {
           0%, 100% {
-            stroke: #b8e600;
+            stroke: #c8ff00;
           }
           25% {
-            stroke: #c4f000;
+            stroke: #d4ff20;
           }
           50% {
-            stroke: #a8d600;
+            stroke: #b8e600;
           }
           75% {
-            stroke: #bef000;
+            stroke: #d0ff10;
           }
         }
         
@@ -182,16 +187,16 @@ export default function NeonLogo({ className = "", onClick }: NeonLogoProps) {
         
         @keyframes ambientTextShift {
           0%, 100% {
-            fill: #b8e600;
+            fill: #c8ff00;
           }
           25% {
-            fill: #c4f000;
+            fill: #d4ff20;
           }
           50% {
-            fill: #a8d600;
+            fill: #b8e600;
           }
           75% {
-            fill: #bef000;
+            fill: #d0ff10;
           }
         }
       `}</style>

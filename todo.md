@@ -438,3 +438,12 @@
 - [x] Step 4: Review and submit
 - [x] Send notification to admin on submission
 - [x] Store application in database for review
+
+## Logo Sizing Fix (Jan 17)
+
+### Logo Proportions
+- [x] Match NEON text proportions exactly to PDF
+- [x] Add horizontal line below NEON text
+- [x] Add ENERGY DRINK text below line
+- [x] Ensure proper spacing between elements
+- [x] Size logo appropriately for header
