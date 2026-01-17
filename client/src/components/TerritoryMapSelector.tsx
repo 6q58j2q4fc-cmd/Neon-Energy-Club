@@ -1,18 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MapPin, Search, DollarSign, Maximize2 } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { MapPin, Search, DollarSign, Maximize2, Users, Minus, Plus, Target, ZoomIn, ZoomOut } from "lucide-react";
 import { MapView } from "@/components/Map";
 
 export interface TerritoryData {
   center: { lat: number; lng: number };
   address: string;
+  zipCode: string;
   radiusMiles: number;
   squareMiles: number;
   basePrice: number;
   demandMultiplier: number;
   totalPrice: number;
+  estimatedPopulation: number;
 }
 
 interface TerritoryMapSelectorProps {
@@ -21,24 +24,37 @@ interface TerritoryMapSelectorProps {
 
 export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMapSelectorProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
   const [territory, setTerritory] = useState<TerritoryData>({
-    center: { lat: 40.7128, lng: -74.0060 }, // Default: New York City
+    center: { lat: 40.7128, lng: -74.0060 },
     address: "New York, NY",
+    zipCode: "10001",
     radiusMiles: 5,
     squareMiles: 78.54,
-    basePrice: 50, // $50 per sq mile base
-    demandMultiplier: 1.5, // NYC is high demand
+    basePrice: 50,
+    demandMultiplier: 1.5,
     totalPrice: 5891,
+    estimatedPopulation: 250000,
   });
 
   const circleRef = useRef<google.maps.Circle | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const geocoderRef = useRef<google.maps.Geocoder | null>(null);
+  const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
+
+  // Population density estimates by region type (people per sq mile)
+  const getPopulationDensity = (demandMultiplier: number): number => {
+    if (demandMultiplier >= 2.0) return 27000; // Dense urban (NYC, SF)
+    if (demandMultiplier >= 1.7) return 12000; // Urban
+    if (demandMultiplier >= 1.4) return 4000;  // Suburban
+    if (demandMultiplier >= 1.2) return 1500;  // Semi-rural
+    return 500; // Rural
+  };
 
   // Demand multipliers by major cities/regions
   const getDemandMultiplier = (lat: number, lng: number): number => {
-    // High demand areas (major cities)
     const highDemandCities = [
       { lat: 40.7128, lng: -74.0060, name: "NYC", multiplier: 2.0 },
       { lat: 34.0522, lng: -118.2437, name: "LA", multiplier: 1.8 },
@@ -48,18 +64,20 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
       { lat: 37.7749, lng: -122.4194, name: "SF", multiplier: 2.2 },
       { lat: 32.7767, lng: -96.7970, name: "Dallas", multiplier: 1.6 },
       { lat: 25.7617, lng: -80.1918, name: "Miami", multiplier: 1.9 },
+      { lat: 47.6062, lng: -122.3321, name: "Seattle", multiplier: 1.7 },
+      { lat: 33.7490, lng: -84.3880, name: "Atlanta", multiplier: 1.6 },
+      { lat: 42.3601, lng: -71.0589, name: "Boston", multiplier: 1.8 },
+      { lat: 39.7392, lng: -104.9903, name: "Denver", multiplier: 1.5 },
     ];
 
-    // Find closest city
-    let closestMultiplier = 1.0; // Default for rural/suburban
+    let closestMultiplier = 1.0;
     let minDistance = Infinity;
 
     highDemandCities.forEach((city) => {
       const distance = Math.sqrt(
         Math.pow(lat - city.lat, 2) + Math.pow(lng - city.lng, 2)
       );
-      if (distance < minDistance && distance < 0.5) {
-        // Within ~50 miles
+      if (distance < minDistance && distance < 0.8) {
         minDistance = distance;
         closestMultiplier = city.multiplier;
       }
@@ -68,67 +86,161 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
     return closestMultiplier;
   };
 
-  const calculatePrice = (radiusMiles: number, lat: number, lng: number) => {
+  const calculatePrice = useCallback((radiusMiles: number, lat: number, lng: number) => {
     const squareMiles = Math.PI * radiusMiles * radiusMiles;
-    const basePrice = 50; // $50 per sq mile
+    const basePrice = 50;
     const demandMultiplier = getDemandMultiplier(lat, lng);
     const totalPrice = Math.round(squareMiles * basePrice * demandMultiplier);
+    const populationDensity = getPopulationDensity(demandMultiplier);
+    const estimatedPopulation = Math.round(squareMiles * populationDensity);
 
     return {
       squareMiles: Math.round(squareMiles * 100) / 100,
       basePrice,
       demandMultiplier,
       totalPrice,
+      estimatedPopulation,
     };
-  };
+  }, []);
 
-  const updateTerritory = (
+  const updateTerritory = useCallback((
     center: { lat: number; lng: number },
     radiusMiles: number,
-    address?: string
+    address?: string,
+    zipCode?: string
   ) => {
     const pricing = calculatePrice(radiusMiles, center.lat, center.lng);
 
     const newTerritory: TerritoryData = {
       center,
       address: address || territory.address,
+      zipCode: zipCode || territory.zipCode,
       radiusMiles,
       ...pricing,
     };
 
     setTerritory(newTerritory);
     onTerritoryChange(newTerritory);
+
+    // Update circle on map
+    if (circleRef.current) {
+      circleRef.current.setCenter(center);
+      circleRef.current.setRadius(radiusMiles * 1609.34);
+    }
+
+    // Update marker
+    if (markerRef.current) {
+      markerRef.current.position = center;
+    }
+
+    // Pan map to center
+    if (mapRef.current) {
+      mapRef.current.panTo(center);
+      // Adjust zoom based on radius
+      const zoom = radiusMiles <= 2 ? 13 : radiusMiles <= 5 ? 11 : radiusMiles <= 10 ? 10 : 9;
+      mapRef.current.setZoom(zoom);
+    }
+  }, [calculatePrice, onTerritoryChange, territory.address, territory.zipCode]);
+
+  // Extract zip code from address components
+  const extractZipCode = (results: google.maps.GeocoderResult[]): string => {
+    for (const result of results) {
+      for (const component of result.address_components) {
+        if (component.types.includes("postal_code")) {
+          return component.short_name;
+        }
+      }
+    }
+    return "";
   };
 
-  const handleMapReady = (map: google.maps.Map) => {
-    mapRef.current = map;
+  // Search by zip code or address
+  const handleSearch = useCallback(async () => {
+    if (!searchQuery.trim() || !geocoderRef.current || !mapRef.current) return;
 
-    // Create draggable circle
+    setIsSearching(true);
+
+    try {
+      geocoderRef.current.geocode(
+        { address: searchQuery },
+        (results, status) => {
+          setIsSearching(false);
+          if (status === "OK" && results && results[0]) {
+            const location = results[0].geometry.location;
+            const newCenter = {
+              lat: location.lat(),
+              lng: location.lng(),
+            };
+
+            const zipCode = extractZipCode(results);
+            const formattedAddress = results[0].formatted_address;
+
+            updateTerritory(newCenter, territory.radiusMiles, formattedAddress, zipCode);
+          } else {
+            console.error("Geocode failed:", status);
+          }
+        }
+      );
+    } catch (error) {
+      setIsSearching(false);
+      console.error("Search error:", error);
+    }
+  }, [searchQuery, territory.radiusMiles, updateTerritory]);
+
+  const handleMapReady = useCallback((map: google.maps.Map) => {
+    mapRef.current = map;
+    geocoderRef.current = new google.maps.Geocoder();
+
+    // Create center marker
+    const markerContent = document.createElement("div");
+    markerContent.innerHTML = `
+      <div style="
+        width: 20px;
+        height: 20px;
+        background: #c8ff00;
+        border: 3px solid #0a0a0a;
+        border-radius: 50%;
+        box-shadow: 0 0 10px #c8ff00, 0 0 20px #c8ff00;
+      "></div>
+    `;
+
+    const marker = new google.maps.marker.AdvancedMarkerElement({
+      map,
+      position: territory.center,
+      content: markerContent,
+      title: "Territory Center",
+    });
+    markerRef.current = marker;
+
+    // Create draggable, resizable circle
     const circle = new google.maps.Circle({
       map,
       center: territory.center,
-      radius: territory.radiusMiles * 1609.34, // Convert miles to meters
+      radius: territory.radiusMiles * 1609.34,
       strokeColor: "#c8ff00",
-      strokeOpacity: 0.8,
+      strokeOpacity: 0.9,
       strokeWeight: 3,
       fillColor: "#c8ff00",
-      fillOpacity: 0.2,
+      fillOpacity: 0.15,
       editable: true,
       draggable: true,
     });
 
     circleRef.current = circle;
 
-    // Handle radius change
+    // Handle radius change (dragging edge)
     google.maps.event.addListener(circle, "radius_changed", () => {
       const radiusMeters = circle.getRadius();
-      const radiusMiles = radiusMeters / 1609.34;
+      const radiusMiles = Math.max(1, Math.min(50, radiusMeters / 1609.34));
       const center = circle.getCenter();
+      
       if (center) {
-        updateTerritory(
-          { lat: center.lat(), lng: center.lng() },
-          radiusMiles
-        );
+        const pricing = calculatePrice(radiusMiles, center.lat(), center.lng());
+        setTerritory(prev => ({
+          ...prev,
+          radiusMiles: Math.round(radiusMiles * 10) / 10,
+          ...pricing,
+        }));
       }
     });
 
@@ -137,21 +249,33 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
       const center = circle.getCenter();
       const radiusMeters = circle.getRadius();
       const radiusMiles = radiusMeters / 1609.34;
+      
       if (center) {
+        // Update marker position
+        if (markerRef.current) {
+          markerRef.current.position = { lat: center.lat(), lng: center.lng() };
+        }
+
         // Reverse geocode to get address
-        const geocoder = new google.maps.Geocoder();
-        geocoder.geocode(
-          { location: { lat: center.lat(), lng: center.lng() } },
-          (results, status) => {
-            if (status === "OK" && results && results[0]) {
-              updateTerritory(
-                { lat: center.lat(), lng: center.lng() },
-                radiusMiles,
-                results[0].formatted_address
-              );
+        if (geocoderRef.current) {
+          geocoderRef.current.geocode(
+            { location: { lat: center.lat(), lng: center.lng() } },
+            (results, status) => {
+              if (status === "OK" && results && results[0]) {
+                const zipCode = extractZipCode(results);
+                const pricing = calculatePrice(radiusMiles, center.lat(), center.lng());
+                
+                setTerritory(prev => ({
+                  ...prev,
+                  center: { lat: center.lat(), lng: center.lng() },
+                  address: results[0].formatted_address,
+                  zipCode: zipCode || prev.zipCode,
+                  ...pricing,
+                }));
+              }
             }
-          }
-        );
+          );
+        }
       }
     });
 
@@ -160,7 +284,8 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
       const autocomplete = new google.maps.places.Autocomplete(
         searchInputRef.current,
         {
-          types: ["address", "intersection", "neighborhood"],
+          types: ["geocode"],
+          componentRestrictions: { country: "us" },
         }
       );
 
@@ -174,171 +299,300 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
             lng: place.geometry.location.lng(),
           };
 
-          // Update map and circle
-          map.setCenter(newCenter);
-          circle.setCenter(newCenter);
+          let zipCode = "";
+          if (place.address_components) {
+            for (const component of place.address_components) {
+              if (component.types.includes("postal_code")) {
+                zipCode = component.short_name;
+                break;
+              }
+            }
+          }
 
           updateTerritory(
             newCenter,
             territory.radiusMiles,
-            place.formatted_address || place.name
+            place.formatted_address || place.name,
+            zipCode
           );
         }
       });
     }
-  };
+  }, [territory.center, territory.radiusMiles, calculatePrice, updateTerritory]);
 
+  // Adjust radius with buttons
   const adjustRadius = (delta: number) => {
     const newRadius = Math.max(1, Math.min(50, territory.radiusMiles + delta));
-    if (circleRef.current) {
-      circleRef.current.setRadius(newRadius * 1609.34);
+    updateTerritory(territory.center, newRadius, territory.address, territory.zipCode);
+  };
+
+  // Handle slider change
+  const handleSliderChange = (value: number[]) => {
+    const newRadius = value[0];
+    updateTerritory(territory.center, newRadius, territory.address, territory.zipCode);
+  };
+
+  // Handle key press for search
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch();
     }
-    updateTerritory(territory.center, newRadius);
   };
 
   return (
     <div className="space-y-6">
-      <Card className="bg-[#0a0a0a] border-[#c8ff00]/30">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-[#c8ff00]" />
-            Territory Selector
+      <Card className="bg-gradient-to-br from-[#0a0a0a] to-[#1a0a2e] border-[#c8ff00]/30 overflow-hidden">
+        <CardHeader className="border-b border-[#c8ff00]/20">
+          <CardTitle className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-[#c8ff00]/10">
+              <Target className="w-6 h-6 text-[#c8ff00]" />
+            </div>
+            <div>
+              <span className="text-xl font-bold text-white">Territory Selector</span>
+              <p className="text-sm text-gray-400 font-normal mt-1">Search by zip code or address, then adjust your territory radius</p>
+            </div>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="p-6 space-y-6">
           {/* Search Bar */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-            <Input
-              ref={searchInputRef}
-              type="text"
-              placeholder="Search address, neighborhood, or cross streets..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-black border-[#c8ff00]/30 text-white"
-            />
+          <div className="flex gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#c8ff00]/60" />
+              <Input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Enter zip code, city, or address..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className="pl-12 h-12 bg-black/50 border-[#c8ff00]/30 text-white placeholder:text-gray-500 focus:border-[#c8ff00] focus:ring-[#c8ff00]/20 text-lg"
+              />
+            </div>
+            <Button
+              onClick={handleSearch}
+              disabled={isSearching}
+              className="h-12 px-6 bg-[#c8ff00] text-black font-bold hover:bg-[#d4ff33] transition-all"
+            >
+              {isSearching ? (
+                <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+              ) : (
+                <>
+                  <MapPin className="w-5 h-5 mr-2" />
+                  Search
+                </>
+              )}
+            </Button>
           </div>
 
-          {/* Map Container */}
-          <div className="relative">
-            <MapView
-              onMapReady={handleMapReady}
-              className="w-full h-[500px] rounded-lg border-2 border-[#c8ff00]/30"
-              initialCenter={territory.center}
-              initialZoom={11}
-            />
-
-            {/* Map Controls Overlay */}
-            <div className="absolute top-4 right-4 bg-black/90 backdrop-blur-sm border border-[#c8ff00]/30 rounded-lg p-4 space-y-3">
-              <div className="text-xs font-bold text-[#c8ff00] mb-2">RADIUS CONTROL</div>
+          {/* Radius Slider Control */}
+          <div className="bg-black/30 rounded-xl p-5 border border-[#c8ff00]/20">
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
+                <Maximize2 className="w-5 h-5 text-[#c8ff00]" />
+                <span className="font-semibold text-white">Territory Radius</span>
+              </div>
+              <div className="flex items-center gap-3">
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => adjustRadius(-1)}
-                  className="border-[#c8ff00]/30 text-[#c8ff00] hover:bg-[#c8ff00]/10"
+                  className="w-10 h-10 p-0 border-[#c8ff00]/30 text-[#c8ff00] hover:bg-[#c8ff00]/10 hover:border-[#c8ff00]"
                 >
-                  -1 mi
+                  <Minus className="w-4 h-4" />
                 </Button>
-                <div className="text-center min-w-[60px]">
-                  <div className="text-lg font-bold text-[#c8ff00]">
+                <div className="text-center min-w-[80px] bg-[#c8ff00]/10 rounded-lg py-2 px-4">
+                  <div className="text-2xl font-black text-[#c8ff00]">
                     {territory.radiusMiles.toFixed(1)}
                   </div>
-                  <div className="text-xs text-gray-500">miles</div>
+                  <div className="text-xs text-gray-400">miles</div>
                 </div>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => adjustRadius(1)}
-                  className="border-[#c8ff00]/30 text-[#c8ff00] hover:bg-[#c8ff00]/10"
+                  className="w-10 h-10 p-0 border-[#c8ff00]/30 text-[#c8ff00] hover:bg-[#c8ff00]/10 hover:border-[#c8ff00]"
                 >
-                  +1 mi
+                  <Plus className="w-4 h-4" />
                 </Button>
               </div>
-              <div className="text-xs text-gray-400 text-center">
-                Drag circle to resize
+            </div>
+            
+            <div className="px-2">
+              <Slider
+                value={[territory.radiusMiles]}
+                onValueChange={handleSliderChange}
+                min={1}
+                max={50}
+                step={0.5}
+                className="w-full [&_[role=slider]]:bg-[#c8ff00] [&_[role=slider]]:border-[#c8ff00] [&_[role=slider]]:shadow-[0_0_10px_rgba(200,255,0,0.5)] [&_.bg-primary]:bg-[#c8ff00]"
+              />
+              <div className="flex justify-between mt-2 text-xs text-gray-500">
+                <span>1 mi</span>
+                <span>10 mi</span>
+                <span>25 mi</span>
+                <span>50 mi</span>
               </div>
             </div>
           </div>
 
-          {/* Territory Stats */}
-          <div className="grid md:grid-cols-2 gap-4">
+          {/* Map Container */}
+          <div className="relative rounded-xl overflow-hidden border-2 border-[#c8ff00]/30">
+            <MapView
+              onMapReady={handleMapReady}
+              className="w-full h-[450px]"
+              initialCenter={territory.center}
+              initialZoom={11}
+            />
+
+            {/* Map Zoom Controls */}
+            <div className="absolute bottom-4 right-4 flex flex-col gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => mapRef.current?.setZoom((mapRef.current.getZoom() || 11) + 1)}
+                className="w-10 h-10 p-0 bg-black/80 border-[#c8ff00]/30 text-[#c8ff00] hover:bg-black hover:border-[#c8ff00]"
+              >
+                <ZoomIn className="w-4 h-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => mapRef.current?.setZoom((mapRef.current.getZoom() || 11) - 1)}
+                className="w-10 h-10 p-0 bg-black/80 border-[#c8ff00]/30 text-[#c8ff00] hover:bg-black hover:border-[#c8ff00]"
+              >
+                <ZoomOut className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Current Location Badge */}
+            <div className="absolute top-4 left-4 bg-black/90 backdrop-blur-sm border border-[#c8ff00]/30 rounded-lg px-4 py-2">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-[#c8ff00]" />
+                <div>
+                  <div className="text-sm font-semibold text-white truncate max-w-[200px]">
+                    {territory.zipCode && <span className="text-[#c8ff00] mr-2">{territory.zipCode}</span>}
+                    {territory.address.split(",")[0]}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Territory Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card className="bg-gradient-to-br from-[#c8ff00]/10 to-transparent border-[#c8ff00]/30">
               <CardContent className="p-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="text-sm text-gray-400 mb-1">Selected Area</div>
-                    <div className="font-bold text-white">{territory.address}</div>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#c8ff00]/10">
+                    <Maximize2 className="w-5 h-5 text-[#c8ff00]" />
                   </div>
-                  <MapPin className="w-5 h-5 text-[#c8ff00]" />
+                  <div>
+                    <div className="text-xs text-gray-400">Area Coverage</div>
+                    <div className="text-lg font-bold text-white">
+                      {territory.squareMiles.toFixed(1)} <span className="text-sm font-normal">sq mi</span>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-[#c8ff00]/10 to-transparent border-[#c8ff00]/30">
+            <Card className="bg-gradient-to-br from-[#00ffff]/10 to-transparent border-[#00ffff]/30">
               <CardContent className="p-4">
-                <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#00ffff]/10">
+                    <Users className="w-5 h-5 text-[#00ffff]" />
+                  </div>
                   <div>
-                    <div className="text-sm text-gray-400 mb-1">Territory Size</div>
-                    <div className="font-bold text-white">
-                      {territory.squareMiles.toFixed(2)} sq mi
+                    <div className="text-xs text-gray-400">Est. Population</div>
+                    <div className="text-lg font-bold text-white">
+                      {territory.estimatedPopulation.toLocaleString()}
                     </div>
                   </div>
-                  <Maximize2 className="w-5 h-5 text-[#c8ff00]" />
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-[#c8ff00]/10 to-transparent border-[#c8ff00]/30">
+            <Card className="bg-gradient-to-br from-[#ff0080]/10 to-transparent border-[#ff0080]/30">
               <CardContent className="p-4">
-                <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#ff0080]/10">
+                    <Target className="w-5 h-5 text-[#ff0080]" />
+                  </div>
                   <div>
-                    <div className="text-sm text-gray-400 mb-1">Base Rate</div>
-                    <div className="font-bold text-white">
-                      ${territory.basePrice}/sq mi × {territory.demandMultiplier}x
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {territory.demandMultiplier > 1.5 ? "High" : territory.demandMultiplier > 1.2 ? "Medium" : "Standard"} demand area
+                    <div className="text-xs text-gray-400">Demand Level</div>
+                    <div className="text-lg font-bold text-white">
+                      {territory.demandMultiplier >= 2.0 ? "Very High" : 
+                       territory.demandMultiplier >= 1.7 ? "High" : 
+                       territory.demandMultiplier >= 1.4 ? "Medium" : "Standard"}
                     </div>
                   </div>
-                  <DollarSign className="w-5 h-5 text-[#c8ff00]" />
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-[#c8ff00]/20 to-transparent border-[#c8ff00]">
+            <Card className="bg-gradient-to-br from-[#c8ff00]/20 to-[#c8ff00]/5 border-[#c8ff00]">
               <CardContent className="p-4">
-                <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#c8ff00]/20">
+                    <DollarSign className="w-5 h-5 text-[#c8ff00]" />
+                  </div>
                   <div>
-                    <div className="text-sm text-gray-400 mb-1">Total License Cost</div>
-                    <div className="text-3xl font-black text-[#c8ff00] neon-text">
+                    <div className="text-xs text-gray-400">License Cost</div>
+                    <div className="text-xl font-black text-[#c8ff00]">
                       ${territory.totalPrice.toLocaleString()}
                     </div>
                   </div>
-                  <DollarSign className="w-6 h-6 text-[#c8ff00]" />
                 </div>
               </CardContent>
             </Card>
           </div>
 
+          {/* Pricing Breakdown */}
+          <div className="bg-black/30 rounded-xl p-4 border border-[#c8ff00]/20">
+            <div className="text-sm text-gray-400 mb-3">Pricing Breakdown</div>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <div className="text-lg font-bold text-white">${territory.basePrice}</div>
+                <div className="text-xs text-gray-500">per sq mile</div>
+              </div>
+              <div>
+                <div className="text-lg font-bold text-[#ff0080]">×{territory.demandMultiplier}</div>
+                <div className="text-xs text-gray-500">demand multiplier</div>
+              </div>
+              <div>
+                <div className="text-lg font-bold text-[#c8ff00]">${territory.totalPrice.toLocaleString()}</div>
+                <div className="text-xs text-gray-500">total cost</div>
+              </div>
+            </div>
+          </div>
+
           {/* Instructions */}
-          <div className="bg-[#c8ff00]/5 border border-[#c8ff00]/20 rounded-lg p-4">
-            <div className="text-sm text-gray-300 space-y-2">
+          <div className="bg-[#c8ff00]/5 border border-[#c8ff00]/20 rounded-xl p-4">
+            <div className="text-sm font-semibold text-[#c8ff00] mb-3">How to Select Your Territory</div>
+            <div className="grid md:grid-cols-2 gap-3 text-sm text-gray-300">
               <div className="flex items-start gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#c8ff00] mt-1.5"></div>
-                <div><strong>Search:</strong> Enter any address, neighborhood, or cross streets</div>
+                <div className="w-6 h-6 rounded-full bg-[#c8ff00]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-[#c8ff00]">1</span>
+                </div>
+                <div><strong>Search:</strong> Enter a zip code, city, or address to center your territory</div>
               </div>
               <div className="flex items-start gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#c8ff00] mt-1.5"></div>
-                <div><strong>Resize:</strong> Drag the edge of the green circle to adjust territory size</div>
+                <div className="w-6 h-6 rounded-full bg-[#c8ff00]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-[#c8ff00]">2</span>
+                </div>
+                <div><strong>Adjust:</strong> Use the slider or +/- buttons to change your radius</div>
               </div>
               <div className="flex items-start gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#c8ff00] mt-1.5"></div>
-                <div><strong>Move:</strong> Drag the circle to reposition your territory</div>
+                <div className="w-6 h-6 rounded-full bg-[#c8ff00]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-[#c8ff00]">3</span>
+                </div>
+                <div><strong>Drag:</strong> Move the circle on the map to reposition your territory</div>
               </div>
               <div className="flex items-start gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#c8ff00] mt-1.5"></div>
-                <div><strong>Pricing:</strong> Automatically adjusts based on territory size and location demand</div>
+                <div className="w-6 h-6 rounded-full bg-[#c8ff00]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-[#c8ff00]">4</span>
+                </div>
+                <div><strong>Resize:</strong> Drag the edge of the green circle to fine-tune the area</div>
               </div>
             </div>
           </div>

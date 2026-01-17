@@ -397,3 +397,14 @@
 - [x] Add neon flicker animation effect
 - [x] Implement smooth color transition (ambient neon lighting)
 - [x] Ensure logo matches can branding style
+
+## Territory Selector Fix (Jan 17)
+
+### Interactive Map Functionality
+- [x] Fix territory map to auto-update radius on zip code search
+- [x] Add interactive radius increase/decrease controls (slider + buttons)
+- [x] Implement real-time circle visualization on map
+- [x] Add zip code/address autocomplete search
+- [x] Make radius draggable and resizable on map
+- [x] Display territory coverage area in real-time
+- [x] Calculate and show population/market size within radius
