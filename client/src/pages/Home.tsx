@@ -9,6 +9,8 @@ import ViralNewsletterPopup, { shouldShowPopup, markPopupShown } from "@/compone
 import { PalmTreeGroup } from "@/components/PalmTreeSilhouette";
 import { CityLights, WindowLights } from "@/components/CityLights";
 import NeonLogo from "@/components/NeonLogo";
+import MobileMenu from "@/components/MobileMenu";
+import { NeonSkyline, ViceSunset, SynthwaveGrid } from "@/components/ViceCityDecorations";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
 import { motion, AnimatePresence } from "framer-motion";
@@ -163,76 +165,13 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Mobile Dropdown Menu - Full screen overlay that doesn't navigate away */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <>
-              {/* Backdrop overlay to close menu when clicking outside */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-                onClick={() => setMobileMenuOpen(false)}
-              />
-              <motion.div
-                initial={{ opacity: 0, y: -20, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
-                className="lg:hidden fixed top-[70px] left-4 right-4 bg-gradient-to-b from-[#1a0a2e] to-[#0d0418] backdrop-blur-xl border-2 border-[#b8e600]/40 rounded-2xl shadow-[0_10px_60px_rgba(184,230,0,0.3)] z-50 overflow-hidden"
-              >
-                <nav className="p-4 flex flex-col gap-2">
-                  {navItems.map((item, index) => (
-                    <motion.button
-                      key={item.path}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setMobileMenuOpen(false);
-                        // Small delay to allow menu close animation
-                        setTimeout(() => setLocation(item.path), 150);
-                      }}
-                      className={`w-full text-left px-5 py-4 rounded-xl font-semibold text-lg transition-all duration-300 ${
-                        item.path === "/"
-                          ? "bg-[#b8e600]/20 text-[#b8e600] border border-[#b8e600]/40"
-                          : "text-white/90 hover:text-[#b8e600] hover:bg-[#b8e600]/10 active:bg-[#b8e600]/20"
-                      }`}
-                    >
-                      {item.label}
-                    </motion.button>
-                  ))}
-                  <div className="flex gap-3 mt-4 pt-4 border-t border-white/10">
-                    <Button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setMobileMenuOpen(false);
-                        setTimeout(() => setLocation("/join"), 150);
-                      }}
-                      variant="outline"
-                      className="flex-1 border-[#00ffff]/60 text-[#00ffff] hover:bg-[#00ffff]/15 font-bold h-14 text-base"
-                    >
-                      JOIN NOW
-                    </Button>
-                    <Button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setMobileMenuOpen(false);
-                        setTimeout(() => setLocation("/crowdfund"), 150);
-                      }}
-                      className="flex-1 btn-vice-pink text-white font-bold h-14 text-base"
-                    >
-                      BACK US
-                    </Button>
-                  </div>
-                </nav>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
+        {/* Full-screen Mobile Menu */}
+        <MobileMenu
+          isOpen={mobileMenuOpen}
+          onClose={() => setMobileMenuOpen(false)}
+          onNavigate={setLocation}
+          currentPath="/"
+        />
       </header>
 
       {/* Hero Section - GTA Vice City Style */}
@@ -262,6 +201,12 @@ export default function Home() {
         {/* Animated Twinkling City Lights */}
         <CityLights />
         <WindowLights />
+        
+        {/* Vice City Neon Skyline */}
+        <NeonSkyline className="opacity-40" />
+        
+        {/* Vice City Sunset Effect */}
+        <ViceSunset className="opacity-50" />
         
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">

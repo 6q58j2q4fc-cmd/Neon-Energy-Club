@@ -273,6 +273,13 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         const { subscribeNewsletter } = await import("./db");
         const subscription = await subscribeNewsletter(input);
+        
+        // Notify admin of new newsletter subscription
+        await notifyOwner({
+          title: "New Newsletter Subscription",
+          content: `New subscriber: ${input.name} (${input.email}) has joined the NEON newsletter. Total subscribers growing!`,
+        });
+        
         return subscription;
       }),
 
@@ -285,8 +292,20 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
-        const { addNewsletterReferrals } = await import("./db");
+        const { addNewsletterReferrals, getNewsletterSubscription } = await import("./db");
         await addNewsletterReferrals(input.subscriptionId, input.friendEmails);
+        
+        // Get subscriber info for notification
+        const subscription = await getNewsletterSubscription(input.subscriptionId);
+        const subscriberName = subscription?.name || "A subscriber";
+        const subscriberEmail = subscription?.email || "unknown";
+        
+        // Notify admin of referrals
+        await notifyOwner({
+          title: "New Referrals Submitted",
+          content: `${subscriberName} (${subscriberEmail}) has referred ${input.friendEmails.length} friend(s) to NEON: ${input.friendEmails.join(", ")}. Viral growth in action!`,
+        });
+        
         return { success: true };
       }),
 

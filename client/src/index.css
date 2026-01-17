@@ -1120,4 +1120,264 @@
     pointer-events: none;
     opacity: 0.3;
   }
+
+  /* ===== MOBILE MENU ANIMATIONS ===== */
+  @keyframes gridMove {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 50px 50px;
+    }
+  }
+
+  @keyframes menuSlideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes menuSlideOut {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes menuItemSlide {
+    from {
+      transform: translateX(50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .mobile-menu-enter {
+    animation: menuSlideIn 0.4s var(--ease-out-expo) forwards;
+  }
+
+  .mobile-menu-exit {
+    animation: menuSlideOut 0.3s var(--ease-out-expo) forwards;
+  }
+
+  .mobile-menu-item {
+    animation: menuItemSlide 0.4s var(--ease-out-expo) forwards;
+  }
+
+  /* ===== VICE CITY NEON SIGN EFFECTS ===== */
+  @keyframes neonSignFlicker {
+    0%, 100% {
+      opacity: 1;
+      filter: brightness(1);
+    }
+    5% {
+      opacity: 0.8;
+      filter: brightness(0.8);
+    }
+    10% {
+      opacity: 1;
+      filter: brightness(1.1);
+    }
+    15% {
+      opacity: 0.9;
+      filter: brightness(0.9);
+    }
+    50% {
+      opacity: 1;
+      filter: brightness(1);
+    }
+    55% {
+      opacity: 0.85;
+      filter: brightness(0.85);
+    }
+    60% {
+      opacity: 1;
+      filter: brightness(1.05);
+    }
+  }
+
+  .neon-sign-flicker {
+    animation: neonSignFlicker 4s ease-in-out infinite;
+  }
+
+  /* ===== VICE CITY DECORATIVE ELEMENTS ===== */
+  .vice-neon-border {
+    position: relative;
+  }
+
+  .vice-neon-border::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, 
+      var(--vice-pink) 0%, 
+      var(--vice-cyan) 25%, 
+      var(--vice-purple) 50%, 
+      var(--vice-pink) 75%, 
+      var(--vice-cyan) 100%);
+    border-radius: inherit;
+    z-index: -1;
+    animation: borderGlow 3s linear infinite;
+    background-size: 200% 200%;
+  }
+
+  @keyframes borderGlow {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* Vice City Palm Tree Silhouette Glow */
+  .palm-glow {
+    filter: drop-shadow(0 0 20px rgba(var(--vice-pink-rgb), 0.3))
+            drop-shadow(0 0 40px rgba(var(--vice-purple-rgb), 0.2));
+  }
+
+  /* Vice City Neon Building Outline */
+  .building-neon {
+    stroke: var(--vice-cyan);
+    stroke-width: 2;
+    filter: drop-shadow(0 0 5px var(--vice-cyan))
+            drop-shadow(0 0 10px var(--vice-cyan))
+            drop-shadow(0 0 20px var(--vice-cyan));
+    animation: buildingPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes buildingPulse {
+    0%, 100% {
+      opacity: 0.8;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  /* Vice City Sunset Reflection */
+  .sunset-reflection {
+    background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(255, 102, 0, 0.1) 30%,
+      rgba(255, 0, 128, 0.15) 60%,
+      rgba(157, 78, 221, 0.1) 100%);
+    pointer-events: none;
+  }
+
+  /* CRT/Retro Monitor Effect */
+  .crt-effect {
+    position: relative;
+  }
+
+  .crt-effect::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.05) 0px,
+      rgba(0, 0, 0, 0.05) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .crt-effect::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
+    pointer-events: none;
+    z-index: 99;
+  }
+
+  /* Vice City Neon Text Glow Animation */
+  @keyframes textNeonPulse {
+    0%, 100% {
+      text-shadow: 
+        0 0 5px currentColor,
+        0 0 10px currentColor,
+        0 0 20px currentColor;
+    }
+    50% {
+      text-shadow: 
+        0 0 10px currentColor,
+        0 0 20px currentColor,
+        0 0 40px currentColor,
+        0 0 60px currentColor;
+    }
+  }
+
+  .text-neon-pulse {
+    animation: textNeonPulse 2s ease-in-out infinite;
+  }
+
+  /* Vice City Road/Highway Lines */
+  .highway-lines {
+    background: repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 40px,
+      rgba(255, 255, 0, 0.8) 40px,
+      rgba(255, 255, 0, 0.8) 60px
+    );
+    height: 4px;
+    animation: highwayMove 1s linear infinite;
+  }
+
+  @keyframes highwayMove {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 100px 0;
+    }
+  }
+
+  /* Vice City Ambient Light Rays */
+  .light-rays {
+    position: absolute;
+    inset: 0;
+    background: conic-gradient(
+      from 180deg at 50% 0%,
+      transparent 0deg,
+      rgba(255, 0, 128, 0.1) 30deg,
+      transparent 60deg,
+      rgba(0, 255, 255, 0.1) 120deg,
+      transparent 150deg,
+      rgba(157, 78, 221, 0.1) 210deg,
+      transparent 240deg,
+      rgba(255, 0, 128, 0.1) 300deg,
+      transparent 330deg
+    );
+    pointer-events: none;
+    animation: lightRaysRotate 30s linear infinite;
+  }
+
+  @keyframes lightRaysRotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 }

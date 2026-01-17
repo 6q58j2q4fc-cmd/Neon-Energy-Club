@@ -494,3 +494,50 @@
 - [x] Add missing CTAs where needed
 - [x] Add /story route alias for About page
 - [x] Write vitest tests for territory management
+
+## Email Notifications & Logo Animation (Jan 17)
+
+### Email Subscription Notifications
+- [x] Add admin notification when user subscribes to newsletter
+- [x] Add admin notification when user submits referral emails
+- [x] Verify viral email subscription flow works correctly
+- [x] Test complete referral process end-to-end
+
+### Neon Logo Animation Enhancement
+- [x] Create realistic neon light flicker "turning on" effect
+- [x] Add 3D neon light realistic look
+- [x] Implement smooth ambient color transitions
+- [x] Make colors transition like ambient lighting effect
+
+### Territory Selector Full Debug
+- [x] Debug territory map for full interactivity
+- [x] Ensure map loads correctly with Google Maps
+- [x] Test radius adjustment controls
+- [x] Test address/zip code search (geocoding working)
+- [x] Verify territory availability checking
+- [x] Test complete application submission flow
+- [x] All 40 vitest tests passing
+
+## Mobile Navigation & Vice City Theme Enhancement (Jan 17)
+
+### Mobile-Adaptive Navigation
+- [x] Create full-screen mobile menu with smooth slide transitions
+- [x] Add hamburger menu icon with animation
+- [x] Implement touch-friendly navigation items
+- [x] Add backdrop blur and neon glow effects to mobile menu
+- [x] Ensure all navigation links work on mobile
+
+### Vice City/GTA6-Inspired Graphics
+- [x] Add neon cityscape background images
+- [x] Include palm tree silhouettes with neon lighting
+- [x] Add retro-futuristic neon grid effects
+- [x] Create synthwave sunset gradients
+- [x] Add neon sign decorative elements
+- [x] Include Vice City-style neon building outlines
+
+### Theme Graphics Enhancement
+- [x] Add more neon glow effects throughout site
+- [x] Enhance color palette with Vice City pink/cyan/purple
+- [x] Add animated neon borders and accents
+- [x] Create neon reflection effects
+- [x] Add scanline/CRT effects for retro feel

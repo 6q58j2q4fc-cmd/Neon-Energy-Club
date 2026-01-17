@@ -7,6 +7,7 @@ import { MapPin, Search, DollarSign, Maximize2, Users, Minus, Plus, Target, Zoom
 import { MapView } from "@/components/Map";
 import { trpc } from "@/lib/trpc";
 import { TerritoryApplicationForm } from "./TerritoryApplicationForm";
+import { toast } from "sonner";
 
 export interface TerritoryData {
   center: { lat: number; lng: number };
@@ -29,6 +30,7 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
   const [isSearching, setIsSearching] = useState(false);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [territoryAvailable, setTerritoryAvailable] = useState(true);
+  const [mapReady, setMapReady] = useState(false);
   
   // Fetch claimed territories
   const { data: claimedTerritories = [] } = trpc.territory.getClaimedTerritories.useQuery();
@@ -46,8 +48,6 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
 
   const circleRef = useRef<google.maps.Circle | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
   const geocoderRef = useRef<google.maps.Geocoder | null>(null);
   const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
   const claimedCirclesRef = useRef<google.maps.Circle[]>([]);
@@ -79,25 +79,34 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
       { lat: 39.7392, lng: -104.9903, name: "Denver", multiplier: 1.5 },
     ];
 
-    let closestMultiplier = 1.0;
+    // Find nearest major city and calculate distance-based multiplier
+    let nearestCity = highDemandCities[0];
     let minDistance = Infinity;
 
-    highDemandCities.forEach((city) => {
+    for (const city of highDemandCities) {
       const distance = Math.sqrt(
         Math.pow(lat - city.lat, 2) + Math.pow(lng - city.lng, 2)
       );
-      if (distance < minDistance && distance < 0.8) {
+      if (distance < minDistance) {
         minDistance = distance;
-        closestMultiplier = city.multiplier;
+        nearestCity = city;
       }
-    });
+    }
 
-    return closestMultiplier;
+    // Within ~50 miles (0.7 degrees), use city multiplier
+    // Beyond that, gradually decrease to base multiplier of 1.0
+    if (minDistance < 0.7) {
+      return nearestCity.multiplier;
+    } else if (minDistance < 2) {
+      const factor = 1 - (minDistance - 0.7) / 1.3;
+      return 1 + (nearestCity.multiplier - 1) * factor;
+    }
+    return 1.0;
   };
 
   const calculatePrice = useCallback((radiusMiles: number, lat: number, lng: number) => {
     const squareMiles = Math.PI * radiusMiles * radiusMiles;
-    const basePrice = 50;
+    const basePrice = 50; // Base price per square mile
     const demandMultiplier = getDemandMultiplier(lat, lng);
     const totalPrice = Math.round(squareMiles * basePrice * demandMultiplier);
     const populationDensity = getPopulationDensity(demandMultiplier);
@@ -149,7 +158,46 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
       const zoom = radiusMiles <= 2 ? 13 : radiusMiles <= 5 ? 11 : radiusMiles <= 10 ? 10 : 9;
       mapRef.current.setZoom(zoom);
     }
+
+    // Check for overlaps with claimed territories
+    checkTerritoryOverlap(center, radiusMiles);
   }, [calculatePrice, onTerritoryChange, territory.address, territory.zipCode]);
+
+  // Check if selected territory overlaps with claimed territories
+  const checkTerritoryOverlap = useCallback((center: { lat: number; lng: number }, radiusMiles: number) => {
+    if (!claimedTerritories || claimedTerritories.length === 0) {
+      setTerritoryAvailable(true);
+      return;
+    }
+
+    const radiusMeters = radiusMiles * 1609.34;
+    
+    for (const claimed of claimedTerritories) {
+      const claimedCenter = { 
+        lat: parseFloat(claimed.centerLat), 
+        lng: parseFloat(claimed.centerLng) 
+      };
+      const claimedRadiusMeters = claimed.radiusMiles * 1609.34;
+      
+      // Calculate distance between centers using Haversine formula
+      const R = 6371000; // Earth's radius in meters
+      const dLat = (claimedCenter.lat - center.lat) * Math.PI / 180;
+      const dLng = (claimedCenter.lng - center.lng) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(center.lat * Math.PI / 180) * Math.cos(claimedCenter.lat * Math.PI / 180) *
+                Math.sin(dLng/2) * Math.sin(dLng/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const distance = R * c;
+      
+      // Check if circles overlap
+      if (distance < (radiusMeters + claimedRadiusMeters)) {
+        setTerritoryAvailable(false);
+        return;
+      }
+    }
+    
+    setTerritoryAvailable(true);
+  }, [claimedTerritories]);
 
   // Extract zip code from address components
   const extractZipCode = (results: google.maps.GeocoderResult[]): string => {
@@ -165,7 +213,15 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
 
   // Search by zip code or address
   const handleSearch = useCallback(async () => {
-    if (!searchQuery.trim() || !geocoderRef.current || !mapRef.current) return;
+    if (!searchQuery.trim()) {
+      toast.error("Please enter a location to search");
+      return;
+    }
+    
+    if (!mapReady || !geocoderRef.current || !mapRef.current) {
+      toast.error("Map is still loading, please wait...");
+      return;
+    }
 
     setIsSearching(true);
 
@@ -185,20 +241,24 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
             const formattedAddress = results[0].formatted_address;
 
             updateTerritory(newCenter, territory.radiusMiles, formattedAddress, zipCode);
+            toast.success(`Found: ${formattedAddress}`);
           } else {
             console.error("Geocode failed:", status);
+            toast.error(`Location not found. Try a different search term.`);
           }
         }
       );
     } catch (error) {
       setIsSearching(false);
       console.error("Search error:", error);
+      toast.error("Search failed. Please try again.");
     }
-  }, [searchQuery, territory.radiusMiles, updateTerritory]);
+  }, [searchQuery, territory.radiusMiles, updateTerritory, mapReady]);
 
   const handleMapReady = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
     geocoderRef.current = new google.maps.Geocoder();
+    setMapReady(true);
 
     // Create center marker
     const markerContent = document.createElement("div");
@@ -279,124 +339,85 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
       });
     }
 
-    // Handle radius change (dragging edge)
-    google.maps.event.addListener(circle, "radius_changed", () => {
-      const radiusMeters = circle.getRadius();
-      const radiusMiles = Math.max(1, Math.min(50, radiusMeters / 1609.34));
-      const center = circle.getCenter();
-      
-      if (center) {
-        const pricing = calculatePrice(radiusMiles, center.lat(), center.lng());
-        setTerritory(prev => ({
-          ...prev,
-          radiusMiles: Math.round(radiusMiles * 10) / 10,
-          ...pricing,
-        }));
-      }
-    });
-
-    // Handle center drag
+    // Listen for circle drag events
     google.maps.event.addListener(circle, "center_changed", () => {
-      const center = circle.getCenter();
-      const radiusMeters = circle.getRadius();
-      const radiusMiles = radiusMeters / 1609.34;
-      
-      if (center) {
-        // Update marker position
-        if (markerRef.current) {
-          markerRef.current.position = { lat: center.lat(), lng: center.lng() };
-        }
-
+      const newCenter = circle.getCenter();
+      if (newCenter) {
+        const center = { lat: newCenter.lat(), lng: newCenter.lng() };
         // Reverse geocode to get address
         if (geocoderRef.current) {
-          geocoderRef.current.geocode(
-            { location: { lat: center.lat(), lng: center.lng() } },
-            (results, status) => {
-              if (status === "OK" && results && results[0]) {
-                const zipCode = extractZipCode(results);
-                const pricing = calculatePrice(radiusMiles, center.lat(), center.lng());
-                
-                setTerritory(prev => ({
-                  ...prev,
-                  center: { lat: center.lat(), lng: center.lng() },
-                  address: results[0].formatted_address,
-                  zipCode: zipCode || prev.zipCode,
-                  ...pricing,
-                }));
-              }
+          geocoderRef.current.geocode({ location: center }, (results, status) => {
+            if (status === "OK" && results && results[0]) {
+              const zipCode = extractZipCode(results);
+              updateTerritory(center, territory.radiusMiles, results[0].formatted_address, zipCode);
+            } else {
+              updateTerritory(center, territory.radiusMiles);
             }
-          );
+          });
+        }
+        // Update marker position
+        if (markerRef.current) {
+          markerRef.current.position = center;
         }
       }
     });
 
-    // Setup autocomplete for address search
-    if (searchInputRef.current) {
-      const autocomplete = new google.maps.places.Autocomplete(
-        searchInputRef.current,
-        {
-          types: ["geocode"],
-          componentRestrictions: { country: "us" },
-        }
-      );
-
-      autocompleteRef.current = autocomplete;
-
-      autocomplete.addListener("place_changed", () => {
-        const place = autocomplete.getPlace();
-        if (place.geometry && place.geometry.location) {
-          const newCenter = {
-            lat: place.geometry.location.lat(),
-            lng: place.geometry.location.lng(),
-          };
-
-          let zipCode = "";
-          if (place.address_components) {
-            for (const component of place.address_components) {
-              if (component.types.includes("postal_code")) {
-                zipCode = component.short_name;
-                break;
-              }
-            }
-          }
-
-          updateTerritory(
-            newCenter,
-            territory.radiusMiles,
-            place.formatted_address || place.name,
-            zipCode
-          );
-        }
-      });
-    }
-  }, [territory.center, territory.radiusMiles, calculatePrice, updateTerritory, claimedTerritories]);
-
-  // Check for territory overlap with claimed territories
-  useEffect(() => {
-    if (!claimedTerritories || claimedTerritories.length === 0) {
-      setTerritoryAvailable(true);
-      return;
-    }
-
-    const hasOverlap = claimedTerritories.some((claimed: { centerLat: string; centerLng: string; radiusMiles: number }) => {
-      const claimedCenter = { lat: parseFloat(claimed.centerLat), lng: parseFloat(claimed.centerLng) };
-      
-      // Calculate distance between centers using Haversine formula
-      const R = 3959; // Earth's radius in miles
-      const dLat = (claimedCenter.lat - territory.center.lat) * Math.PI / 180;
-      const dLng = (claimedCenter.lng - territory.center.lng) * Math.PI / 180;
-      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(territory.center.lat * Math.PI / 180) * Math.cos(claimedCenter.lat * Math.PI / 180) *
-                Math.sin(dLng/2) * Math.sin(dLng/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      const distance = R * c;
-
-      // Check if circles overlap (distance < sum of radii)
-      return distance < (territory.radiusMiles + claimed.radiusMiles);
+    // Listen for circle radius change
+    google.maps.event.addListener(circle, "radius_changed", () => {
+      const newRadius = circle.getRadius();
+      if (newRadius) {
+        const radiusMiles = newRadius / 1609.34;
+        updateTerritory(territory.center, radiusMiles, territory.address, territory.zipCode);
+      }
     });
 
-    setTerritoryAvailable(!hasOverlap);
-  }, [territory.center, territory.radiusMiles, claimedTerritories]);
+    // Initial overlap check
+    checkTerritoryOverlap(territory.center, territory.radiusMiles);
+  }, [territory.center, territory.radiusMiles, territory.address, territory.zipCode, claimedTerritories, updateTerritory, checkTerritoryOverlap]);
+
+  // Update claimed circles when data changes
+  useEffect(() => {
+    if (!mapRef.current || !claimedTerritories) return;
+
+    // Clear existing claimed circles
+    claimedCirclesRef.current.forEach(c => c.setMap(null));
+    claimedCirclesRef.current = [];
+
+    // Redraw claimed territories
+    claimedTerritories.forEach((claimed: { centerLat: string; centerLng: string; radiusMiles: number; territoryName: string; status: string }) => {
+      const claimedCircle = new google.maps.Circle({
+        map: mapRef.current,
+        center: { lat: parseFloat(claimed.centerLat), lng: parseFloat(claimed.centerLng) },
+        radius: claimed.radiusMiles * 1609.34,
+        strokeColor: "#ff3333",
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: "#ff3333",
+        fillOpacity: 0.2,
+        clickable: true,
+      });
+
+      google.maps.event.addListener(claimedCircle, "click", () => {
+        if (infoWindowRef.current) {
+          infoWindowRef.current.setContent(`
+            <div style="padding: 8px; color: #333;">
+              <strong style="color: #ff3333;">Claimed Territory</strong><br/>
+              <span>${claimed.territoryName}</span><br/>
+              <span>Radius: ${claimed.radiusMiles} miles</span><br/>
+              <span>Status: ${claimed.status}</span>
+            </div>
+          `);
+          infoWindowRef.current.setPosition({ lat: parseFloat(claimed.centerLat), lng: parseFloat(claimed.centerLng) });
+          infoWindowRef.current.open(mapRef.current);
+        }
+      });
+
+      claimedCirclesRef.current.push(claimedCircle);
+    });
+
+    // Re-check overlap
+    checkTerritoryOverlap(territory.center, territory.radiusMiles);
+  }, [claimedTerritories, territory.center, territory.radiusMiles, checkTerritoryOverlap]);
 
   // Adjust radius with buttons
   const adjustRadius = (delta: number) => {
@@ -437,7 +458,6 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#c8ff00]/60" />
               <Input
-                ref={searchInputRef}
                 type="text"
                 placeholder="Enter zip code, city, or address..."
                 value={searchQuery}
@@ -448,8 +468,8 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
             </div>
             <Button
               onClick={handleSearch}
-              disabled={isSearching}
-              className="h-12 px-6 bg-[#c8ff00] text-black font-bold hover:bg-[#d4ff33] transition-all"
+              disabled={isSearching || !mapReady}
+              className="h-12 px-6 bg-[#c8ff00] text-black font-bold hover:bg-[#d4ff33] transition-all disabled:opacity-50"
             >
               {isSearching ? (
                 <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
@@ -502,9 +522,9 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
                 min={1}
                 max={50}
                 step={0.5}
-                className="w-full [&_[role=slider]]:bg-[#c8ff00] [&_[role=slider]]:border-[#c8ff00] [&_[role=slider]]:shadow-[0_0_10px_rgba(200,255,0,0.5)] [&_.bg-primary]:bg-[#c8ff00]"
+                className="w-full"
               />
-              <div className="flex justify-between mt-2 text-xs text-gray-500">
+              <div className="flex justify-between text-xs text-gray-500 mt-2">
                 <span>1 mi</span>
                 <span>10 mi</span>
                 <span>25 mi</span>
@@ -515,42 +535,68 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
 
           {/* Map Container */}
           <div className="relative rounded-xl overflow-hidden border-2 border-[#c8ff00]/30">
-            <MapView
-              onMapReady={handleMapReady}
-              className="w-full h-[450px]"
-              initialCenter={territory.center}
-              initialZoom={11}
-            />
+            {/* Location Badge */}
+            <div className="absolute top-4 left-4 z-10 bg-black/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-[#c8ff00]/30">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-[#c8ff00]" />
+                <div className="text-sm">
+                  {territory.zipCode && <span className="text-[#c8ff00] mr-2">{territory.zipCode}</span>}
+                  <span className="text-white">{territory.address.split(",")[0]}</span>
+                </div>
+              </div>
+            </div>
 
-            {/* Map Zoom Controls */}
-            <div className="absolute bottom-4 right-4 flex flex-col gap-2">
+            {/* Legend */}
+            <div className="absolute top-4 right-4 z-10 bg-black/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-[#c8ff00]/30">
+              <div className="text-xs space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-[#c8ff00]/50 border border-[#c8ff00]"></div>
+                  <span className="text-gray-300">Your Selection</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500/50 border border-red-500"></div>
+                  <span className="text-gray-300">Claimed Territory</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Zoom Controls */}
+            <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-2">
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => mapRef.current?.setZoom((mapRef.current.getZoom() || 11) + 1)}
-                className="w-10 h-10 p-0 bg-black/80 border-[#c8ff00]/30 text-[#c8ff00] hover:bg-black hover:border-[#c8ff00]"
+                onClick={() => mapRef.current?.setZoom((mapRef.current?.getZoom() || 10) + 1)}
+                className="w-10 h-10 p-0 bg-black/80 border-[#c8ff00]/30 text-[#c8ff00] hover:bg-[#c8ff00]/10"
               >
                 <ZoomIn className="w-4 h-4" />
               </Button>
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => mapRef.current?.setZoom((mapRef.current.getZoom() || 11) - 1)}
-                className="w-10 h-10 p-0 bg-black/80 border-[#c8ff00]/30 text-[#c8ff00] hover:bg-black hover:border-[#c8ff00]"
+                onClick={() => mapRef.current?.setZoom((mapRef.current?.getZoom() || 10) - 1)}
+                className="w-10 h-10 p-0 bg-black/80 border-[#c8ff00]/30 text-[#c8ff00] hover:bg-[#c8ff00]/10"
               >
                 <ZoomOut className="w-4 h-4" />
               </Button>
             </div>
 
-            {/* Current Location Badge */}
-            <div className="absolute top-4 left-4 bg-black/90 backdrop-blur-sm border border-[#c8ff00]/30 rounded-lg px-4 py-2">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-[#c8ff00]" />
-                <div>
-                  <div className="text-sm font-semibold text-white truncate max-w-[200px]">
-                    {territory.zipCode && <span className="text-[#c8ff00] mr-2">{territory.zipCode}</span>}
-                    {territory.address.split(",")[0]}
-                  </div>
+            <MapView
+              className="h-[400px]"
+              initialCenter={territory.center}
+              initialZoom={11}
+              onMapReady={handleMapReady}
+            />
+          </div>
+
+          {/* Territory Info Card */}
+          <div className="bg-black/30 rounded-xl p-5 border border-[#c8ff00]/20">
+            <div className="flex items-center gap-3 mb-4">
+              <MapPin className="w-5 h-5 text-[#c8ff00]" />
+              <div className="flex-1">
+                <div className="font-semibold text-white">Selected Territory</div>
+                <div className="text-sm text-gray-400">
+                  {territory.zipCode && <span className="text-[#c8ff00] mr-2">{territory.zipCode}</span>}
+                  {territory.address.split(",")[0]}
                 </div>
               </div>
             </div>
@@ -709,7 +755,7 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
         </CardContent>
       </Card>
 
-      {/* Territory Application Form Modal */}
+      {/* Application Form Modal */}
       {showApplicationForm && (
         <TerritoryApplicationForm
           territoryData={{
@@ -724,6 +770,7 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
           onClose={() => setShowApplicationForm(false)}
           onSuccess={() => {
             setShowApplicationForm(false);
+            toast.success("Application submitted successfully!");
           }}
         />
       )}
