@@ -287,3 +287,21 @@
 - [x] Create orange version of can for NEON Organic
 - [x] Update Products page with both can versions
 - [x] Ensure transparent backgrounds work on all pages
+
+## Palm Trees, Google Maps & Can Image (Jan 17)
+
+### Palm Tree Silhouettes
+- [x] Create palm tree SVG silhouettes
+- [x] Add palm trees to hero section for Vice City feel
+- [x] Position palm trees decoratively on left and right sides
+
+### Google Maps Territory Selector
+- [x] Find territory selector page/component
+- [x] Integrate Google Maps using built-in Map component
+- [x] Debug and ensure map is fully functional
+- [x] Allow territory selection via map interaction
+
+### Can Image Update
+- [x] Copy user's attached can image to project
+- [x] Update all can image references to use new image
+- [x] Ensure can displays correctly across all pages

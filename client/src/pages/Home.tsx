@@ -6,6 +6,7 @@ import { useLocation } from "wouter";
 import { Zap, MapPin, DollarSign, Clock, TrendingUp, Users, Star, Sparkles, ArrowRight, Gift, Target, Trophy, Menu, X, ChevronDown, Play, Shield, Leaf, Heart } from "lucide-react";
 import SocialProofNotifications from "@/components/SocialProofNotifications";
 import ViralNewsletterPopup, { shouldShowPopup, markPopupShown } from "@/components/ViralNewsletterPopup";
+import { PalmTreeGroup } from "@/components/PalmTreeSilhouette";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
 import { motion, AnimatePresence } from "framer-motion";
@@ -189,6 +190,9 @@ export default function Home() {
         <div className="absolute right-0 top-1/4 w-[600px] h-[800px] bg-gradient-to-l from-[#b8e600]/15 via-[#b8e600]/08 to-transparent blur-[120px] pointer-events-none" />
         <div className="absolute right-1/4 top-1/3 w-[300px] h-[400px] bg-gradient-to-b from-[#b8e600]/10 to-transparent blur-[80px] pointer-events-none" />
         
+        {/* Palm Tree Silhouettes - Vice City Style */}
+        <PalmTreeGroup className="z-[5]" />
+        
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
@@ -284,12 +288,12 @@ export default function Home() {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-radial from-[#b8e600]/20 via-[#b8e600]/08 to-transparent rounded-full blur-[100px] pointer-events-none" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-[#b8e600]/10 rounded-full blur-[60px] pointer-events-none animate-glow-pulse" />
                 
-                {/* Main Can - Enhanced Glow with Transparent Background */}
+                {/* Main Can - Official NEON Can Image */}
                 <img
-                  src="/neon-original-can.png"
+                  src="/neon-can-official.png"
                   alt="NEON Energy Drink Can"
                   className="h-[450px] md:h-[550px] object-contain product-glow animate-float relative z-10"
-                  style={{ filter: 'drop-shadow(0 0 50px rgba(184, 230, 0, 0.5)) drop-shadow(0 0 100px rgba(184, 230, 0, 0.3)) drop-shadow(0 30px 60px rgba(0, 0, 0, 0.4))' }}
+                  style={{ filter: 'drop-shadow(0 0 60px rgba(184, 230, 0, 0.6)) drop-shadow(0 0 120px rgba(184, 230, 0, 0.3)) drop-shadow(0 30px 60px rgba(0, 0, 0, 0.5))' }}
                 />
               </div>
 
