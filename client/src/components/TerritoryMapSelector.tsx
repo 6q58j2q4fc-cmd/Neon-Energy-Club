@@ -50,6 +50,8 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
   const searchInputRef = useRef<HTMLInputElement>(null);
   const geocoderRef = useRef<google.maps.Geocoder | null>(null);
   const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
+  const claimedCirclesRef = useRef<google.maps.Circle[]>([]);
+  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
 
   // Population density estimates by region type (people per sq mile)
   const getPopulationDensity = (demandMultiplier: number): number => {
@@ -235,6 +237,48 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
 
     circleRef.current = circle;
 
+    // Create info window for claimed territories
+    infoWindowRef.current = new google.maps.InfoWindow();
+
+    // Draw claimed territories as red circles
+    if (claimedTerritories && claimedTerritories.length > 0) {
+      // Clear existing claimed circles
+      claimedCirclesRef.current.forEach(c => c.setMap(null));
+      claimedCirclesRef.current = [];
+
+      claimedTerritories.forEach((claimed: { centerLat: string; centerLng: string; radiusMiles: number; territoryName: string; status: string }) => {
+        const claimedCircle = new google.maps.Circle({
+          map,
+          center: { lat: parseFloat(claimed.centerLat), lng: parseFloat(claimed.centerLng) },
+          radius: claimed.radiusMiles * 1609.34,
+          strokeColor: "#ff3333",
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: "#ff3333",
+          fillOpacity: 0.2,
+          clickable: true,
+        });
+
+        // Add hover info
+        google.maps.event.addListener(claimedCircle, "click", () => {
+          if (infoWindowRef.current) {
+            infoWindowRef.current.setContent(`
+              <div style="padding: 8px; color: #333;">
+                <strong style="color: #ff3333;">Claimed Territory</strong><br/>
+                <span>${claimed.territoryName}</span><br/>
+                <span>Radius: ${claimed.radiusMiles} miles</span><br/>
+                <span>Status: ${claimed.status}</span>
+              </div>
+            `);
+            infoWindowRef.current.setPosition({ lat: parseFloat(claimed.centerLat), lng: parseFloat(claimed.centerLng) });
+            infoWindowRef.current.open(map);
+          }
+        });
+
+        claimedCirclesRef.current.push(claimedCircle);
+      });
+    }
+
     // Handle radius change (dragging edge)
     google.maps.event.addListener(circle, "radius_changed", () => {
       const radiusMeters = circle.getRadius();
@@ -325,7 +369,34 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
         }
       });
     }
-  }, [territory.center, territory.radiusMiles, calculatePrice, updateTerritory]);
+  }, [territory.center, territory.radiusMiles, calculatePrice, updateTerritory, claimedTerritories]);
+
+  // Check for territory overlap with claimed territories
+  useEffect(() => {
+    if (!claimedTerritories || claimedTerritories.length === 0) {
+      setTerritoryAvailable(true);
+      return;
+    }
+
+    const hasOverlap = claimedTerritories.some((claimed: { centerLat: string; centerLng: string; radiusMiles: number }) => {
+      const claimedCenter = { lat: parseFloat(claimed.centerLat), lng: parseFloat(claimed.centerLng) };
+      
+      // Calculate distance between centers using Haversine formula
+      const R = 3959; // Earth's radius in miles
+      const dLat = (claimedCenter.lat - territory.center.lat) * Math.PI / 180;
+      const dLng = (claimedCenter.lng - territory.center.lng) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(territory.center.lat * Math.PI / 180) * Math.cos(claimedCenter.lat * Math.PI / 180) *
+                Math.sin(dLng/2) * Math.sin(dLng/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const distance = R * c;
+
+      // Check if circles overlap (distance < sum of radii)
+      return distance < (territory.radiusMiles + claimed.radiusMiles);
+    });
+
+    setTerritoryAvailable(!hasOverlap);
+  }, [territory.center, territory.radiusMiles, claimedTerritories]);
 
   // Adjust radius with buttons
   const adjustRadius = (delta: number) => {

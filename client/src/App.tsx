@@ -23,6 +23,7 @@ import Compensation from "./pages/Compensation";
 import DistributorPortal from "./pages/DistributorPortal";
 import Blog from "./pages/Blog";
 import VendingMachines from "./pages/VendingMachines";
+import AdminTerritories from "./pages/AdminTerritories";
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -73,6 +74,7 @@ function Router() {
     <Switch key={location}>
       <Route path={"/"} component={Home} />
       <Route path={"/about"} component={About} />
+      <Route path={"/story"} component={About} />
       <Route path={"/products"} component={Products} />
       <Route path={"/success"} component={Success} />
       <Route path={"/admin"} component={Admin} />
@@ -89,6 +91,7 @@ function Router() {
       <Route path={"/blog"} component={Blog} />
       <Route path={"/blog/:slug"} component={Blog} />
       <Route path={"/vending"} component={VendingMachines} />
+      <Route path={"/admin/territories"} component={AdminTerritories} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

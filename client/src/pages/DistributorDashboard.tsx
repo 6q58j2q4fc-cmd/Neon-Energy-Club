@@ -8,7 +8,7 @@ import { useLocation } from "wouter";
 import { 
   TrendingUp, Users, DollarSign, Link as LinkIcon, Copy, ExternalLink, 
   Award, Target, Zap, ArrowUp, ArrowDown, Clock, CheckCircle, XCircle,
-  Share2, BarChart3, PieChart, Activity, Sparkles
+  Share2, BarChart3, PieChart, Activity, Sparkles, MapPin, Settings
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -94,6 +94,16 @@ export default function DistributorDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              {user?.role === "admin" && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => setLocation("/admin/territories")} 
+                  className="border-[#ff0080]/30 text-[#ff0080] hover:bg-[#ff0080]/10"
+                >
+                  <MapPin className="w-4 h-4 mr-2" />
+                  Territory Admin
+                </Button>
+              )}
               <Button variant="outline" onClick={() => setLocation("/")} className="border-[#c8ff00]/30 text-white">
                 Back to Site
               </Button>

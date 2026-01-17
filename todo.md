@@ -451,3 +451,46 @@
 ## Logo Line Width Fix (Jan 17)
 
 - [x] Fix horizontal line to match NEON text width exactly
+
+## Territory Management & Site Audit (Jan 17)
+
+### Territory Overlap Visualization
+- [x] Display claimed territories as red circles on map
+- [x] Show territory owner info on hover
+- [x] Indicate overlap warnings when selecting new territory
+- [x] Add legend for available vs claimed territories
+
+### Admin Territory Management Panel
+- [x] Create admin-only territory management page
+- [x] List all territory applications with status
+- [x] Add approve/reject functionality with notes
+- [x] Show territory details and applicant info
+- [ ] Add bulk actions for multiple applications
+
+### Email Notifications
+- [x] Send notification to admin on new application
+- [ ] Send approval email to applicant
+- [ ] Send rejection email with reason to applicant
+- [ ] Send reminder for pending applications
+
+### Site-Wide Debugging & Functionality Audit
+- [x] Test all navigation links and routes
+- [x] Verify all forms submit correctly
+- [x] Check mobile responsiveness on all pages
+- [x] Fix any console errors or warnings
+- [x] Verify all API endpoints work correctly
+- [x] Test user authentication flow
+- [x] Test distributor dashboard functionality
+
+### Content Audit & Enhancement
+- [x] Review and enhance Home page content
+- [x] Review and enhance Products page content
+- [x] Review and enhance About/Story page content
+- [x] Review and enhance Celebrities page content
+- [x] Review and enhance Franchise page content
+- [x] Review and enhance Vending Machines page content
+- [x] Review and enhance Compensation Plan page content
+- [x] Ensure consistent branding and messaging
+- [x] Add missing CTAs where needed
+- [x] Add /story route alias for About page
+- [x] Write vitest tests for territory management
