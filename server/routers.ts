@@ -431,6 +431,247 @@ export const appRouter = router({
       return await generateBlogPost();
     }),
   }),
+
+  territory: router({
+    // Check territory availability at a given location
+    checkAvailability: publicProcedure
+      .input(
+        z.object({
+          lat: z.number(),
+          lng: z.number(),
+          radiusMiles: z.number().min(1).max(50),
+        })
+      )
+      .query(async ({ input }) => {
+        const { getClaimedTerritoriesNear } = await import("./db");
+        const claimed = await getClaimedTerritoriesNear(input.lat, input.lng, input.radiusMiles * 2);
+        
+        // Check if any claimed territory overlaps with the requested area
+        const overlapping = claimed.filter(territory => {
+          const distance = calculateDistance(
+            input.lat, input.lng,
+            Number(territory.centerLat), Number(territory.centerLng)
+          );
+          // Check if circles overlap (distance < sum of radii)
+          return distance < (input.radiusMiles + territory.radiusMiles);
+        });
+        
+        return {
+          available: overlapping.length === 0,
+          overlappingTerritories: overlapping.map(t => ({
+            id: t.id,
+            name: t.territoryName,
+            radiusMiles: t.radiusMiles,
+          })),
+          nearbyClaimedCount: claimed.length,
+        };
+      }),
+
+    // Get all claimed territories for map display
+    getClaimedTerritories: publicProcedure.query(async () => {
+      const { getAllClaimedTerritories } = await import("./db");
+      return await getAllClaimedTerritories();
+    }),
+
+    // Start a new territory application
+    startApplication: publicProcedure
+      .input(
+        z.object({
+          centerLat: z.number(),
+          centerLng: z.number(),
+          radiusMiles: z.number().min(1).max(50),
+          territoryName: z.string().min(1),
+          estimatedPopulation: z.number().optional(),
+          termMonths: z.number().int().min(6),
+          totalCost: z.number().int().min(1),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const { createTerritoryApplication } = await import("./db");
+        const application = await createTerritoryApplication({
+          userId: ctx.user?.id,
+          currentStep: 1,
+          centerLat: String(input.centerLat),
+          centerLng: String(input.centerLng),
+          radiusMiles: input.radiusMiles,
+          territoryName: input.territoryName,
+          estimatedPopulation: input.estimatedPopulation,
+          termMonths: input.termMonths,
+          totalCost: input.totalCost,
+        });
+        return { applicationId: application.id };
+      }),
+
+    // Update application with personal details (Step 2)
+    updatePersonalDetails: publicProcedure
+      .input(
+        z.object({
+          applicationId: z.number().int(),
+          firstName: z.string().min(1),
+          lastName: z.string().min(1),
+          email: z.string().email(),
+          phone: z.string().min(10),
+          dateOfBirth: z.string().optional(),
+          streetAddress: z.string().min(1),
+          city: z.string().min(1),
+          state: z.string().min(1),
+          zipCode: z.string().min(5),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { updateTerritoryApplication } = await import("./db");
+        await updateTerritoryApplication(input.applicationId, {
+          currentStep: 2,
+          firstName: input.firstName,
+          lastName: input.lastName,
+          email: input.email,
+          phone: input.phone,
+          dateOfBirth: input.dateOfBirth,
+          streetAddress: input.streetAddress,
+          city: input.city,
+          state: input.state,
+          zipCode: input.zipCode,
+        });
+        return { success: true };
+      }),
+
+    // Update application with business info (Step 3)
+    updateBusinessInfo: publicProcedure
+      .input(
+        z.object({
+          applicationId: z.number().int(),
+          businessName: z.string().optional(),
+          businessType: z.enum(["individual", "llc", "corporation", "partnership"]),
+          taxId: z.string().optional(),
+          yearsInBusiness: z.number().int().optional(),
+          investmentCapital: z.number().int().optional(),
+          franchiseExperience: z.string().optional(),
+          whyInterested: z.string().min(10),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { updateTerritoryApplication } = await import("./db");
+        await updateTerritoryApplication(input.applicationId, {
+          currentStep: 3,
+          businessName: input.businessName,
+          businessType: input.businessType,
+          taxId: input.taxId,
+          yearsInBusiness: input.yearsInBusiness,
+          investmentCapital: input.investmentCapital,
+          franchiseExperience: input.franchiseExperience,
+          whyInterested: input.whyInterested,
+        });
+        return { success: true };
+      }),
+
+    // Submit application (Step 4)
+    submitApplication: publicProcedure
+      .input(
+        z.object({
+          applicationId: z.number().int(),
+          agreedToTerms: z.boolean(),
+          signature: z.string().min(1),
+        })
+      )
+      .mutation(async ({ input }) => {
+        if (!input.agreedToTerms) {
+          throw new Error("You must agree to the terms and conditions");
+        }
+        
+        const { updateTerritoryApplication, getTerritoryApplication } = await import("./db");
+        
+        await updateTerritoryApplication(input.applicationId, {
+          currentStep: 4,
+          agreedToTerms: 1,
+          signature: input.signature,
+          status: "submitted",
+          submittedAt: new Date(),
+        });
+        
+        // Get application details for notification
+        const application = await getTerritoryApplication(input.applicationId);
+        
+        // Notify admin of new application
+        await notifyOwner({
+          title: "New Territory Application Submitted",
+          content: `New territory application from ${application?.firstName} ${application?.lastName} (${application?.email}) for ${application?.territoryName}. Radius: ${application?.radiusMiles} miles. Total cost: $${application?.totalCost?.toLocaleString()}. Review in admin dashboard.`,
+        });
+        
+        return { success: true };
+      }),
+
+    // Get application by ID
+    getApplication: publicProcedure
+      .input(z.object({ applicationId: z.number().int() }))
+      .query(async ({ input }) => {
+        const { getTerritoryApplication } = await import("./db");
+        return await getTerritoryApplication(input.applicationId);
+      }),
+
+    // Admin: List all applications
+    listApplications: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new Error("Unauthorized: Admin access required");
+      }
+      const { getAllTerritoryApplications } = await import("./db");
+      return await getAllTerritoryApplications();
+    }),
+
+    // Admin: Approve/reject application
+    updateApplicationStatus: protectedProcedure
+      .input(
+        z.object({
+          applicationId: z.number().int(),
+          status: z.enum(["under_review", "approved", "rejected"]),
+          adminNotes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized: Admin access required");
+        }
+        
+        const { updateTerritoryApplication, getTerritoryApplication, createClaimedTerritory } = await import("./db");
+        
+        await updateTerritoryApplication(input.applicationId, {
+          status: input.status,
+          adminNotes: input.adminNotes,
+        });
+        
+        // If approved, create claimed territory
+        if (input.status === "approved") {
+          const application = await getTerritoryApplication(input.applicationId);
+          if (application && application.centerLat && application.centerLng && application.radiusMiles) {
+            await createClaimedTerritory({
+              territoryLicenseId: input.applicationId,
+              centerLat: String(application.centerLat),
+              centerLng: String(application.centerLng),
+              radiusMiles: application.radiusMiles,
+              territoryName: application.territoryName || "Unnamed Territory",
+              city: application.city,
+              state: application.state,
+              zipCode: application.zipCode,
+              status: "active",
+            });
+          }
+        }
+        
+        return { success: true };
+      }),
+  }),
 });
+
+// Helper function to calculate distance between two coordinates in miles
+function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 3959; // Earth's radius in miles
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
 
 export type AppRouter = typeof appRouter;

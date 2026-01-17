@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { MapPin, Search, DollarSign, Maximize2, Users, Minus, Plus, Target, ZoomIn, ZoomOut } from "lucide-react";
+import { MapPin, Search, DollarSign, Maximize2, Users, Minus, Plus, Target, ZoomIn, ZoomOut, AlertTriangle, CheckCircle } from "lucide-react";
 import { MapView } from "@/components/Map";
+import { trpc } from "@/lib/trpc";
+import { TerritoryApplicationForm } from "./TerritoryApplicationForm";
 
 export interface TerritoryData {
   center: { lat: number; lng: number };
@@ -25,6 +27,11 @@ interface TerritoryMapSelectorProps {
 export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMapSelectorProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const [territoryAvailable, setTerritoryAvailable] = useState(true);
+  
+  // Fetch claimed territories
+  const { data: claimedTerritories = [] } = trpc.territory.getClaimedTerritories.useQuery();
   const [territory, setTerritory] = useState<TerritoryData>({
     center: { lat: 40.7128, lng: -74.0060 },
     address: "New York, NY",
@@ -566,6 +573,38 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
             </div>
           </div>
 
+          {/* Territory Availability Status */}
+          <div className={`rounded-xl p-4 border ${territoryAvailable ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
+            <div className="flex items-center gap-3">
+              {territoryAvailable ? (
+                <>
+                  <CheckCircle className="w-6 h-6 text-green-500" />
+                  <div>
+                    <div className="font-semibold text-green-500">Territory Available!</div>
+                    <div className="text-sm text-gray-400">This area is open for licensing. Apply now to secure your exclusive territory.</div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="w-6 h-6 text-red-500" />
+                  <div>
+                    <div className="font-semibold text-red-500">Territory Overlap Detected</div>
+                    <div className="text-sm text-gray-400">This area overlaps with an existing territory. Try adjusting your location or radius.</div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Apply Button */}
+          <Button
+            onClick={() => setShowApplicationForm(true)}
+            disabled={!territoryAvailable}
+            className="w-full py-6 text-lg font-bold bg-gradient-to-r from-[#c8ff00] to-[#00ff00] text-black hover:from-[#00ff00] hover:to-[#c8ff00] disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_30px_rgba(200,255,0,0.3)] hover:shadow-[0_0_40px_rgba(200,255,0,0.5)] transition-all"
+          >
+            Apply for This Territory - ${territory.totalPrice.toLocaleString()}
+          </Button>
+
           {/* Instructions */}
           <div className="bg-[#c8ff00]/5 border border-[#c8ff00]/20 rounded-xl p-4">
             <div className="text-sm font-semibold text-[#c8ff00] mb-3">How to Select Your Territory</div>
@@ -598,6 +637,25 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
           </div>
         </CardContent>
       </Card>
+
+      {/* Territory Application Form Modal */}
+      {showApplicationForm && (
+        <TerritoryApplicationForm
+          territoryData={{
+            centerLat: territory.center.lat,
+            centerLng: territory.center.lng,
+            radiusMiles: territory.radiusMiles,
+            territoryName: territory.address,
+            estimatedPopulation: territory.estimatedPopulation,
+            termMonths: 12,
+            totalCost: territory.totalPrice,
+          }}
+          onClose={() => setShowApplicationForm(false)}
+          onSuccess={() => {
+            setShowApplicationForm(false);
+          }}
+        />
+      )}
     </div>
   );
 }

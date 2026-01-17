@@ -408,3 +408,33 @@
 - [x] Make radius draggable and resizable on map
 - [x] Display territory coverage area in real-time
 - [x] Calculate and show population/market size within radius
+
+## Hamburger Menu, Logo & Territory Features (Jan 17)
+
+### Hamburger Menu Fix
+- [x] Fix hamburger menu to work as overlay dropdown (not navigate away)
+- [x] Ensure menu stays on same page when opened
+- [x] Add smooth animation for menu open/close
+- [x] Make menu close when clicking outside or on a link
+
+### Logo Update
+- [x] Recreate logo matching PDF design
+- [x] Apply bright neon green color (#c8ff00)
+- [x] Add realistic neon flicker "turn on" effect
+- [x] Implement smooth ambient color transition (no glow)
+- [x] Ensure logo matches can branding exactly
+
+### Territory Availability Check
+- [x] Add database schema for claimed territories
+- [x] Create API endpoint to check territory availability
+- [x] Display available vs claimed status on map
+- [x] Show visual indicator for claimed territories
+
+### Territory Application Workflow
+- [x] Build multi-step application form
+- [x] Step 1: Territory selection confirmation
+- [x] Step 2: Applicant personal details
+- [x] Step 3: Business information
+- [x] Step 4: Review and submit
+- [x] Send notification to admin on submission
+- [x] Store application in database for review

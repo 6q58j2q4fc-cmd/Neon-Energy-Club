@@ -1,6 +1,6 @@
 import { desc, eq, sql, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions } from "../drizzle/schema";
+import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -721,4 +721,77 @@ export async function updateBlogPost(id: number, data: {
     .where(eq(blogPosts.id, id));
   
   return { success: true };
+}
+
+
+// ============ Territory Functions ============
+
+export async function getClaimedTerritoriesNear(lat: number, lng: number, radiusMiles: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // Get all claimed territories and filter by distance
+  // For simplicity, we fetch all and filter in JS (for production, use spatial queries)
+  const territories = await db.select().from(claimedTerritories)
+    .where(eq(claimedTerritories.status, "active"));
+  
+  return territories;
+}
+
+export async function getAllClaimedTerritories() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const territories = await db.select().from(claimedTerritories)
+    .where(eq(claimedTerritories.status, "active"));
+  
+  return territories;
+}
+
+export async function createClaimedTerritory(data: Omit<InsertClaimedTerritory, "id" | "createdAt">) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(claimedTerritories).values(data);
+  return { id: Number(result[0].insertId) };
+}
+
+export async function createTerritoryApplication(data: Partial<InsertTerritoryApplication>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(territoryApplications).values(data as any);
+  return { id: Number(result[0].insertId) };
+}
+
+export async function updateTerritoryApplication(id: number, data: Partial<InsertTerritoryApplication>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(territoryApplications)
+    .set(data as any)
+    .where(eq(territoryApplications.id, id));
+  
+  return { success: true };
+}
+
+export async function getTerritoryApplication(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(territoryApplications)
+    .where(eq(territoryApplications.id, id))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+export async function getAllTerritoryApplications() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const applications = await db.select().from(territoryApplications)
+    .orderBy(desc(territoryApplications.createdAt));
+  
+  return applications;
 }

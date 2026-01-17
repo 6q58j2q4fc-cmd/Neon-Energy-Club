@@ -8,6 +8,7 @@ import SocialProofNotifications from "@/components/SocialProofNotifications";
 import ViralNewsletterPopup, { shouldShowPopup, markPopupShown } from "@/components/ViralNewsletterPopup";
 import { PalmTreeGroup } from "@/components/PalmTreeSilhouette";
 import { CityLights, WindowLights } from "@/components/CityLights";
+import NeonLogo from "@/components/NeonLogo";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
 import { motion, AnimatePresence } from "framer-motion";
@@ -102,21 +103,8 @@ export default function Home() {
       >
         <div className="container mx-auto px-4 md:px-6 py-3 md:py-4">
           <div className="flex items-center justify-between">
-            {/* Logo - Large Neon Sign Style matching can */}
-            <div 
-              className="flex flex-col cursor-pointer group"
-              onClick={() => setLocation("/")}
-            >
-              <div className="flex items-baseline">
-                <span className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight neon-logo-text">
-                  NEON
-                </span>
-                <span className="text-[#b8e600]/70 text-[10px] sm:text-xs ml-0.5 align-super">®</span>
-              </div>
-              <span className="text-[8px] sm:text-[10px] md:text-xs text-[#b8e600]/80 tracking-[0.3em] font-medium -mt-1 neon-logo-text" style={{ animationDelay: '0.5s' }}>
-                ENERGY DRINK
-              </span>
-            </div>
+            {/* Logo - Exact match to PDF with neon flicker effect */}
+            <NeonLogo onClick={() => setLocation("/")} />
 
             {/* Desktop Navigation - Fixed Menu Buttons */}
             <nav className="hidden lg:flex items-center gap-2">
@@ -133,17 +121,27 @@ export default function Home() {
               ))}
             </nav>
 
-            {/* Mobile Hamburger Menu Button - Fixed & Visible */}
+            {/* Mobile Hamburger Menu Button - Fixed & Always Visible */}
             <button
-              className="lg:hidden p-3 rounded-xl bg-gradient-to-br from-[#b8e600]/20 to-[#00ffff]/10 border-2 border-[#b8e600]/50 hover:bg-[#b8e600]/30 hover:border-[#b8e600] hover:shadow-[0_0_20px_rgba(184,230,0,0.5)] transition-all duration-300 z-50"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden relative p-3 rounded-xl bg-gradient-to-br from-[#b8e600]/20 to-[#00ffff]/10 border-2 border-[#b8e600]/50 hover:bg-[#b8e600]/30 hover:border-[#b8e600] hover:shadow-[0_0_20px_rgba(184,230,0,0.5)] transition-all duration-300"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setMobileMenuOpen(!mobileMenuOpen);
+              }}
               aria-label="Toggle menu"
+              aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? (
-                <X className="w-7 h-7 text-[#b8e600] drop-shadow-[0_0_8px_rgba(184,230,0,0.8)]" />
-              ) : (
-                <Menu className="w-7 h-7 text-[#b8e600] drop-shadow-[0_0_8px_rgba(184,230,0,0.8)]" />
-              )}
+              <motion.div
+                animate={{ rotate: mobileMenuOpen ? 90 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-7 h-7 text-[#b8e600] drop-shadow-[0_0_8px_rgba(184,230,0,0.8)]" />
+                ) : (
+                  <Menu className="w-7 h-7 text-[#b8e600] drop-shadow-[0_0_8px_rgba(184,230,0,0.8)]" />
+                )}
+              </motion.div>
             </button>
 
             {/* CTA Buttons - Vice City Style */}
@@ -165,59 +163,74 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Mobile Dropdown Menu - Fixed z-index and styling */}
+        {/* Mobile Dropdown Menu - Full screen overlay that doesn't navigate away */}
         <AnimatePresence>
           {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="lg:hidden fixed top-[60px] left-0 right-0 bg-gradient-to-b from-[#1a0a2e]/98 to-[#0d0418]/98 backdrop-blur-xl border-t border-b border-[#b8e600]/30 shadow-[0_10px_40px_rgba(184,230,0,0.2)] z-40"
-            >
-              <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
-                {navItems.map((item, index) => (
-                  <motion.button
-                    key={item.path}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    onClick={() => {
-                      setLocation(item.path);
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-3 rounded-lg font-semibold transition-all duration-300 ${
-                      item.path === "/"
-                        ? "bg-[#b8e600]/20 text-[#b8e600] border border-[#b8e600]/40"
-                        : "text-white/80 hover:text-[#b8e600] hover:bg-[#b8e600]/10"
-                    }`}
-                  >
-                    {item.label}
-                  </motion.button>
-                ))}
-                <div className="flex gap-2 mt-4 pt-4 border-t border-white/10">
-                  <Button
-                    onClick={() => {
-                      setLocation("/join");
-                      setMobileMenuOpen(false);
-                    }}
-                    variant="outline"
-                    className="flex-1 border-[#00ffff]/60 text-[#00ffff] hover:bg-[#00ffff]/15 font-bold h-12"
-                  >
-                    JOIN NOW
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setLocation("/crowdfund");
-                      setMobileMenuOpen(false);
-                    }}
-                    className="flex-1 btn-vice-pink text-white font-bold h-12"
-                  >
-                    BACK US
-                  </Button>
-                </div>
-              </nav>
-            </motion.div>
+            <>
+              {/* Backdrop overlay to close menu when clicking outside */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+                onClick={() => setMobileMenuOpen(false)}
+              />
+              <motion.div
+                initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                className="lg:hidden fixed top-[70px] left-4 right-4 bg-gradient-to-b from-[#1a0a2e] to-[#0d0418] backdrop-blur-xl border-2 border-[#b8e600]/40 rounded-2xl shadow-[0_10px_60px_rgba(184,230,0,0.3)] z-50 overflow-hidden"
+              >
+                <nav className="p-4 flex flex-col gap-2">
+                  {navItems.map((item, index) => (
+                    <motion.button
+                      key={item.path}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setMobileMenuOpen(false);
+                        // Small delay to allow menu close animation
+                        setTimeout(() => setLocation(item.path), 150);
+                      }}
+                      className={`w-full text-left px-5 py-4 rounded-xl font-semibold text-lg transition-all duration-300 ${
+                        item.path === "/"
+                          ? "bg-[#b8e600]/20 text-[#b8e600] border border-[#b8e600]/40"
+                          : "text-white/90 hover:text-[#b8e600] hover:bg-[#b8e600]/10 active:bg-[#b8e600]/20"
+                      }`}
+                    >
+                      {item.label}
+                    </motion.button>
+                  ))}
+                  <div className="flex gap-3 mt-4 pt-4 border-t border-white/10">
+                    <Button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setMobileMenuOpen(false);
+                        setTimeout(() => setLocation("/join"), 150);
+                      }}
+                      variant="outline"
+                      className="flex-1 border-[#00ffff]/60 text-[#00ffff] hover:bg-[#00ffff]/15 font-bold h-14 text-base"
+                    >
+                      JOIN NOW
+                    </Button>
+                    <Button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setMobileMenuOpen(false);
+                        setTimeout(() => setLocation("/crowdfund"), 150);
+                      }}
+                      className="flex-1 btn-vice-pink text-white font-bold h-14 text-base"
+                    >
+                      BACK US
+                    </Button>
+                  </div>
+                </nav>
+              </motion.div>
+            </>
           )}
         </AnimatePresence>
       </header>

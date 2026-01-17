@@ -381,3 +381,121 @@ export const blogPosts = mysqlTable("blog_posts", {
 
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type InsertBlogPost = typeof blogPosts.$inferInsert;
+
+
+/**
+ * Claimed territories table for tracking which territories are already licensed.
+ * Used to show availability on the territory map selector.
+ */
+export const claimedTerritories = mysqlTable("claimed_territories", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Territory license ID (foreign key) */
+  territoryLicenseId: int("territoryLicenseId").notNull(),
+  /** Center latitude */
+  centerLat: decimal("centerLat", { precision: 10, scale: 7 }).notNull(),
+  /** Center longitude */
+  centerLng: decimal("centerLng", { precision: 10, scale: 7 }).notNull(),
+  /** Radius in miles */
+  radiusMiles: int("radiusMiles").notNull(),
+  /** Territory name/description */
+  territoryName: varchar("territoryName", { length: 255 }).notNull(),
+  /** Zip code (if applicable) */
+  zipCode: varchar("zipCode", { length: 20 }),
+  /** City */
+  city: varchar("city", { length: 100 }),
+  /** State */
+  state: varchar("state", { length: 50 }),
+  /** Status */
+  status: mysqlEnum("status", ["pending", "active", "expired"]).default("pending").notNull(),
+  /** Claim timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Expiration timestamp */
+  expiresAt: timestamp("expiresAt"),
+});
+
+export type ClaimedTerritory = typeof claimedTerritories.$inferSelect;
+export type InsertClaimedTerritory = typeof claimedTerritories.$inferInsert;
+
+/**
+ * Territory applications table for multi-step application workflow.
+ * Stores application progress and all applicant details.
+ */
+export const territoryApplications = mysqlTable("territory_applications", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User ID (if logged in) */
+  userId: int("userId"),
+  /** Application step (1-4) */
+  currentStep: int("currentStep").default(1).notNull(),
+  
+  // Step 1: Territory Selection
+  /** Center latitude */
+  centerLat: decimal("centerLat", { precision: 10, scale: 7 }),
+  /** Center longitude */
+  centerLng: decimal("centerLng", { precision: 10, scale: 7 }),
+  /** Radius in miles */
+  radiusMiles: int("radiusMiles"),
+  /** Territory name/description */
+  territoryName: varchar("territoryName", { length: 255 }),
+  /** Estimated population */
+  estimatedPopulation: int("estimatedPopulation"),
+  /** License term in months */
+  termMonths: int("termMonths"),
+  /** Total cost */
+  totalCost: int("totalCost"),
+  
+  // Step 2: Personal Details
+  /** Applicant first name */
+  firstName: varchar("firstName", { length: 100 }),
+  /** Applicant last name */
+  lastName: varchar("lastName", { length: 100 }),
+  /** Email address */
+  email: varchar("email", { length: 320 }),
+  /** Phone number */
+  phone: varchar("phone", { length: 50 }),
+  /** Date of birth */
+  dateOfBirth: varchar("dateOfBirth", { length: 20 }),
+  /** Street address */
+  streetAddress: varchar("streetAddress", { length: 255 }),
+  /** City */
+  city: varchar("city", { length: 100 }),
+  /** State */
+  state: varchar("state", { length: 50 }),
+  /** Zip code */
+  zipCode: varchar("zipCode", { length: 20 }),
+  
+  // Step 3: Business Information
+  /** Business name (if applicable) */
+  businessName: varchar("businessName", { length: 255 }),
+  /** Business type */
+  businessType: mysqlEnum("businessType", ["individual", "llc", "corporation", "partnership"]),
+  /** Tax ID / EIN */
+  taxId: varchar("taxId", { length: 50 }),
+  /** Years in business */
+  yearsInBusiness: int("yearsInBusiness"),
+  /** Investment capital available */
+  investmentCapital: int("investmentCapital"),
+  /** Previous franchise experience */
+  franchiseExperience: text("franchiseExperience"),
+  /** Why interested in NEON */
+  whyInterested: text("whyInterested"),
+  
+  // Step 4: Review & Submit
+  /** Agreed to terms */
+  agreedToTerms: int("agreedToTerms").default(0).notNull(),
+  /** Signature (typed name) */
+  signature: varchar("signature", { length: 255 }),
+  /** Submitted timestamp */
+  submittedAt: timestamp("submittedAt"),
+  
+  /** Application status */
+  status: mysqlEnum("status", ["draft", "submitted", "under_review", "approved", "rejected"]).default("draft").notNull(),
+  /** Admin notes */
+  adminNotes: text("adminNotes"),
+  /** Creation timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Last update timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TerritoryApplication = typeof territoryApplications.$inferSelect;
+export type InsertTerritoryApplication = typeof territoryApplications.$inferInsert;
