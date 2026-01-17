@@ -22,6 +22,7 @@ import Shop from "./pages/Shop";
 import Compensation from "./pages/Compensation";
 import DistributorPortal from "./pages/DistributorPortal";
 import Blog from "./pages/Blog";
+import VendingMachines from "./pages/VendingMachines";
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -87,6 +88,7 @@ function Router() {
       <Route path={"/portal"} component={DistributorPortal} />
       <Route path={"/blog"} component={Blog} />
       <Route path={"/blog/:slug"} component={Blog} />
+      <Route path={"/vending"} component={VendingMachines} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -73,7 +73,8 @@ export default function Home() {
     { label: "PRODUCTS", path: "/shop" },
     { label: "CELEBRITIES", path: "/celebrities" },
     { label: "FRANCHISE", path: "/franchise" },
-    { label: "COMPENSATION", path: "/compensation" },
+    { label: "VENDING", path: "/vending" },
+    { label: "COMP PLAN", path: "/compensation" },
   ];
 
   return (
@@ -126,16 +127,16 @@ export default function Home() {
               ))}
             </nav>
 
-            {/* Mobile Hamburger Menu Button */}
+            {/* Mobile Hamburger Menu Button - Fixed & Visible */}
             <button
-              className="lg:hidden p-2 rounded-lg bg-[#b8e600]/10 border border-[#b8e600]/30 hover:bg-[#b8e600]/20 transition-all duration-300"
+              className="lg:hidden p-3 rounded-xl bg-gradient-to-br from-[#b8e600]/20 to-[#00ffff]/10 border-2 border-[#b8e600]/50 hover:bg-[#b8e600]/30 hover:border-[#b8e600] hover:shadow-[0_0_20px_rgba(184,230,0,0.5)] transition-all duration-300 z-50"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? (
-                <X className="w-6 h-6 text-[#b8e600]" />
+                <X className="w-7 h-7 text-[#b8e600] drop-shadow-[0_0_8px_rgba(184,230,0,0.8)]" />
               ) : (
-                <Menu className="w-6 h-6 text-[#b8e600]" />
+                <Menu className="w-7 h-7 text-[#b8e600] drop-shadow-[0_0_8px_rgba(184,230,0,0.8)]" />
               )}
             </button>
 
@@ -158,15 +159,15 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Mobile Dropdown Menu */}
+        {/* Mobile Dropdown Menu - Fixed z-index and styling */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="lg:hidden bg-[#1a0a2e]/98 backdrop-blur-xl border-t border-[#b8e600]/20"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="lg:hidden fixed top-[60px] left-0 right-0 bg-gradient-to-b from-[#1a0a2e]/98 to-[#0d0418]/98 backdrop-blur-xl border-t border-b border-[#b8e600]/30 shadow-[0_10px_40px_rgba(184,230,0,0.2)] z-40"
             >
               <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
                 {navItems.map((item, index) => (

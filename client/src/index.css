@@ -296,11 +296,11 @@
   /* ===== GTA VICE CITY BACKGROUNDS ===== */
   .vice-bg {
     background: linear-gradient(180deg, 
-      #2a1045 0%,
-      #1f0835 15%,
-      #150628 40%,
-      #0d0418 70%,
-      #080212 100%);
+      #4a1a6d 0%,
+      #3d1259 15%,
+      #2a0d40 40%,
+      #1a0828 70%,
+      #0d0418 100%);
     position: relative;
   }
 
@@ -312,21 +312,42 @@
     right: 0;
     bottom: 0;
     background: 
-      radial-gradient(ellipse 120% 50% at 50% 0%, rgba(var(--vice-pink-rgb), 0.25) 0%, transparent 50%),
-      radial-gradient(ellipse 80% 40% at 0% 30%, rgba(var(--vice-cyan-rgb), 0.18) 0%, transparent 50%),
-      radial-gradient(ellipse 80% 40% at 100% 30%, rgba(var(--vice-purple-rgb), 0.18) 0%, transparent 50%),
-      radial-gradient(ellipse 100% 50% at 50% 100%, rgba(var(--vice-orange-rgb), 0.12) 0%, transparent 40%);
+      radial-gradient(ellipse 150% 60% at 50% 0%, rgba(var(--vice-pink-rgb), 0.45) 0%, transparent 60%),
+      radial-gradient(ellipse 100% 50% at 0% 30%, rgba(var(--vice-cyan-rgb), 0.35) 0%, transparent 60%),
+      radial-gradient(ellipse 100% 50% at 100% 30%, rgba(var(--vice-purple-rgb), 0.35) 0%, transparent 60%),
+      radial-gradient(ellipse 120% 60% at 50% 100%, rgba(var(--vice-orange-rgb), 0.25) 0%, transparent 50%);
     pointer-events: none;
   }
 
-  /* Vice City Sunset Gradient - Extra Vibrant */
+  /* Vice City Sunset Gradient - Ultra Vibrant GTA 6 Style */
   .vice-sunset {
     background: linear-gradient(180deg,
-      #ff8c42 0%,
-      #ff0099 25%,
-      #bf5af2 50%,
-      #2a1045 75%,
-      #0d0418 100%);
+      #ffaa00 0%,
+      #ff6600 15%,
+      #ff0099 35%,
+      #cc00ff 55%,
+      #6600cc 75%,
+      #1a0828 100%);
+  }
+
+  /* Extra bright Vice City overlay for hero sections */
+  .vice-glow-intense {
+    position: relative;
+  }
+
+  .vice-glow-intense::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(ellipse 80% 40% at 50% 20%, rgba(255, 0, 153, 0.4) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 30% at 20% 60%, rgba(0, 255, 255, 0.3) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 30% at 80% 60%, rgba(191, 90, 242, 0.3) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
   }
 
   /* Synthwave Grid - Vice City Style - More Visible */

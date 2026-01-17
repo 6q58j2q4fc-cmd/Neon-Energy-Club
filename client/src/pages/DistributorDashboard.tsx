@@ -197,8 +197,9 @@ export default function DistributorDashboard() {
 
         {/* Tabs */}
         <Tabs defaultValue="overview" className="space-y-8">
-          <TabsList className="bg-[#0a0a0a] border border-[#c8ff00]/30">
+          <TabsList className="bg-[#0a0a0a] border border-[#c8ff00]/30 flex-wrap">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="compensation">Comp Plan</TabsTrigger>
             <TabsTrigger value="links">Affiliate Links</TabsTrigger>
             <TabsTrigger value="team">My Team</TabsTrigger>
             <TabsTrigger value="genealogy">Genealogy</TabsTrigger>
@@ -302,6 +303,125 @@ export default function DistributorDashboard() {
                     <p>No sales yet. Start sharing your links!</p>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Compensation Plan Tab */}
+          <TabsContent value="compensation" className="space-y-8">
+            {/* Your Rank Progress */}
+            <Card className="bg-gradient-to-r from-[#c8ff00]/10 to-transparent border-[#c8ff00]/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="w-5 h-5 text-[#c8ff00]" />
+                  Your Rank Progress
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-4 gap-6">
+                  <div className="text-center p-4 bg-black/30 rounded-lg">
+                    <div className="text-3xl font-black text-[#c8ff00] uppercase mb-1">{distributor.rank}</div>
+                    <div className="text-sm text-gray-400">Current Rank</div>
+                  </div>
+                  <div className="text-center p-4 bg-black/30 rounded-lg">
+                    <div className="text-3xl font-black text-white">{((distributor.personalSales || 0) / 100).toFixed(0)}</div>
+                    <div className="text-sm text-gray-400">Personal Volume (PV)</div>
+                  </div>
+                  <div className="text-center p-4 bg-black/30 rounded-lg">
+                    <div className="text-3xl font-black text-white">{((distributor.totalEarnings || 0) / 100).toFixed(0)}</div>
+                    <div className="text-sm text-gray-400">Group Volume (GV)</div>
+                  </div>
+                  <div className="text-center p-4 bg-black/30 rounded-lg">
+                    <div className="text-3xl font-black text-white">{stats?.teamSize || 0}</div>
+                    <div className="text-sm text-gray-400">Active Legs</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Commission Breakdown */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card className="bg-[#0a0a0a] border-[#c8ff00]/30">
+                <CardHeader>
+                  <CardTitle>Your Commission Rates</CardTitle>
+                  <CardDescription>Based on your current rank</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-black/50 rounded-lg">
+                    <span className="text-gray-300">Retail Profit</span>
+                    <span className="text-2xl font-bold text-[#c8ff00]">20-30%</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-black/50 rounded-lg">
+                    <span className="text-gray-300">Level 1 Team</span>
+                    <span className="text-2xl font-bold text-[#c8ff00]">10%</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-black/50 rounded-lg">
+                    <span className="text-gray-300">Level 2 Team</span>
+                    <span className="text-2xl font-bold text-[#c8ff00]">5%</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-black/50 rounded-lg">
+                    <span className="text-gray-300">Binary Bonus</span>
+                    <span className="text-2xl font-bold text-[#c8ff00]">10%</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-[#0a0a0a] border-[#c8ff00]/30">
+                <CardHeader>
+                  <CardTitle>Next Rank Requirements</CardTitle>
+                  <CardDescription>What you need to advance</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-4 bg-[#c8ff00]/10 border border-[#c8ff00]/30 rounded-lg">
+                    <div className="text-lg font-bold text-[#c8ff00] mb-2">Manager</div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Personal Volume</span>
+                        <span className="text-white">500 PV</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Group Volume</span>
+                        <span className="text-white">2,000 GV</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Active Legs</span>
+                        <span className="text-white">2 legs</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Rank Bonus</span>
+                        <span className="text-[#c8ff00] font-bold">$500</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Button onClick={() => setLocation('/compensation')} className="w-full bg-[#c8ff00] text-black hover:bg-[#a8d600]">
+                    View Full Comp Plan
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Earnings Potential */}
+            <Card className="bg-[#0a0a0a] border-[#c8ff00]/30">
+              <CardHeader>
+                <CardTitle>Earnings Potential by Rank</CardTitle>
+                <CardDescription>Estimated monthly earnings at each level</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-5 gap-4">
+                  {[
+                    { rank: 'Associate', earnings: '$500-$2K', color: 'text-gray-400' },
+                    { rank: 'Manager', earnings: '$2K-$5K', color: 'text-green-400' },
+                    { rank: 'Director', earnings: '$5K-$15K', color: 'text-blue-400' },
+                    { rank: 'Executive', earnings: '$15K-$30K', color: 'text-purple-400' },
+                    { rank: 'Presidential', earnings: '$50K+', color: 'text-[#c8ff00]' },
+                  ].map((level) => (
+                    <div key={level.rank} className="text-center p-4 bg-black/50 rounded-lg border border-[#c8ff00]/20">
+                      <div className={`text-sm font-semibold mb-1 ${level.color}`}>{level.rank}</div>
+                      <div className="text-xl font-black text-white">{level.earnings}</div>
+                      <div className="text-xs text-gray-500">per month</div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

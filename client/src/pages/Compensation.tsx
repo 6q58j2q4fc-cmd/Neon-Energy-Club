@@ -56,24 +56,34 @@ export default function Compensation() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen vice-bg text-white overflow-x-hidden">
+      {/* Vice City Background */}
+      <div className="fixed inset-0 z-0">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
+          style={{ backgroundImage: 'url(/vice-city-bg-vibrant.png)' }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1a0a2e]/80 via-[#1a0a2e]/90 to-[#0d0418]" />
+      </div>
+
       {/* Header */}
-      <header className="border-b border-[#c8ff00]/20 bg-black/80 backdrop-blur-md fixed top-0 w-full z-50">
+      <header className="fixed top-0 w-full z-50 bg-[#1a0a2e]/90 backdrop-blur-xl border-b border-[#ff0080]/30">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 
-            className="text-2xl font-bold text-[#c8ff00] neon-text cursor-pointer flex items-center gap-2" 
+          <div 
+            className="cursor-pointer" 
             onClick={() => setLocation("/")}
           >
-            <Zap className="w-6 h-6" />
-            NEON®
-          </h1>
-          <nav className="flex gap-6 items-center">
-            <button onClick={() => setLocation("/")} className="text-gray-300 hover:text-[#c8ff00] transition-smooth">Home</button>
-            <button onClick={() => setLocation("/shop")} className="text-gray-300 hover:text-[#c8ff00] transition-smooth">Shop</button>
-            <button onClick={() => setLocation("/products")} className="text-gray-300 hover:text-[#c8ff00] transition-smooth">Products</button>
+            <span className="text-2xl md:text-3xl font-black tracking-tight neon-logo-text">NEON</span>
+            <span className="text-[#b8e600]/60 text-xs ml-1">®</span>
+          </div>
+          <nav className="hidden md:flex gap-6 items-center">
+            <button onClick={() => setLocation("/")} className="text-white/80 hover:text-[#b8e600] font-semibold transition-all">Home</button>
+            <button onClick={() => setLocation("/shop")} className="text-white/80 hover:text-[#b8e600] font-semibold transition-all">Shop</button>
+            <button onClick={() => setLocation("/products")} className="text-white/80 hover:text-[#b8e600] font-semibold transition-all">Products</button>
+            <button onClick={() => setLocation("/vending")} className="text-white/80 hover:text-[#b8e600] font-semibold transition-all">Vending</button>
             <Button 
               onClick={() => setLocation("/join")}
-              className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold"
+              className="btn-vice-pink text-white font-bold"
             >
               Join Now
             </Button>
@@ -82,21 +92,21 @@ export default function Compensation() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 bg-gradient-to-b from-black via-[#050505] to-black relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(200,255,0,0.15),transparent_50%)]"></div>
+      <section className="pt-32 pb-20 px-4 relative overflow-hidden z-10">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_20%,rgba(255,0,128,0.3),transparent_60%)]"></div>
         <div className="container mx-auto max-w-6xl text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
             transition={{ duration: 0.8 }}
           >
-            <Badge className="bg-[#c8ff00]/20 text-[#c8ff00] border-[#c8ff00]/30 mb-6">
+            <Badge className="bg-[#ff0080]/20 text-[#ff0080] border-[#ff0080]/30 mb-6">
               <DollarSign className="w-4 h-4 mr-2" />
               COMPENSATION PLAN
             </Badge>
             <h1 className="text-5xl md:text-7xl font-black mb-6">
               BUILD YOUR
-              <span className="block text-[#c8ff00] neon-text">EMPIRE</span>
+              <span className="block gradient-text-vice">EMPIRE</span>
             </h1>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto mb-8">
               Our hybrid compensation plan combines the best of binary and unilevel structures, 
@@ -104,15 +114,15 @@ export default function Compensation() {
             </p>
             <div className="flex flex-wrap justify-center gap-8 text-center">
               <div>
-                <div className="text-4xl font-black text-[#c8ff00]">40-45%</div>
+                <div className="text-4xl font-black text-[#b8e600]">40-45%</div>
                 <div className="text-gray-400">Total Payout</div>
               </div>
               <div>
-                <div className="text-4xl font-black text-[#c8ff00]">Weekly</div>
+                <div className="text-4xl font-black text-[#00ffff]">Weekly</div>
                 <div className="text-gray-400">Commission Payouts</div>
               </div>
               <div>
-                <div className="text-4xl font-black text-[#c8ff00]">5 Ways</div>
+                <div className="text-4xl font-black text-[#ff0080]">5 Ways</div>
                 <div className="text-gray-400">To Earn</div>
               </div>
             </div>
@@ -121,7 +131,7 @@ export default function Compensation() {
       </section>
 
       {/* 5 Ways to Earn */}
-      <section className="py-20 px-4 bg-gradient-to-b from-black to-[#0a0a0a]">
+      <section className="py-20 px-4 relative z-10">
         <div className="container mx-auto max-w-6xl">
           <h2 className="text-4xl font-bold text-center mb-4">5 Ways to Earn</h2>
           <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">
@@ -142,12 +152,12 @@ export default function Compensation() {
                 animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card className="bg-[#0a0a0a] border-[#c8ff00]/30 hover:border-[#c8ff00] transition-all h-full text-center">
+                <Card className="glass-card-vice hover:border-[#b8e600]/50 transition-all h-full text-center">
                   <CardContent className="p-6">
-                    <div className="w-12 h-12 rounded-full bg-[#c8ff00]/20 flex items-center justify-center mx-auto mb-4">
-                      <way.icon className="w-6 h-6 text-[#c8ff00]" />
+                    <div className="w-12 h-12 rounded-full bg-[#b8e600]/20 flex items-center justify-center mx-auto mb-4">
+                      <way.icon className="w-6 h-6 text-[#b8e600]" />
                     </div>
-                    <div className="text-[#c8ff00] font-bold text-sm mb-2">WAY #{way.num}</div>
+                    <div className="text-[#ff0080] font-bold text-sm mb-2">WAY #{way.num}</div>
                     <h3 className="text-lg font-bold text-white mb-2">{way.title}</h3>
                     <p className="text-gray-400 text-sm">{way.desc}</p>
                   </CardContent>
