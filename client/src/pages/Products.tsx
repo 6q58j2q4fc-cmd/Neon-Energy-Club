@@ -85,7 +85,7 @@ export default function Products() {
                 <div className="relative inline-block">
                   <div className="absolute inset-0 bg-[#b8e600] blur-[80px] opacity-60 rounded-full"></div>
                   <img
-                    src="/neon-can-new.png"
+                    src="/neon-can-transparent-final.png"
                     alt="NEON Original"
                     className="w-48 h-auto mx-auto mb-6 animate-float relative z-10"
                     style={{ filter: 'drop-shadow(0 0 50px rgba(184, 230, 0, 0.7)) drop-shadow(0 25px 50px rgba(0, 0, 0, 0.5))' }}

@@ -339,3 +339,11 @@
 - [x] Copy user's attached can image to project
 - [x] Update all can image references across site
 - [x] Ensure can displays correctly on all pages
+
+## Can Background Removal (Jan 17)
+
+### Remove White Background
+- [x] Remove white background from can image
+- [x] Create transparent PNG version
+- [x] Blend can seamlessly with Vice City background
+- [x] Update all can image references

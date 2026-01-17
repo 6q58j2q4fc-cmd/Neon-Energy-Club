@@ -334,9 +334,9 @@ export default function Home() {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-radial from-[#b8e600]/20 via-[#b8e600]/08 to-transparent rounded-full blur-[100px] pointer-events-none" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-[#b8e600]/10 rounded-full blur-[60px] pointer-events-none animate-glow-pulse" />
                 
-                {/* Main Can - User's Official Can Image */}
+                {/* Main Can - Transparent Background */}
                 <img
-                  src="/neon-can-new.png"
+                  src="/neon-can-transparent-final.png"
                   alt="NEON Energy Drink Can"
                   className="h-[450px] md:h-[550px] object-contain product-glow animate-float relative z-10"
                   style={{ filter: 'drop-shadow(0 0 80px rgba(184, 230, 0, 0.7)) drop-shadow(0 0 150px rgba(184, 230, 0, 0.4)) drop-shadow(0 40px 80px rgba(0, 0, 0, 0.6))' }}
