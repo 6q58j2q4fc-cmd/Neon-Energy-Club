@@ -447,3 +447,7 @@
 - [x] Add ENERGY DRINK text below line
 - [x] Ensure proper spacing between elements
 - [x] Size logo appropriately for header
+
+## Logo Line Width Fix (Jan 17)
+
+- [x] Fix horizontal line to match NEON text width exactly

@@ -127,14 +127,14 @@ export default function NeonLogo({ className = "", onClick }: NeonLogoProps) {
         </text>
       </svg>
 
-      {/* Horizontal line separator - matching PDF */}
+      {/* Horizontal line separator - matching PDF, same width as NEON text */}
       <motion.div
         className="bg-[#c8ff00] mt-0.5"
         initial={{ scaleX: 0 }}
         animate={{ scaleX: isOn ? 1 : 0 }}
         transition={{ delay: 0.6, duration: 0.4 }}
         style={{ 
-          width: '100%',
+          width: '78%', // Match the width of NEON text (ends at second N, not the ® symbol)
           height: '2px',
           opacity: getOpacity() * 0.9,
           transformOrigin: 'left',
