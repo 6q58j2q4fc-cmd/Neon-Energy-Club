@@ -98,20 +98,17 @@ export default function Home() {
           boxShadow: scrollY > 50 ? '0 4px 30px rgba(255, 0, 128, 0.15)' : 'none',
         }}
       >
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-4 md:px-6 py-3 md:py-4">
           <div className="flex items-center justify-between">
-            {/* Logo - Vice City Style */}
+            {/* Logo - Neon Sign Style matching can */}
             <div 
-              className="flex items-center gap-3 cursor-pointer group"
+              className="flex items-center cursor-pointer group"
               onClick={() => setLocation("/")}
             >
-              <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-[#ff0080] to-[#00ffff] flex items-center justify-center shadow-[0_0_20px_rgba(255,0,128,0.4)] group-hover:shadow-[0_0_30px_rgba(255,0,128,0.6)] transition-all duration-300">
-                <Zap className="w-6 h-6 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
-              </div>
-              <span className="text-2xl font-black tracking-wider font-vice">
-                <span className="gradient-text-vice drop-shadow-[0_0_10px_rgba(255,0,128,0.5)]">NEON</span>
-                <span className="text-[#00ffff]/80 text-sm ml-1">®</span>
+              <span className="text-2xl md:text-3xl font-black tracking-tight neon-logo-text">
+                NEON
               </span>
+              <span className="text-[#b8e600]/60 text-xs ml-1 hidden sm:inline">®</span>
             </div>
 
             {/* Desktop Navigation - Fixed Menu Buttons */}
@@ -129,37 +126,31 @@ export default function Home() {
               ))}
             </nav>
 
-            {/* Mobile Horizontal Scrollable Navigation */}
-            <div className="lg:hidden flex-1 mx-4 overflow-x-auto scrollbar-hide">
-              <nav className="flex items-center gap-2 min-w-max px-2">
-                {navItems.map((item) => (
-                  <button
-                    key={item.path}
-                    onClick={() => setLocation(item.path)}
-                    className={`whitespace-nowrap px-3 py-1.5 text-xs font-semibold rounded-full transition-all duration-300 ${
-                      item.path === "/"
-                        ? "bg-[#ff0080]/20 text-[#ff0080] border border-[#ff0080]/50"
-                        : "text-white/70 hover:text-[#00ffff] hover:bg-[#00ffff]/10"
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </nav>
-            </div>
+            {/* Mobile Hamburger Menu Button */}
+            <button
+              className="lg:hidden p-2 rounded-lg bg-[#b8e600]/10 border border-[#b8e600]/30 hover:bg-[#b8e600]/20 transition-all duration-300"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? (
+                <X className="w-6 h-6 text-[#b8e600]" />
+              ) : (
+                <Menu className="w-6 h-6 text-[#b8e600]" />
+              )}
+            </button>
 
             {/* CTA Buttons - Vice City Style */}
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="hidden md:flex items-center gap-2 flex-shrink-0">
               <Button
                 onClick={() => setLocation("/join")}
                 variant="outline"
-                className="hidden md:flex border-[#00ffff]/60 text-[#00ffff] hover:bg-[#00ffff]/15 hover:border-[#00ffff] hover:shadow-[0_0_25px_rgba(0,255,255,0.4)] font-bold h-10 px-5 transition-all duration-300 tracking-wider"
+                className="border-[#00ffff]/60 text-[#00ffff] hover:bg-[#00ffff]/15 hover:border-[#00ffff] hover:shadow-[0_0_25px_rgba(0,255,255,0.4)] font-bold h-10 px-5 transition-all duration-300 tracking-wider"
               >
                 JOIN NOW
               </Button>
               <Button
                 onClick={() => setLocation("/crowdfund")}
-                className="btn-vice-pink text-white font-bold px-4 md:px-6 h-9 md:h-10 rounded-lg tracking-wider text-sm md:text-base"
+                className="btn-vice-pink text-white font-bold px-6 h-10 rounded-lg tracking-wider"
               >
                 BACK US
               </Button>
@@ -167,6 +158,61 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Mobile Dropdown Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              className="lg:hidden bg-[#1a0a2e]/98 backdrop-blur-xl border-t border-[#b8e600]/20"
+            >
+              <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
+                {navItems.map((item, index) => (
+                  <motion.button
+                    key={item.path}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    onClick={() => {
+                      setLocation(item.path);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-3 rounded-lg font-semibold transition-all duration-300 ${
+                      item.path === "/"
+                        ? "bg-[#b8e600]/20 text-[#b8e600] border border-[#b8e600]/40"
+                        : "text-white/80 hover:text-[#b8e600] hover:bg-[#b8e600]/10"
+                    }`}
+                  >
+                    {item.label}
+                  </motion.button>
+                ))}
+                <div className="flex gap-2 mt-4 pt-4 border-t border-white/10">
+                  <Button
+                    onClick={() => {
+                      setLocation("/join");
+                      setMobileMenuOpen(false);
+                    }}
+                    variant="outline"
+                    className="flex-1 border-[#00ffff]/60 text-[#00ffff] hover:bg-[#00ffff]/15 font-bold h-12"
+                  >
+                    JOIN NOW
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setLocation("/crowdfund");
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex-1 btn-vice-pink text-white font-bold h-12"
+                  >
+                    BACK US
+                  </Button>
+                </div>
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* Hero Section - GTA Vice City Style */}
@@ -288,9 +334,9 @@ export default function Home() {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-radial from-[#b8e600]/20 via-[#b8e600]/08 to-transparent rounded-full blur-[100px] pointer-events-none" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-[#b8e600]/10 rounded-full blur-[60px] pointer-events-none animate-glow-pulse" />
                 
-                {/* Main Can - Transparent Background */}
+                {/* Main Can - User's Official Can Image */}
                 <img
-                  src="/neon-can-transparent.png"
+                  src="/neon-can-new.png"
                   alt="NEON Energy Drink Can"
                   className="h-[450px] md:h-[550px] object-contain product-glow animate-float relative z-10"
                   style={{ filter: 'drop-shadow(0 0 80px rgba(184, 230, 0, 0.7)) drop-shadow(0 0 150px rgba(184, 230, 0, 0.4)) drop-shadow(0 40px 80px rgba(0, 0, 0, 0.6))' }}

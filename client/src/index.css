@@ -231,6 +231,68 @@
     letter-spacing: 0.1em;
   }
 
+  /* ===== NEON LOGO - Matching Can Style ===== */
+  .neon-logo-text {
+    font-family: 'Bebas Neue', 'Orbitron', sans-serif;
+    color: #b8e600;
+    text-shadow:
+      0 0 5px #b8e600,
+      0 0 10px #b8e600,
+      0 0 20px #b8e600,
+      0 0 40px #9acd00,
+      0 0 80px #9acd00;
+    animation: neon-flicker 3s ease-in-out infinite;
+    letter-spacing: 0.02em;
+  }
+
+  .neon-logo-text:hover {
+    text-shadow:
+      0 0 5px #b8e600,
+      0 0 15px #b8e600,
+      0 0 30px #b8e600,
+      0 0 60px #9acd00,
+      0 0 100px #9acd00,
+      0 0 120px #b8e600;
+    animation: neon-pulse 0.5s ease-in-out infinite;
+  }
+
+  @keyframes neon-flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+      text-shadow:
+        0 0 5px #b8e600,
+        0 0 10px #b8e600,
+        0 0 20px #b8e600,
+        0 0 40px #9acd00,
+        0 0 80px #9acd00;
+      opacity: 1;
+    }
+    20%, 24%, 55% {
+      text-shadow:
+        0 0 2px #b8e600,
+        0 0 5px #b8e600;
+      opacity: 0.9;
+    }
+  }
+
+  @keyframes neon-pulse {
+    0%, 100% {
+      text-shadow:
+        0 0 5px #b8e600,
+        0 0 15px #b8e600,
+        0 0 30px #b8e600,
+        0 0 60px #9acd00,
+        0 0 100px #9acd00;
+    }
+    50% {
+      text-shadow:
+        0 0 10px #b8e600,
+        0 0 25px #b8e600,
+        0 0 50px #b8e600,
+        0 0 80px #9acd00,
+        0 0 120px #9acd00;
+    }
+  }
+
   /* ===== GTA VICE CITY BACKGROUNDS ===== */
   .vice-bg {
     background: linear-gradient(180deg, 

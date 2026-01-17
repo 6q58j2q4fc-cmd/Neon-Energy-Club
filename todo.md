@@ -320,3 +320,22 @@
 - [x] Add more prominent GTA 6 style graphics
 - [x] Make sunset gradient more vivid
 - [x] Ensure background doesn't get lost behind content
+
+## Mobile Menu, Neon Logo & Can Update (Jan 17)
+
+### Mobile Hamburger Menu
+- [x] Add proper hamburger menu icon for mobile
+- [x] Create dropdown menu that opens on tap
+- [x] Ensure menu is accessible and works on all mobile browsers
+- [x] Add smooth animation for menu open/close
+
+### Animated Neon Logo
+- [x] Update logo to match NEON text style from can
+- [x] Add flickering neon sign animation effect
+- [x] Make logo glow like authentic neon sign
+- [x] Position logo in top left corner
+
+### Can Image Update
+- [x] Copy user's attached can image to project
+- [x] Update all can image references across site
+- [x] Ensure can displays correctly on all pages
