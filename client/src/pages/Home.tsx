@@ -7,6 +7,7 @@ import { Zap, MapPin, DollarSign, Clock, TrendingUp, Users, Star, Sparkles, Arro
 import SocialProofNotifications from "@/components/SocialProofNotifications";
 import ViralNewsletterPopup, { shouldShowPopup, markPopupShown } from "@/components/ViralNewsletterPopup";
 import { PalmTreeGroup } from "@/components/PalmTreeSilhouette";
+import { CityLights, WindowLights } from "@/components/CityLights";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
 import { motion, AnimatePresence } from "framer-motion";
@@ -101,15 +102,20 @@ export default function Home() {
       >
         <div className="container mx-auto px-4 md:px-6 py-3 md:py-4">
           <div className="flex items-center justify-between">
-            {/* Logo - Neon Sign Style matching can */}
+            {/* Logo - Large Neon Sign Style matching can */}
             <div 
-              className="flex items-center cursor-pointer group"
+              className="flex flex-col cursor-pointer group"
               onClick={() => setLocation("/")}
             >
-              <span className="text-2xl md:text-3xl font-black tracking-tight neon-logo-text">
-                NEON
+              <div className="flex items-baseline">
+                <span className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight neon-logo-text">
+                  NEON
+                </span>
+                <span className="text-[#b8e600]/70 text-[10px] sm:text-xs ml-0.5 align-super">®</span>
+              </div>
+              <span className="text-[8px] sm:text-[10px] md:text-xs text-[#b8e600]/80 tracking-[0.3em] font-medium -mt-1 neon-logo-text" style={{ animationDelay: '0.5s' }}>
+                ENERGY DRINK
               </span>
-              <span className="text-[#b8e600]/60 text-xs ml-1 hidden sm:inline">®</span>
             </div>
 
             {/* Desktop Navigation - Fixed Menu Buttons */}
@@ -239,6 +245,10 @@ export default function Home() {
         
         {/* Palm Tree Silhouettes - Vice City Style */}
         <PalmTreeGroup className="z-[5]" />
+        
+        {/* Animated Twinkling City Lights */}
+        <CityLights />
+        <WindowLights />
         
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">

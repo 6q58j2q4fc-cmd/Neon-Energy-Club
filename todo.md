@@ -383,3 +383,17 @@
 - [x] Ensure all pages have consistent Vice City styling
 - [x] Add graphics to all sections
 - [x] Polish visual consistency across site
+
+## Animated City Lights & Enhanced Logo (Jan 17)
+
+### Twinkling City Lights
+- [x] Add animated twinkling lights to city skyline background
+- [x] Create subtle random twinkle effect for Vice City ambiance
+- [x] Ensure lights don't distract from main content
+
+### Enhanced NEON Logo
+- [x] Make logo larger and more prominent
+- [x] Add "Energy Drink ®" text below NEON
+- [x] Add neon flicker animation effect
+- [x] Implement smooth color transition (ambient neon lighting)
+- [x] Ensure logo matches can branding style

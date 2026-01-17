@@ -231,7 +231,7 @@
     letter-spacing: 0.1em;
   }
 
-  /* ===== NEON LOGO - Matching Can Style ===== */
+  /* ===== NEON LOGO - Enhanced with Color Transitions ===== */
   .neon-logo-text {
     font-family: 'Bebas Neue', 'Orbitron', sans-serif;
     color: #b8e600;
@@ -241,7 +241,7 @@
       0 0 20px #b8e600,
       0 0 40px #9acd00,
       0 0 80px #9acd00;
-    animation: neon-flicker 3s ease-in-out infinite;
+    animation: neon-flicker-color 8s ease-in-out infinite, neon-subtle-flicker 0.1s ease-in-out infinite;
     letter-spacing: 0.02em;
   }
 
@@ -256,8 +256,32 @@
     animation: neon-pulse 0.5s ease-in-out infinite;
   }
 
-  @keyframes neon-flicker {
-    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+  /* Subtle random flicker for authentic neon feel */
+  @keyframes neon-subtle-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.98; }
+  }
+
+  /* Color-transitioning neon flicker with ambient lighting */
+  @keyframes neon-flicker-color {
+    0%, 100% {
+      color: #b8e600;
+      text-shadow:
+        0 0 5px #b8e600,
+        0 0 10px #b8e600,
+        0 0 20px #b8e600,
+        0 0 40px #9acd00,
+        0 0 80px #9acd00;
+    }
+    5%, 7% {
+      color: #a8d600;
+      text-shadow:
+        0 0 3px #a8d600,
+        0 0 6px #a8d600;
+      opacity: 0.92;
+    }
+    8% {
+      color: #b8e600;
       text-shadow:
         0 0 5px #b8e600,
         0 0 10px #b8e600,
@@ -266,11 +290,62 @@
         0 0 80px #9acd00;
       opacity: 1;
     }
-    20%, 24%, 55% {
+    25% {
+      color: #c8f000;
+      text-shadow:
+        0 0 8px #c8f000,
+        0 0 15px #c8f000,
+        0 0 30px #b8e600,
+        0 0 50px #00ffff,
+        0 0 80px #00ffff;
+    }
+    35%, 37% {
+      color: #b8e600;
+      text-shadow:
+        0 0 2px #b8e600,
+        0 0 4px #b8e600;
+      opacity: 0.88;
+    }
+    38% {
+      opacity: 1;
+    }
+    50% {
+      color: #d0ff00;
+      text-shadow:
+        0 0 8px #d0ff00,
+        0 0 15px #d0ff00,
+        0 0 30px #ff0080,
+        0 0 50px #ff0080,
+        0 0 80px #ff0080;
+    }
+    65%, 67% {
+      color: #b8e600;
+      text-shadow:
+        0 0 3px #b8e600,
+        0 0 5px #b8e600;
+      opacity: 0.9;
+    }
+    68% {
+      opacity: 1;
+    }
+    75% {
+      color: #c0ee00;
+      text-shadow:
+        0 0 8px #c0ee00,
+        0 0 15px #c0ee00,
+        0 0 30px #bf5af2,
+        0 0 50px #bf5af2,
+        0 0 80px #bf5af2;
+    }
+    90%, 92% {
+      color: #b8e600;
       text-shadow:
         0 0 2px #b8e600,
         0 0 5px #b8e600;
-      opacity: 0.9;
+      opacity: 0.85;
+    }
+    93% {
+      opacity: 1;
     }
   }
 
@@ -290,6 +365,91 @@
         0 0 50px #b8e600,
         0 0 80px #9acd00,
         0 0 120px #9acd00;
+    }
+  }
+
+  /* ===== TWINKLING CITY LIGHTS ===== */
+  .city-lights {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .city-light {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    animation: twinkle var(--twinkle-duration, 2s) ease-in-out infinite;
+    animation-delay: var(--twinkle-delay, 0s);
+  }
+
+  .city-light.pink {
+    background: #ff0080;
+    box-shadow: 0 0 4px #ff0080, 0 0 8px #ff0080, 0 0 12px #ff0080;
+  }
+
+  .city-light.cyan {
+    background: #00ffff;
+    box-shadow: 0 0 4px #00ffff, 0 0 8px #00ffff, 0 0 12px #00ffff;
+  }
+
+  .city-light.purple {
+    background: #bf5af2;
+    box-shadow: 0 0 4px #bf5af2, 0 0 8px #bf5af2, 0 0 12px #bf5af2;
+  }
+
+  .city-light.gold {
+    background: #ffd700;
+    box-shadow: 0 0 4px #ffd700, 0 0 8px #ffd700, 0 0 12px #ffd700;
+  }
+
+  .city-light.green {
+    background: #b8e600;
+    box-shadow: 0 0 4px #b8e600, 0 0 8px #b8e600, 0 0 12px #b8e600;
+  }
+
+  @keyframes twinkle {
+    0%, 100% {
+      opacity: 0.3;
+      transform: scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+  }
+
+  /* Larger building window lights */
+  .window-light {
+    position: absolute;
+    width: 2px;
+    height: 4px;
+    animation: window-flicker var(--flicker-duration, 3s) ease-in-out infinite;
+    animation-delay: var(--flicker-delay, 0s);
+  }
+
+  .window-light.warm {
+    background: #ffcc66;
+    box-shadow: 0 0 3px #ffcc66, 0 0 6px #ff9933;
+  }
+
+  .window-light.cool {
+    background: #66ccff;
+    box-shadow: 0 0 3px #66ccff, 0 0 6px #0099ff;
+  }
+
+  @keyframes window-flicker {
+    0%, 20%, 22%, 40%, 42%, 60%, 100% {
+      opacity: 0.8;
+    }
+    21%, 41% {
+      opacity: 0.3;
     }
   }
 
