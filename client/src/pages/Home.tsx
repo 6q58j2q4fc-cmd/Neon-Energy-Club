@@ -102,7 +102,7 @@ export default function Home() {
         className="fixed top-0 w-full z-50 transition-all duration-500"
         style={{
           backgroundColor: scrollY > 50 ? 'rgba(26, 10, 46, 0.95)' : 'transparent',
-          backdropFilter: scrollY > 50 ? 'blur(20px)' : 'none',
+          backdropFilter: scrollY > 50 ? 'blur(8px)' : 'none',
           borderBottom: scrollY > 50 ? '1px solid rgba(255, 0, 128, 0.2)' : 'none',
           boxShadow: scrollY > 50 ? '0 4px 30px rgba(255, 0, 128, 0.15)' : 'none',
         }}

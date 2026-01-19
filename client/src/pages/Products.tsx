@@ -194,7 +194,7 @@ export default function Products() {
                 <div className="relative inline-block">
                   <div className="absolute inset-0 bg-orange-500 blur-[80px] opacity-50 rounded-full"></div>
                   <img
-                    src="/neon-organic-can.png"
+                    src="/neon-organic-can.webp"
                     alt="NEON Organic"
                     className="w-48 h-auto mx-auto mb-6 animate-float relative z-10"
                     style={{ filter: 'drop-shadow(0 0 30px rgba(255, 140, 0, 0.5)) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3))', animationDelay: '0.5s' }}

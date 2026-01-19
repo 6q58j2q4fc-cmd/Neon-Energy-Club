@@ -38,15 +38,15 @@ function ScrollToTop() {
 
 // Page transition wrapper
 const pageVariants = {
-  initial: { opacity: 0, y: 8 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -8 }
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 }
 };
 
 const pageTransition = {
   type: "tween" as const,
-  ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-  duration: 0.4
+  ease: "easeOut" as const,
+  duration: 0.15
 };
 
 function AnimatedPage({ children }: { children: React.ReactNode }) {

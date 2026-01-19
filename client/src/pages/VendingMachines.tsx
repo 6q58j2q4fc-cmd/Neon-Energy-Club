@@ -126,7 +126,7 @@ export default function VendingMachines() {
                 className="relative"
               >
                 <img 
-                  src="/vending-machine-1.png" 
+                  src="/vending-machine-1.webp" 
                   alt="NEON Energy Vending Machine"
                   className="w-full max-w-lg mx-auto rounded-2xl shadow-2xl shadow-[#c8ff00]/20"
                 />
@@ -182,7 +182,7 @@ export default function VendingMachines() {
                 whileInView={{ opacity: 1, y: 0 }}
                 className="rounded-2xl overflow-hidden border border-[#c8ff00]/30"
               >
-                <img src="/vending-machine-1.png" alt="NEON Vending Machine Street" className="w-full h-80 object-cover" />
+                <img src="/vending-machine-1.webp" alt="NEON Vending Machine Street" className="w-full h-80 object-cover" />
                 <div className="p-6 bg-black/80">
                   <h3 className="text-xl font-bold text-white mb-2">Street Corner Model</h3>
                   <p className="text-gray-400">Perfect for high-traffic urban locations</p>
@@ -195,7 +195,7 @@ export default function VendingMachines() {
                 transition={{ delay: 0.1 }}
                 className="rounded-2xl overflow-hidden border border-[#c8ff00]/30"
               >
-                <img src="/vending-machine-2.png" alt="NEON Vending Machine Gym" className="w-full h-80 object-cover" />
+                <img src="/vending-machine-2.webp" alt="NEON Vending Machine Gym" className="w-full h-80 object-cover" />
                 <div className="p-6 bg-black/80">
                   <h3 className="text-xl font-bold text-white mb-2">Fitness Center Model</h3>
                   <p className="text-gray-400">Optimized for gyms and wellness centers</p>
@@ -208,7 +208,7 @@ export default function VendingMachines() {
                 transition={{ delay: 0.2 }}
                 className="rounded-2xl overflow-hidden border border-[#c8ff00]/30 md:col-span-2 lg:col-span-1"
               >
-                <img src="/vending-machine-street.png" alt="NEON Vending Machine Vice City" className="w-full h-80 object-cover" />
+                <img src="/vending-machine-street.webp" alt="NEON Vending Machine Vice City" className="w-full h-80 object-cover" />
                 <div className="p-6 bg-black/80">
                   <h3 className="text-xl font-bold text-white mb-2">Premium Display Model</h3>
                   <p className="text-gray-400">Eye-catching design for maximum visibility</p>

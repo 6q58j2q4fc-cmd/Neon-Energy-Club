@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 interface Light {
   id: number;
@@ -10,28 +10,29 @@ interface Light {
   size: 'small' | 'medium';
 }
 
-export function CityLights() {
-  const [lights, setLights] = useState<Light[]>([]);
+// Reduced from 50 to 15 lights for performance
+const CITY_LIGHTS_COUNT = 15;
+const WINDOW_LIGHTS_COUNT = 10;
 
-  useEffect(() => {
-    // Generate random lights for the city skyline
+export function CityLights() {
+  // Use useMemo to prevent regeneration on every render
+  const lights = useMemo<Light[]>(() => {
     const colors: Light['color'][] = ['pink', 'cyan', 'purple', 'gold', 'green'];
     const generatedLights: Light[] = [];
 
-    // Create lights scattered across the skyline area (bottom 60% of hero)
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < CITY_LIGHTS_COUNT; i++) {
       generatedLights.push({
         id: i,
-        x: Math.random() * 100, // percentage across width
-        y: 40 + Math.random() * 50, // percentage from top (40-90% to stay in skyline area)
+        x: Math.random() * 100,
+        y: 40 + Math.random() * 50,
         color: colors[Math.floor(Math.random() * colors.length)],
-        duration: 1.5 + Math.random() * 3, // 1.5-4.5s
-        delay: Math.random() * 5, // 0-5s delay
+        duration: 2 + Math.random() * 3, // Slower animation
+        delay: Math.random() * 5,
         size: Math.random() > 0.7 ? 'medium' : 'small',
       });
     }
 
-    setLights(generatedLights);
+    return generatedLights;
   }, []);
 
   return (
@@ -55,31 +56,22 @@ export function CityLights() {
 }
 
 export function WindowLights() {
-  const [windows, setWindows] = useState<Array<{
-    id: number;
-    x: number;
-    y: number;
-    type: 'warm' | 'cool';
-    duration: number;
-    delay: number;
-  }>>([]);
-
-  useEffect(() => {
+  // Use useMemo to prevent regeneration on every render
+  const windows = useMemo(() => {
     const generatedWindows = [];
     
-    // Create window lights in building areas
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < WINDOW_LIGHTS_COUNT; i++) {
       generatedWindows.push({
         id: i,
         x: Math.random() * 100,
-        y: 50 + Math.random() * 40, // Lower portion of screen
+        y: 50 + Math.random() * 40,
         type: Math.random() > 0.5 ? 'warm' : 'cool' as 'warm' | 'cool',
-        duration: 2 + Math.random() * 4,
+        duration: 3 + Math.random() * 4, // Slower animation
         delay: Math.random() * 8,
       });
     }
 
-    setWindows(generatedWindows);
+    return generatedWindows;
   }, []);
 
   return (

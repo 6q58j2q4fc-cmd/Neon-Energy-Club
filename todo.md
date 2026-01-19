@@ -589,3 +589,38 @@
 - [x] Territory application flow
 - [x] Distributor enrollment flow
 - [x] Navigation between all pages
+
+## Performance Forensic Audit (Jan 19)
+
+### Identify Performance Bottlenecks
+- [ ] Audit CSS animations for GPU-intensive effects
+- [ ] Check for infinite animation loops
+- [ ] Identify heavy re-renders in React components
+- [ ] Check image sizes and loading strategy
+- [ ] Audit JavaScript bundle size
+- [ ] Check for memory leaks
+
+### Fix Heavy Animations
+- [x] Reduce or remove complex CSS animations (simplified 15+ animations)
+- [x] Use transform/opacity only for animations (GPU accelerated)
+- [x] Add will-change hints for animated elements
+- [x] Reduce animation duration and complexity
+- [x] Remove unnecessary keyframe animations
+
+### Optimize Component Rendering
+- [x] Add useMemo to CityLights component
+- [x] Remove framer-motion from ViceCityDecorations
+- [x] Simplify NeonLogo (removed requestAnimationFrame loop)
+- [x] Reduce state updates frequency
+
+### Optimize Image Loading
+- [x] Convert PNG to WebP (6MB → 250KB per image)
+- [x] Update image references in Products and VendingMachines
+- [x] Reduce total transfer size to 748KB
+- [x] Use appropriate image dimensions
+
+### Smooth Page Transitions
+- [x] Fix navigation lag (reduced transition duration 0.4s → 0.15s)
+- [x] Simplified page transition animations (opacity only)
+- [x] Reduced backdrop-filter blur (20px → 8px)
+- [x] DOM Content Loaded: 484ms, First Contentful Paint: 902ms
