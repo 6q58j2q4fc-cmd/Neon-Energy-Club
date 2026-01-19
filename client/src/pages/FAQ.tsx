@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import { Mail, MessageCircle, Phone, MapPin, ChevronDown, Send } from "lucide-react";
+import HamburgerHeader from "@/components/HamburgerHeader";
 
 const faqCategories = [
   {
@@ -144,40 +145,13 @@ export default function FAQ() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="border-b border-[#c8ff00]/20 bg-black/80 backdrop-blur-md fixed top-0 w-full z-50">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-[#c8ff00] neon-text cursor-pointer" onClick={() => setLocation("/")}>
-            NEON
-          </h1>
-          <nav className="flex gap-6 items-center">
-            <button onClick={() => setLocation("/")} className="text-gray-300 hover:text-[#c8ff00] transition-smooth">
-              Home
-            </button>
-            <button onClick={() => setLocation("/about")} className="text-gray-300 hover:text-[#c8ff00] transition-smooth">
-              Our Story
-            </button>
-            <button onClick={() => setLocation("/products")} className="text-gray-300 hover:text-[#c8ff00] transition-smooth">
-              Products
-            </button>
-            <button onClick={() => setLocation("/celebrities")} className="text-gray-300 hover:text-[#c8ff00] transition-smooth">
-              Celebrity Fans
-            </button>
-            <button onClick={() => setLocation("/franchise")} className="text-gray-300 hover:text-[#c8ff00] transition-smooth">
-              Franchise
-            </button>
-            <button onClick={() => setLocation("/faq")} className="text-[#c8ff00] transition-smooth">
-              FAQ
-            </button>
-            {user && user.role === "admin" && (
-              <Button variant="outline" className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00] hover:text-black" onClick={() => setLocation("/admin")}>
-                Admin
-              </Button>
-            )}
-          </nav>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gradient-to-b from-[#0d0620] via-[#1a0a2e] to-[#0d0620] text-white relative overflow-hidden">
+      {/* Background Graphics */}
+      <div className="synthwave-grid-bg" />
+      <div className="floating-neon-orb green w-96 h-96 -top-48 -left-48" style={{ animationDelay: '0s' }} />
+      <div className="floating-neon-orb pink w-80 h-80 top-1/3 -right-40" style={{ animationDelay: '-5s' }} />
+      
+      <HamburgerHeader variant="default" />
 
       {/* Hero Section */}
       <section className="pt-32 pb-12 px-4 animated-bg">

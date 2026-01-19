@@ -1,6 +1,7 @@
 import { Check, X } from "lucide-react";
-import { useLocation } from "wouter";
 import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
+import HamburgerHeader from "@/components/HamburgerHeader";
 
 export default function Products() {
   const [, setLocation] = useLocation();
@@ -12,37 +13,7 @@ export default function Products() {
 
   return (
     <div className="min-h-screen vice-bg text-white">
-      {/* Header - Vice City Style */}
-      <header className="border-b border-[#ff0080]/20 bg-[#1a0a2e]/90 backdrop-blur-xl fixed top-0 w-full z-50 transition-smooth">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1
-            className="text-2xl font-bold font-vice gradient-text-vice cursor-pointer drop-shadow-[0_0_10px_rgba(255,0,128,0.5)]"
-            onClick={() => setLocation("/")}
-          >
-            NEON
-          </h1>
-          <nav className="flex gap-6 items-center">
-            <button
-              onClick={() => setLocation("/")}
-              className="nav-btn"
-            >
-              Home
-            </button>
-            <button
-              onClick={() => setLocation("/about")}
-              className="nav-btn"
-            >
-              Our Story
-            </button>
-            <button
-              onClick={() => setLocation("/products")}
-              className="nav-btn active"
-            >
-              Products
-            </button>
-          </nav>
-        </div>
-      </header>
+      <HamburgerHeader variant="vice" />
 
       {/* Hero Section - Vice City Style */}
       <section className="pt-32 pb-16 px-4 relative overflow-hidden">

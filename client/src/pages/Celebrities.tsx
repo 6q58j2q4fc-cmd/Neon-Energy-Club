@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Star, Play, Music, TrendingUp, ExternalLink, Zap, Menu, X } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { motion, AnimatePresence } from "framer-motion";
+import HamburgerHeader from "@/components/HamburgerHeader";
 
 // Celebrity data with real YouTube video IDs
 const celebrities = [
@@ -107,77 +108,7 @@ export default function Celebrities() {
         url="/celebrities"
       />
 
-      {/* Header - Vice City Style */}
-      <header className="fixed top-0 w-full z-50 bg-[#1a0a2e]/95 backdrop-blur-xl border-b border-[#ff0080]/20">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setLocation("/")}>
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#ff0080] to-[#00ffff] flex items-center justify-center shadow-[0_0_20px_rgba(255,0,128,0.4)] group-hover:shadow-[0_0_30px_rgba(255,0,128,0.6)] transition-all duration-300">
-                <Zap className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-black font-vice gradient-text-vice drop-shadow-[0_0_10px_rgba(255,0,128,0.5)]">NEON®</span>
-            </div>
-
-            <nav className="hidden lg:flex items-center gap-1">
-              {navItems.map((item) => (
-                <button
-                  key={item.path}
-                  onClick={() => setLocation(item.path)}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                    item.path === "/celebrities" 
-                      ? "text-[#b8e600] bg-[#b8e600]/10" 
-                      : "text-white/70 hover:text-white hover:bg-white/5"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-
-            <div className="flex items-center gap-3">
-              <Button
-                onClick={() => setLocation("/crowdfund")}
-                className="btn-primary-shiny text-black font-bold px-6 h-10 rounded-lg"
-              >
-                BACK US
-              </Button>
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 text-white/80"
-              >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-black/95 backdrop-blur-xl border-t border-white/10 fixed top-[72px] left-0 right-0 z-40"
-            >
-              <nav className="container mx-auto px-6 py-4 flex flex-col gap-2">
-                {navItems.map((item) => (
-                  <button
-                    key={item.path}
-                    onClick={() => {
-                      setLocation(item.path);
-                      setMobileMenuOpen(false);
-                    }}
-                    className="py-3 px-4 text-left text-white/80 hover:text-[#b8e600] hover:bg-white/5 rounded-lg transition-all"
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </nav>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </header>
+      <HamburgerHeader variant="vice" />
 
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-6 relative overflow-hidden">

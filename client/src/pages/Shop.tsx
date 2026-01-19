@@ -1,4 +1,3 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { motion } from "framer-motion";
 import { 
   Package, 
@@ -23,6 +23,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
+import HamburgerHeader from "@/components/HamburgerHeader";
 
 // Distributor Packages
 const distributorPackages = [
@@ -173,29 +174,8 @@ export default function Shop() {
       {/* Decorative Palm Trees */}
       <img src="/neon-palm-tree.png" alt="" className="palm-tree-left hidden lg:block" />
       <img src="/neon-palm-tree.png" alt="" className="palm-tree-right hidden lg:block" />
-      {/* Header */}
-      <header className="border-b border-[#c8ff00]/20 bg-black/80 backdrop-blur-md fixed top-0 w-full z-50">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 
-            className="text-2xl font-bold text-[#c8ff00] neon-text cursor-pointer flex items-center gap-2" 
-            onClick={() => setLocation("/")}
-          >
-            <Zap className="w-6 h-6" />
-            NEON®
-          </h1>
-          <nav className="flex gap-6 items-center">
-            <button onClick={() => setLocation("/")} className="text-gray-300 hover:text-[#c8ff00] transition-smooth">Home</button>
-            <button onClick={() => setLocation("/products")} className="text-gray-300 hover:text-[#c8ff00] transition-smooth">Products</button>
-            <button onClick={() => setLocation("/compensation")} className="text-gray-300 hover:text-[#c8ff00] transition-smooth">Opportunity</button>
-            <Button 
-              onClick={() => setLocation("/join")}
-              className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold"
-            >
-              Join Now
-            </Button>
-          </nav>
-        </div>
-      </header>
+      
+      <HamburgerHeader variant="default" />
 
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-4 relative z-10">

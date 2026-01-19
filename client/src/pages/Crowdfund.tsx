@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Check, Star, Zap, Crown, Gift, ArrowLeft, TrendingUp, Users, Clock } from "lucide-react";
+import HamburgerHeader from "@/components/HamburgerHeader";
 
 // Reward tiers
 const rewardTiers = [
@@ -137,36 +138,8 @@ export default function Crowdfund() {
       {/* Decorative Palm Trees */}
       <img src="/neon-palm-tree.png" alt="" className="palm-tree-left hidden lg:block" />
       <img src="/neon-palm-tree.png" alt="" className="palm-tree-right hidden lg:block" />
-      {/* Header */}
-      <header className="border-b border-[#c8ff00]/20 bg-black/80 backdrop-blur-md fixed top-0 w-full z-50">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-[#c8ff00] neon-text cursor-pointer" onClick={() => setLocation("/")}>
-            NEON
-          </h1>
-          <nav className="flex gap-6 items-center">
-            <button onClick={() => setLocation("/")} className="text-gray-300 hover:text-[#c8ff00] transition-smooth">
-              Home
-            </button>
-            <button onClick={() => setLocation("/about")} className="text-gray-300 hover:text-[#c8ff00] transition-smooth">
-              Our Story
-            </button>
-            <button onClick={() => setLocation("/products")} className="text-gray-300 hover:text-[#c8ff00] transition-smooth">
-              Products
-            </button>
-            <button onClick={() => setLocation("/celebrities")} className="text-gray-300 hover:text-[#c8ff00] transition-smooth">
-              Celebrity Fans
-            </button>
-            <button onClick={() => setLocation("/franchise")} className="text-gray-300 hover:text-[#c8ff00] transition-smooth">
-              Franchise
-            </button>
-            {user && user.role === "admin" && (
-              <Button variant="outline" className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00] hover:text-black" onClick={() => setLocation("/admin")}>
-                Admin
-              </Button>
-            )}
-          </nav>
-        </div>
-      </header>
+      
+      <HamburgerHeader variant="default" />
 
       {/* Hero Section */}
       <section className="pt-32 pb-12 px-4 relative z-10">
