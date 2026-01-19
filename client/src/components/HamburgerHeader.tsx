@@ -222,13 +222,15 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
             {/* Logo */}
             <button 
               onClick={() => setLocation("/")} 
-              className="flex items-center gap-3 flex-shrink-0 group"
+              className="flex items-center flex-shrink-0 group"
             >
               <Zap className="w-6 h-6 text-[#c8ff00] group-hover:text-[#d4ff33] transition-colors" />
-              <div className="w-8 h-[2px] bg-white/60 group-hover:bg-white transition-colors" />
-              <span className={`text-2xl font-bold tracking-[0.2em] ${logoStyles[variant]}`}>
-                NEON
-              </span>
+              <div className="flex flex-col items-center mx-2">
+                <span className={`text-2xl font-bold tracking-[0.2em] ${logoStyles[variant]}`}>
+                  NEON
+                </span>
+                <div className="w-full h-[2px] bg-gradient-to-r from-[#c8ff00] to-[#00ffff] mt-0.5" />
+              </div>
             </button>
 
             {/* Right side controls */}

@@ -568,3 +568,141 @@ export const neonNfts = mysqlTable("neon_nfts", {
 
 export type NeonNft = typeof neonNfts.$inferSelect;
 export type InsertNeonNft = typeof neonNfts.$inferInsert;
+
+
+/**
+ * SMS Opt-in table for tracking user SMS preferences and referral codes.
+ * Links subscribers to their unique referral codes for tracking conversions.
+ */
+export const smsOptIns = mysqlTable("sms_opt_ins", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User ID (if registered) */
+  userId: int("userId"),
+  /** Phone number */
+  phone: varchar("phone", { length: 50 }).notNull(),
+  /** Email address */
+  email: varchar("email", { length: 320 }),
+  /** Subscriber's name */
+  name: varchar("name", { length: 255 }),
+  /** Unique subscriber ID for tracking */
+  subscriberId: varchar("subscriberId", { length: 50 }).notNull().unique(),
+  /** Unique referral code for this subscriber */
+  referralCode: varchar("referralCode", { length: 50 }).notNull().unique(),
+  /** Referred by subscriber ID */
+  referredBy: varchar("referredBy", { length: 50 }),
+  /** SMS opt-in status */
+  optedIn: int("optedIn").default(1).notNull(),
+  /** Opt-in timestamp */
+  optInDate: timestamp("optInDate").defaultNow(),
+  /** Opt-out timestamp */
+  optOutDate: timestamp("optOutDate"),
+  /** Preferences - order updates */
+  prefOrderUpdates: int("prefOrderUpdates").default(1).notNull(),
+  /** Preferences - promotions */
+  prefPromotions: int("prefPromotions").default(1).notNull(),
+  /** Preferences - referral alerts */
+  prefReferralAlerts: int("prefReferralAlerts").default(1).notNull(),
+  /** Preferences - territory updates */
+  prefTerritoryUpdates: int("prefTerritoryUpdates").default(1).notNull(),
+  /** Total referrals made */
+  totalReferrals: int("totalReferrals").default(0).notNull(),
+  /** Referrals converted to customers */
+  customersReferred: int("customersReferred").default(0).notNull(),
+  /** Referrals converted to distributors */
+  distributorsReferred: int("distributorsReferred").default(0).notNull(),
+  /** Creation timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Last update timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SMSOptIn = typeof smsOptIns.$inferSelect;
+export type InsertSMSOptIn = typeof smsOptIns.$inferInsert;
+
+/**
+ * Referral tracking table for detailed referral analytics.
+ * Tracks each referral from source to conversion.
+ */
+export const referralTracking = mysqlTable("referral_tracking", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Referrer's subscriber ID */
+  referrerId: varchar("referrerId", { length: 50 }).notNull(),
+  /** Referrer's name */
+  referrerName: varchar("referrerName", { length: 255 }),
+  /** Referral code used */
+  referralCode: varchar("referralCode", { length: 50 }).notNull(),
+  /** Referred person's phone (if SMS) */
+  referredPhone: varchar("referredPhone", { length: 50 }),
+  /** Referred person's email */
+  referredEmail: varchar("referredEmail", { length: 320 }),
+  /** Referred person's name */
+  referredName: varchar("referredName", { length: 255 }),
+  /** Source of referral */
+  source: mysqlEnum("source", ["sms", "email", "social", "direct", "whatsapp", "twitter", "facebook"]).default("direct").notNull(),
+  /** Referral status */
+  status: mysqlEnum("status", ["pending", "clicked", "signed_up", "customer", "distributor"]).default("pending").notNull(),
+  /** Converted to customer */
+  convertedToCustomer: int("convertedToCustomer").default(0).notNull(),
+  /** Converted to distributor */
+  convertedToDistributor: int("convertedToDistributor").default(0).notNull(),
+  /** Customer order ID (if converted) */
+  customerOrderId: int("customerOrderId"),
+  /** Distributor ID (if converted) */
+  distributorId: int("distributorId"),
+  /** Referral bonus paid */
+  bonusPaid: int("bonusPaid").default(0).notNull(),
+  /** Bonus amount in cents */
+  bonusAmount: int("bonusAmount").default(0).notNull(),
+  /** Click timestamp */
+  clickedAt: timestamp("clickedAt"),
+  /** Signup timestamp */
+  signedUpAt: timestamp("signedUpAt"),
+  /** Conversion timestamp */
+  convertedAt: timestamp("convertedAt"),
+  /** Creation timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ReferralTracking = typeof referralTracking.$inferSelect;
+export type InsertReferralTracking = typeof referralTracking.$inferInsert;
+
+/**
+ * SMS message log for tracking all sent messages.
+ * Used for analytics and compliance.
+ */
+export const smsMessageLog = mysqlTable("sms_message_log", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Recipient phone number */
+  phone: varchar("phone", { length: 50 }).notNull(),
+  /** Recipient name */
+  recipientName: varchar("recipientName", { length: 255 }),
+  /** Message type */
+  messageType: mysqlEnum("messageType", [
+    "order_confirmation",
+    "shipping_update",
+    "delivery_confirmation",
+    "territory_submitted",
+    "territory_approved",
+    "territory_rejected",
+    "referral_invite",
+    "welcome",
+    "nft_minted",
+    "crowdfund_contribution",
+    "promotional"
+  ]).notNull(),
+  /** Message content */
+  messageContent: text("messageContent").notNull(),
+  /** Message ID from SMS provider */
+  messageId: varchar("messageId", { length: 100 }),
+  /** Delivery status */
+  status: mysqlEnum("status", ["pending", "sent", "delivered", "failed"]).default("pending").notNull(),
+  /** Error message if failed */
+  errorMessage: text("errorMessage"),
+  /** Sent timestamp */
+  sentAt: timestamp("sentAt").defaultNow().notNull(),
+  /** Delivered timestamp */
+  deliveredAt: timestamp("deliveredAt"),
+});
+
+export type SMSMessageLog = typeof smsMessageLog.$inferSelect;
+export type InsertSMSMessageLog = typeof smsMessageLog.$inferInsert;

@@ -1117,3 +1117,287 @@ export async function getUserProfile(userId: number) {
   
   return result[0];
 }
+
+
+// ============ SMS Opt-In and Referral Tracking Functions ============
+
+import { smsOptIns, referralTracking, smsMessageLog, InsertSMSOptIn, InsertReferralTracking, InsertSMSMessageLog } from "../drizzle/schema";
+
+/**
+ * Create a new SMS opt-in record
+ */
+export async function createSMSOptIn(data: InsertSMSOptIn) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(smsOptIns).values(data);
+  
+  return { success: true, subscriberId: data.subscriberId };
+}
+
+/**
+ * Update SMS opt-in record by phone
+ */
+export async function updateSMSOptIn(phone: string, data: Partial<InsertSMSOptIn>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(smsOptIns)
+    .set(data)
+    .where(eq(smsOptIns.phone, phone));
+  
+  return { success: true };
+}
+
+/**
+ * Get SMS opt-in by phone number
+ */
+export async function getSMSOptInByPhone(phone: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const results = await db.select().from(smsOptIns)
+    .where(eq(smsOptIns.phone, phone));
+  
+  return results[0] || null;
+}
+
+/**
+ * Get SMS opt-in by subscriber ID
+ */
+export async function getSMSOptInBySubscriberId(subscriberId: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const results = await db.select().from(smsOptIns)
+    .where(eq(smsOptIns.subscriberId, subscriberId));
+  
+  return results[0] || null;
+}
+
+/**
+ * Get SMS opt-in by referral code
+ */
+export async function getSMSOptInByReferralCode(referralCode: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const results = await db.select().from(smsOptIns)
+    .where(eq(smsOptIns.referralCode, referralCode));
+  
+  return results[0] || null;
+}
+
+/**
+ * Get all SMS opt-ins (admin)
+ */
+export async function getAllSMSOptIns() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(smsOptIns)
+    .orderBy(desc(smsOptIns.createdAt));
+}
+
+/**
+ * Create referral tracking record
+ */
+export async function createReferralTracking(data: InsertReferralTracking) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(referralTracking).values(data);
+  
+  return { success: true };
+}
+
+/**
+ * Track a referral click
+ */
+export async function trackReferralClick(referralCode: string, phone?: string, email?: string, name?: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get the referrer
+  const referrer = await getSMSOptInByReferralCode(referralCode);
+  if (!referrer) return { success: false, error: "Referrer not found" };
+  
+  // Create tracking record
+  await db.insert(referralTracking).values({
+    referrerId: referrer.subscriberId,
+    referrerName: referrer.name || undefined,
+    referralCode,
+    referredPhone: phone,
+    referredEmail: email,
+    referredName: name,
+    source: "sms",
+    status: "clicked",
+    clickedAt: new Date(),
+  });
+  
+  // Increment referrer's total referrals
+  await db.update(smsOptIns)
+    .set({ totalReferrals: referrer.totalReferrals + 1 })
+    .where(eq(smsOptIns.referralCode, referralCode));
+  
+  return { success: true };
+}
+
+/**
+ * Update referral status
+ */
+export async function updateReferralStatus(referralCode: string, status: "pending" | "clicked" | "signed_up" | "customer" | "distributor") {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const updateData: Record<string, unknown> = { status };
+  
+  if (status === "clicked") {
+    updateData.clickedAt = new Date();
+  } else if (status === "signed_up") {
+    updateData.signedUpAt = new Date();
+  } else if (status === "customer" || status === "distributor") {
+    updateData.convertedAt = new Date();
+  }
+  
+  await db.update(referralTracking)
+    .set(updateData)
+    .where(eq(referralTracking.referralCode, referralCode));
+  
+  return { success: true };
+}
+
+/**
+ * Convert referral to customer
+ */
+export async function convertReferralToCustomer(referralCode: string, orderId: number, customerEmail: string, customerName: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(referralTracking)
+    .set({
+      status: "customer",
+      convertedToCustomer: 1,
+      customerOrderId: orderId,
+      referredEmail: customerEmail,
+      referredName: customerName,
+      convertedAt: new Date(),
+    })
+    .where(eq(referralTracking.referralCode, referralCode));
+  
+  return { success: true };
+}
+
+/**
+ * Convert referral to distributor
+ */
+export async function convertReferralToDistributor(referralCode: string, distributorId: number, distributorEmail: string, distributorName: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(referralTracking)
+    .set({
+      status: "distributor",
+      convertedToDistributor: 1,
+      distributorId,
+      referredEmail: distributorEmail,
+      referredName: distributorName,
+      convertedAt: new Date(),
+    })
+    .where(eq(referralTracking.referralCode, referralCode));
+  
+  return { success: true };
+}
+
+/**
+ * Increment referrer stats when a referral converts
+ */
+export async function incrementReferrerStats(referralCode: string, type: "customer" | "distributor") {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const referrer = await getSMSOptInByReferralCode(referralCode);
+  if (!referrer) return { success: false };
+  
+  if (type === "customer") {
+    await db.update(smsOptIns)
+      .set({ customersReferred: referrer.customersReferred + 1 })
+      .where(eq(smsOptIns.referralCode, referralCode));
+  } else {
+    await db.update(smsOptIns)
+      .set({ distributorsReferred: referrer.distributorsReferred + 1 })
+      .where(eq(smsOptIns.referralCode, referralCode));
+  }
+  
+  return { success: true };
+}
+
+/**
+ * Get referrals by referrer code
+ */
+export async function getReferralsByReferrer(referralCode: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(referralTracking)
+    .where(eq(referralTracking.referralCode, referralCode))
+    .orderBy(desc(referralTracking.createdAt));
+}
+
+/**
+ * Get all referral tracking records (admin)
+ */
+export async function getAllReferralTracking() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(referralTracking)
+    .orderBy(desc(referralTracking.createdAt));
+}
+
+/**
+ * Log an SMS message
+ */
+export async function logSMSMessage(data: InsertSMSMessageLog) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(smsMessageLog).values(data);
+  
+  return { success: true };
+}
+
+/**
+ * Update SMS message status
+ */
+export async function updateSMSMessageStatus(messageId: string, status: "pending" | "sent" | "delivered" | "failed", errorMessage?: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const updateData: Record<string, unknown> = { status };
+  
+  if (status === "delivered") {
+    updateData.deliveredAt = new Date();
+  }
+  if (errorMessage) {
+    updateData.errorMessage = errorMessage;
+  }
+  
+  await db.update(smsMessageLog)
+    .set(updateData)
+    .where(eq(smsMessageLog.messageId, messageId));
+  
+  return { success: true };
+}
+
+/**
+ * Get SMS message logs (admin)
+ */
+export async function getSMSMessageLogs(limit: number = 100) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(smsMessageLog)
+    .orderBy(desc(smsMessageLog.sentAt))
+    .limit(limit);
+}

@@ -1,0 +1,62 @@
+CREATE TABLE `referral_tracking` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`referrerId` varchar(50) NOT NULL,
+	`referrerName` varchar(255),
+	`referralCode` varchar(50) NOT NULL,
+	`referredPhone` varchar(50),
+	`referredEmail` varchar(320),
+	`referredName` varchar(255),
+	`source` enum('sms','email','social','direct','whatsapp','twitter','facebook') NOT NULL DEFAULT 'direct',
+	`status` enum('pending','clicked','signed_up','customer','distributor') NOT NULL DEFAULT 'pending',
+	`convertedToCustomer` int NOT NULL DEFAULT 0,
+	`convertedToDistributor` int NOT NULL DEFAULT 0,
+	`customerOrderId` int,
+	`distributorId` int,
+	`bonusPaid` int NOT NULL DEFAULT 0,
+	`bonusAmount` int NOT NULL DEFAULT 0,
+	`clickedAt` timestamp,
+	`signedUpAt` timestamp,
+	`convertedAt` timestamp,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `referral_tracking_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `sms_message_log` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`phone` varchar(50) NOT NULL,
+	`recipientName` varchar(255),
+	`messageType` enum('order_confirmation','shipping_update','delivery_confirmation','territory_submitted','territory_approved','territory_rejected','referral_invite','welcome','nft_minted','crowdfund_contribution','promotional') NOT NULL,
+	`messageContent` text NOT NULL,
+	`messageId` varchar(100),
+	`status` enum('pending','sent','delivered','failed') NOT NULL DEFAULT 'pending',
+	`errorMessage` text,
+	`sentAt` timestamp NOT NULL DEFAULT (now()),
+	`deliveredAt` timestamp,
+	CONSTRAINT `sms_message_log_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `sms_opt_ins` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`userId` int,
+	`phone` varchar(50) NOT NULL,
+	`email` varchar(320),
+	`name` varchar(255),
+	`subscriberId` varchar(50) NOT NULL,
+	`referralCode` varchar(50) NOT NULL,
+	`referredBy` varchar(50),
+	`optedIn` int NOT NULL DEFAULT 1,
+	`optInDate` timestamp DEFAULT (now()),
+	`optOutDate` timestamp,
+	`prefOrderUpdates` int NOT NULL DEFAULT 1,
+	`prefPromotions` int NOT NULL DEFAULT 1,
+	`prefReferralAlerts` int NOT NULL DEFAULT 1,
+	`prefTerritoryUpdates` int NOT NULL DEFAULT 1,
+	`totalReferrals` int NOT NULL DEFAULT 0,
+	`customersReferred` int NOT NULL DEFAULT 0,
+	`distributorsReferred` int NOT NULL DEFAULT 0,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `sms_opt_ins_id` PRIMARY KEY(`id`),
+	CONSTRAINT `sms_opt_ins_subscriberId_unique` UNIQUE(`subscriberId`),
+	CONSTRAINT `sms_opt_ins_referralCode_unique` UNIQUE(`referralCode`)
+);

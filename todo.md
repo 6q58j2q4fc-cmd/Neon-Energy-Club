@@ -1008,3 +1008,46 @@
 - [x] Show territory info on click (name, status)
 - [x] Update map in real-time when territories are claimed
 - [x] All 95 vitest tests passing
+
+
+## January 19, 2026 - Logo Fix, Performance, Admin Dashboard & SMS
+
+### Logo Centering Fix
+- [x] Fix the horizontal line under NEON logo to be perfectly centered
+- [x] Ensure consistent alignment across all header variants
+- [x] Created NeonLogo component with SVG-based centered line
+- [x] Updated HamburgerHeader with new logo styling
+
+### Page Performance Optimization
+- [x] Identify and fix slow-loading pages
+- [x] Add lazy loading for images (LazyImage component)
+- [x] Add loading skeletons (PageSkeleton component)
+- [x] Created performance utility hooks (useDebounce, useThrottle, useLazyLoad)
+- [x] Optimized component re-renders with memoization utilities
+
+### Admin Territory Management Dashboard
+- [x] Create admin-only territory management page (/admin/territories)
+- [x] Display all pending territory applications with stats
+- [x] Add one-click approve/reject actions
+- [x] Show application details (applicant info, territory, pricing, size)
+- [x] Add filtering by status (all, pending, approved, rejected)
+- [x] Add search by applicant name, email, or territory
+- [x] Send notification emails on approval/rejection
+- [x] Added route to App.tsx
+
+### SMS Notification System
+- [x] Create SMS notification service (smsNotifications.ts)
+- [x] Add SMS opt-in database tables (smsOptIns, smsMessageLog)
+- [x] Send order confirmation SMS
+- [x] Send shipping update SMS
+- [x] Send territory notification SMS (submitted, approved, rejected)
+- [x] Create pre-written referral text messages for SMS, Twitter, Facebook, WhatsApp, Email
+- [x] Generate unique referral codes with NEON prefix
+- [x] Include unique subscriber ID in referral links
+- [x] Created referral tracking database table
+- [x] Track conversions from subscriber to distributor
+- [x] Track conversions from subscriber to customer
+- [x] Add customer referral bonus tracking
+- [x] Add commission tracking for distributor conversions
+- [x] Added SMS router with opt-in, referral, and tracking endpoints
+- [x] All 110 vitest tests passing

@@ -1044,6 +1044,253 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
       return { balance: await getWalletBalance() };
     }),
   }),
+
+  // SMS Notifications and Referral Tracking
+  sms: router({
+    // Opt-in to SMS notifications
+    optIn: publicProcedure
+      .input(
+        z.object({
+          phone: z.string().min(10, "Valid phone number required"),
+          email: z.string().email().optional(),
+          name: z.string().min(1, "Name is required"),
+          referredBy: z.string().optional(),
+          preferences: z.object({
+            orderUpdates: z.boolean().default(true),
+            promotions: z.boolean().default(true),
+            referralAlerts: z.boolean().default(true),
+            territoryUpdates: z.boolean().default(true),
+          }).optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { generateReferralCode, sendWelcomeSubscriberSMS } = await import("./smsNotifications");
+        const { createSMSOptIn, trackReferralClick } = await import("./db");
+        
+        // Generate unique subscriber ID and referral code
+        const subscriberId = `SUB${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+        const referralCode = generateReferralCode(subscriberId);
+        
+        // Create SMS opt-in record
+        const optIn = await createSMSOptIn({
+          phone: input.phone,
+          email: input.email,
+          name: input.name,
+          subscriberId,
+          referralCode,
+          referredBy: input.referredBy,
+          optedIn: 1,
+          prefOrderUpdates: input.preferences?.orderUpdates ? 1 : 0,
+          prefPromotions: input.preferences?.promotions ? 1 : 0,
+          prefReferralAlerts: input.preferences?.referralAlerts ? 1 : 0,
+          prefTerritoryUpdates: input.preferences?.territoryUpdates ? 1 : 0,
+        });
+        
+        // Track referral if applicable
+        if (input.referredBy) {
+          await trackReferralClick(input.referredBy, input.phone, input.email, input.name);
+        }
+        
+        // Send welcome SMS
+        await sendWelcomeSubscriberSMS(
+          { phone: input.phone, name: input.name },
+          referralCode
+        );
+        
+        return {
+          success: true,
+          subscriberId,
+          referralCode,
+        };
+      }),
+
+    // Opt-out of SMS notifications
+    optOut: publicProcedure
+      .input(z.object({ phone: z.string().min(10) }))
+      .mutation(async ({ input }) => {
+        const { updateSMSOptIn } = await import("./db");
+        await updateSMSOptIn(input.phone, { optedIn: 0, optOutDate: new Date() });
+        return { success: true };
+      }),
+
+    // Update SMS preferences
+    updatePreferences: publicProcedure
+      .input(
+        z.object({
+          phone: z.string().min(10),
+          preferences: z.object({
+            orderUpdates: z.boolean(),
+            promotions: z.boolean(),
+            referralAlerts: z.boolean(),
+            territoryUpdates: z.boolean(),
+          }),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { updateSMSOptIn } = await import("./db");
+        await updateSMSOptIn(input.phone, {
+          prefOrderUpdates: input.preferences.orderUpdates ? 1 : 0,
+          prefPromotions: input.preferences.promotions ? 1 : 0,
+          prefReferralAlerts: input.preferences.referralAlerts ? 1 : 0,
+          prefTerritoryUpdates: input.preferences.territoryUpdates ? 1 : 0,
+        });
+        return { success: true };
+      }),
+
+    // Get referral messages for sharing
+    getReferralMessages: publicProcedure
+      .input(z.object({ referrerName: z.string(), referralCode: z.string() }))
+      .query(async ({ input }) => {
+        const { generateReferralMessages } = await import("./smsNotifications");
+        return generateReferralMessages(input.referrerName, input.referralCode);
+      }),
+
+    // Send referral invite via SMS
+    sendReferralInvite: publicProcedure
+      .input(
+        z.object({
+          referrerName: z.string(),
+          referralCode: z.string(),
+          recipientPhone: z.string().min(10),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { sendReferralInviteSMS } = await import("./smsNotifications");
+        const { createReferralTracking } = await import("./db");
+        
+        // Track the referral
+        await createReferralTracking({
+          referrerId: input.referralCode.replace("NEON", "").substring(0, 6),
+          referrerName: input.referrerName,
+          referralCode: input.referralCode,
+          referredPhone: input.recipientPhone,
+          source: "sms",
+          status: "pending",
+        });
+        
+        // Send the SMS
+        const success = await sendReferralInviteSMS(
+          input.referrerName,
+          input.referralCode,
+          input.recipientPhone
+        );
+        
+        return { success };
+      }),
+
+    // Get subscriber's referral stats
+    getReferralStats: publicProcedure
+      .input(z.object({ subscriberId: z.string() }))
+      .query(async ({ input }) => {
+        const { getSMSOptInBySubscriberId, getReferralsByReferrer } = await import("./db");
+        
+        const subscriber = await getSMSOptInBySubscriberId(input.subscriberId);
+        if (!subscriber) {
+          throw new Error("Subscriber not found");
+        }
+        
+        const referrals = await getReferralsByReferrer(subscriber.referralCode);
+        
+        return {
+          totalReferrals: subscriber.totalReferrals,
+          customersReferred: subscriber.customersReferred,
+          distributorsReferred: subscriber.distributorsReferred,
+          referralCode: subscriber.referralCode,
+          referrals: referrals.map((r: any) => ({
+            name: r.referredName,
+            status: r.status,
+            source: r.source,
+            convertedToCustomer: r.convertedToCustomer === 1,
+            convertedToDistributor: r.convertedToDistributor === 1,
+            createdAt: r.createdAt,
+          })),
+        };
+      }),
+
+    // Track referral click (when someone uses a referral link)
+    trackClick: publicProcedure
+      .input(
+        z.object({
+          referralCode: z.string(),
+          source: z.enum(["sms", "email", "social", "direct", "whatsapp", "twitter", "facebook"]).default("direct"),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { updateReferralStatus } = await import("./db");
+        await updateReferralStatus(input.referralCode, "clicked");
+        return { success: true };
+      }),
+
+    // Convert referral to customer
+    convertToCustomer: publicProcedure
+      .input(
+        z.object({
+          referralCode: z.string(),
+          orderId: z.number().int(),
+          customerEmail: z.string().email(),
+          customerName: z.string(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { convertReferralToCustomer, incrementReferrerStats } = await import("./db");
+        
+        await convertReferralToCustomer(
+          input.referralCode,
+          input.orderId,
+          input.customerEmail,
+          input.customerName
+        );
+        
+        // Increment referrer's customer count
+        await incrementReferrerStats(input.referralCode, "customer");
+        
+        return { success: true };
+      }),
+
+    // Convert referral to distributor
+    convertToDistributor: publicProcedure
+      .input(
+        z.object({
+          referralCode: z.string(),
+          distributorId: z.number().int(),
+          distributorEmail: z.string().email(),
+          distributorName: z.string(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { convertReferralToDistributor, incrementReferrerStats } = await import("./db");
+        
+        await convertReferralToDistributor(
+          input.referralCode,
+          input.distributorId,
+          input.distributorEmail,
+          input.distributorName
+        );
+        
+        // Increment referrer's distributor count
+        await incrementReferrerStats(input.referralCode, "distributor");
+        
+        return { success: true };
+      }),
+
+    // Admin: Get all SMS opt-ins
+    listOptIns: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new Error("Unauthorized: Admin access required");
+      }
+      const { getAllSMSOptIns } = await import("./db");
+      return await getAllSMSOptIns();
+    }),
+
+    // Admin: Get all referral tracking data
+    listReferrals: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new Error("Unauthorized: Admin access required");
+      }
+      const { getAllReferralTracking } = await import("./db");
+      return await getAllReferralTracking();
+    }),
+  }),
 });
 
 // Helper function to calculate distance between two coordinates in miles

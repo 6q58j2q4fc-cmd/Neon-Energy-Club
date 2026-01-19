@@ -8,7 +8,7 @@ export default function NeonLogo({ className = "", onClick }: NeonLogoProps) {
 
   return (
     <div 
-      className={`flex flex-col cursor-pointer select-none ${className}`}
+      className={`flex flex-col items-center cursor-pointer select-none ${className}`}
       onClick={onClick}
     >
       {/* Main NEON Text - Static SVG */}
@@ -88,20 +88,21 @@ export default function NeonLogo({ className = "", onClick }: NeonLogoProps) {
         </text>
       </svg>
 
-      {/* Horizontal line separator */}
+      {/* Horizontal line separator - perfectly centered */}
       <div
+        className="mt-0.5 mx-auto"
         style={{ 
-          width: '78%',
+          width: '100%',
+          maxWidth: '120px',
           height: '2px',
-          backgroundColor: neonColor,
+          background: `linear-gradient(90deg, transparent, ${neonColor} 15%, ${neonColor} 85%, transparent)`,
           boxShadow: `0 0 6px ${neonColor}`,
         }}
-        className="mt-0.5"
       />
 
-      {/* ENERGY DRINK text */}
+      {/* ENERGY DRINK text - centered */}
       <span
-        className="text-[8px] sm:text-[9px] md:text-[10px] tracking-[0.25em] font-medium mt-0.5"
+        className="text-[8px] sm:text-[9px] md:text-[10px] tracking-[0.25em] font-medium mt-0.5 text-center"
         style={{
           color: neonColor,
           fontFamily: 'Inter, system-ui, sans-serif',

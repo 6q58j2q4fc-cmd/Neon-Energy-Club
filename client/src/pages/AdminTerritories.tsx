@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,11 +23,16 @@ import {
   RefreshCw,
   ArrowLeft,
   Target,
-  Calendar
+  Calendar,
+  MessageSquare,
+  Send
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import NeonLogo from "@/components/NeonLogo";
+import HamburgerHeader from "@/components/HamburgerHeader";
+import Footer from "@/components/Footer";
+import { SEO } from "@/components/SEO";
+import { toast } from "sonner";
 
 export default function AdminTerritories() {
   const { user } = useAuth();
@@ -133,22 +138,11 @@ export default function AdminTerritories() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a0a0a] via-[#1a0a2e] to-[#0a0a0a]">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-[#c8ff00]/20">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/">
-            <NeonLogo />
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/distributor">
-              <Button variant="outline" className="border-[#c8ff00]/30 text-[#c8ff00] hover:bg-[#c8ff00]/10">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <SEO 
+        title="Territory Management | Admin Dashboard"
+        description="Review and manage territory applications from distributors"
+      />
+      <HamburgerHeader />
 
       <main className="pt-24 pb-16 px-4">
         <div className="container mx-auto max-w-7xl">
@@ -517,6 +511,7 @@ export default function AdminTerritories() {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
