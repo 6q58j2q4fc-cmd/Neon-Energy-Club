@@ -1290,8 +1290,93 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
       const { getAllReferralTracking } = await import("./db");
       return await getAllReferralTracking();
     }),
+
+    // Public leaderboard - top referrers
+    leaderboard: publicProcedure
+      .input(
+        z.object({
+          limit: z.number().int().min(1).max(100).default(50),
+          timeframe: z.enum(["all", "monthly", "weekly"]).default("all"),
+        }).optional()
+      )
+      .query(async ({ input }) => {
+        const { getLeaderboard } = await import("./db");
+        const leaders = await getLeaderboard(input || {});
+        
+        // Add rank and anonymize names for privacy
+        return leaders.map((leader: any, index: number) => ({
+          rank: index + 1,
+          name: leader.name ? anonymizeName(leader.name) : "Anonymous",
+          totalReferrals: leader.totalReferrals,
+          customersReferred: leader.customersReferred,
+          distributorsReferred: leader.distributorsReferred,
+          subscriberId: leader.subscriberId,
+          // Calculate tier based on referrals
+          tier: getTierFromReferrals(leader.totalReferrals),
+          // Calculate points (referrals * 10 + customers * 50 + distributors * 100)
+          points: (leader.totalReferrals * 10) + (leader.customersReferred * 50) + (leader.distributorsReferred * 100),
+        }));
+      }),
+
+    // Leaderboard stats summary
+    leaderboardStats: publicProcedure.query(async () => {
+      const { getLeaderboardStats } = await import("./db");
+      return await getLeaderboardStats();
+    }),
+
+    // Get user's position on leaderboard
+    myPosition: protectedProcedure.query(async ({ ctx }) => {
+      const { getUserReferralStatsByEmail } = await import("./db");
+      
+      if (!ctx.user.email) {
+        return null;
+      }
+      
+      const stats = await getUserReferralStatsByEmail(ctx.user.email);
+      if (!stats) return null;
+      
+      return {
+        position: stats.position,
+        totalReferrals: stats.totalReferrals,
+        customersReferred: stats.customersReferred,
+        distributorsReferred: stats.distributorsReferred,
+        referralCode: stats.referralCode,
+        tier: getTierFromReferrals(stats.totalReferrals),
+        points: (stats.totalReferrals * 10) + (stats.customersReferred * 50) + (stats.distributorsReferred * 100),
+      };
+    }),
   }),
 });
+
+// Helper function to anonymize names for privacy on public leaderboard
+function anonymizeName(name: string): string {
+  const parts = name.trim().split(' ');
+  if (parts.length === 1) {
+    // Single name: show first 2 chars + ***
+    return parts[0].substring(0, 2) + '***';
+  }
+  // Multiple names: show first name initial + last name initial
+  const firstName = parts[0];
+  const lastName = parts[parts.length - 1];
+  return firstName.charAt(0).toUpperCase() + '. ' + lastName.charAt(0).toUpperCase() + '.';
+}
+
+// Helper function to get tier based on referral count
+function getTierFromReferrals(referrals: number): { name: string; color: string; badge: string } {
+  if (referrals >= 100) {
+    return { name: 'Diamond', color: '#b9f2ff', badge: '💎' };
+  } else if (referrals >= 50) {
+    return { name: 'Platinum', color: '#e5e4e2', badge: '🏆' };
+  } else if (referrals >= 25) {
+    return { name: 'Gold', color: '#ffd700', badge: '🥇' };
+  } else if (referrals >= 10) {
+    return { name: 'Silver', color: '#c0c0c0', badge: '🥈' };
+  } else if (referrals >= 5) {
+    return { name: 'Bronze', color: '#cd7f32', badge: '🥉' };
+  } else {
+    return { name: 'Starter', color: '#c8ff00', badge: '⭐' };
+  }
+}
 
 // Helper function to calculate distance between two coordinates in miles
 function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {

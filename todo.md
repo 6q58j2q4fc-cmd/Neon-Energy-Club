@@ -1064,3 +1064,32 @@
 - [x] SMS notifications now check NODE_ENV === "production"
 - [x] Dev mode logs "Skipping notification" instead of sending
 - [x] All 110 vitest tests passing
+
+
+## January 19, 2026 - Referral Leaderboard
+
+### Public Leaderboard Page
+- [ ] Create /leaderboard route
+- [ ] Display top referrers with rankings
+- [ ] Show referral counts and conversion stats
+- [ ] Add gamification elements (badges, tiers)
+- [ ] Include user's own ranking if logged in
+- [ ] Add time-based filters (all-time, monthly, weekly)
+- [ ] Show prizes/rewards for top positions
+
+## Referral Leaderboard (Jan 19)
+
+- [x] Create public referral leaderboard page at /leaderboard
+- [x] Add leaderboard hero section with Vice City styling
+- [x] Display stats cards (Active Referrers, Total Referrals, Customers Converted, Distributors Recruited)
+- [x] Create tier rewards section (Starter, Bronze, Silver, Gold, Platinum, Diamond)
+- [x] Build top referrers table with tabs (All Time, This Month, This Week)
+- [x] Add empty state with "Be the First!" message
+- [x] Display ranking methodology explanation
+- [x] Add user's position highlight when logged in
+- [x] Create tRPC endpoints for leaderboard data (leaderboard, leaderboardStats, myPosition)
+- [x] Add database functions for referral leaderboard queries
+- [x] Add leaderboard link to navigation menu
+- [x] Add leaderboard to searchable pages
+- [x] Write vitest tests for leaderboard functionality (24 tests)
+- [x] All 134 tests passing

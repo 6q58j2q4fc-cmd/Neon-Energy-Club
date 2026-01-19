@@ -1,4 +1,4 @@
-import { desc, eq, sql, and } from "drizzle-orm";
+import { desc, eq, sql, and, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -1400,4 +1400,121 @@ export async function getSMSMessageLogs(limit: number = 100) {
   return await db.select().from(smsMessageLog)
     .orderBy(desc(smsMessageLog.sentAt))
     .limit(limit);
+}
+
+
+// ============ Referral Leaderboard Functions ============
+
+/**
+ * Get top referrers for leaderboard
+ * Returns referrers sorted by total referrals with conversion stats
+ */
+export async function getLeaderboard(options: {
+  limit?: number;
+  timeframe?: "all" | "monthly" | "weekly";
+} = {}) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { limit = 50, timeframe = "all" } = options;
+  
+  let query = db.select({
+    id: smsOptIns.id,
+    name: smsOptIns.name,
+    subscriberId: smsOptIns.subscriberId,
+    referralCode: smsOptIns.referralCode,
+    totalReferrals: smsOptIns.totalReferrals,
+    customersReferred: smsOptIns.customersReferred,
+    distributorsReferred: smsOptIns.distributorsReferred,
+    optInDate: smsOptIns.optInDate,
+  }).from(smsOptIns)
+    .where(gt(smsOptIns.totalReferrals, 0))
+    .orderBy(desc(smsOptIns.totalReferrals), desc(smsOptIns.customersReferred), desc(smsOptIns.distributorsReferred))
+    .limit(limit);
+  
+  return await query;
+}
+
+/**
+ * Get leaderboard stats summary
+ */
+export async function getLeaderboardStats() {
+  const db = await getDb();
+  if (!db) return {
+    totalReferrers: 0,
+    totalReferrals: 0,
+    totalCustomerConversions: 0,
+    totalDistributorConversions: 0,
+    averageReferrals: 0,
+  };
+  
+  const result = await db.select({
+    totalReferrers: sql<number>`COUNT(*)`,
+    totalReferrals: sql<number>`SUM(totalReferrals)`,
+    totalCustomerConversions: sql<number>`SUM(customersReferred)`,
+    totalDistributorConversions: sql<number>`SUM(distributorsReferred)`,
+    averageReferrals: sql<number>`AVG(totalReferrals)`,
+  }).from(smsOptIns)
+    .where(gt(smsOptIns.totalReferrals, 0));
+  
+  return result[0] || {
+    totalReferrers: 0,
+    totalReferrals: 0,
+    totalCustomerConversions: 0,
+    totalDistributorConversions: 0,
+    averageReferrals: 0,
+  };
+}
+
+/**
+ * Get user's leaderboard position
+ */
+export async function getUserLeaderboardPosition(subscriberId: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  // Get the user's stats
+  const userStats = await db.select().from(smsOptIns)
+    .where(eq(smsOptIns.subscriberId, subscriberId));
+  
+  if (!userStats[0]) return null;
+  
+  // Count how many users have more referrals
+  const higherRanked = await db.select({
+    count: sql<number>`COUNT(*)`,
+  }).from(smsOptIns)
+    .where(gt(smsOptIns.totalReferrals, userStats[0].totalReferrals));
+  
+  const position = (higherRanked[0]?.count || 0) + 1;
+  
+  return {
+    position,
+    ...userStats[0],
+  };
+}
+
+/**
+ * Get user's referral stats by email
+ */
+export async function getUserReferralStatsByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const results = await db.select().from(smsOptIns)
+    .where(eq(smsOptIns.email, email));
+  
+  if (!results[0]) return null;
+  
+  // Get position
+  const higherRanked = await db.select({
+    count: sql<number>`COUNT(*)`,
+  }).from(smsOptIns)
+    .where(gt(smsOptIns.totalReferrals, results[0].totalReferrals));
+  
+  const position = (higherRanked[0]?.count || 0) + 1;
+  
+  return {
+    position,
+    ...results[0],
+  };
 }

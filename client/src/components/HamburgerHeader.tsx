@@ -17,6 +17,7 @@ const navItems = [
   { label: "FRANCHISE", path: "/franchise", icon: MapPin },
   { label: "VENDING", path: "/vending", icon: Building2 },
   { label: "NFT GALLERY", path: "/nft-gallery", icon: Gem },
+  { label: "LEADERBOARD", path: "/leaderboard", icon: Trophy },
 ];
 
 // Product data with variants, pricing, and availability
@@ -78,6 +79,7 @@ const searchablePages = [
   { title: "Privacy Policy", path: "/privacy", keywords: ["privacy", "policy", "data", "legal"], category: "page" },
   { title: "Terms & Conditions", path: "/terms", keywords: ["terms", "conditions", "legal", "agreement"], category: "page" },
   { title: "Policies & Procedures", path: "/policies", keywords: ["policies", "procedures", "rules", "guidelines"], category: "page" },
+  { title: "Leaderboard", path: "/leaderboard", keywords: ["leaderboard", "referral", "ranking", "top", "champions", "rewards"], category: "page" },
 ];
 
 interface HamburgerHeaderProps {
