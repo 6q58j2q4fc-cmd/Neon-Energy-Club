@@ -706,3 +706,55 @@ export const smsMessageLog = mysqlTable("sms_message_log", {
 
 export type SMSMessageLog = typeof smsMessageLog.$inferSelect;
 export type InsertSMSMessageLog = typeof smsMessageLog.$inferInsert;
+
+
+/**
+ * Investor inquiries table.
+ * Stores potential investor contact information and investment preferences.
+ */
+export const investorInquiries = mysqlTable("investor_inquiries", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Investor full name */
+  name: varchar("name", { length: 255 }).notNull(),
+  /** Investor email */
+  email: varchar("email", { length: 320 }).notNull(),
+  /** Investor phone number */
+  phone: varchar("phone", { length: 50 }),
+  /** Company name (if applicable) */
+  company: varchar("company", { length: 255 }),
+  /** Investment range interest */
+  investmentRange: mysqlEnum("investmentRange", [
+    "under_10k",
+    "10k_50k",
+    "50k_100k",
+    "100k_500k",
+    "500k_1m",
+    "over_1m"
+  ]).notNull(),
+  /** Accredited investor status */
+  accreditedStatus: mysqlEnum("accreditedStatus", ["yes", "no", "unsure"]).notNull(),
+  /** Type of investment interest */
+  investmentType: mysqlEnum("investmentType", [
+    "equity",
+    "convertible_note",
+    "revenue_share",
+    "franchise",
+    "other"
+  ]).notNull(),
+  /** How they heard about NEON */
+  referralSource: varchar("referralSource", { length: 255 }),
+  /** Additional message/questions */
+  message: text("message"),
+  /** Inquiry status */
+  status: mysqlEnum("status", ["new", "contacted", "in_discussion", "committed", "declined"]).default("new").notNull(),
+  /** Admin notes */
+  adminNotes: text("adminNotes"),
+  /** Inquiry timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Last update timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type InvestorInquiry = typeof investorInquiries.$inferSelect;
+export type InsertInvestorInquiry = typeof investorInquiries.$inferInsert;
+

@@ -541,6 +541,32 @@ export const appRouter = router({
       const { generateBlogPost } = await import("./blogGenerator");
       return await generateBlogPost();
     }),
+
+    // Get category counts (public)
+    categories: publicProcedure.query(async () => {
+      const { getBlogPostCountByCategory } = await import("./db");
+      return await getBlogPostCountByCategory();
+    }),
+
+    // Get recent posts for sidebar/footer (public)
+    recent: publicProcedure
+      .input(z.object({ limit: z.number().int().min(1).max(10).default(5) }).optional())
+      .query(async ({ input }) => {
+        const { getRecentBlogPosts } = await import("./db");
+        return await getRecentBlogPosts(input?.limit || 5);
+      }),
+
+    // Admin: Delete post
+    delete: protectedProcedure
+      .input(z.object({ id: z.number().int() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized: Admin access required");
+        }
+        const { deleteBlogPost } = await import("./db");
+        await deleteBlogPost(input.id);
+        return { success: true };
+      }),
   }),
 
   territory: router({
@@ -1346,6 +1372,76 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
       };
     }),
   }),
+
+  // Investor inquiries router
+  investor: router({
+    // Submit investor inquiry (public)
+    submit: publicProcedure
+      .input(
+        z.object({
+          name: z.string().min(1, "Name is required"),
+          email: z.string().email("Valid email is required"),
+          phone: z.string().optional(),
+          company: z.string().optional(),
+          investmentRange: z.enum(["under_10k", "10k_50k", "50k_100k", "100k_500k", "500k_1m", "over_1m"]),
+          accreditedStatus: z.enum(["yes", "no", "unsure"]),
+          investmentType: z.enum(["equity", "convertible_note", "revenue_share", "franchise", "other"]),
+          referralSource: z.string().optional(),
+          message: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { createInvestorInquiry } = await import("./db");
+        const id = await createInvestorInquiry(input);
+        
+        // Notify owner of new investor inquiry
+        try {
+          await notifyOwner({
+            title: "🎯 New Investor Inquiry",
+            content: `New investor inquiry from ${input.name} (${input.email})\n\nInvestment Range: ${input.investmentRange.replace(/_/g, " ")}\nAccredited: ${input.accreditedStatus}\nType: ${input.investmentType.replace(/_/g, " ")}\n\nMessage: ${input.message || "No message provided"}`,
+          });
+        } catch (err) {
+          console.warn("[Investor] Failed to notify owner:", err);
+        }
+        
+        return { success: true, id };
+      }),
+
+    // List all inquiries (admin only)
+    list: protectedProcedure
+      .input(
+        z.object({
+          limit: z.number().int().min(1).max(500).default(100),
+          status: z.string().optional(),
+        }).optional()
+      )
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized: Admin access required");
+        }
+        const { getInvestorInquiries } = await import("./db");
+        return await getInvestorInquiries(input || {});
+      }),
+
+    // Update inquiry status (admin only)
+    updateStatus: protectedProcedure
+      .input(
+        z.object({
+          id: z.number().int(),
+          status: z.enum(["new", "contacted", "in_discussion", "committed", "declined"]),
+          adminNotes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized: Admin access required");
+        }
+        const { updateInvestorInquiryStatus } = await import("./db");
+        await updateInvestorInquiryStatus(input.id, input.status, input.adminNotes);
+        return { success: true };
+      }),
+  }),
+
 });
 
 // Helper function to anonymize names for privacy on public leaderboard

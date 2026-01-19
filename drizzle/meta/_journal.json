@@ -78,6 +78,13 @@
       "when": 1768827318656,
       "tag": "0010_abnormal_microchip",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1768831759899,
+      "tag": "0011_small_katie_power",
+      "breakpoints": true
     }
   ]
 }

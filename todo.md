@@ -1142,3 +1142,34 @@
 - [x] Add Miami skyline elements (synthwave-grid-bg, floating-neon-orb)
 - [x] Add firefly/particle effects for night atmosphere (firefly-field, firefly classes)
 - [x] Ensure all headers/footers match new theme (updated Header.tsx, Footer.tsx)
+
+## Investors Section & Auto-Posting Blog (Jan 19)
+
+### Investors Section
+- [x] Create investorInquiries database table (name, email, phone, company, investment_range, accredited_status, investment_type, referral_source, message, status, admin_notes, created_at)
+- [x] Build Investors page with inquiry form (/investors)
+- [x] Add investment tiers and opportunity information (6 tiers from <$10k to $1M+)
+- [x] Create backend tRPC procedures for investor inquiries (submit, list, updateStatus)
+- [x] Add email notification for new investor inquiries (via notifyOwner)
+- [x] Add investors link to navigation (HamburgerHeader, searchable pages)
+
+### Blog System with Auto-Posting
+- [x] Create blog_posts database table (already existed, extended with generate procedure)
+- [x] Build Blog listing page (/blog) - already existed with category filtering
+- [x] Build Blog post detail page (/blog/:slug) - already existed
+- [x] Create tRPC procedures for blog CRUD operations (list, create, delete, categories, recent)
+- [x] Implement LLM-powered auto-posting system (blog.generate procedure with 7 topic categories)
+- [x] Add SEO meta tags and Open Graph for blog posts (via SEO component)
+- [x] Create initial seed articles about NEON relaunch (via generate procedure)
+- [x] Add blog link to navigation and footer
+- [x] Implement sitemap.xml generation for blog posts (already in sitemap.xml)
+
+### SEO Optimization
+- [x] Add structured data (Article schema) for blog posts - via SEO component
+- [x] Implement canonical URLs for blog posts - via SEO component
+- [ ] Add RSS feed for blog
+- [x] Optimize meta descriptions and titles - via SEO component
+
+### Testing
+- [x] 17 new vitest tests for investor and blog features
+- [x] Total 151 vitest tests passing

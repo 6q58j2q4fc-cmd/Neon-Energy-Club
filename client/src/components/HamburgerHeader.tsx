@@ -6,7 +6,7 @@ import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { 
   Zap, Home, BookOpen, Store, Star, MapPin, Building2, Gem, Users, Trophy, 
-  Search, X, User, Package, LogOut, ChevronDown, Settings, ShoppingBag
+  Search, X, User, Package, LogOut, ChevronDown, Settings, ShoppingBag, TrendingUp
 } from "lucide-react";
 
 const navItems = [
@@ -18,6 +18,7 @@ const navItems = [
   { label: "VENDING", path: "/vending", icon: Building2 },
   { label: "NFT GALLERY", path: "/nft-gallery", icon: Gem },
   { label: "LEADERBOARD", path: "/leaderboard", icon: Trophy },
+  { label: "INVESTORS", path: "/investors", icon: TrendingUp },
 ];
 
 // Product data with variants, pricing, and availability
@@ -78,6 +79,9 @@ const searchablePages = [
   { title: "My Orders", path: "/orders", keywords: ["orders", "purchases", "history", "tracking", "my"], category: "page" },
   { title: "Privacy Policy", path: "/privacy", keywords: ["privacy", "policy", "data", "legal"], category: "page" },
   { title: "Terms & Conditions", path: "/terms", keywords: ["terms", "conditions", "legal", "agreement"], category: "page" },
+  { title: "Investors", path: "/investors", keywords: ["invest", "investors", "funding", "equity", "capital", "opportunity"], category: "page" },
+  { title: "Leaderboard", path: "/leaderboard", keywords: ["leaderboard", "ranking", "top", "referrals", "points"], category: "page" },
+  { title: "Blog", path: "/blog", keywords: ["blog", "news", "articles", "posts", "updates"], category: "page" },
   { title: "Policies & Procedures", path: "/policies", keywords: ["policies", "procedures", "rules", "guidelines"], category: "page" },
   { title: "Leaderboard", path: "/leaderboard", keywords: ["leaderboard", "referral", "ranking", "top", "champions", "rewards"], category: "page" },
 ];

@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft } from "../drizzle/schema";
+import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -1517,4 +1517,112 @@ export async function getUserReferralStatsByEmail(email: string) {
     position,
     ...results[0],
   };
+}
+
+
+// ============ Investor Inquiry Functions ============
+
+/**
+ * Create a new investor inquiry
+ */
+export async function createInvestorInquiry(inquiry: InsertInvestorInquiry) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(investorInquiries).values(inquiry);
+  return result[0].insertId;
+}
+
+/**
+ * Get all investor inquiries (admin)
+ */
+export async function getInvestorInquiries(options: {
+  limit?: number;
+  status?: string;
+} = {}) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { limit = 100, status } = options;
+  
+  if (status) {
+    return await db.select().from(investorInquiries)
+      .where(eq(investorInquiries.status, status as any))
+      .orderBy(desc(investorInquiries.createdAt))
+      .limit(limit);
+  }
+  
+  return await db.select().from(investorInquiries)
+    .orderBy(desc(investorInquiries.createdAt))
+    .limit(limit);
+}
+
+/**
+ * Update investor inquiry status
+ */
+export async function updateInvestorInquiryStatus(id: number, status: string, adminNotes?: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const updateData: any = { status };
+  if (adminNotes !== undefined) {
+    updateData.adminNotes = adminNotes;
+  }
+  
+  await db.update(investorInquiries)
+    .set(updateData)
+    .where(eq(investorInquiries.id, id));
+}
+
+/**
+ * Delete blog post
+ */
+export async function deleteBlogPost(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(blogPosts)
+    .where(eq(blogPosts.id, id));
+}
+
+/**
+ * Get blog posts for sitemap
+ */
+export async function getBlogPostsForSitemap() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select({
+    slug: blogPosts.slug,
+    updatedAt: blogPosts.updatedAt,
+  }).from(blogPosts)
+    .where(eq(blogPosts.status, "published"));
+}
+
+/**
+ * Get recent blog posts for RSS feed
+ */
+export async function getRecentBlogPosts(limit: number = 20) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(blogPosts)
+    .where(eq(blogPosts.status, "published"))
+    .orderBy(desc(blogPosts.publishedAt))
+    .limit(limit);
+}
+
+/**
+ * Get blog post count by category
+ */
+export async function getBlogPostCountByCategory() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select({
+    category: blogPosts.category,
+    count: sql<number>`COUNT(*)`,
+  }).from(blogPosts)
+    .where(eq(blogPosts.status, "published"))
+    .groupBy(blogPosts.category);
 }

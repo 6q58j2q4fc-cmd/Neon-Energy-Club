@@ -31,6 +31,7 @@ import Policies from "./pages/Policies";
 import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
 import Leaderboard from "./pages/Leaderboard";
+import Investors from "./pages/Investors";
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -77,6 +78,8 @@ function Router() {
         <Route path="/profile" component={Profile} />
         <Route path="/orders" component={Orders} />
         <Route path="/leaderboard" component={Leaderboard} />
+        <Route path="/investors" component={Investors} />
+        <Route path="/invest" component={Investors} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>
