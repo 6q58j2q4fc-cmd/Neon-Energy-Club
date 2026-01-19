@@ -46,15 +46,17 @@ export default function Leaderboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
+    <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a]">
       <HamburgerHeader />
       
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#c8ff00]/10 via-transparent to-[#ff00ff]/10" />
-        <div className="absolute top-20 left-1/4 w-96 h-96 bg-[#c8ff00]/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#ff00ff]/20 rounded-full blur-3xl" />
+        {/* Background Effects - Tropical */}
+        <div className="jungle-canopy-overlay" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#c8ff00]/10 via-transparent to-[#ff0080]/10" />
+        <div className="floating-neon-orb green w-96 h-96 top-20 left-1/4" style={{ animationDelay: '0s' }} />
+        <div className="floating-neon-orb pink w-80 h-80 bottom-0 right-1/4" style={{ animationDelay: '-5s' }} />
+        <div className="floating-neon-orb jungle w-72 h-72 top-1/3 -left-20" style={{ animationDelay: '-3s' }} />
         
         <div className="container relative z-10">
           <div className="text-center mb-12">

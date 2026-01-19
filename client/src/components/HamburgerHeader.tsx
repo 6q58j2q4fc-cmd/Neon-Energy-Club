@@ -198,7 +198,7 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
   // Style variants
   const headerStyles = {
     default: `${scrolled ? "bg-black/95" : "bg-black/80"} border-b border-[#c8ff00]/20`,
-    vice: `${scrolled ? "bg-[#1a0a2e]/95" : "bg-[#1a0a2e]/90"} border-b border-[#ff0080]/20`,
+    vice: `${scrolled ? "bg-[#0d2818]/95" : "bg-[#0d2818]/90"} border-b border-[#ff0080]/20`,
     dark: `${scrolled ? "bg-black/95" : "bg-black/90"} border-b border-white/10`,
   };
 

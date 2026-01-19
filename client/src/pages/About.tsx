@@ -11,12 +11,13 @@ export default function About() {
   }, []);
 
   return (
-    <div className="min-h-screen vice-bg text-white relative overflow-hidden">
-      {/* Background Graphics */}
+    <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a] text-white relative overflow-hidden">
+      {/* Background Graphics - Tropical */}
+      <div className="jungle-canopy-overlay" />
       <div className="synthwave-grid-bg" />
-      <div className="floating-neon-orb pink w-96 h-96 -top-48 -left-48" style={{ animationDelay: '0s' }} />
-      <div className="floating-neon-orb cyan w-80 h-80 top-1/4 -right-40" style={{ animationDelay: '-5s' }} />
-      <div className="floating-neon-orb purple w-72 h-72 bottom-1/3 -left-36" style={{ animationDelay: '-10s' }} />
+      <div className="floating-neon-orb green w-96 h-96 -top-48 -left-48" style={{ animationDelay: '0s' }} />
+      <div className="floating-neon-orb pink w-80 h-80 top-1/4 -right-40" style={{ animationDelay: '-5s' }} />
+      <div className="floating-neon-orb jungle w-72 h-72 bottom-1/3 -left-36" style={{ animationDelay: '-10s' }} />
       
       {/* Decorative Palm Trees */}
       <img src="/neon-palm-tree.png" alt="" className="palm-tree-left hidden lg:block" />

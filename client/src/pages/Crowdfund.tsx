@@ -128,7 +128,7 @@ export default function Crowdfund() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0d0620] via-[#1a0a2e] to-[#0d0620] text-white relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a] text-white relative overflow-hidden">
       {/* Background Graphics */}
       <div className="synthwave-grid-bg" />
       <div className="floating-neon-orb green w-96 h-96 -top-48 -left-48" style={{ animationDelay: '0s' }} />
@@ -163,22 +163,22 @@ export default function Crowdfund() {
 
           {/* Campaign Stats */}
           <div className="grid md:grid-cols-4 gap-4 mb-12">
-            <div className="bg-[#0a0a0a] border border-[#c8ff00]/20 rounded-xl p-6 text-center neon-border hover-lift">
+            <div className="bg-[#0a1a1a]/90 backdrop-blur-sm border border-[#c8ff00]/20 rounded-xl p-6 text-center neon-border hover-lift">
               <TrendingUp className="w-8 h-8 text-[#c8ff00] mx-auto mb-2 neon-glow" />
               <div className="text-3xl font-black text-[#c8ff00]">$487,350</div>
               <div className="text-sm text-gray-400">Raised</div>
             </div>
-            <div className="bg-[#0a0a0a] border border-[#c8ff00]/20 rounded-xl p-6 text-center neon-border hover-lift">
+            <div className="bg-[#0a1a1a]/90 backdrop-blur-sm border border-[#c8ff00]/20 rounded-xl p-6 text-center neon-border hover-lift">
               <Users className="w-8 h-8 text-[#c8ff00] mx-auto mb-2 neon-glow" />
               <div className="text-3xl font-black text-[#c8ff00]">2,847</div>
               <div className="text-sm text-gray-400">Backers</div>
             </div>
-            <div className="bg-[#0a0a0a] border border-[#c8ff00]/20 rounded-xl p-6 text-center neon-border hover-lift">
+            <div className="bg-[#0a1a1a]/90 backdrop-blur-sm border border-[#c8ff00]/20 rounded-xl p-6 text-center neon-border hover-lift">
               <Clock className="w-8 h-8 text-[#c8ff00] mx-auto mb-2 neon-glow" />
               <div className="text-3xl font-black text-[#c8ff00]">48%</div>
               <div className="text-sm text-gray-400">Funded</div>
             </div>
-            <div className="bg-[#0a0a0a] border border-[#c8ff00]/20 rounded-xl p-6 text-center neon-border hover-lift">
+            <div className="bg-[#0a1a1a]/90 backdrop-blur-sm border border-[#c8ff00]/20 rounded-xl p-6 text-center neon-border hover-lift">
               <Star className="w-8 h-8 text-[#c8ff00] mx-auto mb-2 neon-glow" />
               <div className="text-3xl font-black text-[#c8ff00]">90</div>
               <div className="text-sm text-gray-400">Days Left</div>

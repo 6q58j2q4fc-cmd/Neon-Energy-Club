@@ -79,33 +79,40 @@
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.623 0.214 259.815);
   
-  /* Vice City Colors */
+  /* Tropical Miami Night Colors */
   --neon-green: #c8ff00;
   --vice-pink: #ff0080;
   --vice-cyan: #00ffff;
   --vice-purple: #9d4edd;
+  --jungle-deep: #0a1f0a;
+  --jungle-dark: #0d2818;
+  --jungle-mid: #1a4028;
+  --jungle-accent: #2d5a3d;
+  --miami-night: #0a0a1a;
+  --miami-purple: #1a0a2e;
+  --miami-teal: #0a2a2a;
 }
 
 .dark {
-  --background: oklch(0.08 0.02 280);
-  --foreground: oklch(0.95 0.01 280);
-  --card: oklch(0.12 0.02 280);
-  --card-foreground: oklch(0.95 0.01 280);
-  --popover: oklch(0.12 0.02 280);
-  --popover-foreground: oklch(0.95 0.01 280);
-  --primary: oklch(0.75 0.25 130);
-  --primary-foreground: oklch(0.1 0.02 130);
-  --secondary: oklch(0.2 0.02 280);
-  --secondary-foreground: oklch(0.9 0.01 280);
-  --muted: oklch(0.2 0.02 280);
-  --muted-foreground: oklch(0.65 0.02 280);
-  --accent: oklch(0.25 0.03 280);
-  --accent-foreground: oklch(0.95 0.01 280);
+  --background: oklch(0.06 0.03 150);
+  --foreground: oklch(0.95 0.01 150);
+  --card: oklch(0.10 0.04 150);
+  --card-foreground: oklch(0.95 0.01 150);
+  --popover: oklch(0.10 0.04 150);
+  --popover-foreground: oklch(0.95 0.01 150);
+  --primary: oklch(0.85 0.30 115);
+  --primary-foreground: oklch(0.1 0.02 115);
+  --secondary: oklch(0.15 0.04 150);
+  --secondary-foreground: oklch(0.9 0.01 150);
+  --muted: oklch(0.15 0.04 150);
+  --muted-foreground: oklch(0.65 0.02 150);
+  --accent: oklch(0.20 0.05 150);
+  --accent-foreground: oklch(0.95 0.01 150);
   --destructive: oklch(0.6 0.25 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.25 0.02 280);
-  --input: oklch(0.25 0.02 280);
-  --ring: oklch(0.75 0.25 130);
+  --border: oklch(0.20 0.04 150);
+  --input: oklch(0.20 0.04 150);
+  --ring: oklch(0.85 0.30 115);
 }
 
 @layer base {
@@ -133,18 +140,230 @@
   min-height: 0;
 }
 
-/* Button styles - simplified, no animations */
+/* ========================================
+   TROPICAL RAINFOREST NIGHT THEME
+   Modern Miami Aesthetics
+   ======================================== */
+
+/* Primary Background - Tropical Night */
+.tropical-night-bg {
+  background: linear-gradient(180deg, 
+    #0a0a0a 0%,
+    #0a1a1a 15%,
+    #0d2818 35%,
+    #1a3528 50%,
+    #0d2818 65%,
+    #0a1a1a 85%,
+    #0a0a0a 100%
+  );
+}
+
+/* Miami Skyline Night */
+.miami-night-bg {
+  background: linear-gradient(180deg, 
+    #0a0a1a 0%,
+    #0a1a2a 20%,
+    #1a2a3a 40%,
+    #ff6b35 75%,
+    #ff0080 90%,
+    #9d4edd 100%
+  );
+}
+
+/* Jungle Canopy Overlay */
+.jungle-canopy-overlay {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(45, 90, 61, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 10%, rgba(26, 64, 40, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 45% at 50% 5%, rgba(13, 40, 24, 0.5) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Firefly Particles */
+.firefly-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.firefly {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #c8ff00;
+  border-radius: 50%;
+  box-shadow: 0 0 10px 3px rgba(200, 255, 0, 0.6), 0 0 20px 6px rgba(200, 255, 0, 0.3);
+  animation: firefly-glow 4s ease-in-out infinite, firefly-float 12s ease-in-out infinite;
+}
+
+.firefly:nth-child(2n) { animation-delay: -2s; }
+.firefly:nth-child(3n) { animation-delay: -4s; width: 3px; height: 3px; }
+.firefly:nth-child(4n) { animation-delay: -6s; }
+.firefly:nth-child(5n) { animation-delay: -1s; width: 5px; height: 5px; }
+
+@keyframes firefly-glow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes firefly-float {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(30px, -40px); }
+  50% { transform: translate(-20px, -20px); }
+  75% { transform: translate(40px, 30px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Tropical Leaf Silhouettes */
+.tropical-leaves-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200'%3E%3Cpath d='M0,100 Q100,20 200,80 T400,60 T600,90 T800,50 T1000,70 T1200,40 L1200,0 L0,0 Z' fill='%230d2818' opacity='0.8'/%3E%3Cpath d='M0,120 Q150,40 300,100 T600,70 T900,110 T1200,60 L1200,0 L0,0 Z' fill='%231a3528' opacity='0.5'/%3E%3C/svg%3E") no-repeat center top;
+  background-size: cover;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.tropical-leaves-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 150px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 150'%3E%3Cpath d='M0,50 Q100,130 200,70 T400,90 T600,60 T800,100 T1000,80 T1200,110 L1200,150 L0,150 Z' fill='%230d2818' opacity='0.9'/%3E%3Cpath d='M0,80 Q150,110 300,50 T600,80 T900,40 T1200,90 L1200,150 L0,150 Z' fill='%231a3528' opacity='0.6'/%3E%3C/svg%3E") no-repeat center bottom;
+  background-size: cover;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Neon Palm Tree Silhouettes */
+.palm-tree-left {
+  position: absolute;
+  left: -50px;
+  bottom: 0;
+  width: 250px;
+  height: auto;
+  opacity: 0.4;
+  filter: drop-shadow(0 0 30px rgba(200, 255, 0, 0.3)) drop-shadow(0 0 60px rgba(0, 255, 255, 0.2));
+  pointer-events: none;
+  z-index: 2;
+}
+
+.palm-tree-right {
+  position: absolute;
+  right: -50px;
+  bottom: 0;
+  width: 250px;
+  height: auto;
+  opacity: 0.4;
+  filter: drop-shadow(0 0 30px rgba(255, 0, 128, 0.3)) drop-shadow(0 0 60px rgba(157, 78, 221, 0.2));
+  pointer-events: none;
+  z-index: 2;
+  transform: scaleX(-1);
+}
+
+/* Miami Neon Glow Effects */
+.miami-glow-pink {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 0, 128, 0.4) 0%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.miami-glow-cyan {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.3) 0%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.miami-glow-green {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200, 255, 0, 0.35) 0%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+/* Floating Neon Orbs - Updated for Tropical Theme */
+.floating-neon-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  animation: float-orb 20s ease-in-out infinite;
+}
+
+.floating-neon-orb.green {
+  background: radial-gradient(circle, rgba(200, 255, 0, 0.4) 0%, transparent 70%);
+}
+
+.floating-neon-orb.pink {
+  background: radial-gradient(circle, rgba(255, 0, 128, 0.3) 0%, transparent 70%);
+}
+
+.floating-neon-orb.cyan {
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.3) 0%, transparent 70%);
+}
+
+.floating-neon-orb.purple {
+  background: radial-gradient(circle, rgba(157, 78, 221, 0.3) 0%, transparent 70%);
+}
+
+.floating-neon-orb.jungle {
+  background: radial-gradient(circle, rgba(45, 90, 61, 0.5) 0%, transparent 70%);
+}
+
+@keyframes float-orb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -20px) scale(1.1); }
+  50% { transform: translate(-20px, 30px) scale(0.9); }
+  75% { transform: translate(-30px, -10px) scale(1.05); }
+}
+
+/* Synthwave Grid - Tropical Version */
+.synthwave-grid-bg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 300px;
+  background: 
+    linear-gradient(90deg, rgba(200, 255, 0, 0.1) 1px, transparent 1px),
+    linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 60px 60px;
+  transform: perspective(500px) rotateX(60deg);
+  transform-origin: center bottom;
+  opacity: 0.3;
+  pointer-events: none;
+  mask-image: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+}
+
+/* Button styles - Tropical Neon */
 .btn-neon {
   background: linear-gradient(135deg, #c8ff00 0%, #a8e000 100%);
   color: #000;
   font-weight: 700;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
-  transition: opacity 0.15s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 20px rgba(200, 255, 0, 0.3);
 }
 
 .btn-neon:hover {
-  opacity: 0.9;
+  box-shadow: 0 0 30px rgba(200, 255, 0, 0.5);
+  transform: translateY(-2px);
 }
 
 .btn-vice-pink {
@@ -153,11 +372,13 @@
   font-weight: 700;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
-  transition: opacity 0.15s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 20px rgba(255, 0, 128, 0.3);
 }
 
 .btn-vice-pink:hover {
-  opacity: 0.9;
+  box-shadow: 0 0 30px rgba(255, 0, 128, 0.5);
+  transform: translateY(-2px);
 }
 
 .btn-vice-cyan {
@@ -166,11 +387,13 @@
   font-weight: 700;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
-  transition: opacity 0.15s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
 }
 
 .btn-vice-cyan:hover {
-  opacity: 0.9;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+  transform: translateY(-2px);
 }
 
 .btn-outline-neon {
@@ -180,58 +403,56 @@
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .btn-outline-neon:hover {
   background: #c8ff00;
   color: #000;
+  box-shadow: 0 0 20px rgba(200, 255, 0, 0.4);
 }
 
-/* Text glow - static, no animation */
+/* Text glow - Tropical Neon */
 .text-neon-glow {
   color: #c8ff00;
-  text-shadow: 0 0 10px rgba(200, 255, 0, 0.5);
+  text-shadow: 0 0 10px rgba(200, 255, 0, 0.5), 0 0 20px rgba(200, 255, 0, 0.3);
 }
 
 .text-vice-pink-glow {
   color: #ff0080;
-  text-shadow: 0 0 10px rgba(255, 0, 128, 0.5);
+  text-shadow: 0 0 10px rgba(255, 0, 128, 0.5), 0 0 20px rgba(255, 0, 128, 0.3);
 }
 
 .text-vice-cyan-glow {
   color: #00ffff;
-  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.3);
 }
 
-/* Card styles - simplified */
+/* Card styles - Jungle Glass */
 .glass-card {
-  background: rgba(10, 4, 24, 0.8);
-  border: 1px solid rgba(184, 230, 0, 0.2);
+  background: rgba(10, 26, 26, 0.85);
+  border: 1px solid rgba(200, 255, 0, 0.2);
   border-radius: 1rem;
+  backdrop-filter: blur(10px);
 }
 
 .glass-card-pink {
-  background: rgba(10, 4, 24, 0.8);
+  background: rgba(26, 10, 26, 0.85);
   border: 1px solid rgba(255, 0, 128, 0.2);
   border-radius: 1rem;
+  backdrop-filter: blur(10px);
 }
 
-/* Vice City background */
-.vice-city-bg {
-  background: linear-gradient(180deg, 
-    #1a0a2e 0%, 
-    #2d1b4e 30%, 
-    #4a2c6a 50%,
-    #ff6b35 70%,
-    #ff0080 85%,
-    #1a0a2e 100%
-  );
+.glass-card-jungle {
+  background: rgba(13, 40, 24, 0.9);
+  border: 1px solid rgba(45, 90, 61, 0.3);
+  border-radius: 1rem;
+  backdrop-filter: blur(10px);
 }
 
 /* Gradient text */
 .gradient-text {
-  background: linear-gradient(135deg, #b8e600, #00ffff);
+  background: linear-gradient(135deg, #c8ff00, #00ffff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -244,41 +465,18 @@
   background-clip: text;
 }
 
-/* City lights - static dots, no animation */
-.city-lights {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
+.gradient-text-tropical {
+  background: linear-gradient(135deg, #c8ff00, #2d5a3d, #00ffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
-
-.city-light {
-  position: absolute;
-  border-radius: 50%;
-  opacity: 0.6;
-}
-
-.city-light.pink { background: #ff0080; }
-.city-light.cyan { background: #00ffff; }
-.city-light.purple { background: #bf5af2; }
-.city-light.gold { background: #ffd700; }
-.city-light.green { background: #b8e600; }
-
-.window-light {
-  position: absolute;
-  width: 3px;
-  height: 6px;
-  opacity: 0.4;
-}
-
-.window-light.warm { background: #ffd700; }
-.window-light.cool { background: #87ceeb; }
 
 /* Mobile menu */
 .mobile-menu-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 4, 24, 0.95);
+  background: rgba(10, 26, 26, 0.98);
   z-index: 50;
 }
 
@@ -300,72 +498,73 @@
 }
 
 .mobile-menu-item:hover {
-  color: #b8e600;
+  color: #c8ff00;
 }
 
-/* Neon logo - static */
+/* Neon logo - Tropical */
 .neon-logo-text {
   font-family: 'Orbitron', sans-serif;
   font-weight: 900;
-  color: #b8e600;
-  text-shadow: 0 0 10px rgba(184, 230, 0, 0.5);
+  color: #c8ff00;
+  text-shadow: 0 0 10px rgba(200, 255, 0, 0.5), 0 0 20px rgba(200, 255, 0, 0.3);
 }
 
-/* Scrollbar styling */
+/* Scrollbar styling - Jungle Theme */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0418;
+  background: #0a1a1a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #b8e600;
+  background: linear-gradient(180deg, #c8ff00, #2d5a3d);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8fb800;
+  background: linear-gradient(180deg, #c8ff00, #00ffff);
 }
 
-/* Form inputs */
+/* Form inputs - Tropical */
 input, textarea, select {
-  background: rgba(10, 4, 24, 0.8);
-  border: 1px solid rgba(184, 230, 0, 0.3);
+  background: rgba(10, 26, 26, 0.9);
+  border: 1px solid rgba(200, 255, 0, 0.3);
   color: #fff;
   border-radius: 0.5rem;
   padding: 0.75rem 1rem;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: #b8e600;
+  border-color: #c8ff00;
+  box-shadow: 0 0 10px rgba(200, 255, 0, 0.2);
 }
 
 input::placeholder, textarea::placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
 
-/* Progress bar */
+/* Progress bar - Tropical */
 .progress-bar {
-  background: rgba(184, 230, 0, 0.2);
+  background: rgba(200, 255, 0, 0.2);
   border-radius: 9999px;
   overflow: hidden;
 }
 
 .progress-bar-fill {
-  background: linear-gradient(90deg, #b8e600, #00ffff);
+  background: linear-gradient(90deg, #c8ff00, #00ffff);
   height: 100%;
   border-radius: 9999px;
 }
 
-/* Badge styles */
+/* Badge styles - Tropical */
 .badge-neon {
-  background: rgba(184, 230, 0, 0.2);
-  color: #b8e600;
+  background: rgba(200, 255, 0, 0.2);
+  color: #c8ff00;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   font-size: 0.75rem;
@@ -381,7 +580,16 @@ input::placeholder, textarea::placeholder {
   font-weight: 600;
 }
 
-/* Table styles */
+.badge-jungle {
+  background: rgba(45, 90, 61, 0.3);
+  color: #7ddf64;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Table styles - Tropical */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -390,17 +598,17 @@ table {
 th, td {
   padding: 0.75rem 1rem;
   text-align: left;
-  border-bottom: 1px solid rgba(184, 230, 0, 0.1);
+  border-bottom: 1px solid rgba(200, 255, 0, 0.1);
 }
 
 th {
-  color: #b8e600;
+  color: #c8ff00;
   font-weight: 600;
 }
 
 /* Selection */
 ::selection {
-  background: rgba(184, 230, 0, 0.3);
+  background: rgba(200, 255, 0, 0.3);
   color: #fff;
 }
 
@@ -412,122 +620,74 @@ th {
   }
 }
 
-
 /* ========================================
-   ENHANCED VISUAL GRAPHICS - Vice City Style
+   SECTION BACKGROUNDS - Tropical Night
    ======================================== */
 
-/* Decorative Palm Trees */
-.palm-tree-left {
-  position: absolute;
-  left: -50px;
-  bottom: 0;
-  width: 200px;
-  height: auto;
-  opacity: 0.3;
-  filter: drop-shadow(0 0 20px rgba(157, 78, 221, 0.3));
-  pointer-events: none;
-  z-index: 1;
+.section-bg-jungle-1 {
+  background: linear-gradient(180deg, 
+    #0a0a0a 0%,
+    #0a1a1a 30%,
+    #0d2818 60%,
+    #0a1a1a 90%,
+    #0a0a0a 100%
+  );
 }
 
-.palm-tree-right {
-  position: absolute;
-  right: -50px;
-  bottom: 0;
-  width: 200px;
-  height: auto;
-  opacity: 0.3;
-  filter: drop-shadow(0 0 20px rgba(255, 0, 128, 0.3));
-  pointer-events: none;
-  z-index: 1;
-  transform: scaleX(-1);
+.section-bg-jungle-2 {
+  background: linear-gradient(180deg, 
+    #0a0a0a 0%,
+    #0d2818 20%,
+    #1a3528 50%,
+    #0d2818 80%,
+    #0a0a0a 100%
+  );
 }
 
-/* Synthwave Grid Floor */
-.synthwave-grid-bg {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 300px;
-  background-image: url('/synthwave-grid.png');
-  background-size: cover;
-  background-position: center top;
-  opacity: 0.15;
-  pointer-events: none;
-  mask-image: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+.section-bg-miami-sunset {
+  background: linear-gradient(180deg, 
+    #0a1a2a 0%,
+    #1a2a3a 30%,
+    #ff6b35 60%,
+    #ff0080 80%,
+    #9d4edd 100%
+  );
 }
 
-/* Neon Cityscape Background */
-.neon-cityscape-bg {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 400px;
-  background-image: url('/neon-cityscape.jpg');
-  background-size: cover;
-  background-position: center bottom;
-  opacity: 0.2;
-  pointer-events: none;
-  mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 80%);
-  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 80%);
+.section-bg-gradient-1 {
+  background: linear-gradient(180deg, 
+    rgba(10, 10, 10, 1) 0%,
+    rgba(10, 26, 26, 0.95) 50%,
+    rgba(10, 10, 10, 1) 100%
+  );
 }
 
-/* Vice City Scene Overlay */
-.vice-city-scene-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
-  background-image: url('/vice-city-scene.jpg');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.1;
-  pointer-events: none;
-  mix-blend-mode: overlay;
+.section-bg-gradient-2 {
+  background: linear-gradient(180deg, 
+    rgba(10, 10, 10, 1) 0%,
+    rgba(13, 40, 24, 0.3) 30%,
+    rgba(255, 0, 128, 0.08) 70%,
+    rgba(10, 10, 10, 1) 100%
+  );
 }
 
-/* Floating Neon Elements */
-.floating-neon-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  pointer-events: none;
-  animation: float-orb 20s ease-in-out infinite;
+.section-bg-gradient-3 {
+  background: linear-gradient(180deg, 
+    rgba(10, 10, 10, 1) 0%,
+    rgba(0, 255, 255, 0.05) 50%,
+    rgba(10, 10, 10, 1) 100%
+  );
 }
 
-.floating-neon-orb.green {
-  background: radial-gradient(circle, rgba(184, 230, 0, 0.4) 0%, transparent 70%);
-}
+/* ========================================
+   NEON LINE DECORATIONS
+   ======================================== */
 
-.floating-neon-orb.pink {
-  background: radial-gradient(circle, rgba(255, 0, 128, 0.3) 0%, transparent 70%);
-}
-
-.floating-neon-orb.cyan {
-  background: radial-gradient(circle, rgba(0, 255, 255, 0.3) 0%, transparent 70%);
-}
-
-.floating-neon-orb.purple {
-  background: radial-gradient(circle, rgba(157, 78, 221, 0.3) 0%, transparent 70%);
-}
-
-@keyframes float-orb {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(30px, -20px) scale(1.1); }
-  50% { transform: translate(-20px, 30px) scale(0.9); }
-  75% { transform: translate(-30px, -10px) scale(1.05); }
-}
-
-/* Neon Line Decorations */
 .neon-line-horizontal {
   position: absolute;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #b8e600, transparent);
-  box-shadow: 0 0 10px rgba(184, 230, 0, 0.5), 0 0 20px rgba(184, 230, 0, 0.3);
+  background: linear-gradient(90deg, transparent, #c8ff00, transparent);
+  box-shadow: 0 0 10px rgba(200, 255, 0, 0.5), 0 0 20px rgba(200, 255, 0, 0.3);
   pointer-events: none;
 }
 
@@ -539,14 +699,16 @@ th {
   pointer-events: none;
 }
 
-/* Corner Accent Graphics */
+/* Corner Accent Graphics - Tropical */
 .corner-accent-tl {
   position: absolute;
   top: 0;
   left: 0;
-  width: 150px;
-  height: 150px;
-  background: linear-gradient(135deg, rgba(184, 230, 0, 0.1) 0%, transparent 50%);
+  width: 200px;
+  height: 200px;
+  background: 
+    radial-gradient(ellipse at top left, rgba(200, 255, 0, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 30% 20%, rgba(45, 90, 61, 0.2) 0%, transparent 40%);
   pointer-events: none;
 }
 
@@ -554,10 +716,45 @@ th {
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 150px;
-  height: 150px;
-  background: linear-gradient(315deg, rgba(255, 0, 128, 0.1) 0%, transparent 50%);
+  width: 200px;
+  height: 200px;
+  background: 
+    radial-gradient(ellipse at bottom right, rgba(255, 0, 128, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 40%);
   pointer-events: none;
+}
+
+/* Retro Sun - Miami Tropical */
+.retro-sun {
+  position: absolute;
+  width: 400px;
+  height: 200px;
+  background: linear-gradient(180deg, 
+    #ff6b35 0%, 
+    #ff0080 40%, 
+    #9d4edd 70%,
+    transparent 100%
+  );
+  border-radius: 400px 400px 0 0;
+  opacity: 0.4;
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+.retro-sun::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 10px,
+    rgba(0, 0, 0, 0.3) 10px,
+    rgba(0, 0, 0, 0.3) 20px
+  );
 }
 
 /* Scan Line Effect */
@@ -584,7 +781,7 @@ th {
   content: '';
   position: absolute;
   inset: -2px;
-  background: linear-gradient(45deg, #b8e600, #00ffff, #ff0080, #9d4edd, #b8e600);
+  background: linear-gradient(45deg, #c8ff00, #00ffff, #ff0080, #9d4edd, #c8ff00);
   background-size: 400% 400%;
   border-radius: inherit;
   z-index: -1;
@@ -598,66 +795,7 @@ th {
   50% { background-position: 100% 50%; }
 }
 
-/* Retro Sun */
-.retro-sun {
-  position: absolute;
-  width: 300px;
-  height: 150px;
-  background: linear-gradient(180deg, 
-    #ff6b35 0%, 
-    #ff0080 40%, 
-    #9d4edd 70%,
-    transparent 100%
-  );
-  border-radius: 300px 300px 0 0;
-  opacity: 0.3;
-  filter: blur(2px);
-  pointer-events: none;
-}
-
-.retro-sun::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent 0px,
-    transparent 8px,
-    rgba(0, 0, 0, 0.3) 8px,
-    rgba(0, 0, 0, 0.3) 16px
-  );
-}
-
-/* Enhanced Section Backgrounds */
-.section-bg-gradient-1 {
-  background: linear-gradient(180deg, 
-    rgba(13, 6, 32, 1) 0%,
-    rgba(26, 10, 46, 0.95) 50%,
-    rgba(13, 6, 32, 1) 100%
-  );
-}
-
-.section-bg-gradient-2 {
-  background: linear-gradient(180deg, 
-    rgba(13, 6, 32, 1) 0%,
-    rgba(157, 78, 221, 0.1) 30%,
-    rgba(255, 0, 128, 0.08) 70%,
-    rgba(13, 6, 32, 1) 100%
-  );
-}
-
-.section-bg-gradient-3 {
-  background: linear-gradient(180deg, 
-    rgba(13, 6, 32, 1) 0%,
-    rgba(0, 255, 255, 0.05) 50%,
-    rgba(13, 6, 32, 1) 100%
-  );
-}
-
-/* Animated Background Particles */
+/* Animated Background Particles - Fireflies */
 .particle-field {
   position: absolute;
   inset: 0;
@@ -669,7 +807,7 @@ th {
   position: absolute;
   width: 4px;
   height: 4px;
-  background: #b8e600;
+  background: #c8ff00;
   border-radius: 50%;
   opacity: 0.4;
   animation: particle-float 15s linear infinite;
@@ -677,7 +815,7 @@ th {
 
 .particle:nth-child(2n) { background: #ff0080; animation-delay: -5s; }
 .particle:nth-child(3n) { background: #00ffff; animation-delay: -10s; }
-.particle:nth-child(4n) { background: #9d4edd; animation-delay: -3s; }
+.particle:nth-child(4n) { background: #2d5a3d; animation-delay: -3s; }
 
 @keyframes particle-float {
   0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
@@ -728,4 +866,55 @@ th {
   40% { transform: translate(2px, 2px); }
   60% { transform: translate(-2px, -2px); }
   80% { transform: translate(-2px, 2px); }
+}
+
+/* City lights - static dots */
+.city-lights {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.city-light {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+.city-light.pink { background: #ff0080; }
+.city-light.cyan { background: #00ffff; }
+.city-light.purple { background: #bf5af2; }
+.city-light.gold { background: #ffd700; }
+.city-light.green { background: #c8ff00; }
+
+.window-light {
+  position: absolute;
+  width: 3px;
+  height: 6px;
+  opacity: 0.4;
+}
+
+.window-light.warm { background: #ffd700; }
+.window-light.cool { background: #87ceeb; }
+
+/* Tropical Vine Decoration */
+.tropical-vine {
+  position: absolute;
+  width: 100px;
+  height: 300px;
+  background: linear-gradient(180deg, #1a3528 0%, transparent 100%);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.tropical-vine::before {
+  content: '';
+  position: absolute;
+  width: 80%;
+  height: 100%;
+  background: radial-gradient(ellipse 50% 20% at 50% 20%, rgba(45, 90, 61, 0.5) 0%, transparent 100%),
+              radial-gradient(ellipse 60% 25% at 30% 40%, rgba(45, 90, 61, 0.4) 0%, transparent 100%),
+              radial-gradient(ellipse 55% 22% at 70% 60%, rgba(45, 90, 61, 0.45) 0%, transparent 100%),
+              radial-gradient(ellipse 50% 20% at 40% 80%, rgba(45, 90, 61, 0.35) 0%, transparent 100%);
 }

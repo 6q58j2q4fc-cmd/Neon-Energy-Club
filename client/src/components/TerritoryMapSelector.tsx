@@ -767,7 +767,7 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
         </CardContent>
       </Card>
 
-      <Card className="bg-gradient-to-br from-[#0a0a0a] to-[#1a0a2e] border-[#c8ff00]/30 overflow-hidden">
+      <Card className="bg-gradient-to-br from-[#0a0a0a] to-[#0d2818] border-[#c8ff00]/30 overflow-hidden">
         <CardHeader className="border-b border-[#c8ff00]/20">
           <CardTitle className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-[#c8ff00]/10">
@@ -1119,7 +1119,7 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
           </div>
 
           {/* Enhanced Pricing Calculator */}
-          <div className="bg-gradient-to-br from-black/50 to-[#1a0a2e]/50 rounded-xl p-5 border border-[#c8ff00]/30">
+          <div className="bg-gradient-to-br from-black/50 to-[#0d2818]/50 rounded-xl p-5 border border-[#c8ff00]/30">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <DollarSign className="w-5 h-5 text-[#c8ff00]" />

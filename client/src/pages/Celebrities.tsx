@@ -100,7 +100,7 @@ export default function Celebrities() {
   ];
 
   return (
-    <div className="min-h-screen vice-bg text-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a] text-white">
       <SEO 
         title="Celebrity Fans - NEON Energy Drink"
         description="See NEON Energy Drink featured in music videos by Snoop Dogg, Chris Brown, Christina Milian, and more. Watch the actual videos featuring NEON."
@@ -112,12 +112,12 @@ export default function Celebrities() {
 
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-6 relative overflow-hidden">
+        {/* Tropical Background */}
+        <div className="jungle-canopy-overlay" />
         <div className="absolute inset-0 animated-grid opacity-20" />
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-[#c8ff00]/10 rounded-full blur-[100px]" />
-        
-        {/* Subtle Background Glow */}
-        <div className="absolute -left-40 top-1/3 w-80 h-80 bg-[#c8ff00]/5 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute -right-20 bottom-0 w-60 h-60 bg-[#9d4edd]/4 rounded-full blur-[80px] pointer-events-none" />
+        <div className="floating-neon-orb green w-96 h-96 top-1/4 right-1/4" style={{ animationDelay: '0s' }} />
+        <div className="floating-neon-orb pink w-80 h-80 -left-40 top-1/3" style={{ animationDelay: '-5s' }} />
+        <div className="floating-neon-orb jungle w-60 h-60 -right-20 bottom-0" style={{ animationDelay: '-3s' }} />
         
         <div className={`container mx-auto max-w-6xl text-center relative z-10 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
           <span className="badge-neon mb-4 inline-block">AS SEEN IN MUSIC VIDEOS</span>

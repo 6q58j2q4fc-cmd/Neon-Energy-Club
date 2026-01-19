@@ -4,7 +4,7 @@
 
 export function HeroSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a0a0a] to-[#1a0a2e] animate-pulse">
+    <div className="min-h-screen bg-gradient-to-b from-[#0a0a0a] to-[#0d2818] animate-pulse">
       <div className="container mx-auto px-4 pt-32">
         <div className="flex flex-col lg:flex-row items-center gap-12">
           {/* Text content skeleton */}
@@ -83,7 +83,7 @@ export function TableSkeleton({ rows = 5 }: { rows?: number }) {
 
 export function MapSkeleton() {
   return (
-    <div className="w-full h-[500px] bg-gradient-to-br from-[#1a0a2e] to-[#0a0a0a] rounded-xl animate-pulse flex items-center justify-center">
+    <div className="w-full h-[500px] bg-gradient-to-br from-[#0d2818] to-[#0a0a0a] rounded-xl animate-pulse flex items-center justify-center">
       <div className="text-center">
         <div className="w-16 h-16 bg-white/10 rounded-full mx-auto mb-4" />
         <div className="h-4 w-32 bg-white/10 rounded mx-auto" />

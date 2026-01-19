@@ -219,7 +219,7 @@ export function NeonBorder({
       <div
         className={`absolute -inset-[2px] rounded-[inherit] bg-gradient-to-r ${borderColors[color]} opacity-60`}
       />
-      <div className="relative bg-[#0a0418] rounded-[inherit]">
+      <div className="relative bg-[#0a1a1a] rounded-[inherit]">
         {children}
       </div>
     </div>

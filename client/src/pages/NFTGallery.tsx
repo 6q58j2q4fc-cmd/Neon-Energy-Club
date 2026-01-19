@@ -25,7 +25,7 @@ export default function NFTGallery() {
   const stats = statsQuery.data || { totalMinted: 0, legendaryCount: 0, epicCount: 0, rareCount: 0, uncommonCount: 0, commonCount: 0 };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0d0620] via-[#1a0a2e] to-[#0d0620] text-white relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a] text-white relative overflow-hidden">
       <SEO 
         title="NEON Genesis NFT Gallery - Limited Edition Relaunch Collection"
         description="Explore the NEON Genesis NFT Collection. Each order receives a unique limited edition NFT with rarity based on order number. Earlier orders = more rare and valuable NFTs."
@@ -77,7 +77,7 @@ export default function NFTGallery() {
           </div>
 
           {/* Rarity System Explanation */}
-          <Card className="bg-gradient-to-br from-[#1a0a2e]/80 to-[#0d0620]/80 border border-[#c8ff00]/20 mb-12">
+          <Card className="bg-gradient-to-br from-[#0d2818]/80 to-[#0a1a1a]/80 border border-[#c8ff00]/20 mb-12">
             <CardContent className="p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Info className="w-5 h-5 text-[#c8ff00]" />

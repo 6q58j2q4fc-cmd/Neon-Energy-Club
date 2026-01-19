@@ -69,7 +69,7 @@ export default function Compensation() {
       </div>
 
       {/* Header */}
-      <header className="fixed top-0 w-full z-50 bg-[#1a0a2e]/90 backdrop-blur-xl border-b border-[#ff0080]/30">
+      <header className="fixed top-0 w-full z-50 bg-[#0d2818]/90 backdrop-blur-xl border-b border-[#ff0080]/30">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div 
             className="cursor-pointer" 

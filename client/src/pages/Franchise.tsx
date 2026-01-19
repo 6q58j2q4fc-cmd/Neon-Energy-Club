@@ -89,7 +89,7 @@ export default function Franchise() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0d0620] via-[#1a0a2e] to-[#0d0620] text-white relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a] text-white relative overflow-hidden">
       {/* Background Graphics */}
       <div className="synthwave-grid-bg" />
       <div className="floating-neon-orb green w-96 h-96 -top-48 -left-48" style={{ animationDelay: '0s' }} />
@@ -112,7 +112,7 @@ export default function Franchise() {
       </section>
 
       {/* Territory Map & Pricing Calculator */}
-      <section className="py-16 px-4 bg-gradient-to-b from-black to-[#0a0a0a] animated-bg">
+      <section className="py-16 px-4 bg-gradient-to-b from-[#0a1a1a] to-[#0d2818] animated-bg">
         <div className="container mx-auto max-w-7xl">
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Territory Map */}
@@ -121,7 +121,7 @@ export default function Franchise() {
               <TerritoryMapSelector onTerritoryChange={setTerritory} />
 
               {/* Term Length Selector */}
-              <Card className="bg-[#0a0a0a] border-[#c8ff00]/30 neon-border">
+              <Card className="bg-[#0a1a1a]/90 backdrop-blur-sm border-[#c8ff00]/30 neon-border">
                 <CardHeader>
                   <CardTitle className="text-xl font-bold text-[#c8ff00] flex items-center gap-3">
                     <Calendar className="w-6 h-6 neon-glow" />
@@ -153,7 +153,7 @@ export default function Franchise() {
 
             {/* Pricing Calculator */}
             <div className={`space-y-6 ${isVisible ? 'animate-slide-in-right' : 'opacity-0'}`}>
-              <Card className="bg-[#0a0a0a] border-[#c8ff00]/30 neon-border sticky top-24">
+              <Card className="bg-[#0a1a1a]/90 backdrop-blur-sm border-[#c8ff00]/30 neon-border sticky top-24">
                 <CardHeader>
                   <CardTitle className="text-3xl font-bold text-[#c8ff00] flex items-center gap-3">
                     <DollarSign className="w-8 h-8 neon-glow" />

@@ -1114,3 +1114,31 @@
 - [x] Add share buttons to NFT detail page (already had Twitter, Facebook, LinkedIn, Copy Link)
 - [x] Add share buttons to Orders page NFT section (Twitter, Facebook, Copy Link)
 - [x] Test share functionality on both platforms (verified UI renders correctly)
+
+## Tropical Rainforest Night / Miami Theme Redesign (Jan 19)
+
+### Global Theme Updates
+- [x] Update CSS color palette with tropical night colors (deep jungle greens, midnight blues, neon accents)
+- [x] Add tropical foliage patterns and textures to backgrounds (jungle-canopy-overlay, firefly effects)
+- [x] Update gradient styles to reflect Miami neon nightlife
+- [x] Ensure neon green (#c8ff00), hot pink (#ff0080), and cyan (#00ffff) remain brand colors
+
+### Page-by-Page Brand Consistency
+- [x] Home page - tropical hero with palm trees and neon city skyline
+- [x] Shop page - consistent dark jungle background
+- [x] Crowdfund page - Miami Vice aesthetic with tropical elements
+- [x] Franchise page - professional but tropical themed
+- [x] NFT Gallery - neon jungle atmosphere
+- [x] Leaderboard - consistent tropical styling
+- [x] Orders page - dark theme with tropical accents
+- [x] Story page - tropical brand narrative
+- [x] Products page - jungle product showcase
+- [x] Celebrities page - Miami nightlife feel
+- [x] Vending page - tropical vending visuals
+
+### Visual Elements
+- [x] Add neon palm tree silhouettes (palm-tree-left, palm-tree-right classes)
+- [x] Add tropical leaf overlays (jungle-canopy-overlay, tropical-leaves-top/bottom)
+- [x] Add Miami skyline elements (synthwave-grid-bg, floating-neon-orb)
+- [x] Add firefly/particle effects for night atmosphere (firefly-field, firefly classes)
+- [x] Ensure all headers/footers match new theme (updated Header.tsx, Footer.tsx)

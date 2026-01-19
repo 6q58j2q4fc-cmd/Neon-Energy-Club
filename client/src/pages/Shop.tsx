@@ -164,7 +164,7 @@ export default function Shop() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0d0620] via-[#1a0a2e] to-[#0d0620] text-white relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a] text-white relative overflow-hidden">
       {/* Background Graphics */}
       <div className="synthwave-grid-bg" />
       <div className="floating-neon-orb green w-96 h-96 -top-48 -left-48" style={{ animationDelay: '0s' }} />
@@ -202,7 +202,7 @@ export default function Shop() {
       </section>
 
       {/* Main Shop Content */}
-      <section className="py-16 px-4 bg-gradient-to-b from-black to-[#0a0a0a]">
+      <section className="py-16 px-4 bg-gradient-to-b from-[#0a1a1a] to-[#0d2818]">
         <div className="container mx-auto max-w-7xl">
           <Tabs defaultValue="distributor" className="w-full">
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-12 bg-black/50 border border-[#c8ff00]/30">
@@ -240,7 +240,7 @@ export default function Shop() {
                     animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                   >
-                    <Card className={`relative bg-[#0a0a0a] border-2 ${pkg.popular ? 'border-[#c8ff00] neon-border' : 'border-gray-800'} overflow-hidden h-full flex flex-col`}>
+                    <Card className={`relative bg-[#0a1a1a]/90 backdrop-blur-sm border-2 ${pkg.popular ? 'border-[#c8ff00] neon-border' : 'border-[#2d5a3d]/50'} overflow-hidden h-full flex flex-col`}>
                       {pkg.popular && (
                         <div className="absolute top-0 right-0 bg-[#c8ff00] text-black px-4 py-1 text-sm font-bold">
                           MOST POPULAR

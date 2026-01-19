@@ -59,9 +59,9 @@ export default function VendingMachines() {
         description="Start your own NEON Energy vending machine business. Earn $600+ monthly profit per machine with our turnkey micro-franchise opportunity."
       />
       
-      <div className="min-h-screen bg-[#0a0a0a] vice-city-bg">
+      <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a]">
         {/* Header */}
-        <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-[#c8ff00]/20">
+        <header className="fixed top-0 left-0 right-0 z-50 bg-[#0a1a1a]/90 backdrop-blur-md border-b border-[#c8ff00]/20">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/">
               <span className="text-2xl font-black neon-text-glow cursor-pointer">NEON</span>

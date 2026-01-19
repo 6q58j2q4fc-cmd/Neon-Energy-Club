@@ -12,7 +12,7 @@ export default function Products() {
   }, []);
 
   return (
-    <div className="min-h-screen vice-bg text-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a] text-white">
       <HamburgerHeader variant="vice" />
 
       {/* Hero Section - Vice City Style */}
@@ -22,15 +22,16 @@ export default function Products() {
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30"
           style={{ backgroundImage: 'url(/vice-city-bg.png)' }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0d0620] via-[#0d0620]/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1a1a] via-[#0a1a1a]/80 to-transparent" />
         
         {/* Synthwave Grid Floor */}
         <div className="synthwave-grid-bg" />
         
-        {/* Vice City Gradient Orbs */}
-        <div className="floating-neon-orb pink w-96 h-96 -left-40 top-1/4" style={{ animationDelay: '0s' }} />
+        {/* Tropical Gradient Orbs */}
+        <div className="jungle-canopy-overlay" />
+        <div className="floating-neon-orb green w-96 h-96 -left-40 top-1/4" style={{ animationDelay: '0s' }} />
         <div className="floating-neon-orb cyan w-80 h-80 -right-20 bottom-0" style={{ animationDelay: '-5s' }} />
-        <div className="floating-neon-orb purple w-[600px] h-[300px] top-0 left-1/2 -translate-x-1/2" style={{ animationDelay: '-10s' }} />
+        <div className="floating-neon-orb jungle w-[600px] h-[300px] top-0 left-1/2 -translate-x-1/2" style={{ animationDelay: '-10s' }} />
         
         {/* Decorative Palm Trees */}
         <img src="/neon-palm-tree.png" alt="" className="palm-tree-left hidden lg:block" />

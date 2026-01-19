@@ -54,7 +54,7 @@ export default function AdminTerritories() {
   // Check if user is admin
   if (!user || user.role !== "admin") {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0a0a0a] via-[#1a0a2e] to-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#0a0a0a] via-[#0d2818] to-[#0a0a0a] flex items-center justify-center">
         <Card className="bg-black/50 border-red-500/30 p-8 text-center">
           <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">Access Denied</h2>
@@ -137,7 +137,7 @@ export default function AdminTerritories() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a0a0a] via-[#1a0a2e] to-[#0a0a0a]">
+    <div className="min-h-screen bg-gradient-to-b from-[#0a0a0a] via-[#0d2818] to-[#0a0a0a]">
       <SEO 
         title="Territory Management | Admin Dashboard"
         description="Review and manage territory applications from distributors"

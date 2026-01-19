@@ -86,22 +86,41 @@ export default function Home() {
 
       <Header />
 
-      {/* Hero Section - GTA Vice City Style */}
+      {/* Hero Section - Tropical Rainforest Night / Miami Style */}
       <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-        {/* Vice City Background Image - Vibrant & Bold */}
+        {/* Tropical Night Background - Deep Jungle with Miami Glow */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-70"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: 'url(/vice-city-bg-vibrant.png)' }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0d0620] via-[#0d0620]/40 to-transparent" />
+        {/* Jungle Canopy Overlay */}
+        <div className="jungle-canopy-overlay" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1a1a] via-[#0a1a1a]/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0d2818]/40 via-transparent to-[#0a1a1a]" />
         
         {/* Synthwave Grid Floor */}
         <div className="synthwave-grid-bg" />
         
-        {/* Floating Neon Orbs */}
+        {/* Floating Neon Orbs - Tropical */}
         <div className="floating-neon-orb green w-96 h-96 top-20 -left-48" style={{ animationDelay: '0s' }} />
         <div className="floating-neon-orb pink w-72 h-72 top-40 -right-36" style={{ animationDelay: '-5s' }} />
         <div className="floating-neon-orb cyan w-64 h-64 bottom-20 left-1/4" style={{ animationDelay: '-10s' }} />
+        <div className="floating-neon-orb jungle w-80 h-80 top-1/3 right-1/4" style={{ animationDelay: '-3s' }} />
+        
+        {/* Firefly Effects */}
+        <div className="firefly-field">
+          {[...Array(12)].map((_, i) => (
+            <div 
+              key={i} 
+              className="firefly" 
+              style={{ 
+                left: `${10 + (i * 7) % 80}%`, 
+                top: `${15 + (i * 11) % 70}%`,
+                animationDelay: `${i * 0.5}s`
+              }} 
+            />
+          ))}
+        </div>
         
         {/* Decorative Palm Trees */}
         <img src="/neon-palm-tree.png" alt="" className="palm-tree-left hidden lg:block" />
