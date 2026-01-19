@@ -1,0 +1,12 @@
+# NEON Energy Drink Website
+# https://neon-energy.com
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://neon-energy.com/sitemap.xml
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /admin/

@@ -44,17 +44,21 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll);
     
     const calculateTimeLeft = () => {
-      const launchDate = new Date();
-      launchDate.setDate(launchDate.getDate() + 90);
+      // Fixed launch date: April 19, 2026
+      const launchDate = new Date('2026-04-19T00:00:00');
+      const now = new Date();
+      const difference = launchDate.getTime() - now.getTime();
       
-      const difference = launchDate.getTime() - new Date().getTime();
-      
-      setTimeLeft({
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
-      });
+      if (difference > 0) {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+          seconds: Math.floor((difference / 1000) % 60),
+        });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      }
     };
     
     calculateTimeLeft();
