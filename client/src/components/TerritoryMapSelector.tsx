@@ -907,17 +907,31 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
             </div>
 
             {/* Legend */}
-            <div className="absolute top-4 right-4 z-10 bg-black/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-[#c8ff00]/30">
-              <div className="text-xs space-y-1">
+            <div className="absolute top-4 right-4 z-10 bg-black/90 backdrop-blur-sm rounded-lg px-4 py-3 border border-[#c8ff00]/30 min-w-[200px]">
+              <div className="text-xs font-semibold text-[#c8ff00] mb-2 border-b border-[#c8ff00]/20 pb-1">Territory Legend</div>
+              <div className="text-xs space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#c8ff00]/50 border border-[#c8ff00]"></div>
-                  <span className="text-gray-300">Your Selection</span>
+                  <div className="w-4 h-4 rounded-full bg-[#c8ff00]/40 border-2 border-[#c8ff00]"></div>
+                  <span className="text-white">Your Selection</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/50 border border-red-500"></div>
-                  <span className="text-gray-300">Claimed Vending Territory</span>
+                  <div className="w-4 h-4 rounded-full bg-red-500/40 border-2 border-red-500"></div>
+                  <span className="text-gray-300">Claimed (Unavailable)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full bg-yellow-500/40 border-2 border-yellow-500"></div>
+                  <span className="text-gray-300">Pending Approval</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full bg-green-500/40 border-2 border-green-500"></div>
+                  <span className="text-gray-300">Available</span>
                 </div>
               </div>
+              {claimedTerritories && claimedTerritories.length > 0 && (
+                <div className="mt-2 pt-2 border-t border-[#c8ff00]/20 text-xs text-gray-400">
+                  <span className="text-red-400 font-semibold">{claimedTerritories.length}</span> territories claimed
+                </div>
+              )}
             </div>
 
             {/* Zoom Controls */}

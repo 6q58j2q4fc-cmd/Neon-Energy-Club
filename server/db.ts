@@ -100,7 +100,9 @@ export async function createPreorder(data: InsertPreorder) {
   }
   
   const result = await db.insert(preorders).values(data);
-  return result;
+  // Get the inserted ID from the result
+  const insertId = (result as any)[0]?.insertId;
+  return { id: insertId || Date.now() };
 }
 
 export async function getAllPreorders() {

@@ -65,6 +65,12 @@ export const preorders = mysqlTable("preorders", {
   country: varchar("country", { length: 100 }).notNull().default("USA"),
   /** Order status */
   status: mysqlEnum("status", ["pending", "confirmed", "shipped", "delivered", "cancelled"]).default("pending").notNull(),
+  /** Shipping tracking number */
+  trackingNumber: varchar("trackingNumber", { length: 100 }),
+  /** Shipping carrier (UPS, FedEx, USPS, DHL) */
+  carrier: varchar("carrier", { length: 50 }),
+  /** Estimated delivery date */
+  estimatedDelivery: timestamp("estimatedDelivery"),
   /** Additional notes from customer */
   notes: text("notes"),
   /** Order creation timestamp */

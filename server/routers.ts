@@ -37,7 +37,23 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         const { createPreorder } = await import("./db");
-        await createPreorder(input);
+        const result = await createPreorder(input);
+        
+        // Send order confirmation email
+        try {
+          const { sendOrderConfirmation } = await import("./emailNotifications");
+          await sendOrderConfirmation({
+            customerName: input.name,
+            customerEmail: input.email,
+            orderId: result?.id || Date.now(),
+            orderType: "preorder",
+            quantity: input.quantity,
+            shippingAddress: `${input.address}, ${input.city}, ${input.state} ${input.postalCode}, ${input.country}`,
+          });
+        } catch (emailError) {
+          console.warn("[Preorder] Failed to send confirmation email:", emailError);
+        }
+        
         return { success: true };
       }),
 
@@ -60,8 +76,38 @@ export const appRouter = router({
         if (ctx.user.role !== "admin") {
           throw new Error("Unauthorized: Admin access required");
         }
-        const { updatePreorderStatus } = await import("./db");
+        const { updatePreorderStatus, getPreorderById } = await import("./db");
         await updatePreorderStatus(input.id, input.status);
+        
+        // Send status update email
+        try {
+          const preorder = await getPreorderById(input.id);
+          if (preorder) {
+            const { sendShippingNotification, sendDeliveryNotification } = await import("./emailNotifications");
+            
+            if (input.status === "shipped") {
+              await sendShippingNotification({
+                customerName: preorder.name,
+                customerEmail: preorder.email,
+                orderId: preorder.id,
+                orderType: "preorder",
+                shippingAddress: `${preorder.address}, ${preorder.city}, ${preorder.state} ${preorder.postalCode}`,
+                trackingNumber: preorder.trackingNumber || undefined,
+                carrier: preorder.carrier || undefined,
+              });
+            } else if (input.status === "delivered") {
+              await sendDeliveryNotification({
+                customerName: preorder.name,
+                customerEmail: preorder.email,
+                orderId: preorder.id,
+                orderType: "preorder",
+              });
+            }
+          }
+        } catch (emailError) {
+          console.warn("[Preorder] Failed to send status update email:", emailError);
+        }
+        
         return { success: true };
       }),
   }),
@@ -763,6 +809,24 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
           title: "New Territory Application Submitted",
           content: `New territory application from ${application?.firstName} ${application?.lastName} (${application?.email}) for ${application?.territoryName}. Radius: ${application?.radiusMiles} miles. Total cost: $${application?.totalCost?.toLocaleString()}. Review in admin dashboard.`,
         });
+        
+        // Send confirmation email to applicant
+        try {
+          if (application?.email && application?.firstName) {
+            const { sendTerritorySubmittedNotification } = await import("./emailNotifications");
+            await sendTerritorySubmittedNotification({
+              applicantName: `${application.firstName} ${application.lastName || ""}`.trim(),
+              applicantEmail: application.email,
+              applicationId: input.applicationId,
+              territoryName: application.territoryName || "Your Territory",
+              squareMiles: Math.PI * Math.pow(application.radiusMiles || 5, 2),
+              status: "submitted",
+              monthlyFee: application.totalCost ? Math.round(application.totalCost / (application.termMonths || 12)) : undefined,
+            });
+          }
+        } catch (emailError) {
+          console.warn("[Territory] Failed to send submission email:", emailError);
+        }
         
         return { success: true };
       }),

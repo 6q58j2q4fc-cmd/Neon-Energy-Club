@@ -978,3 +978,33 @@
 - [x] Added user.updateProfile and user.profile tRPC endpoints
 - [x] Database schema updated with phone and address fields
 - [x] All 86 vitest tests passing
+
+
+## January 19, 2026 - Email Notifications & Territory Availability Map
+
+### Email Notification System
+- [x] Create email notification service using built-in notification API
+- [x] Design email templates for order confirmations
+- [x] Add shipping status update email notifications
+- [x] Add territory application submission confirmation emails
+- [x] Add territory approval/rejection notification emails
+- [x] Implement email triggers on status changes
+- [x] Created emailNotifications.ts with full template system
+- [x] Added sendOrderConfirmationEmail, sendShippingUpdateEmail functions
+- [x] Added sendTerritorySubmittedNotification, sendTerritoryApprovalNotification
+- [x] Added NFT minting notification emails
+- [x] Added crowdfunding contribution notification emails
+- [x] Added generateEmailTemplate for styled HTML emails
+- [x] Integrated email triggers into preorder submit and status update
+- [x] Integrated email triggers into territory application submission
+
+### Territory Availability Map
+- [x] Fetch and display already-claimed territories on map
+- [x] Show claimed territories as red colored overlays
+- [x] Add enhanced legend explaining territory status colors
+- [x] Show Your Selection, Claimed (Unavailable), Pending Approval, Available statuses
+- [x] Display count of claimed territories in legend
+- [x] Prevent drawing over claimed territories with overlap detection
+- [x] Show territory info on click (name, status)
+- [x] Update map in real-time when territories are claimed
+- [x] All 95 vitest tests passing
