@@ -4,7 +4,6 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
 import Home from "./pages/Home";
 import Franchise from "./pages/Franchise";
@@ -36,83 +35,42 @@ function ScrollToTop() {
   return null;
 }
 
-// Page transition wrapper
-const pageVariants = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
-  exit: { opacity: 0 }
-};
-
-const pageTransition = {
-  type: "tween" as const,
-  ease: "easeOut" as const,
-  duration: 0.15
-};
-
-function AnimatedPage({ children }: { children: React.ReactNode }) {
-  return (
-    <motion.div
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      variants={pageVariants}
-      transition={pageTransition}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
 function Router() {
-  const [location] = useLocation();
-  
-  // make sure to consider if you need authentication for certain routes
   return (
     <>
-    <ScrollToTop />
-    <AnimatePresence mode="wait">
-    <Switch key={location}>
-      <Route path={"/"} component={Home} />
-      <Route path={"/about"} component={About} />
-      <Route path={"/story"} component={About} />
-      <Route path={"/products"} component={Products} />
-      <Route path={"/success"} component={Success} />
-      <Route path={"/admin"} component={Admin} />
-      <Route path={"/franchise"} component={Franchise} />
-      <Route path={"/celebrities"} component={Celebrities} />
-      <Route path={"/crowdfund"} component={Crowdfund} />
-      <Route path={"/faq"} component={FAQ} />
-      <Route path={"/join"} component={JoinNow} />
-      <Route path={"/distributor/dashboard"} component={DistributorDashboard} />
-      <Route path={"/d/:code"} component={DistributorSite} />
-      <Route path={"/shop"} component={Shop} />
-      <Route path={"/compensation"} component={Compensation} />
-      <Route path={"/portal"} component={DistributorPortal} />
-      <Route path={"/blog"} component={Blog} />
-      <Route path={"/blog/:slug"} component={Blog} />
-      <Route path={"/vending"} component={VendingMachines} />
-      <Route path={"/admin/territories"} component={AdminTerritories} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
-    </AnimatePresence>
+      <ScrollToTop />
+      <Switch>
+        <Route path={"/"} component={Home} />
+        <Route path={"/about"} component={About} />
+        <Route path={"/story"} component={About} />
+        <Route path={"/products"} component={Products} />
+        <Route path={"/success"} component={Success} />
+        <Route path={"/admin"} component={Admin} />
+        <Route path={"/franchise"} component={Franchise} />
+        <Route path={"/celebrities"} component={Celebrities} />
+        <Route path={"/crowdfund"} component={Crowdfund} />
+        <Route path={"/faq"} component={FAQ} />
+        <Route path={"/join"} component={JoinNow} />
+        <Route path={"/distributor/dashboard"} component={DistributorDashboard} />
+        <Route path={"/d/:code"} component={DistributorSite} />
+        <Route path={"/shop"} component={Shop} />
+        <Route path={"/compensation"} component={Compensation} />
+        <Route path={"/portal"} component={DistributorPortal} />
+        <Route path={"/blog"} component={Blog} />
+        <Route path={"/blog/:slug"} component={Blog} />
+        <Route path={"/vending"} component={VendingMachines} />
+        <Route path={"/admin/territories"} component={AdminTerritories} />
+        <Route path={"/404"} component={NotFound} />
+        <Route component={NotFound} />
+      </Switch>
     </>
   );
 }
 
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
-
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="dark"
-        // switchable
-      >
+      <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
           <Router />

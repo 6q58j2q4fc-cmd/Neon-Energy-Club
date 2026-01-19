@@ -79,1083 +79,335 @@
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.623 0.214 259.815);
   
-  /* ===== GTA VICE CITY COLOR PALETTE ===== */
-  /* NEON Green (from can) */
+  /* Vice City Colors */
   --neon-green: #b8e600;
-  --neon-green-rgb: 184, 230, 0;
-  --neon-green-dark: #8fb800;
-  
-  /* Vice City Hot Pink */
   --vice-pink: #ff0080;
-  --vice-pink-rgb: 255, 0, 128;
-  --vice-pink-light: #ff69b4;
-  --vice-pink-light-rgb: 255, 105, 180;
-  
-  /* Vice City Electric Cyan */
   --vice-cyan: #00ffff;
-  --vice-cyan-rgb: 0, 255, 255;
-  --vice-cyan-dark: #00d4d4;
-  
-  /* Vice City Purple/Magenta */
   --vice-purple: #9d4edd;
-  --vice-purple-rgb: 157, 78, 221;
-  --vice-magenta: #e040fb;
-  --vice-magenta-rgb: 224, 64, 251;
-  
-  /* Vice City Sunset Orange */
-  --vice-orange: #ff6b35;
-  --vice-orange-rgb: 255, 107, 53;
-  --vice-gold: #ffd700;
-  
-  /* Professional Easing Curves */
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
-  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .dark {
-  --primary: oklch(0.75 0.3 330);
-  --primary-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.75 0.3 330);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --background: oklch(0.06 0.02 300);
-  --foreground: oklch(0.95 0 0);
-  --card: oklch(0.08 0.02 300);
-  --card-foreground: oklch(0.95 0 0);
-  --popover: oklch(0.1 0.02 300);
-  --popover-foreground: oklch(0.95 0 0);
-  --secondary: oklch(0.14 0.02 300);
-  --secondary-foreground: oklch(0.95 0 0);
-  --muted: oklch(0.18 0.02 300);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.75 0.3 330);
-  --accent-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.55 0.25 25);
+  --background: oklch(0.08 0.02 280);
+  --foreground: oklch(0.95 0.01 280);
+  --card: oklch(0.12 0.02 280);
+  --card-foreground: oklch(0.95 0.01 280);
+  --popover: oklch(0.12 0.02 280);
+  --popover-foreground: oklch(0.95 0.01 280);
+  --primary: oklch(0.75 0.25 130);
+  --primary-foreground: oklch(0.1 0.02 130);
+  --secondary: oklch(0.2 0.02 280);
+  --secondary-foreground: oklch(0.9 0.01 280);
+  --muted: oklch(0.2 0.02 280);
+  --muted-foreground: oklch(0.65 0.02 280);
+  --accent: oklch(0.25 0.03 280);
+  --accent-foreground: oklch(0.95 0.01 280);
+  --destructive: oklch(0.6 0.25 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.22 0.03 300);
-  --input: oklch(0.18 0.03 300);
-  --ring: oklch(0.75 0.3 330);
-  --chart-1: oklch(0.85 0.2 125);
-  --chart-2: oklch(0.75 0.3 330);
-  --chart-3: oklch(0.8 0.25 190);
-  --chart-4: oklch(0.7 0.25 290);
-  --chart-5: oklch(0.75 0.2 30);
-  --sidebar: oklch(0.07 0.02 300);
-  --sidebar-foreground: oklch(0.95 0 0);
-  --sidebar-accent: oklch(0.75 0.3 330);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.22 0.03 300);
-  --sidebar-ring: oklch(0.75 0.3 330);
+  --border: oklch(0.25 0.02 280);
+  --input: oklch(0.25 0.02 280);
+  --ring: oklch(0.75 0.25 130);
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
-  
-  html {
-    scroll-behavior: smooth;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    overflow-x: hidden;
-    line-height: 1.6;
   }
-  
-  button:not(:disabled),
-  [role="button"]:not([aria-disabled="true"]),
-  [type="button"]:not(:disabled),
-  [type="submit"]:not(:disabled),
-  [type="reset"]:not(:disabled),
-  a[href],
-  select:not(:disabled),
-  input[type="checkbox"]:not(:disabled),
-  input[type="radio"]:not(:disabled) {
-    @apply cursor-pointer;
-  }
-
-  ::selection {
-    background: rgba(255, 0, 128, 0.4);
-    color: white;
-  }
-  
-  :focus-visible {
-    outline: 2px solid rgba(var(--vice-cyan-rgb), 0.6);
-    outline-offset: 2px;
-    transition: outline-offset 0.2s var(--ease-out-expo);
+  html {
+    scroll-behavior: smooth;
   }
 }
 
-@layer components {
+/* Container */
+.container {
+  @apply mx-auto px-4;
+  max-width: 1280px;
+}
+
+/* Flex defaults */
+.flex {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Button styles - simplified, no animations */
+.btn-neon {
+  background: linear-gradient(135deg, #b8e600 0%, #8fb800 100%);
+  color: #000;
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: opacity 0.15s ease;
+}
+
+.btn-neon:hover {
+  opacity: 0.9;
+}
+
+.btn-vice-pink {
+  background: linear-gradient(135deg, #ff0080 0%, #cc0066 100%);
+  color: #fff;
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: opacity 0.15s ease;
+}
+
+.btn-vice-pink:hover {
+  opacity: 0.9;
+}
+
+.btn-vice-cyan {
+  background: linear-gradient(135deg, #00ffff 0%, #00cccc 100%);
+  color: #000;
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: opacity 0.15s ease;
+}
+
+.btn-vice-cyan:hover {
+  opacity: 0.9;
+}
+
+.btn-outline-neon {
+  background: transparent;
+  border: 2px solid #b8e600;
+  color: #b8e600;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-outline-neon:hover {
+  background: #b8e600;
+  color: #000;
+}
+
+/* Text glow - static, no animation */
+.text-neon-glow {
+  color: #b8e600;
+  text-shadow: 0 0 10px rgba(184, 230, 0, 0.5);
+}
+
+.text-vice-pink-glow {
+  color: #ff0080;
+  text-shadow: 0 0 10px rgba(255, 0, 128, 0.5);
+}
+
+.text-vice-cyan-glow {
+  color: #00ffff;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+/* Card styles - simplified */
+.glass-card {
+  background: rgba(10, 4, 24, 0.8);
+  border: 1px solid rgba(184, 230, 0, 0.2);
+  border-radius: 1rem;
+}
+
+.glass-card-pink {
+  background: rgba(10, 4, 24, 0.8);
+  border: 1px solid rgba(255, 0, 128, 0.2);
+  border-radius: 1rem;
+}
+
+/* Vice City background */
+.vice-city-bg {
+  background: linear-gradient(180deg, 
+    #1a0a2e 0%, 
+    #2d1b4e 30%, 
+    #4a2c6a 50%,
+    #ff6b35 70%,
+    #ff0080 85%,
+    #1a0a2e 100%
+  );
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #b8e600, #00ffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-vice {
+  background: linear-gradient(135deg, #ff0080, #00ffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* City lights - static dots, no animation */
+.city-lights {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.city-light {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+.city-light.pink { background: #ff0080; }
+.city-light.cyan { background: #00ffff; }
+.city-light.purple { background: #bf5af2; }
+.city-light.gold { background: #ffd700; }
+.city-light.green { background: #b8e600; }
+
+.window-light {
+  position: absolute;
+  width: 3px;
+  height: 6px;
+  opacity: 0.4;
+}
+
+.window-light.warm { background: #ffd700; }
+.window-light.cool { background: #87ceeb; }
+
+/* Mobile menu */
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 4, 24, 0.95);
+  z-index: 50;
+}
+
+.mobile-menu-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 1.5rem;
+}
+
+.mobile-menu-item {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  padding: 0.75rem 2rem;
+  transition: color 0.15s ease;
+}
+
+.mobile-menu-item:hover {
+  color: #b8e600;
+}
+
+/* Neon logo - static */
+.neon-logo-text {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  color: #b8e600;
+  text-shadow: 0 0 10px rgba(184, 230, 0, 0.5);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0418;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #b8e600;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8fb800;
+}
+
+/* Form inputs */
+input, textarea, select {
+  background: rgba(10, 4, 24, 0.8);
+  border: 1px solid rgba(184, 230, 0, 0.3);
+  color: #fff;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  transition: border-color 0.15s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #b8e600;
+}
+
+input::placeholder, textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Progress bar */
+.progress-bar {
+  background: rgba(184, 230, 0, 0.2);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  background: linear-gradient(90deg, #b8e600, #00ffff);
+  height: 100%;
+  border-radius: 9999px;
+}
+
+/* Badge styles */
+.badge-neon {
+  background: rgba(184, 230, 0, 0.2);
+  color: #b8e600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-pink {
+  background: rgba(255, 0, 128, 0.2);
+  color: #ff0080;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Table styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(184, 230, 0, 0.1);
+}
+
+th {
+  color: #b8e600;
+  font-weight: 600;
+}
+
+/* Selection */
+::selection {
+  background: rgba(184, 230, 0, 0.3);
+  color: #fff;
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
   .container {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
     padding-left: 1rem;
     padding-right: 1rem;
-  }
-
-  .flex {
-    min-height: 0;
-    min-width: 0;
-  }
-
-  @media (min-width: 640px) {
-    .container {
-      padding-left: 1.5rem;
-      padding-right: 1.5rem;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .container {
-      padding-left: 2rem;
-      padding-right: 2rem;
-      max-width: 1280px;
-    }
-  }
-
-  /* ===== TYPOGRAPHY ===== */
-  .font-vice {
-    font-family: 'Orbitron', 'Inter', sans-serif;
-    letter-spacing: 0.05em;
-  }
-
-  .font-bebas {
-    font-family: 'Bebas Neue', 'Inter', sans-serif;
-    letter-spacing: 0.1em;
-  }
-
-  /* ===== NEON LOGO - Enhanced with Color Transitions ===== */
-  .neon-logo-text {
-    font-family: 'Bebas Neue', 'Orbitron', sans-serif;
-    color: #b8e600;
-    text-shadow:
-      0 0 5px #b8e600,
-      0 0 10px #b8e600,
-      0 0 20px #b8e600,
-      0 0 40px #9acd00,
-      0 0 80px #9acd00;
-    animation: neon-flicker-color 8s ease-in-out infinite;
-    letter-spacing: 0.02em;
-  }
-
-  .neon-logo-text:hover {
-    text-shadow:
-      0 0 5px #b8e600,
-      0 0 15px #b8e600,
-      0 0 30px #b8e600,
-      0 0 60px #9acd00,
-      0 0 100px #9acd00,
-      0 0 120px #b8e600;
-    animation: neon-pulse 0.5s ease-in-out infinite;
-  }
-
-  /* Subtle random flicker removed for performance */
-
-  /* Simplified color-transitioning neon flicker for performance */
-  @keyframes neon-flicker-color {
-    0%, 100% {
-      color: #b8e600;
-      text-shadow: 0 0 10px #b8e600, 0 0 30px #9acd00;
-    }
-    50% {
-      color: #c8f000;
-      text-shadow: 0 0 15px #c8f000, 0 0 40px #00ffff;
-    }
-  }
-
-  @keyframes neon-pulse {
-    0%, 100% {
-      text-shadow: 0 0 10px #b8e600, 0 0 30px #9acd00;
-    }
-    50% {
-      text-shadow: 0 0 20px #b8e600, 0 0 50px #9acd00;
-    }
-  }
-
-  /* ===== TWINKLING CITY LIGHTS ===== */
-  .city-lights {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 1;
-  }
-
-  .city-light {
-    position: absolute;
-    width: 3px;
-    height: 3px;
-    border-radius: 50%;
-    animation: twinkle var(--twinkle-duration, 2s) ease-in-out infinite;
-    animation-delay: var(--twinkle-delay, 0s);
-  }
-
-  .city-light.pink {
-    background: #ff0080;
-    box-shadow: 0 0 6px #ff0080;
-  }
-
-  .city-light.cyan {
-    background: #00ffff;
-    box-shadow: 0 0 6px #00ffff;
-  }
-
-  .city-light.purple {
-    background: #bf5af2;
-    box-shadow: 0 0 6px #bf5af2;
-  }
-
-  .city-light.gold {
-    background: #ffd700;
-    box-shadow: 0 0 6px #ffd700;
-  }
-
-  .city-light.green {
-    background: #b8e600;
-    box-shadow: 0 0 6px #b8e600;
-  }
-
-  @keyframes twinkle {
-    0%, 100% {
-      opacity: 0.4;
-    }
-    50% {
-      opacity: 1;
-    }
-  }
-
-  /* Larger building window lights */
-  .window-light {
-    position: absolute;
-    width: 2px;
-    height: 4px;
-    animation: window-flicker var(--flicker-duration, 3s) ease-in-out infinite;
-    animation-delay: var(--flicker-delay, 0s);
-  }
-
-  .window-light.warm {
-    background: #ffcc66;
-    box-shadow: 0 0 4px #ffcc66;
-  }
-
-  .window-light.cool {
-    background: #66ccff;
-    box-shadow: 0 0 4px #66ccff;
-  }
-
-  @keyframes window-flicker {
-    0%, 100% {
-      opacity: 0.8;
-    }
-    50% {
-      opacity: 0.5;
-    }
-  }
-
-  /* ===== GTA VICE CITY BACKGROUNDS ===== */
-  .vice-bg {
-    background: linear-gradient(180deg, 
-      #4a1a6d 0%,
-      #3d1259 15%,
-      #2a0d40 40%,
-      #1a0828 70%,
-      #0d0418 100%);
-    position: relative;
-  }
-
-  .vice-bg::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-      radial-gradient(ellipse 150% 60% at 50% 0%, rgba(var(--vice-pink-rgb), 0.45) 0%, transparent 60%),
-      radial-gradient(ellipse 100% 50% at 0% 30%, rgba(var(--vice-cyan-rgb), 0.35) 0%, transparent 60%),
-      radial-gradient(ellipse 100% 50% at 100% 30%, rgba(var(--vice-purple-rgb), 0.35) 0%, transparent 60%),
-      radial-gradient(ellipse 120% 60% at 50% 100%, rgba(var(--vice-orange-rgb), 0.25) 0%, transparent 50%);
-    pointer-events: none;
-  }
-
-  /* Vice City Sunset Gradient - Ultra Vibrant GTA 6 Style */
-  .vice-sunset {
-    background: linear-gradient(180deg,
-      #ffaa00 0%,
-      #ff6600 15%,
-      #ff0099 35%,
-      #cc00ff 55%,
-      #6600cc 75%,
-      #1a0828 100%);
-  }
-
-  /* Extra bright Vice City overlay for hero sections */
-  .vice-glow-intense {
-    position: relative;
-  }
-
-  .vice-glow-intense::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-      radial-gradient(ellipse 80% 40% at 50% 20%, rgba(255, 0, 153, 0.4) 0%, transparent 70%),
-      radial-gradient(ellipse 60% 30% at 20% 60%, rgba(0, 255, 255, 0.3) 0%, transparent 70%),
-      radial-gradient(ellipse 60% 30% at 80% 60%, rgba(191, 90, 242, 0.3) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  /* Synthwave Grid - Vice City Style - More Visible */
-  .animated-grid {
-    position: relative;
-  }
-
-  .animated-grid::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-      linear-gradient(rgba(var(--vice-pink-rgb), 0.08) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(var(--vice-cyan-rgb), 0.08) 1px, transparent 1px);
-    background-size: 50px 50px;
-    pointer-events: none;
-    opacity: 0.9;
-    mask-image: linear-gradient(180deg, transparent 0%, black 15%, black 85%, transparent 100%);
-    -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 15%, black 85%, transparent 100%);
-  }
-
-  /* ===== GLASS CARDS - Vice City Style ===== */
-  .glass-card {
-    background: rgba(26, 10, 46, 0.85);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(var(--vice-pink-rgb), 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  }
-
-  .glass-card-neon {
-    background: rgba(var(--neon-green-rgb), 0.08);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(var(--neon-green-rgb), 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  }
-
-  .glass-card-vice {
-    background: linear-gradient(135deg, 
-      rgba(var(--vice-pink-rgb), 0.1) 0%,
-      rgba(var(--vice-purple-rgb), 0.08) 50%,
-      rgba(var(--vice-cyan-rgb), 0.1) 100%);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(var(--vice-pink-rgb), 0.25);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  }
-
-  /* ===== BUTTONS - GTA Vice City Style ===== */
-  .btn-primary-shiny {
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(135deg, 
-      var(--neon-green) 0%, 
-      var(--neon-green-dark) 100%);
-    color: #000;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    border: none;
-    box-shadow: 0 0 20px rgba(var(--neon-green-rgb), 0.4), 0 4px 15px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease-out;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
-  }
-
-  .btn-primary-shiny::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.4),
-      transparent
-    );
-    transition: left 0.5s var(--ease-out-expo);
-  }
-
-  .btn-primary-shiny:hover::before {
-    left: 100%;
-  }
-
-  .btn-primary-shiny:hover {
-    box-shadow: 0 0 30px rgba(var(--neon-green-rgb), 0.6), 0 8px 25px rgba(0, 0, 0, 0.4);
-    transform: translateY(-2px);
-  }
-
-  .btn-primary-shiny:active {
-    transform: translateY(-1px) scale(1);
-    transition-duration: 0.1s;
-  }
-
-  /* Vice City Hot Pink Button */
-  .btn-vice-pink {
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(135deg, 
-      var(--vice-pink) 0%, 
-      var(--vice-magenta) 100%);
-    color: #fff;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    border: none;
-    box-shadow: 0 0 20px rgba(var(--vice-pink-rgb), 0.4), 0 4px 15px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease-out;
-  }
-
-  .btn-vice-pink::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.3),
-      transparent
-    );
-    transition: left 0.5s var(--ease-out-expo);
-  }
-
-  .btn-vice-pink:hover::before {
-    left: 100%;
-  }
-
-  .btn-vice-pink:hover {
-    box-shadow: 0 0 30px rgba(var(--vice-pink-rgb), 0.6), 0 8px 25px rgba(0, 0, 0, 0.4);
-    transform: translateY(-2px);
-  }
-
-  /* Vice City Cyan Button */
-  .btn-vice-cyan {
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(135deg, 
-      var(--vice-cyan) 0%, 
-      var(--vice-cyan-dark) 100%);
-    color: #000;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    border: none;
-    box-shadow: 0 0 20px rgba(var(--vice-cyan-rgb), 0.4), 0 4px 15px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease-out;
-  }
-
-  .btn-vice-cyan:hover {
-    box-shadow: 0 0 30px rgba(var(--vice-cyan-rgb), 0.6), 0 8px 25px rgba(0, 0, 0, 0.4);
-    transform: translateY(-2px);
-  }
-
-  /* Outline Button - Vice Style */
-  .btn-shiny {
-    position: relative;
-    overflow: hidden;
-    background: rgba(var(--vice-cyan-rgb), 0.08);
-    border: 2px solid rgba(var(--vice-cyan-rgb), 0.5);
-    box-shadow: 0 0 15px rgba(var(--vice-cyan-rgb), 0.2);
-    transition: all 0.3s ease-out;
-  }
-
-  .btn-shiny:hover {
-    background: rgba(var(--vice-cyan-rgb), 0.15);
-    border-color: rgba(var(--vice-cyan-rgb), 0.8);
-    box-shadow: 0 0 25px rgba(var(--vice-cyan-rgb), 0.4);
-    transform: translateY(-2px);
-  }
-
-  /* ===== NAVIGATION - Vice City Style ===== */
-  .nav-btn {
-    position: relative;
-    padding: 0.625rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    color: rgba(255, 255, 255, 0.75);
-    background: transparent;
-    border: none;
-    border-radius: 0.5rem;
-    transition: all 0.3s var(--ease-out-expo);
-    cursor: pointer;
-    text-transform: uppercase;
-  }
-
-  .nav-btn:hover {
-    color: var(--vice-cyan);
-    background: rgba(var(--vice-cyan-rgb), 0.1);
-    text-shadow: 0 0 10px rgba(var(--vice-cyan-rgb), 0.5);
-  }
-
-  .nav-btn.active {
-    color: var(--vice-pink);
-    background: rgba(var(--vice-pink-rgb), 0.15);
-    text-shadow: 0 0 15px rgba(var(--vice-pink-rgb), 0.6);
-  }
-
-  .nav-btn.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 70%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--vice-pink), var(--vice-cyan), transparent);
-    border-radius: 1px;
-    box-shadow: 0 0 10px rgba(var(--vice-pink-rgb), 0.6);
-  }
-
-  /* ===== ANIMATIONS ===== */
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes slideInLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-40px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  @keyframes slideInRight {
-    from {
-      opacity: 0;
-      transform: translateX(40px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  @keyframes scaleIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
-  }
-
-  @keyframes float-slow {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-  }
-
-  @keyframes glow-pulse {
-    0%, 100% { opacity: 0.5; filter: brightness(1); }
-    50% { opacity: 1; filter: brightness(1.2); }
-  }
-
-  @keyframes neon-flicker {
-    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
-      opacity: 1;
-      text-shadow: 
-        0 0 5px var(--vice-pink),
-        0 0 15px var(--vice-pink),
-        0 0 25px var(--vice-pink);
-    }
-    20%, 24%, 55% {
-      opacity: 0.7;
-      text-shadow: none;
-    }
-  }
-
-  @keyframes grid-scroll {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(50px); }
-  }
-
-  @keyframes scanline {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(100vh); }
-  }
-
-  .animate-fade-in-up {
-    animation: fadeInUp 0.8s var(--ease-out-expo) forwards;
-  }
-
-  .animate-fade-in {
-    animation: fadeIn 0.6s var(--ease-out-quart) forwards;
-  }
-
-  .animate-slide-in-left {
-    animation: slideInLeft 0.7s var(--ease-out-expo) forwards;
-  }
-
-  .animate-slide-in-right {
-    animation: slideInRight 0.7s var(--ease-out-expo) forwards;
-  }
-
-  .animate-scale-in {
-    animation: scaleIn 0.5s var(--ease-out-expo) forwards;
-  }
-
-  .animate-float {
-    animation: float 5s ease-in-out infinite;
-  }
-
-  .animate-float-slow {
-    animation: float-slow 7s ease-in-out infinite;
-  }
-
-  .animate-glow-pulse {
-    animation: glow-pulse 3s ease-in-out infinite;
-  }
-
-  .animate-neon-flicker {
-    animation: neon-flicker 4s infinite;
-  }
-
-  .delay-100 { animation-delay: 0.1s; }
-  .delay-200 { animation-delay: 0.2s; }
-  .delay-300 { animation-delay: 0.3s; }
-  .delay-400 { animation-delay: 0.4s; }
-  .delay-500 { animation-delay: 0.5s; }
-
-  /* ===== GLOW EFFECTS - Vice City Style ===== */
-  .neon-glow {
-    filter: drop-shadow(0 0 5px rgba(var(--neon-green-rgb), 0.5));
-  }
-
-  .neon-glow-strong {
-    filter: drop-shadow(0 0 15px rgba(var(--neon-green-rgb), 0.5));
-  }
-
-  .vice-glow-pink {
-    filter: drop-shadow(0 0 15px rgba(var(--vice-pink-rgb), 0.5));
-  }
-
-  .vice-glow-cyan {
-    filter: drop-shadow(0 0 15px rgba(var(--vice-cyan-rgb), 0.5));
-  }
-
-  .neon-text {
-    text-shadow: 0 0 10px rgba(var(--neon-green-rgb), 0.6);
-  }
-
-  .vice-text-pink {
-    text-shadow: 0 0 10px rgba(var(--vice-pink-rgb), 0.6);
-  }
-
-  .vice-text-cyan {
-    text-shadow: 0 0 10px rgba(var(--vice-cyan-rgb), 0.6);
-  }
-
-  .product-glow {
-    filter: drop-shadow(0 0 30px rgba(var(--neon-green-rgb), 0.4))
-            drop-shadow(0 15px 40px rgba(0, 0, 0, 0.5));
-  }
-
-  /* ===== GRADIENT TEXT ===== */
-  .gradient-text {
-    background: linear-gradient(135deg, var(--neon-green) 0%, #d4ff00 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .gradient-text-vice {
-    background: linear-gradient(135deg, var(--vice-pink) 0%, var(--vice-cyan) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .gradient-text-sunset {
-    background: linear-gradient(135deg, var(--vice-orange) 0%, var(--vice-pink) 50%, var(--vice-purple) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* ===== UI COMPONENTS ===== */
-  .badge-neon {
-    background: rgba(var(--neon-green-rgb), 0.15);
-    border: 1px solid rgba(var(--neon-green-rgb), 0.5);
-    color: var(--neon-green);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    padding: 0.375rem 1rem;
-    border-radius: 9999px;
-    box-shadow: 0 0 15px rgba(var(--neon-green-rgb), 0.2);
-    text-transform: uppercase;
-  }
-
-  .badge-vice {
-    background: linear-gradient(135deg, rgba(var(--vice-pink-rgb), 0.2) 0%, rgba(var(--vice-cyan-rgb), 0.2) 100%);
-    border: 1px solid rgba(var(--vice-pink-rgb), 0.5);
-    color: var(--vice-pink);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    padding: 0.375rem 1rem;
-    border-radius: 9999px;
-    box-shadow: 0 0 15px rgba(var(--vice-pink-rgb), 0.2);
-    text-transform: uppercase;
-  }
-
-  .stat-card {
-    background: linear-gradient(135deg, 
-      rgba(var(--vice-pink-rgb), 0.08) 0%,
-      rgba(var(--vice-purple-rgb), 0.05) 50%,
-      rgba(var(--vice-cyan-rgb), 0.08) 100%);
-    border: 1px solid rgba(var(--vice-pink-rgb), 0.2);
-    border-radius: 16px;
-    padding: 1.5rem;
-    transition: all 0.4s var(--ease-out-expo);
-  }
-
-  .stat-card:hover {
-    border-color: rgba(var(--vice-pink-rgb), 0.4);
-    transform: translateY(-4px);
-    box-shadow: 
-      0 15px 40px rgba(var(--vice-pink-rgb), 0.15),
-      0 0 30px rgba(var(--vice-cyan-rgb), 0.1);
-  }
-
-  .progress-neon {
-    background: rgba(var(--neon-green-rgb), 0.15);
-    border-radius: 9999px;
-    overflow: hidden;
-  }
-
-  .progress-neon-bar {
-    background: linear-gradient(90deg, var(--neon-green) 0%, #d4ff00 100%);
-    box-shadow: 0 0 20px rgba(var(--neon-green-rgb), 0.6);
-    border-radius: 9999px;
-    transition: width 0.8s var(--ease-out-expo);
-  }
-
-  .input-neon {
-    background: rgba(10, 4, 24, 0.8);
-    border: 1px solid rgba(var(--vice-pink-rgb), 0.25);
-    transition: all 0.3s var(--ease-out-expo);
-  }
-
-  .input-neon:focus {
-    border-color: rgba(var(--vice-cyan-rgb), 0.6);
-    box-shadow: 
-      0 0 0 3px rgba(var(--vice-cyan-rgb), 0.15),
-      0 0 20px rgba(var(--vice-cyan-rgb), 0.15);
-    outline: none;
-  }
-
-  .neon-border {
-    box-shadow: 
-      0 0 15px rgba(var(--neon-green-rgb), 0.25),
-      inset 0 0 15px rgba(var(--neon-green-rgb), 0.05);
-  }
-
-  .vice-border {
-    box-shadow: 
-      0 0 15px rgba(var(--vice-pink-rgb), 0.25),
-      0 0 30px rgba(var(--vice-cyan-rgb), 0.1);
-  }
-
-  .neon-divider {
-    height: 1px;
-    background: linear-gradient(90deg, 
-      transparent 0%, 
-      rgba(var(--vice-pink-rgb), 0.5) 20%,
-      rgba(var(--vice-cyan-rgb), 0.5) 80%,
-      transparent 100%);
-  }
-
-  /* ===== SCROLLBAR HIDE UTILITY ===== */
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* ===== SCROLLBAR - Vice City Style ===== */
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: rgba(26, 10, 46, 0.8);
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, var(--vice-pink), var(--vice-purple));
-    border-radius: 5px;
-    border: 2px solid transparent;
-    background-clip: padding-box;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, var(--vice-pink-light), var(--vice-magenta));
-  }
-
-  /* ===== HOVER EFFECTS ===== */
-  .hover-lift {
-    transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s var(--ease-out-expo);
-  }
-
-  .hover-lift:hover {
-    transform: translateY(-8px);
-    box-shadow: 
-      0 20px 50px rgba(0, 0, 0, 0.4),
-      0 0 40px rgba(var(--vice-pink-rgb), 0.15);
-  }
-
-  .transition-smooth {
-    transition: all 0.4s var(--ease-out-expo);
-  }
-
-  /* ===== SCANLINE EFFECT ===== */
-  .scanlines::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      rgba(0, 0, 0, 0.1) 0px,
-      rgba(0, 0, 0, 0.1) 1px,
-      transparent 1px,
-      transparent 2px
-    );
-    pointer-events: none;
-    opacity: 0.3;
-  }
-
-  /* ===== MOBILE MENU ANIMATIONS ===== */
-  @keyframes gridMove {
-    0% {
-      background-position: 0 0;
-    }
-    100% {
-      background-position: 50px 50px;
-    }
-  }
-
-  @keyframes menuSlideIn {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-
-  @keyframes menuSlideOut {
-    from {
-      transform: translateX(0);
-      opacity: 1;
-    }
-    to {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-  }
-
-  @keyframes menuItemSlide {
-    from {
-      transform: translateX(50px);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-
-  .mobile-menu-enter {
-    animation: menuSlideIn 0.4s var(--ease-out-expo) forwards;
-  }
-
-  .mobile-menu-exit {
-    animation: menuSlideOut 0.3s var(--ease-out-expo) forwards;
-  }
-
-  .mobile-menu-item {
-    animation: menuItemSlide 0.4s var(--ease-out-expo) forwards;
-  }
-
-  /* ===== VICE CITY NEON SIGN EFFECTS - Simplified ===== */
-  @keyframes neonSignFlicker {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.95;
-    }
-  }
-
-  .neon-sign-flicker {
-    animation: neonSignFlicker 4s ease-in-out infinite;
-  }
-
-  /* ===== VICE CITY DECORATIVE ELEMENTS ===== */
-  .vice-neon-border {
-    position: relative;
-  }
-
-  .vice-neon-border::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    background: linear-gradient(45deg, 
-      var(--vice-pink) 0%, 
-      var(--vice-cyan) 25%, 
-      var(--vice-purple) 50%, 
-      var(--vice-pink) 75%, 
-      var(--vice-cyan) 100%);
-    border-radius: inherit;
-    z-index: -1;
-    /* animation removed for performance */
-    background-size: 200% 200%;
-  }
-
-  /* borderGlow animation removed for performance */
-
-  /* Vice City Palm Tree Silhouette Glow */
-  .palm-glow {
-    filter: drop-shadow(0 0 15px rgba(var(--vice-pink-rgb), 0.3));
-  }
-
-  /* Vice City Neon Building Outline - Static for performance */
-  .building-neon {
-    stroke: var(--vice-cyan);
-    stroke-width: 2;
-    filter: drop-shadow(0 0 8px var(--vice-cyan));
-  }
-
-  /* Vice City Sunset Reflection */
-  .sunset-reflection {
-    background: linear-gradient(180deg,
-      transparent 0%,
-      rgba(255, 102, 0, 0.1) 30%,
-      rgba(255, 0, 128, 0.15) 60%,
-      rgba(157, 78, 221, 0.1) 100%);
-    pointer-events: none;
-  }
-
-  /* CRT/Retro Monitor Effect */
-  .crt-effect {
-    position: relative;
-  }
-
-  .crt-effect::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      rgba(0, 0, 0, 0.05) 0px,
-      rgba(0, 0, 0, 0.05) 1px,
-      transparent 1px,
-      transparent 3px
-    );
-    pointer-events: none;
-    z-index: 100;
-  }
-
-  .crt-effect::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
-    pointer-events: none;
-    z-index: 99;
-  }
-
-  /* Vice City Neon Text Glow - Static for performance */
-  .text-neon-pulse {
-    text-shadow: 0 0 10px currentColor;
-  }
-
-  /* Vice City Road/Highway Lines - Static for performance */
-  .highway-lines {
-    background: repeating-linear-gradient(
-      90deg,
-      transparent 0px,
-      transparent 40px,
-      rgba(255, 255, 0, 0.8) 40px,
-      rgba(255, 255, 0, 0.8) 60px
-    );
-    height: 4px;
-  }
-
-  /* Vice City Ambient Light Rays - Static for performance */
-  .light-rays {
-    position: absolute;
-    inset: 0;
-    background: conic-gradient(
-      from 180deg at 50% 0%,
-      transparent 0deg,
-      rgba(255, 0, 128, 0.08) 30deg,
-      transparent 60deg,
-      rgba(0, 255, 255, 0.08) 120deg,
-      transparent 150deg,
-      rgba(157, 78, 221, 0.08) 210deg,
-      transparent 240deg,
-      rgba(255, 0, 128, 0.08) 300deg,
-      transparent 330deg
-    );
-    pointer-events: none;
   }
 }

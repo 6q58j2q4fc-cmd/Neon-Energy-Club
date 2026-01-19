@@ -6,14 +6,11 @@ import { useLocation } from "wouter";
 import { Zap, MapPin, DollarSign, Clock, TrendingUp, Users, Star, Sparkles, ArrowRight, Gift, Target, Trophy, Menu, X, ChevronDown, Play, Shield, Leaf, Heart } from "lucide-react";
 import SocialProofNotifications from "@/components/SocialProofNotifications";
 import ViralNewsletterPopup, { shouldShowPopup, markPopupShown } from "@/components/ViralNewsletterPopup";
-import { PalmTreeGroup } from "@/components/PalmTreeSilhouette";
-import { CityLights, WindowLights } from "@/components/CityLights";
 import NeonLogo from "@/components/NeonLogo";
 import MobileMenu from "@/components/MobileMenu";
-import { NeonSkyline, ViceSunset, SynthwaveGrid } from "@/components/ViceCityDecorations";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
-import { motion, AnimatePresence } from "framer-motion";
+
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -138,16 +135,11 @@ export default function Home() {
               aria-label="Toggle menu"
               aria-expanded={mobileMenuOpen}
             >
-              <motion.div
-                animate={{ rotate: mobileMenuOpen ? 90 : 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                {mobileMenuOpen ? (
-                  <X className="w-7 h-7 text-[#b8e600] drop-shadow-[0_0_8px_rgba(184,230,0,0.8)]" />
+              {mobileMenuOpen ? (
+                  <X className="w-7 h-7 text-[#b8e600]" />
                 ) : (
-                  <Menu className="w-7 h-7 text-[#b8e600] drop-shadow-[0_0_8px_rgba(184,230,0,0.8)]" />
+                  <Menu className="w-7 h-7 text-[#b8e600]" />
                 )}
-              </motion.div>
             </button>
 
             {/* CTA Buttons - Vice City Style */}
@@ -186,31 +178,6 @@ export default function Home() {
           style={{ backgroundImage: 'url(/vice-city-bg-vibrant.png)' }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0d0620] via-[#0d0620]/40 to-transparent" />
-        
-        {/* Vice City Animated Grid */}
-        <div className="absolute inset-0 animated-grid opacity-30" />
-        
-        {/* Vice City Gradient Orbs - Hot Pink, Cyan, Purple */}
-        <div className="absolute top-0 left-1/4 w-[700px] h-[700px] bg-gradient-to-br from-[#ff0080]/25 to-transparent rounded-full blur-[150px] animate-glow-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-gradient-to-tl from-[#00ffff]/20 to-transparent rounded-full blur-[150px] animate-glow-pulse" style={{ animationDelay: "1s" }} />
-        <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-gradient-to-r from-[#9d4edd]/20 to-transparent rounded-full blur-[130px] animate-glow-pulse" style={{ animationDelay: "2s" }} />
-        
-        {/* Ambient Glow for Can Blending - Matches NEON green */}
-        <div className="absolute right-0 top-1/4 w-[600px] h-[800px] bg-gradient-to-l from-[#b8e600]/15 via-[#b8e600]/08 to-transparent blur-[120px] pointer-events-none" />
-        <div className="absolute right-1/4 top-1/3 w-[300px] h-[400px] bg-gradient-to-b from-[#b8e600]/10 to-transparent blur-[80px] pointer-events-none" />
-        
-        {/* Palm Tree Silhouettes - Vice City Style */}
-        <PalmTreeGroup className="z-[5]" />
-        
-        {/* Animated Twinkling City Lights */}
-        <CityLights />
-        <WindowLights />
-        
-        {/* Vice City Neon Skyline */}
-        <NeonSkyline className="opacity-40" />
-        
-        {/* Vice City Sunset Effect */}
-        <ViceSunset className="opacity-50" />
         
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
