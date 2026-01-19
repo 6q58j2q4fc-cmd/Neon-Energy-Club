@@ -848,3 +848,25 @@
 - Backdrop overlay when menu is open
 - JOIN NOW and BACK THE RELAUNCH CTA buttons
 - Active page indicator
+
+
+## January 19, 2026 - Header Enhancement Update
+
+### User Account Dropdown
+- [x] Add user authentication state detection to HamburgerHeader
+- [x] Create user icon display when logged in
+- [x] Add dropdown menu with Profile, Orders, My NFTs, and Logout options
+- [x] Implement logout functionality via trpc mutation
+- [x] Show login button when not authenticated
+- [x] Admin Dashboard link for admin users
+- [x] Click outside to close dropdown
+
+### Search Functionality
+- [x] Add search bar to hamburger header
+- [x] Implement search overlay/modal with backdrop
+- [x] Add quick search results for products and pages
+- [x] Add keyboard shortcut support (Cmd/Ctrl + K to open, ESC to close)
+- [x] Style search results with Vice City theme
+- [x] Quick links section when no search query
+- [x] Real-time filtering as user types
+- [x] All 55 vitest tests passing
