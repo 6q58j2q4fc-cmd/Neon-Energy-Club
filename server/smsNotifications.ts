@@ -128,8 +128,13 @@ export function generateReferralMessages(referrerName: string, referralCode: str
   };
 }
 
+// Production mode flag - set to true to enable real SMS notifications
+// When false, SMS notifications are logged but not sent
+const SMS_NOTIFICATIONS_ENABLED = process.env.NODE_ENV === "production";
+
 /**
- * Send SMS notification (simulated - logs to owner notification)
+ * Send SMS notification
+ * Only sends in production mode to avoid simulated/test notifications
  * In production, this would integrate with Twilio or similar
  */
 export async function sendSMS(
@@ -137,6 +142,15 @@ export async function sendSMS(
   message: string,
   type: "transactional" | "promotional" = "transactional"
 ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  // Skip SMS notifications in development/test mode
+  if (!SMS_NOTIFICATIONS_ENABLED) {
+    console.log(`[SMS] Skipping notification (dev mode): ${type} to ${recipient.phone}`);
+    return {
+      success: true,
+      messageId: `sms_dev_${Date.now()}`,
+    };
+  }
+  
   try {
     // Log the SMS attempt for tracking
     console.log(`[SMS] Sending ${type} message to ${recipient.phone}: ${message.substring(0, 50)}...`);

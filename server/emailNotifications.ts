@@ -289,14 +289,25 @@ The NEON Energy Team
   }),
 };
 
+// Production mode flag - set to true to enable real notifications
+// When false, notifications are logged but not sent
+const NOTIFICATIONS_ENABLED = process.env.NODE_ENV === "production";
+
 /**
  * Send an email notification
  * Uses the Manus notification service to deliver emails
+ * Only sends in production mode to avoid simulated/test notifications
  */
 export async function sendEmailNotification(
   type: EmailNotificationType,
   data: OrderEmailData | TerritoryEmailData | NftEmailData
 ): Promise<boolean> {
+  // Skip notifications in development/test mode
+  if (!NOTIFICATIONS_ENABLED) {
+    console.log(`[Email] Skipping notification (dev mode): ${type}`);
+    return true; // Return true to not break the flow
+  }
+  
   try {
     let template: { title: string; content: string };
 

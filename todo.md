@@ -1051,3 +1051,16 @@
 - [x] Add commission tracking for distributor conversions
 - [x] Added SMS router with opt-in, referral, and tracking endpoints
 - [x] All 110 vitest tests passing
+
+
+## January 19, 2026 - Notification System Update
+
+### Disable Simulated Notifications
+- [x] Remove test/simulated notification triggers
+- [x] Only send email notifications for real orders (production mode only)
+- [x] Only send SMS notifications for real subscribers (production mode only)
+- [x] Add production mode check before sending notifications
+- [x] Email notifications now check NODE_ENV === "production"
+- [x] SMS notifications now check NODE_ENV === "production"
+- [x] Dev mode logs "Skipping notification" instead of sending
+- [x] All 110 vitest tests passing
