@@ -13,7 +13,7 @@ interface SEOProps {
 }
 
 const BASE_URL = "https://neonenergy.com";
-const DEFAULT_IMAGE = "/neon-original-can.png";
+const DEFAULT_IMAGE = "/og-image.png";
 const SITE_NAME = "NEON Energy Drink";
 
 export function SEO({

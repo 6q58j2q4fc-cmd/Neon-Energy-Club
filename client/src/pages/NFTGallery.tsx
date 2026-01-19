@@ -31,6 +31,7 @@ export default function NFTGallery() {
         description="Explore the NEON Genesis NFT Collection. Each order receives a unique limited edition NFT with rarity based on order number. Earlier orders = more rare and valuable NFTs."
         keywords="NEON NFT, energy drink NFT, limited edition NFT, genesis collection, rare NFT, crypto collectibles"
         url="/nft-gallery"
+        image="/og-nft.png"
       />
       
       {/* Background Graphics */}

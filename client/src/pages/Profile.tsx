@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SUPPORTED_COUNTRIES, getRegionsForCountry } from "../../../shared/countries";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
 import { User, Mail, Calendar, Shield, Package, Gem, ArrowLeft, Edit2, Save, X, Phone, MapPin, Home, Check } from "lucide-react";
@@ -297,18 +299,36 @@ export default function Profile() {
                         />
                       </div>
                       <div>
-                        <Label className="text-xs text-white/60 uppercase tracking-wide">State</Label>
-                        <Input
-                          value={formData.state}
-                          onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                          className="mt-1 bg-white/5 border-white/20 text-white"
-                          placeholder="State"
-                        />
+                        <Label className="text-xs text-white/60 uppercase tracking-wide">State/Province</Label>
+                        {getRegionsForCountry(formData.country).length > 0 ? (
+                          <Select
+                            value={formData.state}
+                            onValueChange={(value) => setFormData({ ...formData, state: value })}
+                          >
+                            <SelectTrigger className="mt-1 bg-white/5 border-white/20 text-white">
+                              <SelectValue placeholder="Select state/province" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#1a1a2e] border-white/20 max-h-60">
+                              {getRegionsForCountry(formData.country).map((region) => (
+                                <SelectItem key={region.code} value={region.name} className="text-white hover:bg-white/10">
+                                  {region.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Input
+                            value={formData.state}
+                            onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                            className="mt-1 bg-white/5 border-white/20 text-white"
+                            placeholder="State/Province"
+                          />
+                        )}
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label className="text-xs text-white/60 uppercase tracking-wide">ZIP Code</Label>
+                        <Label className="text-xs text-white/60 uppercase tracking-wide">ZIP/Postal Code</Label>
                         <Input
                           value={formData.postalCode}
                           onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
@@ -318,12 +338,21 @@ export default function Profile() {
                       </div>
                       <div>
                         <Label className="text-xs text-white/60 uppercase tracking-wide">Country</Label>
-                        <Input
+                        <Select
                           value={formData.country}
-                          onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                          className="mt-1 bg-white/5 border-white/20 text-white"
-                          placeholder="United States"
-                        />
+                          onValueChange={(value) => setFormData({ ...formData, country: value, state: "" })}
+                        >
+                          <SelectTrigger className="mt-1 bg-white/5 border-white/20 text-white">
+                            <SelectValue placeholder="Select country" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#1a1a2e] border-white/20 max-h-60">
+                            {SUPPORTED_COUNTRIES.map((country) => (
+                              <SelectItem key={country.code} value={country.name} className="text-white hover:bg-white/10">
+                                {country.flag} {country.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
                   </div>

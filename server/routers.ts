@@ -1442,6 +1442,70 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
       }),
   }),
 
+  // AI Chat for sales and support
+  chat: router({
+    send: publicProcedure
+      .input(
+        z.object({
+          message: z.string().min(1),
+          language: z.string().default("en"),
+          context: z.enum(["sales", "support", "general"]).default("sales"),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { invokeLLM } = await import("./_core/llm");
+        
+        // System prompt for sales-focused chatbot
+        const systemPrompts: Record<string, string> = {
+          en: `You are NEON Assistant, a friendly and enthusiastic sales representative for NEON Energy Drink. Your goal is to help visitors:
+1. Pre-order NEON Energy drinks (link: /shop)
+2. Learn about franchise opportunities (link: /franchise, deposit: $2,500)
+3. Explore investment options (link: /investors)
+4. Discover exclusive NFTs (link: /nft-gallery)
+5. Join the crowdfunding campaign (link: /crowdfund)
+
+Key selling points:
+- NEON is a legendary energy drink making a comeback
+- 100% natural ingredients, no artificial additives
+- Exclusive NFTs with every purchase
+- Franchise territories available starting at $2,500 deposit
+- Early backers get exclusive rewards and discounts
+
+Promo codes available:
+- NEON10: 10% off orders over $50
+- FIRSTORDER: 15% off first order
+- FRANCHISE25: $25 off franchise deposit
+
+Always be helpful, enthusiastic, and guide users toward making a purchase or investment. Keep responses concise (under 150 words). Include relevant links when appropriate.`,
+          es: `Eres NEON Assistant, un representante de ventas amigable y entusiasta de NEON Energy Drink. Tu objetivo es ayudar a los visitantes a realizar pedidos anticipados, conocer franquicias, explorar inversiones y descubrir NFTs. Responde en español. Mantén las respuestas concisas (menos de 150 palabras).`,
+          fr: `Vous êtes NEON Assistant, un représentant commercial sympathique et enthousiaste de NEON Energy Drink. Votre objectif est d'aider les visiteurs à passer des précommandes, découvrir les franchises, explorer les investissements et découvrir les NFTs. Répondez en français. Gardez les réponses concises (moins de 150 mots).`,
+          de: `Sie sind NEON Assistant, ein freundlicher und begeisterter Vertriebsmitarbeiter von NEON Energy Drink. Ihr Ziel ist es, Besuchern bei Vorbestellungen, Franchise-Möglichkeiten, Investitionen und NFTs zu helfen. Antworten Sie auf Deutsch. Halten Sie die Antworten kurz (unter 150 Wörter).`,
+          it: `Sei NEON Assistant, un rappresentante di vendita amichevole ed entusiasta di NEON Energy Drink. Il tuo obiettivo è aiutare i visitatori con preordini, franchising, investimenti e NFT. Rispondi in italiano. Mantieni le risposte concise (meno di 150 parole).`,
+          zh: `你是NEON助手，NEON能量饮料的友好热情销售代表。你的目标是帮助访客预订、了解加盟机会、探索投资选项和发现NFT。用中文回复。保持回复简洁（150字以内）。`,
+          ja: `あなたはNEONアシスタント、NEON Energy Drinkのフレンドリーで熱心な営業担当者です。訪問者の予約注文、フランチャイズ、投資、NFTについてサポートします。日本語で回答してください。回答は簡潔に（150語以内）。`,
+        };
+        
+        const systemPrompt = systemPrompts[input.language] || systemPrompts.en;
+        
+        try {
+          const response = await invokeLLM({
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: input.message },
+            ],
+          });
+          
+          const rawContent = response.choices[0]?.message?.content;
+          const aiMessage = typeof rawContent === 'string' ? rawContent : "I'm sorry, I couldn't process that. Please try again.";
+          
+          return { message: aiMessage };
+        } catch (error) {
+          console.error("[Chat] LLM error:", error);
+          return { message: "I'm having trouble connecting right now. Please try again or contact us directly at support@neonenergy.com" };
+        }
+      }),
+  }),
+
 });
 
 // Helper function to anonymize names for privacy on public leaderboard

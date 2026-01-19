@@ -8,6 +8,7 @@ import {
   Zap, Home, BookOpen, Store, Star, MapPin, Building2, Gem, Users, Trophy, 
   Search, X, User, Package, LogOut, ChevronDown, Settings, ShoppingBag, TrendingUp
 } from "lucide-react";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const navItems = [
   { label: "HOME", path: "/", icon: Home },
@@ -241,6 +242,9 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
 
             {/* Right side controls */}
             <div className="flex items-center gap-2">
+              {/* Language Switcher */}
+              <LanguageSwitcher />
+
               {/* Search Button */}
               <button
                 onClick={() => setSearchOpen(true)}

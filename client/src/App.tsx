@@ -32,6 +32,9 @@ import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
 import Leaderboard from "./pages/Leaderboard";
 import Investors from "./pages/Investors";
+import AmbientSoundToggle from "./components/AmbientSoundToggle";
+import FloatingChatBot from "./components/FloatingChatBot";
+import { LanguageProvider } from "./contexts/LanguageContext";
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -90,12 +93,16 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="dark">
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
+      <LanguageProvider>
+        <ThemeProvider defaultTheme="dark">
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+            <AmbientSoundToggle />
+            <FloatingChatBot />
+          </TooltipProvider>
+        </ThemeProvider>
+      </LanguageProvider>
     </ErrorBoundary>
   );
 }

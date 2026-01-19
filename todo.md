@@ -1173,3 +1173,48 @@
 ### Testing
 - [x] 17 new vitest tests for investor and blog features
 - [x] Total 151 vitest tests passing
+
+## Major Enhancement Update (Jan 19)
+
+### Bug Fixes
+- [x] Fix "View Comp Plan" link on main page - verified working, links to /compensation
+- [x] Debug territory selector - verified map loads and search works correctly
+- [x] Ensure all buttons and features on territory page work correctly
+
+### Open Graph Social Sharing Images
+- [x] Create tropical-themed OG image for homepage (/og-image.png)
+- [x] Create OG images for key pages (Shop, Crowdfund, Franchise, NFT Gallery)
+- [x] Add OG meta tags to all pages via SEO component
+
+### Ambient Jungle Sounds
+- [x] Add ambient jungle/tropical night sounds audio file (jungle-night-pad.mp3)
+- [x] Create AmbientSoundToggle component with volume slider
+- [x] Position toggle in bottom-left corner of screen
+- [x] Save user preference in localStorage
+
+### International Expansion
+- [x] Add Canada to checkout country options (13 provinces/territories)
+- [x] Add all EU countries to checkout (27 countries + UK, Switzerland, Norway)
+- [x] Add Australia, Japan, Korea, Singapore to country list
+- [x] Create shared/countries.ts with 40 countries and state/province data
+- [x] Update Profile page with country/state dropdowns with flags
+
+### Multi-Language Support
+- [x] Create LanguageContext with translations for 7 languages
+- [x] Add LanguageSwitcher dropdown to header with flag icons
+- [x] Support English, Spanish, French, German, Italian, Chinese, Japanese
+- [x] Create translations for nav, footer, chat, and common UI elements
+- [x] Implement language switching with localStorage persistence
+- [x] Auto-detect browser language on first visit
+
+### Enhanced Chatbot
+- [x] Create FloatingChatBot component with sales focus
+- [x] Support multi-language conversations (7 languages via LLM)
+- [x] Provide real order links (/shop, /franchise, /investors, /nft-gallery)
+- [x] Display promo codes with copy functionality (NEON10, FIRSTORDER, FRANCHISE25)
+- [x] Quick action buttons for Pre-Order, Franchise, Invest, NFT
+- [x] Add chat.send tRPC procedure with LLM integration
+- [x] Add FloatingChatBot to all pages via App.tsx
+- [x] 10 new vitest tests for chat feature
+- [x] Total 161 vitest tests passing
+
