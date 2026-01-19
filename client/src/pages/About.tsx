@@ -10,7 +10,16 @@ export default function About() {
   }, []);
 
   return (
-    <div className="min-h-screen vice-bg text-white">
+    <div className="min-h-screen vice-bg text-white relative overflow-hidden">
+      {/* Background Graphics */}
+      <div className="synthwave-grid-bg" />
+      <div className="floating-neon-orb pink w-96 h-96 -top-48 -left-48" style={{ animationDelay: '0s' }} />
+      <div className="floating-neon-orb cyan w-80 h-80 top-1/4 -right-40" style={{ animationDelay: '-5s' }} />
+      <div className="floating-neon-orb purple w-72 h-72 bottom-1/3 -left-36" style={{ animationDelay: '-10s' }} />
+      
+      {/* Decorative Palm Trees */}
+      <img src="/neon-palm-tree.png" alt="" className="palm-tree-left hidden lg:block" />
+      <img src="/neon-palm-tree.png" alt="" className="palm-tree-right hidden lg:block" />
       {/* Header - Vice City Style */}
       <header className="border-b border-[#ff0080]/20 bg-[#1a0a2e]/90 backdrop-blur-xl fixed top-0 w-full z-50 transition-smooth">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -44,11 +53,10 @@ export default function About() {
       </header>
 
       {/* Hero Section - Vice City Style */}
-      <section className="pt-32 pb-16 px-4 relative overflow-hidden">
-        {/* Vice City Gradient Orbs */}
-        <div className="absolute -left-40 top-1/4 w-96 h-96 bg-gradient-to-br from-[#ff0080]/15 to-transparent rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute -right-20 bottom-0 w-80 h-80 bg-gradient-to-tl from-[#00ffff]/12 to-transparent rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute inset-0 animated-grid opacity-40" />
+      <section className="pt-32 pb-16 px-4 relative z-10">
+        {/* Neon Lines */}
+        <div className="neon-line-horizontal w-1/3 left-0 top-1/4" />
+        <div className="neon-line-horizontal w-1/4 right-0 bottom-1/3" />
         
         <div className={`container mx-auto max-w-4xl text-center relative z-10 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
           <h2 className="text-5xl md:text-7xl font-black mb-6 font-vice">

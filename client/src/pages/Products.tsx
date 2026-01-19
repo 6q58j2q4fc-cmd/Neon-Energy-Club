@@ -53,10 +53,21 @@ export default function Products() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0d0620] via-[#0d0620]/80 to-transparent" />
         
+        {/* Synthwave Grid Floor */}
+        <div className="synthwave-grid-bg" />
+        
         {/* Vice City Gradient Orbs */}
-        <div className="absolute -left-40 top-1/4 w-96 h-96 bg-gradient-to-br from-[#ff0080]/15 to-transparent rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute -right-20 bottom-0 w-80 h-80 bg-gradient-to-tl from-[#00ffff]/12 to-transparent rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-b from-[#9d4edd]/10 to-transparent blur-[80px] pointer-events-none" />
+        <div className="floating-neon-orb pink w-96 h-96 -left-40 top-1/4" style={{ animationDelay: '0s' }} />
+        <div className="floating-neon-orb cyan w-80 h-80 -right-20 bottom-0" style={{ animationDelay: '-5s' }} />
+        <div className="floating-neon-orb purple w-[600px] h-[300px] top-0 left-1/2 -translate-x-1/2" style={{ animationDelay: '-10s' }} />
+        
+        {/* Decorative Palm Trees */}
+        <img src="/neon-palm-tree.png" alt="" className="palm-tree-left hidden lg:block" />
+        <img src="/neon-palm-tree.png" alt="" className="palm-tree-right hidden lg:block" />
+        
+        {/* Neon Lines */}
+        <div className="neon-line-horizontal w-1/4 left-0 top-1/3" />
+        <div className="neon-line-horizontal w-1/5 right-0 bottom-1/4" />
         
         {/* Animated Grid */}
         <div className="absolute inset-0 animated-grid opacity-30" />
@@ -85,8 +96,8 @@ export default function Products() {
                 <div className="relative inline-block">
                   <div className="absolute inset-0 bg-[#b8e600] blur-[80px] opacity-60 rounded-full"></div>
                   <img
-                    src="/neon-can-transparent-final.png"
-                    alt="NEON Original"
+                    src="/neon-original-can.png"
+                    alt="NEON Original - Green"
                     className="w-48 h-auto mx-auto mb-6 animate-float relative z-10"
                     style={{ filter: 'drop-shadow(0 0 50px rgba(184, 230, 0, 0.7)) drop-shadow(0 25px 50px rgba(0, 0, 0, 0.5))' }}
                   />
@@ -194,8 +205,8 @@ export default function Products() {
                 <div className="relative inline-block">
                   <div className="absolute inset-0 bg-orange-500 blur-[80px] opacity-50 rounded-full"></div>
                   <img
-                    src="/neon-organic-can.webp"
-                    alt="NEON Organic"
+                    src="/neon-organic-can.png"
+                    alt="NEON Organic - Orange"
                     className="w-48 h-auto mx-auto mb-6 animate-float relative z-10"
                     style={{ filter: 'drop-shadow(0 0 30px rgba(255, 140, 0, 0.5)) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3))', animationDelay: '0.5s' }}
                   />

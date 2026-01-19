@@ -25,7 +25,7 @@ export default function NFTGallery() {
   const stats = statsQuery.data || { totalMinted: 0, legendaryCount: 0, epicCount: 0, rareCount: 0, uncommonCount: 0, commonCount: 0 };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0d0620] via-[#1a0a2e] to-[#0d0620] text-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#0d0620] via-[#1a0a2e] to-[#0d0620] text-white relative overflow-hidden">
       <SEO 
         title="NEON Genesis NFT Gallery - Limited Edition Relaunch Collection"
         description="Explore the NEON Genesis NFT Collection. Each order receives a unique limited edition NFT with rarity based on order number. Earlier orders = more rare and valuable NFTs."
@@ -33,10 +33,21 @@ export default function NFTGallery() {
         url="/nft-gallery"
       />
       
+      {/* Background Graphics */}
+      <div className="synthwave-grid-bg" />
+      <div className="floating-neon-orb green w-96 h-96 -top-48 -left-48" style={{ animationDelay: '0s' }} />
+      <div className="floating-neon-orb pink w-80 h-80 top-1/4 -right-40" style={{ animationDelay: '-5s' }} />
+      <div className="floating-neon-orb cyan w-72 h-72 bottom-1/4 -left-36" style={{ animationDelay: '-10s' }} />
+      <div className="floating-neon-orb purple w-64 h-64 -bottom-32 right-1/4" style={{ animationDelay: '-7s' }} />
+      
+      {/* Decorative Palm Trees */}
+      <img src="/neon-palm-tree.png" alt="" className="palm-tree-left hidden lg:block" style={{ bottom: '20%' }} />
+      <img src="/neon-palm-tree.png" alt="" className="palm-tree-right hidden lg:block" style={{ bottom: '30%' }} />
+      
       <Header />
 
       {/* Hero Section */}
-      <section className="pt-24 pb-12 px-4">
+      <section className="pt-24 pb-12 px-4 relative z-10">
         <div className="container mx-auto max-w-6xl">
           <button 
             onClick={() => setLocation("/")}

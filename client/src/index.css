@@ -411,3 +411,321 @@ th {
     padding-right: 1rem;
   }
 }
+
+
+/* ========================================
+   ENHANCED VISUAL GRAPHICS - Vice City Style
+   ======================================== */
+
+/* Decorative Palm Trees */
+.palm-tree-left {
+  position: absolute;
+  left: -50px;
+  bottom: 0;
+  width: 200px;
+  height: auto;
+  opacity: 0.3;
+  filter: drop-shadow(0 0 20px rgba(157, 78, 221, 0.3));
+  pointer-events: none;
+  z-index: 1;
+}
+
+.palm-tree-right {
+  position: absolute;
+  right: -50px;
+  bottom: 0;
+  width: 200px;
+  height: auto;
+  opacity: 0.3;
+  filter: drop-shadow(0 0 20px rgba(255, 0, 128, 0.3));
+  pointer-events: none;
+  z-index: 1;
+  transform: scaleX(-1);
+}
+
+/* Synthwave Grid Floor */
+.synthwave-grid-bg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 300px;
+  background-image: url('/synthwave-grid.png');
+  background-size: cover;
+  background-position: center top;
+  opacity: 0.15;
+  pointer-events: none;
+  mask-image: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+}
+
+/* Neon Cityscape Background */
+.neon-cityscape-bg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 400px;
+  background-image: url('/neon-cityscape.jpg');
+  background-size: cover;
+  background-position: center bottom;
+  opacity: 0.2;
+  pointer-events: none;
+  mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 80%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 80%);
+}
+
+/* Vice City Scene Overlay */
+.vice-city-scene-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background-image: url('/vice-city-scene.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.1;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+/* Floating Neon Elements */
+.floating-neon-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  animation: float-orb 20s ease-in-out infinite;
+}
+
+.floating-neon-orb.green {
+  background: radial-gradient(circle, rgba(184, 230, 0, 0.4) 0%, transparent 70%);
+}
+
+.floating-neon-orb.pink {
+  background: radial-gradient(circle, rgba(255, 0, 128, 0.3) 0%, transparent 70%);
+}
+
+.floating-neon-orb.cyan {
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.3) 0%, transparent 70%);
+}
+
+.floating-neon-orb.purple {
+  background: radial-gradient(circle, rgba(157, 78, 221, 0.3) 0%, transparent 70%);
+}
+
+@keyframes float-orb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -20px) scale(1.1); }
+  50% { transform: translate(-20px, 30px) scale(0.9); }
+  75% { transform: translate(-30px, -10px) scale(1.05); }
+}
+
+/* Neon Line Decorations */
+.neon-line-horizontal {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #b8e600, transparent);
+  box-shadow: 0 0 10px rgba(184, 230, 0, 0.5), 0 0 20px rgba(184, 230, 0, 0.3);
+  pointer-events: none;
+}
+
+.neon-line-vertical {
+  position: absolute;
+  width: 2px;
+  background: linear-gradient(180deg, transparent, #ff0080, transparent);
+  box-shadow: 0 0 10px rgba(255, 0, 128, 0.5), 0 0 20px rgba(255, 0, 128, 0.3);
+  pointer-events: none;
+}
+
+/* Corner Accent Graphics */
+.corner-accent-tl {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 150px;
+  height: 150px;
+  background: linear-gradient(135deg, rgba(184, 230, 0, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.corner-accent-br {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 150px;
+  height: 150px;
+  background: linear-gradient(315deg, rgba(255, 0, 128, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Scan Line Effect */
+.scan-lines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* Neon Border Glow */
+.neon-border-glow {
+  position: relative;
+}
+
+.neon-border-glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, #b8e600, #00ffff, #ff0080, #9d4edd, #b8e600);
+  background-size: 400% 400%;
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0.5;
+  filter: blur(10px);
+  animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Retro Sun */
+.retro-sun {
+  position: absolute;
+  width: 300px;
+  height: 150px;
+  background: linear-gradient(180deg, 
+    #ff6b35 0%, 
+    #ff0080 40%, 
+    #9d4edd 70%,
+    transparent 100%
+  );
+  border-radius: 300px 300px 0 0;
+  opacity: 0.3;
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+.retro-sun::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 8px,
+    rgba(0, 0, 0, 0.3) 8px,
+    rgba(0, 0, 0, 0.3) 16px
+  );
+}
+
+/* Enhanced Section Backgrounds */
+.section-bg-gradient-1 {
+  background: linear-gradient(180deg, 
+    rgba(13, 6, 32, 1) 0%,
+    rgba(26, 10, 46, 0.95) 50%,
+    rgba(13, 6, 32, 1) 100%
+  );
+}
+
+.section-bg-gradient-2 {
+  background: linear-gradient(180deg, 
+    rgba(13, 6, 32, 1) 0%,
+    rgba(157, 78, 221, 0.1) 30%,
+    rgba(255, 0, 128, 0.08) 70%,
+    rgba(13, 6, 32, 1) 100%
+  );
+}
+
+.section-bg-gradient-3 {
+  background: linear-gradient(180deg, 
+    rgba(13, 6, 32, 1) 0%,
+    rgba(0, 255, 255, 0.05) 50%,
+    rgba(13, 6, 32, 1) 100%
+  );
+}
+
+/* Animated Background Particles */
+.particle-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #b8e600;
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: particle-float 15s linear infinite;
+}
+
+.particle:nth-child(2n) { background: #ff0080; animation-delay: -5s; }
+.particle:nth-child(3n) { background: #00ffff; animation-delay: -10s; }
+.particle:nth-child(4n) { background: #9d4edd; animation-delay: -3s; }
+
+@keyframes particle-float {
+  0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.4; }
+  90% { opacity: 0.4; }
+  100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+}
+
+/* Glitch Effect for Headers */
+.glitch-text {
+  position: relative;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+}
+
+.glitch-text::before {
+  color: #ff0080;
+  animation: glitch-1 2s infinite linear alternate-reverse;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+}
+
+.glitch-text::after {
+  color: #00ffff;
+  animation: glitch-2 3s infinite linear alternate-reverse;
+  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+}
+
+@keyframes glitch-1 {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+}
+
+@keyframes glitch-2 {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(2px, -2px); }
+  40% { transform: translate(2px, 2px); }
+  60% { transform: translate(-2px, -2px); }
+  80% { transform: translate(-2px, 2px); }
+}

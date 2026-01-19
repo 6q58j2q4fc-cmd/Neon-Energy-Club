@@ -163,7 +163,16 @@ export default function Shop() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#0d0620] via-[#1a0a2e] to-[#0d0620] text-white relative overflow-hidden">
+      {/* Background Graphics */}
+      <div className="synthwave-grid-bg" />
+      <div className="floating-neon-orb green w-96 h-96 -top-48 -left-48" style={{ animationDelay: '0s' }} />
+      <div className="floating-neon-orb pink w-80 h-80 top-1/4 -right-40" style={{ animationDelay: '-5s' }} />
+      <div className="floating-neon-orb cyan w-72 h-72 bottom-1/3 -left-36" style={{ animationDelay: '-10s' }} />
+      
+      {/* Decorative Palm Trees */}
+      <img src="/neon-palm-tree.png" alt="" className="palm-tree-left hidden lg:block" />
+      <img src="/neon-palm-tree.png" alt="" className="palm-tree-right hidden lg:block" />
       {/* Header */}
       <header className="border-b border-[#c8ff00]/20 bg-black/80 backdrop-blur-md fixed top-0 w-full z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -189,7 +198,7 @@ export default function Shop() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4 bg-gradient-to-b from-black via-[#050505] to-black relative overflow-hidden">
+      <section className="pt-32 pb-16 px-4 relative z-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(200,255,0,0.15),transparent_50%)]"></div>
         <div className="container mx-auto max-w-6xl text-center relative z-10">
           <motion.div

@@ -95,6 +95,22 @@ export default function Home() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0d0620] via-[#0d0620]/40 to-transparent" />
         
+        {/* Synthwave Grid Floor */}
+        <div className="synthwave-grid-bg" />
+        
+        {/* Floating Neon Orbs */}
+        <div className="floating-neon-orb green w-96 h-96 top-20 -left-48" style={{ animationDelay: '0s' }} />
+        <div className="floating-neon-orb pink w-72 h-72 top-40 -right-36" style={{ animationDelay: '-5s' }} />
+        <div className="floating-neon-orb cyan w-64 h-64 bottom-20 left-1/4" style={{ animationDelay: '-10s' }} />
+        
+        {/* Decorative Palm Trees */}
+        <img src="/neon-palm-tree.png" alt="" className="palm-tree-left hidden lg:block" />
+        <img src="/neon-palm-tree.png" alt="" className="palm-tree-right hidden lg:block" />
+        
+        {/* Corner Accents */}
+        <div className="corner-accent-tl" />
+        <div className="corner-accent-br" />
+        
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
@@ -192,8 +208,8 @@ export default function Home() {
                 
                 {/* Main Can - Transparent Background */}
                 <img
-                  src="/neon-can-transparent-final.png"
-                  alt="NEON Energy Drink Can"
+                  src="/neon-original-can.png"
+                  alt="NEON Energy Drink Original - Green"
                   className="h-[450px] md:h-[550px] object-contain product-glow animate-float relative z-10"
                   style={{ filter: 'drop-shadow(0 0 80px rgba(184, 230, 0, 0.7)) drop-shadow(0 0 150px rgba(184, 230, 0, 0.4)) drop-shadow(0 40px 80px rgba(0, 0, 0, 0.6))' }}
                 />
@@ -334,8 +350,17 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-6">
+      <section className="py-20 relative overflow-hidden">
+        {/* Background Graphics */}
+        <div className="absolute inset-0 section-bg-gradient-2" />
+        <div className="floating-neon-orb purple w-80 h-80 -top-40 -right-40" style={{ animationDelay: '-7s' }} />
+        <div className="floating-neon-orb green w-60 h-60 bottom-0 -left-30" style={{ animationDelay: '-12s' }} />
+        
+        {/* Neon Lines */}
+        <div className="neon-line-horizontal w-1/3 left-0 top-1/4" />
+        <div className="neon-line-horizontal w-1/4 right-0 bottom-1/3" />
+        
+        <div className="container mx-auto px-6 relative z-10">
           <div className="text-center mb-16">
             <span className="badge-neon mb-4 inline-block">WHY NEON</span>
             <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
@@ -385,11 +410,18 @@ export default function Home() {
 
       {/* Natural Ingredients Section */}
       <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#b8e600]/5 to-transparent" />
+        <div className="absolute inset-0 section-bg-gradient-3" />
+        
+        {/* Neon Cityscape Background */}
+        <div className="neon-cityscape-bg" />
         
         {/* Subtle Background Accents */}
-        <div className="absolute -right-40 top-1/4 w-80 h-80 bg-[#b8e600]/5 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute -left-40 bottom-1/4 w-60 h-60 bg-[#9d4edd]/4 rounded-full blur-[80px] pointer-events-none" />
+        <div className="floating-neon-orb cyan w-80 h-80 -right-40 top-1/4" style={{ animationDelay: '-3s' }} />
+        <div className="floating-neon-orb purple w-60 h-60 -left-40 bottom-1/4" style={{ animationDelay: '-8s' }} />
+        
+        {/* Decorative Lines */}
+        <div className="neon-line-vertical h-1/2 left-10 top-1/4 hidden lg:block" />
+        <div className="neon-line-vertical h-1/3 right-10 bottom-1/4 hidden lg:block" />
         
         <div className="container mx-auto px-6 relative z-10">
           <div className="text-center mb-16">
