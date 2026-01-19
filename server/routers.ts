@@ -66,6 +66,26 @@ export const appRouter = router({
       }),
   }),
 
+  user: router({
+    // Get current user's orders (preorders and crowdfunding)
+    orders: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.email) {
+        return { preorders: [], crowdfunding: [] };
+      }
+      const { getOrdersByUserEmail } = await import("./db");
+      return await getOrdersByUserEmail(ctx.user.email);
+    }),
+
+    // Get current user's NFTs
+    nfts: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.email) {
+        return [];
+      }
+      const { getNftsByEmail } = await import("./db");
+      return await getNftsByEmail(ctx.user.email);
+    }),
+  }),
+
   franchise: router({
     // Submit a territory license application
     submit: publicProcedure

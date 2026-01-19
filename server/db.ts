@@ -1024,3 +1024,41 @@ export async function regenerateNftArtwork(tokenId: number): Promise<{ success: 
     throw error;
   }
 }
+
+
+/**
+ * Get orders by user email
+ */
+export async function getOrdersByUserEmail(email: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // Get preorders by email
+  const userPreorders = await db.select().from(preorders)
+    .where(eq(preorders.email, email))
+    .orderBy(desc(preorders.createdAt));
+  
+  // Get crowdfunding contributions by email
+  const userCrowdfunding = await db.select().from(crowdfunding)
+    .where(eq(crowdfunding.email, email))
+    .orderBy(desc(crowdfunding.createdAt));
+  
+  return {
+    preorders: userPreorders,
+    crowdfunding: userCrowdfunding,
+  };
+}
+
+/**
+ * Get user's NFTs by email
+ */
+export async function getNftsByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const nfts = await db.select().from(neonNfts)
+    .where(eq(neonNfts.ownerEmail, email))
+    .orderBy(neonNfts.tokenId);
+  
+  return nfts;
+}

@@ -28,6 +28,8 @@ import NFTDetail from "./pages/NFTDetail";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Policies from "./pages/Policies";
+import Profile from "./pages/Profile";
+import Orders from "./pages/Orders";
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -71,6 +73,8 @@ function Router() {
         <Route path="/privacy" component={Privacy} />
         <Route path="/terms" component={Terms} />
         <Route path="/policies" component={Policies} />
+        <Route path="/profile" component={Profile} />
+        <Route path="/orders" component={Orders} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

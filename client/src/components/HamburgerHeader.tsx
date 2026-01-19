@@ -19,20 +19,65 @@ const navItems = [
   { label: "NFT GALLERY", path: "/nft-gallery", icon: Gem },
 ];
 
+// Product data with variants, pricing, and availability
+const products = [
+  { 
+    title: "NEON Original", 
+    path: "/products", 
+    keywords: ["original", "green", "classic", "100 calories", "energy", "drink"],
+    category: "product",
+    price: "$2.99",
+    description: "100 calories, classic energy formula",
+    availability: "Pre-Order",
+    variants: ["8.4 fl oz", "12-pack", "24-pack"]
+  },
+  { 
+    title: "NEON Organic", 
+    path: "/products", 
+    keywords: ["organic", "usda", "40 calories", "orange", "natural", "healthy"],
+    category: "product",
+    price: "$3.49",
+    description: "40 calories, USDA certified organic",
+    availability: "Pre-Order",
+    variants: ["8.4 fl oz", "12-pack", "24-pack"]
+  },
+  {
+    title: "Starter Pack (12 cans)",
+    path: "/shop",
+    keywords: ["starter", "pack", "12", "case", "buy", "purchase"],
+    category: "product",
+    price: "$29.99",
+    description: "12 cans of NEON energy drink",
+    availability: "Pre-Order"
+  },
+  {
+    title: "Full Case (24 cans)",
+    path: "/shop",
+    keywords: ["case", "24", "bulk", "wholesale", "buy", "purchase"],
+    category: "product",
+    price: "$49.99",
+    description: "24 cans of NEON energy drink",
+    availability: "Pre-Order"
+  },
+];
+
 const searchablePages = [
-  { title: "Home", path: "/", keywords: ["home", "main", "start"] },
-  { title: "Our Story", path: "/about", keywords: ["about", "story", "history", "founder"] },
-  { title: "Products", path: "/products", keywords: ["products", "drinks", "energy", "original", "organic"] },
-  { title: "Celebrity Fans", path: "/celebrities", keywords: ["celebrities", "famous", "stars", "snoop", "chris brown"] },
-  { title: "Franchise", path: "/franchise", keywords: ["franchise", "territory", "business", "license"] },
-  { title: "Vending", path: "/vending", keywords: ["vending", "machines", "ai", "locations"] },
-  { title: "NFT Gallery", path: "/nft-gallery", keywords: ["nft", "crypto", "blockchain", "collectibles"] },
-  { title: "Shop", path: "/shop", keywords: ["shop", "buy", "purchase", "order", "distributor"] },
-  { title: "Crowdfund", path: "/crowdfund", keywords: ["crowdfund", "invest", "back", "support", "relaunch"] },
-  { title: "FAQ", path: "/faq", keywords: ["faq", "questions", "help", "support", "contact"] },
-  { title: "Join Now", path: "/join", keywords: ["join", "signup", "register", "account"] },
-  { title: "NEON Original", path: "/products", keywords: ["original", "green", "classic", "100 calories"] },
-  { title: "NEON Organic", path: "/products", keywords: ["organic", "usda", "40 calories", "orange"] },
+  { title: "Home", path: "/", keywords: ["home", "main", "start"], category: "page" },
+  { title: "Our Story", path: "/about", keywords: ["about", "story", "history", "founder", "brand"], category: "page" },
+  { title: "Products", path: "/products", keywords: ["products", "drinks", "energy", "original", "organic", "flavors"], category: "page" },
+  { title: "Celebrity Fans", path: "/celebrities", keywords: ["celebrities", "famous", "stars", "snoop", "chris brown", "ambassadors"], category: "page" },
+  { title: "Franchise", path: "/franchise", keywords: ["franchise", "territory", "business", "license", "opportunity"], category: "page" },
+  { title: "Vending", path: "/vending", keywords: ["vending", "machines", "ai", "locations", "smart"], category: "page" },
+  { title: "NFT Gallery", path: "/nft-gallery", keywords: ["nft", "crypto", "blockchain", "collectibles", "digital"], category: "page" },
+  { title: "Shop", path: "/shop", keywords: ["shop", "buy", "purchase", "order", "distributor", "store"], category: "page" },
+  { title: "Crowdfund", path: "/crowdfund", keywords: ["crowdfund", "invest", "back", "support", "relaunch", "campaign"], category: "page" },
+  { title: "FAQ", path: "/faq", keywords: ["faq", "questions", "help", "support", "contact", "answers"], category: "page" },
+  { title: "Join Now", path: "/join", keywords: ["join", "signup", "register", "account", "become"], category: "page" },
+  { title: "Profile", path: "/profile", keywords: ["profile", "account", "settings", "user", "my"], category: "page" },
+  { title: "My Orders", path: "/orders", keywords: ["orders", "purchases", "history", "tracking", "my"], category: "page" },
+  { title: "Privacy Policy", path: "/privacy", keywords: ["privacy", "policy", "data", "legal"], category: "page" },
+  { title: "Terms & Conditions", path: "/terms", keywords: ["terms", "conditions", "legal", "agreement"], category: "page" },
+  { title: "Policies & Procedures", path: "/policies", keywords: ["policies", "procedures", "rules", "guidelines"], category: "page" },
 ];
 
 interface HamburgerHeaderProps {
@@ -132,12 +177,20 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
     window.location.href = getLoginUrl();
   };
 
-  // Filter search results
+  // Filter search results - combine products and pages
   const searchResults = searchQuery.trim() 
-    ? searchablePages.filter(page => 
-        page.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        page.keywords.some(kw => kw.toLowerCase().includes(searchQuery.toLowerCase()))
-      ).slice(0, 6)
+    ? [
+        // Search products first
+        ...products.filter(product => 
+          product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.keywords.some(kw => kw.toLowerCase().includes(searchQuery.toLowerCase()))
+        ),
+        // Then search pages
+        ...searchablePages.filter(page => 
+          page.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          page.keywords.some(kw => kw.toLowerCase().includes(searchQuery.toLowerCase()))
+        )
+      ].slice(0, 8)
     : [];
 
   // Style variants
@@ -148,9 +201,9 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
   };
 
   const logoStyles = {
-    default: "text-[#c8ff00]",
-    vice: "gradient-text-vice font-vice drop-shadow-[0_0_10px_rgba(255,0,128,0.5)]",
-    dark: "text-[#c8ff00]",
+    default: "text-white",
+    vice: "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]",
+    dark: "text-white",
   };
 
   const accentColor = {
@@ -169,12 +222,11 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
             {/* Logo */}
             <button 
               onClick={() => setLocation("/")} 
-              className="flex items-center gap-2 flex-shrink-0"
+              className="flex items-center gap-3 flex-shrink-0 group"
             >
-              <div className="w-8 h-8 rounded-lg bg-[#c8ff00]/20 flex items-center justify-center">
-                <Zap className="w-5 h-5 text-[#c8ff00]" />
-              </div>
-              <span className={`text-2xl font-bold tracking-wider ${logoStyles[variant]}`}>
+              <Zap className="w-6 h-6 text-[#c8ff00] group-hover:text-[#d4ff33] transition-colors" />
+              <div className="w-8 h-[2px] bg-white/60 group-hover:bg-white transition-colors" />
+              <span className={`text-2xl font-bold tracking-[0.2em] ${logoStyles[variant]}`}>
                 NEON
               </span>
             </button>
@@ -361,23 +413,56 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
             <div className="border-t border-white/10">
               {searchResults.length > 0 ? (
                 <div className="p-2 max-h-80 overflow-y-auto">
-                  {searchResults.map((result, index) => (
-                    <button
-                      key={`${result.path}-${index}`}
-                      onClick={() => handleNavClick(result.path)}
-                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-[#c8ff00]/10 transition-all group"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center group-hover:bg-[#c8ff00]/20 transition-all">
-                        <Search className="w-4 h-4 text-white/60 group-hover:text-[#c8ff00]" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-white group-hover:text-[#c8ff00] transition-colors">
-                          {result.title}
-                        </p>
-                        <p className="text-xs text-white/40">{result.path}</p>
-                      </div>
-                    </button>
-                  ))}
+                  {searchResults.map((result, index) => {
+                    const isProduct = result.category === "product";
+                    const productResult = result as typeof products[0];
+                    return (
+                      <button
+                        key={`${result.path}-${index}`}
+                        onClick={() => handleNavClick(result.path)}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-[#c8ff00]/10 transition-all group"
+                      >
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
+                          isProduct 
+                            ? "bg-[#c8ff00]/20 group-hover:bg-[#c8ff00]/30" 
+                            : "bg-white/10 group-hover:bg-[#c8ff00]/20"
+                        }`}>
+                          {isProduct ? (
+                            <Store className="w-4 h-4 text-[#c8ff00]" />
+                          ) : (
+                            <Search className="w-4 h-4 text-white/60 group-hover:text-[#c8ff00]" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-bold text-white group-hover:text-[#c8ff00] transition-colors">
+                              {result.title}
+                            </p>
+                            {isProduct && (
+                              <span className="text-xs px-1.5 py-0.5 rounded bg-[#c8ff00]/20 text-[#c8ff00]">
+                                Product
+                              </span>
+                            )}
+                          </div>
+                          {isProduct ? (
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-xs text-[#c8ff00] font-bold">{productResult.price}</span>
+                              <span className="text-xs text-white/40">•</span>
+                              <span className="text-xs text-white/40">{productResult.description}</span>
+                              {productResult.availability && (
+                                <>
+                                  <span className="text-xs text-white/40">•</span>
+                                  <span className="text-xs text-[#ff0080]">{productResult.availability}</span>
+                                </>
+                              )}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-white/40">{result.path}</p>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="p-8 text-center">
@@ -493,14 +578,14 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
               <div className="flex flex-col sm:flex-row gap-2">
                 <Button
                   onClick={() => handleNavClick("/join")}
-                  className="flex-1 h-12 text-sm font-bold bg-[#00ffff] hover:bg-[#00ffff]/90 text-black rounded-xl"
+                  className="flex-1 h-12 text-sm font-bold bg-[#c8ff00] hover:bg-[#d4ff33] text-black rounded-xl shadow-lg shadow-[#c8ff00]/30"
                 >
                   <Users className="w-4 h-4 mr-2" />
                   JOIN NOW
                 </Button>
                 <Button
                   onClick={() => handleNavClick("/crowdfund")}
-                  className="flex-1 h-12 text-sm font-bold bg-[#ff0080] hover:bg-[#ff0080]/90 text-white rounded-xl"
+                  className="flex-1 h-12 text-sm font-bold bg-[#c8ff00] hover:bg-[#d4ff33] text-black rounded-xl shadow-lg shadow-[#c8ff00]/30"
                 >
                   <Trophy className="w-4 h-4 mr-2" />
                   BACK THE RELAUNCH

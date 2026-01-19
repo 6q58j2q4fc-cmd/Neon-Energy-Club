@@ -870,3 +870,44 @@
 - [x] Quick links section when no search query
 - [x] Real-time filtering as user types
 - [x] All 55 vitest tests passing
+
+
+## January 19, 2026 - Profile, Orders & Header Styling Update
+
+### Header Styling Updates
+- [x] Change NEON logo text to white
+- [x] Center the line with the text (added horizontal line between icon and text)
+- [x] Update buttons to brighter neon green (#c8ff00) with shadow effects
+
+### Profile Page
+- [x] Create /profile route
+- [x] Display user name and email
+- [x] Show account creation date and last sign in
+- [x] Add edit profile functionality placeholder (disabled button)
+- [x] Show account stats (orders, NFTs, days as member)
+- [x] Quick action buttons to Orders, NFT Gallery, Shop
+
+### Orders Page
+- [x] Create /orders route
+- [x] Display pre-orders from database
+- [x] Display crowdfunding contributions
+- [x] Show order status with color-coded badges
+- [x] Show order date, quantity, and location
+- [x] Display NFT collection with rarity and value
+- [x] Link to NFT detail pages
+
+### Enhanced Search
+- [x] Add product data with variants, pricing, and availability
+- [x] Include pricing information in search results
+- [x] Show availability status (Pre-Order badge)
+- [x] Product results show price, description, and availability
+- [x] Products appear before pages in search results
+- [x] Added Profile and Orders pages to searchable items
+- [x] Added legal pages (Privacy, Terms, Policies) to search
+
+### Backend Updates
+- [x] Added user.orders tRPC endpoint
+- [x] Added user.nfts tRPC endpoint
+- [x] Created getOrdersByUserEmail database function
+- [x] Created getNftsByEmail database function
+- [x] All 67 vitest tests passing
