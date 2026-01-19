@@ -1218,3 +1218,12 @@
 - [x] 10 new vitest tests for chat feature
 - [x] Total 161 vitest tests passing
 
+
+## Daily Blog Auto-Posting Cron Job (Jan 19)
+
+- [x] Create cron endpoint for automated blog post generation (blogGenerator.ts with runDailyBlogGeneration)
+- [x] Configure daily schedule at 9 AM UTC via Manus scheduler
+- [x] Rotate through 35+ topics across 7 categories (product, health, business, franchise, distributor, news, lifestyle)
+- [x] LLM generates SEO-optimized content with meta tags and keywords
+- [x] Generates 1-2 posts per day with 5s delay between posts
+- [x] Posts automatically published to /blog page
