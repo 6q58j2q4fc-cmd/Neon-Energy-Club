@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
-import { Gem, Crown, Star, Sparkles, Trophy, ArrowLeft, ExternalLink, Info, Share2, Twitter } from "lucide-react";
+import { Gem, Crown, Star, Sparkles, Trophy, ArrowLeft, ExternalLink, Info, Share2, Twitter, Facebook } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { trpc } from "@/lib/trpc";
@@ -293,8 +293,20 @@ export default function NFTGallery() {
                               window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank', 'width=600,height=400');
                             }}
                             className="bg-[#1DA1F2] hover:bg-[#1a8cd8] text-white text-xs"
+                            title="Share on Twitter"
                           >
                             <Twitter className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              const shareUrl = `${window.location.origin}/nft/${nft.tokenId}`;
+                              window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank', 'width=600,height=400');
+                            }}
+                            className="bg-[#4267B2] hover:bg-[#365899] text-white text-xs"
+                            title="Share on Facebook"
+                          >
+                            <Facebook className="w-3 h-3" />
                           </Button>
                           <Button
                             size="sm"
@@ -304,6 +316,7 @@ export default function NFTGallery() {
                               alert('Link copied!');
                             }}
                             className="bg-white/10 hover:bg-white/20 text-white text-xs"
+                            title="Copy link"
                           >
                             <Share2 className="w-3 h-3" />
                           </Button>

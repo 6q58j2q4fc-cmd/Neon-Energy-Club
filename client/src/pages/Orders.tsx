@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
-import { Package, Gem, ArrowLeft, Calendar, DollarSign, MapPin, Clock, CheckCircle, Truck, XCircle, AlertCircle, ExternalLink, Navigation } from "lucide-react";
+import { Package, Gem, ArrowLeft, Calendar, DollarSign, MapPin, Clock, CheckCircle, Truck, XCircle, AlertCircle, ExternalLink, Navigation, Twitter, Facebook, Share2 } from "lucide-react";
 import { useEffect } from "react";
 import { getLoginUrl } from "@/const";
 
@@ -462,6 +462,46 @@ export default function Orders() {
                                 ~{formatCurrency(Number(nft.estimatedValue))}
                               </span>
                             )}
+                          </div>
+                          {/* Share Buttons */}
+                          <div className="flex gap-2 mt-3 pt-3 border-t border-white/10">
+                            <Button
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const shareUrl = `${window.location.origin}/nft/${nft.tokenId}`;
+                                const shareText = `Check out my ${nft.rarity.toUpperCase()} NEON Genesis NFT #${nft.tokenId}! Est. value: ${formatCurrency(Number(nft.estimatedValue || 0))}`;
+                                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank', 'width=600,height=400');
+                              }}
+                              className="flex-1 bg-[#1DA1F2] hover:bg-[#1a8cd8] text-white text-xs"
+                            >
+                              <Twitter className="w-3 h-3 mr-1" />
+                              Tweet
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const shareUrl = `${window.location.origin}/nft/${nft.tokenId}`;
+                                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank', 'width=600,height=400');
+                              }}
+                              className="flex-1 bg-[#4267B2] hover:bg-[#365899] text-white text-xs"
+                            >
+                              <Facebook className="w-3 h-3 mr-1" />
+                              Share
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const shareUrl = `${window.location.origin}/nft/${nft.tokenId}`;
+                                navigator.clipboard.writeText(shareUrl);
+                                alert('NFT link copied to clipboard!');
+                              }}
+                              className="bg-white/10 hover:bg-white/20 text-white text-xs"
+                            >
+                              <Share2 className="w-3 h-3" />
+                            </Button>
                           </div>
                         </CardContent>
                       </Card>
