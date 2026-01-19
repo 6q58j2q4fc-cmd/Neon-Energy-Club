@@ -1,6 +1,6 @@
 import { desc, eq, sql, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication } from "../drizzle/schema";
+import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -804,4 +804,163 @@ export async function getAllTerritoryApplications() {
     .orderBy(desc(territoryApplications.createdAt));
   
   return applications;
+}
+
+
+// ============ NFT Functions ============
+
+/**
+ * Get the next available NFT token ID
+ */
+export async function getNextNftTokenId(): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select({ maxId: sql<number>`COALESCE(MAX(tokenId), 0)` })
+    .from(neonNfts);
+  
+  return (result[0]?.maxId || 0) + 1;
+}
+
+/**
+ * Determine NFT rarity based on token ID
+ * Lower token IDs = more rare
+ */
+export function calculateNftRarity(tokenId: number): {
+  rarity: "legendary" | "epic" | "rare" | "uncommon" | "common";
+  rarityRank: number;
+  estimatedValue: number;
+} {
+  if (tokenId <= 10) {
+    return { rarity: "legendary", rarityRank: tokenId, estimatedValue: 10000 - (tokenId - 1) * 500 };
+  } else if (tokenId <= 50) {
+    return { rarity: "epic", rarityRank: tokenId, estimatedValue: 5000 - (tokenId - 10) * 100 };
+  } else if (tokenId <= 200) {
+    return { rarity: "rare", rarityRank: tokenId, estimatedValue: 1000 - (tokenId - 50) * 5 };
+  } else if (tokenId <= 500) {
+    return { rarity: "uncommon", rarityRank: tokenId, estimatedValue: 250 - (tokenId - 200) * 0.5 };
+  } else {
+    return { rarity: "common", rarityRank: tokenId, estimatedValue: Math.max(50, 100 - (tokenId - 500) * 0.1) };
+  }
+}
+
+/**
+ * Generate NFT name based on token ID and rarity
+ */
+export function generateNftName(tokenId: number, rarity: string): string {
+  const rarityNames: Record<string, string> = {
+    legendary: "Genesis",
+    epic: "Pioneer",
+    rare: "Founder",
+    uncommon: "Early Adopter",
+    common: "Supporter"
+  };
+  return `NEON ${rarityNames[rarity] || "Supporter"} #${tokenId}`;
+}
+
+/**
+ * Create a new NFT for an order/contribution
+ */
+export async function createNeonNft(data: {
+  orderId?: number;
+  preorderId?: number;
+  crowdfundingId?: number;
+  userId?: number;
+  ownerEmail: string;
+  ownerName: string;
+  packageType?: string;
+}): Promise<{ tokenId: number; name: string; rarity: string; estimatedValue: number }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const tokenId = await getNextNftTokenId();
+  const { rarity, rarityRank, estimatedValue } = calculateNftRarity(tokenId);
+  const name = generateNftName(tokenId, rarity);
+  
+  const description = `Limited Edition NEON Energy Drink Relaunch NFT. Token #${tokenId} of the Genesis Collection. ${
+    rarity === "legendary" ? "One of the first 10 ever minted - extremely rare!" :
+    rarity === "epic" ? "Pioneer edition - among the first 50 supporters." :
+    rarity === "rare" ? "Founder edition - early believer in the NEON revolution." :
+    rarity === "uncommon" ? "Early Adopter edition - joined before the masses." :
+    "Supporter edition - part of the NEON community."
+  }`;
+  
+  await db.insert(neonNfts).values({
+    ...data,
+    tokenId,
+    name,
+    description,
+    rarity,
+    rarityRank,
+    estimatedValue: estimatedValue.toString(),
+    blockchainStatus: "pending",
+  });
+  
+  return { tokenId, name, rarity, estimatedValue };
+}
+
+/**
+ * Get all NFTs (for gallery)
+ */
+export async function getAllNfts(limit: number = 100) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const nfts = await db.select().from(neonNfts)
+    .orderBy(neonNfts.tokenId)
+    .limit(limit);
+  
+  return nfts;
+}
+
+/**
+ * Get NFTs by user
+ */
+export async function getNftsByUser(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const nfts = await db.select().from(neonNfts)
+    .where(eq(neonNfts.userId, userId))
+    .orderBy(neonNfts.tokenId);
+  
+  return nfts;
+}
+
+/**
+ * Get NFT by token ID
+ */
+export async function getNftByTokenId(tokenId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(neonNfts)
+    .where(eq(neonNfts.tokenId, tokenId))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Get NFT statistics
+ */
+export async function getNftStats() {
+  const db = await getDb();
+  if (!db) return { totalMinted: 0, legendaryCount: 0, epicCount: 0, rareCount: 0, uncommonCount: 0, commonCount: 0 };
+  
+  const total = await db.select({ count: sql<number>`COUNT(*)` }).from(neonNfts);
+  const legendary = await db.select({ count: sql<number>`COUNT(*)` }).from(neonNfts).where(eq(neonNfts.rarity, "legendary"));
+  const epic = await db.select({ count: sql<number>`COUNT(*)` }).from(neonNfts).where(eq(neonNfts.rarity, "epic"));
+  const rare = await db.select({ count: sql<number>`COUNT(*)` }).from(neonNfts).where(eq(neonNfts.rarity, "rare"));
+  const uncommon = await db.select({ count: sql<number>`COUNT(*)` }).from(neonNfts).where(eq(neonNfts.rarity, "uncommon"));
+  const common = await db.select({ count: sql<number>`COUNT(*)` }).from(neonNfts).where(eq(neonNfts.rarity, "common"));
+  
+  return {
+    totalMinted: total[0]?.count || 0,
+    legendaryCount: legendary[0]?.count || 0,
+    epicCount: epic[0]?.count || 0,
+    rareCount: rare[0]?.count || 0,
+    uncommonCount: uncommon[0]?.count || 0,
+    commonCount: common[0]?.count || 0,
+  };
 }

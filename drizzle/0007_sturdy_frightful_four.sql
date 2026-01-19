@@ -1,0 +1,23 @@
+CREATE TABLE `neon_nfts` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`orderId` int,
+	`preorderId` int,
+	`crowdfundingId` int,
+	`userId` int,
+	`tokenId` int NOT NULL,
+	`name` varchar(255) NOT NULL,
+	`description` text,
+	`imageUrl` varchar(500),
+	`rarity` enum('legendary','epic','rare','uncommon','common') NOT NULL,
+	`rarityRank` int NOT NULL,
+	`estimatedValue` decimal(10,2),
+	`ownerEmail` varchar(320),
+	`ownerName` varchar(255),
+	`packageType` varchar(100),
+	`txHash` varchar(100),
+	`blockchainStatus` enum('pending','minted','transferred') NOT NULL DEFAULT 'pending',
+	`mintedAt` timestamp,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `neon_nfts_id` PRIMARY KEY(`id`),
+	CONSTRAINT `neon_nfts_tokenId_unique` UNIQUE(`tokenId`)
+);

@@ -654,3 +654,33 @@
 - Box Shadow Elements: 10 (was 57)
 - Filter Elements: 12 (was 20)
 - All 40 tests passing
+
+## Mobile Menu & NFT System (Jan 19)
+
+### Fix Mobile Menu
+- [x] Fix menu slider getting stuck between pages
+- [x] Create consistent Header component across all pages
+- [x] Ensure smooth menu transitions on mobile (no framer-motion)
+- [x] Test menu on all pages
+
+### Further Performance Optimization
+- [x] Reduce remaining page lag
+- [x] Optimize component loading (simplified MobileMenu)
+- [x] Removed framer-motion from navigation
+
+### NFT Issuance System
+- [x] Create NFT database schema (neonNfts table with 19 columns)
+- [x] Link NFTs to orders with rarity based on order number
+- [x] Generate unique NFT metadata for each order
+- [x] Calculate estimated future value based on rarity (5 tiers)
+- [x] Auto-issue NFT when order is placed
+- [x] Add NFT router with gallery, stats, mint endpoints
+
+### NFT Gallery Page
+- [x] Create /nft-gallery route
+- [x] Display all issued NFTs with owner info
+- [x] Show rarity tier and estimated value
+- [x] Explain the rarity system with 5 tiers
+- [x] Show NFT artwork/preview (SVG-based)
+- [x] Add NFT Gallery link to navigation (desktop + mobile)
+- [x] All 40 tests passing

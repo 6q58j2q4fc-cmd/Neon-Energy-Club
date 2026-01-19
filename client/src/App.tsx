@@ -23,6 +23,7 @@ import DistributorPortal from "./pages/DistributorPortal";
 import Blog from "./pages/Blog";
 import VendingMachines from "./pages/VendingMachines";
 import AdminTerritories from "./pages/AdminTerritories";
+import NFTGallery from "./pages/NFTGallery";
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -60,6 +61,8 @@ function Router() {
         <Route path={"/blog/:slug"} component={Blog} />
         <Route path={"/vending"} component={VendingMachines} />
         <Route path={"/admin/territories"} component={AdminTerritories} />
+        <Route path={"/nft-gallery"} component={NFTGallery} />
+        <Route path={"/nfts"} component={NFTGallery} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>

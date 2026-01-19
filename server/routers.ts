@@ -678,6 +678,60 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+
+  // NFT Gallery and Management
+  nft: router({
+    // Get all NFTs for gallery
+    gallery: publicProcedure
+      .input(z.object({ limit: z.number().int().min(1).max(500).optional() }).optional())
+      .query(async ({ input }) => {
+        const { getAllNfts } = await import("./db");
+        return await getAllNfts(input?.limit || 100);
+      }),
+
+    // Get NFT statistics
+    stats: publicProcedure.query(async () => {
+      const { getNftStats } = await import("./db");
+      return await getNftStats();
+    }),
+
+    // Get single NFT by token ID
+    getByTokenId: publicProcedure
+      .input(z.object({ tokenId: z.number().int() }))
+      .query(async ({ input }) => {
+        const { getNftByTokenId } = await import("./db");
+        return await getNftByTokenId(input.tokenId);
+      }),
+
+    // Get user's NFTs
+    myNfts: protectedProcedure.query(async ({ ctx }) => {
+      const { getNftsByUser } = await import("./db");
+      return await getNftsByUser(ctx.user.id);
+    }),
+
+    // Mint NFT for a new order (called internally when order is placed)
+    mint: publicProcedure
+      .input(z.object({
+        orderId: z.number().int().optional(),
+        preorderId: z.number().int().optional(),
+        crowdfundingId: z.number().int().optional(),
+        ownerEmail: z.string().email(),
+        ownerName: z.string(),
+        packageType: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { createNeonNft } = await import("./db");
+        const nft = await createNeonNft(input);
+        
+        // Notify admin of new NFT minted
+        await notifyOwner({
+          title: `New NFT Minted: ${nft.name}`,
+          content: `A new ${nft.rarity.toUpperCase()} NFT has been minted for ${input.ownerName} (${input.ownerEmail}). Token ID: #${nft.tokenId}. Estimated value: $${nft.estimatedValue.toLocaleString()}.`,
+        });
+        
+        return nft;
+      }),
+  }),
 });
 
 // Helper function to calculate distance between two coordinates in miles

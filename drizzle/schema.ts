@@ -499,3 +499,52 @@ export const territoryApplications = mysqlTable("territory_applications", {
 
 export type TerritoryApplication = typeof territoryApplications.$inferSelect;
 export type InsertTerritoryApplication = typeof territoryApplications.$inferInsert;
+
+
+/**
+ * NEON Relaunch NFTs table.
+ * Each order gets a unique limited edition NFT with rarity based on order number.
+ * Lower order numbers = more rare and valuable.
+ */
+export const neonNfts = mysqlTable("neon_nfts", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Order ID this NFT is tied to */
+  orderId: int("orderId"),
+  /** Pre-order ID (for pre-orders) */
+  preorderId: int("preorderId"),
+  /** Crowdfunding contribution ID */
+  crowdfundingId: int("crowdfundingId"),
+  /** User ID who owns this NFT */
+  userId: int("userId"),
+  /** Unique NFT token ID (sequential, determines rarity) */
+  tokenId: int("tokenId").notNull().unique(),
+  /** NFT name (e.g., "NEON Genesis #1") */
+  name: varchar("name", { length: 255 }).notNull(),
+  /** NFT description */
+  description: text("description"),
+  /** Generated NFT image URL */
+  imageUrl: varchar("imageUrl", { length: 500 }),
+  /** Rarity tier based on token ID */
+  rarity: mysqlEnum("rarity", ["legendary", "epic", "rare", "uncommon", "common"]).notNull(),
+  /** Rarity rank (1 = most rare) */
+  rarityRank: int("rarityRank").notNull(),
+  /** Estimated value in USD */
+  estimatedValue: decimal("estimatedValue", { precision: 10, scale: 2 }),
+  /** Owner email */
+  ownerEmail: varchar("ownerEmail", { length: 320 }),
+  /** Owner name */
+  ownerName: varchar("ownerName", { length: 255 }),
+  /** Package/tier that earned this NFT */
+  packageType: varchar("packageType", { length: 100 }),
+  /** Blockchain transaction hash (for future minting) */
+  txHash: varchar("txHash", { length: 100 }),
+  /** Blockchain status */
+  blockchainStatus: mysqlEnum("blockchainStatus", ["pending", "minted", "transferred"]).default("pending").notNull(),
+  /** Mint timestamp */
+  mintedAt: timestamp("mintedAt"),
+  /** Creation timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type NeonNft = typeof neonNfts.$inferSelect;
+export type InsertNeonNft = typeof neonNfts.$inferInsert;

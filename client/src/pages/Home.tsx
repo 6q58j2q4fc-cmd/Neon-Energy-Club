@@ -3,11 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { Zap, MapPin, DollarSign, Clock, TrendingUp, Users, Star, Sparkles, ArrowRight, Gift, Target, Trophy, Menu, X, ChevronDown, Play, Shield, Leaf, Heart } from "lucide-react";
+import { Zap, MapPin, DollarSign, Clock, TrendingUp, Users, Star, Sparkles, ArrowRight, Gift, Target, Trophy, ChevronDown, Play, Shield, Leaf, Heart } from "lucide-react";
 import SocialProofNotifications from "@/components/SocialProofNotifications";
 import ViralNewsletterPopup, { shouldShowPopup, markPopupShown } from "@/components/ViralNewsletterPopup";
-import NeonLogo from "@/components/NeonLogo";
-import MobileMenu from "@/components/MobileMenu";
+import Header from "@/components/Header";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
 
@@ -18,7 +17,7 @@ export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [showNewsletter, setShowNewsletter] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -72,15 +71,7 @@ export default function Home() {
     ? Math.min((crowdfundingStats.data.totalRaised / crowdfundingStats.data.goal) * 100, 100)
     : 35;
 
-  const navItems = [
-    { label: "HOME", path: "/" },
-    { label: "STORY", path: "/about" },
-    { label: "PRODUCTS", path: "/shop" },
-    { label: "CELEBRITIES", path: "/celebrities" },
-    { label: "FRANCHISE", path: "/franchise" },
-    { label: "VENDING", path: "/vending" },
-    { label: "COMP PLAN", path: "/compensation" },
-  ];
+  
 
   return (
     <div className="min-h-screen vice-bg text-white overflow-x-hidden">
@@ -94,81 +85,7 @@ export default function Home() {
       <SocialProofNotifications />
       <ViralNewsletterPopup open={showNewsletter} onClose={() => setShowNewsletter(false)} />
 
-      {/* GTA Vice City Glass Header */}
-      <header 
-        className="fixed top-0 w-full z-50 transition-all duration-500"
-        style={{
-          backgroundColor: scrollY > 50 ? 'rgba(26, 10, 46, 0.95)' : 'transparent',
-          backdropFilter: scrollY > 50 ? 'blur(8px)' : 'none',
-          borderBottom: scrollY > 50 ? '1px solid rgba(255, 0, 128, 0.2)' : 'none',
-          boxShadow: scrollY > 50 ? '0 4px 30px rgba(255, 0, 128, 0.15)' : 'none',
-        }}
-      >
-        <div className="container mx-auto px-4 md:px-6 py-3 md:py-4">
-          <div className="flex items-center justify-between">
-            {/* Logo - Exact match to PDF with neon flicker effect */}
-            <NeonLogo onClick={() => setLocation("/")} />
-
-            {/* Desktop Navigation - Fixed Menu Buttons */}
-            <nav className="hidden lg:flex items-center gap-2">
-              {navItems.map((item) => (
-                <button
-                  key={item.path}
-                  onClick={() => setLocation(item.path)}
-                  className={`nav-btn ${
-                    item.path === "/" ? "active" : ""
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-
-            {/* Mobile Hamburger Menu Button - Fixed & Always Visible */}
-            <button
-              className="lg:hidden relative p-3 rounded-xl bg-gradient-to-br from-[#b8e600]/20 to-[#00ffff]/10 border-2 border-[#b8e600]/50 hover:bg-[#b8e600]/30 hover:border-[#b8e600] hover:shadow-[0_0_20px_rgba(184,230,0,0.5)] transition-all duration-300"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setMobileMenuOpen(!mobileMenuOpen);
-              }}
-              aria-label="Toggle menu"
-              aria-expanded={mobileMenuOpen}
-            >
-              {mobileMenuOpen ? (
-                  <X className="w-7 h-7 text-[#b8e600]" />
-                ) : (
-                  <Menu className="w-7 h-7 text-[#b8e600]" />
-                )}
-            </button>
-
-            {/* CTA Buttons - Vice City Style */}
-            <div className="hidden md:flex items-center gap-2 flex-shrink-0">
-              <Button
-                onClick={() => setLocation("/join")}
-                variant="outline"
-                className="border-[#00ffff]/60 text-[#00ffff] hover:bg-[#00ffff]/15 hover:border-[#00ffff] hover:shadow-[0_0_25px_rgba(0,255,255,0.4)] font-bold h-10 px-5 transition-all duration-300 tracking-wider"
-              >
-                JOIN NOW
-              </Button>
-              <Button
-                onClick={() => setLocation("/crowdfund")}
-                className="btn-vice-pink text-white font-bold px-6 h-10 rounded-lg tracking-wider"
-              >
-                BACK US
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Full-screen Mobile Menu */}
-        <MobileMenu
-          isOpen={mobileMenuOpen}
-          onClose={() => setMobileMenuOpen(false)}
-          onNavigate={setLocation}
-          currentPath="/"
-        />
-      </header>
+      <Header />
 
       {/* Hero Section - GTA Vice City Style */}
       <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">

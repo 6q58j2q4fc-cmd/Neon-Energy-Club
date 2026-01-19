@@ -50,6 +50,13 @@
       "when": 1768657566557,
       "tag": "0006_bizarre_lady_ursula",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1768818454414,
+      "tag": "0007_sturdy_frightful_four",
+      "breakpoints": true
     }
   ]
 }
