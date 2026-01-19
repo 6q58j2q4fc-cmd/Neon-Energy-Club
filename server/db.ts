@@ -859,7 +859,24 @@ export function generateNftName(tokenId: number, rarity: string): string {
 }
 
 /**
- * Create a new NFT for an order/contribution
+ * Generate AI artwork prompt based on rarity tier
+ */
+function getNftArtworkPrompt(tokenId: number, rarity: string): string {
+  const basePrompt = "Digital art of a glowing NEON energy drink can floating in space, cyberpunk style, neon green and black color scheme, electric energy particles, high quality, 4k";
+  
+  const rarityPrompts: Record<string, string> = {
+    legendary: `${basePrompt}, surrounded by golden lightning bolts and diamond particles, legendary crown floating above, rainbow holographic effects, ultra rare collectible, token number ${tokenId} visible, epic cosmic background with galaxies`,
+    epic: `${basePrompt}, purple and pink aurora borealis background, epic energy waves, glowing purple crystals, mythical dragon silhouette, token number ${tokenId} visible, dramatic lighting`,
+    rare: `${basePrompt}, blue electric storm background, rare gem accents, glowing blue flames, futuristic city skyline, token number ${tokenId} visible, cinematic composition`,
+    uncommon: `${basePrompt}, green matrix code rain background, digital grid floor, emerald particle effects, token number ${tokenId} visible, tech aesthetic`,
+    common: `${basePrompt}, simple neon grid background, clean energy glow, token number ${tokenId} visible, minimalist style`,
+  };
+  
+  return rarityPrompts[rarity] || rarityPrompts.common;
+}
+
+/**
+ * Create a new NFT for an order/contribution with AI-generated artwork
  */
 export async function createNeonNft(data: {
   orderId?: number;
@@ -869,7 +886,7 @@ export async function createNeonNft(data: {
   ownerEmail: string;
   ownerName: string;
   packageType?: string;
-}): Promise<{ tokenId: number; name: string; rarity: string; estimatedValue: number }> {
+}): Promise<{ tokenId: number; name: string; rarity: string; estimatedValue: number; imageUrl?: string }> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
@@ -885,6 +902,18 @@ export async function createNeonNft(data: {
     "Supporter edition - part of the NEON community."
   }`;
   
+  // Generate AI artwork for the NFT
+  let imageUrl: string | undefined;
+  try {
+    const { generateImage } = await import("./_core/imageGeneration");
+    const prompt = getNftArtworkPrompt(tokenId, rarity);
+    const result = await generateImage({ prompt });
+    imageUrl = result.url;
+  } catch (error) {
+    console.error("[NFT] Failed to generate artwork:", error);
+    // Continue without artwork - can be generated later
+  }
+  
   await db.insert(neonNfts).values({
     ...data,
     tokenId,
@@ -893,10 +922,11 @@ export async function createNeonNft(data: {
     rarity,
     rarityRank,
     estimatedValue: estimatedValue.toString(),
+    imageUrl,
     blockchainStatus: "pending",
   });
   
-  return { tokenId, name, rarity, estimatedValue };
+  return { tokenId, name, rarity, estimatedValue, imageUrl };
 }
 
 /**
@@ -963,4 +993,34 @@ export async function getNftStats() {
     uncommonCount: uncommon[0]?.count || 0,
     commonCount: common[0]?.count || 0,
   };
+}
+
+
+/**
+ * Regenerate artwork for an existing NFT
+ */
+export async function regenerateNftArtwork(tokenId: number): Promise<{ success: boolean; imageUrl?: string }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const nft = await getNftByTokenId(tokenId);
+  if (!nft) throw new Error("NFT not found");
+  
+  try {
+    const { generateImage } = await import("./_core/imageGeneration");
+    const prompt = getNftArtworkPrompt(tokenId, nft.rarity);
+    const result = await generateImage({ prompt });
+    
+    if (result.url) {
+      await db.update(neonNfts)
+        .set({ imageUrl: result.url })
+        .where(eq(neonNfts.tokenId, tokenId));
+      
+      return { success: true, imageUrl: result.url };
+    }
+    return { success: false };
+  } catch (error) {
+    console.error("[NFT] Failed to regenerate artwork:", error);
+    throw error;
+  }
 }

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
-import { Gem, Crown, Star, Sparkles, Trophy, ArrowLeft, ExternalLink, Info } from "lucide-react";
+import { Gem, Crown, Star, Sparkles, Trophy, ArrowLeft, ExternalLink, Info, Share2, Twitter } from "lucide-react";
 import Header from "@/components/Header";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
@@ -222,14 +222,25 @@ export default function NFTGallery() {
                         </div>
                       </div>
 
+                      {/* NFT Image - Show AI generated artwork if available */}
+                      {nft.imageUrl && (
+                        <div className="aspect-square overflow-hidden">
+                          <img 
+                            src={nft.imageUrl} 
+                            alt={nft.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+
                       {/* NFT Details */}
                       <div className="p-4 bg-black/30">
                         <h3 className="font-bold text-white mb-1">{nft.name}</h3>
-                        <p className="text-sm text-white/60 mb-3">
+                        <p className="text-sm text-white/60 mb-2">
                           Owned by {nft.ownerName || "Anonymous"}
                         </p>
                         
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between mb-3">
                           <div>
                             <p className="text-xs text-white/40">Est. Value</p>
                             <p className="text-lg font-bold" style={{ color: config.color }}>
@@ -242,6 +253,40 @@ export default function NFTGallery() {
                               {nft.blockchainStatus}
                             </p>
                           </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => setLocation(`/nft/${nft.tokenId}`)}
+                            className="flex-1 bg-white/10 hover:bg-white/20 text-white text-xs"
+                          >
+                            <ExternalLink className="w-3 h-3 mr-1" />
+                            View
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              const shareUrl = `${window.location.origin}/nft/${nft.tokenId}`;
+                              const shareText = `Check out this ${nft.rarity.toUpperCase()} NEON Genesis NFT #${nft.tokenId}! Est. value: $${Number(nft.estimatedValue || 0).toLocaleString()}`;
+                              window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank', 'width=600,height=400');
+                            }}
+                            className="bg-[#1DA1F2] hover:bg-[#1a8cd8] text-white text-xs"
+                          >
+                            <Twitter className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              const shareUrl = `${window.location.origin}/nft/${nft.tokenId}`;
+                              navigator.clipboard.writeText(shareUrl);
+                              alert('Link copied!');
+                            }}
+                            className="bg-white/10 hover:bg-white/20 text-white text-xs"
+                          >
+                            <Share2 className="w-3 h-3" />
+                          </Button>
                         </div>
                       </div>
                     </CardContent>

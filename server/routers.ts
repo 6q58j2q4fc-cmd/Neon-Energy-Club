@@ -726,10 +726,21 @@ export const appRouter = router({
         // Notify admin of new NFT minted
         await notifyOwner({
           title: `New NFT Minted: ${nft.name}`,
-          content: `A new ${nft.rarity.toUpperCase()} NFT has been minted for ${input.ownerName} (${input.ownerEmail}). Token ID: #${nft.tokenId}. Estimated value: $${nft.estimatedValue.toLocaleString()}.`,
+          content: `A new ${nft.rarity.toUpperCase()} NFT has been minted for ${input.ownerName} (${input.ownerEmail}). Token ID: #${nft.tokenId}. Estimated value: $${nft.estimatedValue.toLocaleString()}.${nft.imageUrl ? ` Artwork: ${nft.imageUrl}` : ''}`,
         });
         
         return nft;
+      }),
+
+    // Regenerate artwork for an existing NFT (admin only)
+    regenerateArtwork: protectedProcedure
+      .input(z.object({ tokenId: z.number().int() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized: Admin access required");
+        }
+        const { regenerateNftArtwork } = await import("./db");
+        return await regenerateNftArtwork(input.tokenId);
       }),
   }),
 });
