@@ -55,7 +55,7 @@ export default function Header() {
                   onClick={() => setLocation(item.path)}
                   className={`px-3 py-2 text-sm font-semibold tracking-wide transition-colors ${
                     location === item.path
-                      ? "text-[#b8e600]"
+                      ? "text-[#c8ff00]"
                       : "text-white/70 hover:text-white"
                   }`}
                 >
@@ -88,9 +88,9 @@ export default function Header() {
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? (
-                <X className="w-5 h-5 text-[#b8e600]" />
+                <X className="w-5 h-5 text-[#c8ff00]" />
               ) : (
-                <Menu className="w-5 h-5 text-[#b8e600]" />
+                <Menu className="w-5 h-5 text-[#c8ff00]" />
               )}
             </button>
           </div>

@@ -60,12 +60,12 @@ export default function Products() {
           <div className="grid md:grid-cols-2 gap-8">
             {/* NEON Original */}
             <div className={`glass-card-vice rounded-xl overflow-hidden hover-lift ${isVisible ? 'animate-slide-in-left' : 'opacity-0'}`}>
-              <div className="bg-gradient-to-b from-[#b8e600]/15 via-[#00ffff]/05 to-transparent p-8 text-center relative overflow-hidden">
+              <div className="bg-gradient-to-b from-[#c8ff00]/15 via-[#00ffff]/05 to-transparent p-8 text-center relative overflow-hidden">
                 {/* Vice City Ambient Glow */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-br from-[#b8e600]/15 to-[#00ffff]/08 rounded-full blur-[70px] pointer-events-none" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-br from-[#c8ff00]/15 to-[#00ffff]/08 rounded-full blur-[70px] pointer-events-none" />
                 
                 <div className="relative inline-block">
-                  <div className="absolute inset-0 bg-[#b8e600] blur-[80px] opacity-60 rounded-full"></div>
+                  <div className="absolute inset-0 bg-[#c8ff00] blur-[80px] opacity-60 rounded-full"></div>
                   <img
                     src="/neon-original-can.png"
                     alt="NEON Original - Green"

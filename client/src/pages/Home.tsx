@@ -116,9 +116,9 @@ export default function Home() {
             {/* Left Content */}
             <div className={`space-y-8 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#b8e600]/10 border border-[#b8e600]/20">
-                <span className="w-2 h-2 rounded-full bg-[#b8e600] animate-pulse" />
-                <span className="text-sm font-medium text-[#b8e600]">THE RELAUNCH IS COMING</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c8ff00]/10 border border-[#c8ff00]/20">
+                <span className="w-2 h-2 rounded-full bg-[#c8ff00] animate-pulse" />
+                <span className="text-sm font-medium text-[#c8ff00]">THE RELAUNCH IS COMING</span>
               </div>
 
               {/* Headline */}
@@ -144,8 +144,8 @@ export default function Home() {
                     { value: timeLeft.seconds, label: "SEC" },
                   ].map((item, i) => (
                     <div key={i} className="text-center">
-                      <div className="bg-black/50 rounded-xl p-3 border border-[#b8e600]/10">
-                        <span className="text-3xl md:text-4xl font-black text-[#b8e600] font-vice">
+                      <div className="bg-black/50 rounded-xl p-3 border border-[#c8ff00]/10">
+                        <span className="text-3xl md:text-4xl font-black text-[#c8ff00] font-vice">
                           {String(item.value).padStart(2, '0')}
                         </span>
                       </div>
@@ -159,7 +159,7 @@ export default function Home() {
               <div className="flex flex-wrap gap-4">
                 <Button
                   onClick={() => setLocation("/crowdfund")}
-                  className="btn-primary-shiny text-black font-bold px-8 h-14 text-lg rounded-xl"
+                  className="bg-[#c8ff00] hover:bg-[#d4ff33] text-black font-bold px-8 h-14 text-lg rounded-xl shadow-[0_0_20px_rgba(200,255,0,0.4)] hover:shadow-[0_0_30px_rgba(200,255,0,0.6)] transition-all"
                 >
                   <Gift className="w-5 h-5 mr-2" />
                   BACK THE RELAUNCH
@@ -167,7 +167,7 @@ export default function Home() {
                 <Button
                   onClick={() => setLocation("/shop")}
                   variant="outline"
-                  className="btn-shiny text-[#b8e600] font-bold px-8 h-14 text-lg rounded-xl"
+                  className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10 font-bold px-8 h-14 text-lg rounded-xl"
                 >
                   <Play className="w-5 h-5 mr-2" />
                   PRE-ORDER NOW
@@ -180,7 +180,7 @@ export default function Home() {
                   {[1, 2, 3, 4, 5].map((i) => (
                     <div
                       key={i}
-                      className="w-10 h-10 rounded-full bg-gradient-to-br from-[#b8e600]/30 to-[#b8e600]/10 border-2 border-black flex items-center justify-center text-xs font-bold text-[#b8e600]"
+                      className="w-10 h-10 rounded-full bg-gradient-to-br from-[#c8ff00]/30 to-[#c8ff00]/10 border-2 border-black flex items-center justify-center text-xs font-bold text-[#c8ff00]"
                     >
                       {String.fromCharCode(64 + i)}
                     </div>
@@ -197,14 +197,14 @@ export default function Home() {
             <div className={`relative ${isVisible ? 'animate-fade-in delay-300' : 'opacity-0'}`}>
               {/* Vice City Glow Effect - Blends with can */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-96 h-96 bg-gradient-to-br from-[#b8e600]/15 via-[#00ffff]/05 to-[#ff0080]/05 rounded-full blur-[100px] animate-glow-pulse" />
+                <div className="w-96 h-96 bg-gradient-to-br from-[#c8ff00]/15 via-[#00ffff]/05 to-[#ff0080]/05 rounded-full blur-[100px] animate-glow-pulse" />
               </div>
               
               {/* Product Image - Seamless Background Blend */}
               <div className="relative z-10 flex justify-center">
                 {/* Multi-layer Ambient Glow for Seamless Blending */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-radial from-[#b8e600]/20 via-[#b8e600]/08 to-transparent rounded-full blur-[100px] pointer-events-none" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-[#b8e600]/10 rounded-full blur-[60px] pointer-events-none animate-glow-pulse" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-radial from-[#c8ff00]/20 via-[#c8ff00]/08 to-transparent rounded-full blur-[100px] pointer-events-none" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-[#c8ff00]/10 rounded-full blur-[60px] pointer-events-none animate-glow-pulse" />
                 
                 {/* Main Can - Transparent Background */}
                 <img
@@ -230,8 +230,8 @@ export default function Home() {
 
               <div className="absolute bottom-32 left-0 glass-card-vice rounded-xl p-4 animate-float-slow" style={{ animationDelay: "1s" }}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#b8e600]/30 to-[#b8e600]/10 flex items-center justify-center">
-                    <Leaf className="w-5 h-5 text-[#b8e600]" />
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#c8ff00]/30 to-[#c8ff00]/10 flex items-center justify-center">
+                    <Leaf className="w-5 h-5 text-[#c8ff00]" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-white">0g</p>
@@ -246,7 +246,7 @@ export default function Home() {
         {/* Scroll Indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
           <span className="text-xs text-white/40 font-medium">SCROLL</span>
-          <ChevronDown className="w-5 h-5 text-[#b8e600]/50" />
+          <ChevronDown className="w-5 h-5 text-[#c8ff00]/50" />
         </div>
       </section>
 
@@ -261,7 +261,7 @@ export default function Home() {
                 <h2 className="text-3xl md:text-4xl font-black mb-4">
                   <span className="text-white">CROWDFUNDING</span>
                   <br />
-                  <span className="text-[#b8e600]">PROGRESS</span>
+                  <span className="text-[#c8ff00]">PROGRESS</span>
                 </h2>
                 <p className="text-white/60 mb-8">
                   Help us bring NEON back. Every contribution brings us closer to the relaunch.
@@ -271,7 +271,7 @@ export default function Home() {
                 <div className="mb-6">
                   <div className="flex justify-between mb-2">
                     <span className="text-white/60 text-sm">Raised</span>
-                    <span className="text-[#b8e600] font-bold">{fundingProgress.toFixed(0)}%</span>
+                    <span className="text-[#c8ff00] font-bold">{fundingProgress.toFixed(0)}%</span>
                   </div>
                   <div className="progress-neon h-4 rounded-full">
                     <div 
@@ -283,7 +283,7 @@ export default function Home() {
 
                 <div className="grid grid-cols-3 gap-4">
                   <div className="stat-card text-center">
-                    <p className="text-2xl md:text-3xl font-black text-[#b8e600]">
+                    <p className="text-2xl md:text-3xl font-black text-[#c8ff00]">
                       ${((crowdfundingStats.data?.totalRaised || 175000) / 1000).toFixed(0)}K
                     </p>
                     <p className="text-xs text-white/50 mt-1">RAISED</p>
@@ -315,8 +315,8 @@ export default function Home() {
                     onClick={() => setLocation("/crowdfund")}
                     className={`p-4 rounded-xl border cursor-pointer transition-all hover-lift ${
                       tier.popular 
-                        ? "border-[#b8e600]/50 bg-[#b8e600]/5" 
-                        : "border-white/10 bg-white/5 hover:border-[#b8e600]/30"
+                        ? "border-[#c8ff00]/50 bg-[#c8ff00]/5" 
+                        : "border-white/10 bg-white/5 hover:border-[#c8ff00]/30"
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -330,7 +330,7 @@ export default function Home() {
                         <p className="text-sm text-white/50 mt-1">{tier.reward}</p>
                       </div>
                       <div className="text-right">
-                        <span className="text-2xl font-black text-[#b8e600]">${tier.price}</span>
+                        <span className="text-2xl font-black text-[#c8ff00]">${tier.price}</span>
                       </div>
                     </div>
                   </div>
@@ -364,7 +364,7 @@ export default function Home() {
           <div className="text-center mb-16">
             <span className="badge-neon mb-4 inline-block">WHY NEON</span>
             <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
-              ENERGY <span className="text-[#b8e600]">REIMAGINED</span>
+              ENERGY <span className="text-[#c8ff00]">REIMAGINED</span>
             </h2>
             <p className="text-white/60 max-w-2xl mx-auto">
               We're not just another energy drink. We're a movement towards cleaner, smarter energy.
@@ -427,7 +427,7 @@ export default function Home() {
           <div className="text-center mb-16">
             <span className="badge-neon mb-4 inline-block">WHAT'S INSIDE</span>
             <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
-              NATURAL <span className="text-[#b8e600]">INGREDIENTS</span>
+              NATURAL <span className="text-[#c8ff00]">INGREDIENTS</span>
             </h2>
             <p className="text-white/60 max-w-2xl mx-auto">
               Every can of NEON is packed with premium, natural ingredients for clean, sustained energy.
@@ -463,10 +463,10 @@ export default function Home() {
               >
                 <div className="relative mb-6 mx-auto w-40 h-40">
                   {/* Glow Effect */}
-                  <div className="absolute inset-0 bg-[#b8e600]/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute inset-0 bg-[#c8ff00]/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   
                   {/* Image Container */}
-                  <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-[#b8e600]/30 group-hover:border-[#b8e600] transition-all duration-300 shadow-lg">
+                  <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-[#c8ff00]/30 group-hover:border-[#c8ff00] transition-all duration-300 shadow-lg">
                     <img
                       src={ingredient.image}
                       alt={ingredient.name}
@@ -477,7 +477,7 @@ export default function Home() {
 
                 </div>
                 
-                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#b8e600] transition-colors">
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#c8ff00] transition-colors">
                   {ingredient.name}
                 </h3>
                 <p className="text-white/60 text-sm leading-relaxed">
@@ -490,7 +490,7 @@ export default function Home() {
           {/* Bottom Tagline */}
           <div className="text-center mt-16">
             <p className="text-lg text-white/80 font-medium">
-              <span className="text-[#b8e600] font-bold">Zero artificial ingredients.</span> Just pure, natural energy.
+              <span className="text-[#c8ff00] font-bold">Zero artificial ingredients.</span> Just pure, natural energy.
             </p>
           </div>
         </div>
@@ -499,7 +499,7 @@ export default function Home() {
       {/* Franchise CTA Section */}
       <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#b8e600]/10 via-transparent to-[#9d4edd]/10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#c8ff00]/10 via-transparent to-[#9d4edd]/10" />
         </div>
         
         <div className="container mx-auto px-6 relative z-10">
@@ -507,7 +507,7 @@ export default function Home() {
             <div>
               <span className="badge-neon mb-4 inline-block">BUSINESS OPPORTUNITY</span>
               <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
-                OWN YOUR <span className="text-[#b8e600]">TERRITORY</span>
+                OWN YOUR <span className="text-[#c8ff00]">TERRITORY</span>
               </h2>
               <p className="text-white/60 text-lg mb-8 leading-relaxed">
                 Become a NEON micro-franchise partner. Get exclusive vending machine rights 
@@ -522,7 +522,7 @@ export default function Home() {
                   { icon: Users, label: "Support", value: "24/7" },
                 ].map((stat, i) => (
                   <div key={i} className="stat-card">
-                    <stat.icon className="w-5 h-5 text-[#b8e600] mb-2" />
+                    <stat.icon className="w-5 h-5 text-[#c8ff00] mb-2" />
                     <p className="text-xs text-white/50">{stat.label}</p>
                     <p className="text-lg font-bold text-white">{stat.value}</p>
                   </div>
@@ -540,7 +540,7 @@ export default function Home() {
                 <Button
                   onClick={() => setLocation("/compensation")}
                   variant="outline"
-                  className="btn-shiny text-[#b8e600] font-bold px-8 h-12 rounded-xl"
+                  className="btn-shiny text-[#c8ff00] font-bold px-8 h-12 rounded-xl"
                 >
                   VIEW COMP PLAN
                 </Button>
@@ -549,7 +549,7 @@ export default function Home() {
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-64 h-64 bg-[#b8e600]/10 rounded-full blur-[60px]" />
+                <div className="w-64 h-64 bg-[#c8ff00]/10 rounded-full blur-[60px]" />
               </div>
               <img
                 src="/vending-machine.jpeg"
@@ -567,7 +567,7 @@ export default function Home() {
           <div className="text-center mb-16">
             <span className="badge-neon mb-4 inline-block">TESTIMONIALS</span>
             <h2 className="text-4xl md:text-5xl font-black text-white">
-              WHAT PEOPLE <span className="text-[#b8e600]">SAY</span>
+              WHAT PEOPLE <span className="text-[#c8ff00]">SAY</span>
             </h2>
           </div>
 
@@ -592,7 +592,7 @@ export default function Home() {
               <div key={i} className="glass-card rounded-2xl p-8">
                 <div className="flex gap-1 mb-4">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="w-4 h-4 fill-[#b8e600] text-[#b8e600]" />
+                    <Star key={star} className="w-4 h-4 fill-[#c8ff00] text-[#c8ff00]" />
                   ))}
                 </div>
                 <p className="text-white/80 mb-6 leading-relaxed">"{testimonial.quote}"</p>
@@ -610,10 +610,10 @@ export default function Home() {
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="glass-card-neon rounded-3xl p-12 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-[#b8e600]/5 via-transparent to-[#b8e600]/5" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#c8ff00]/5 via-transparent to-[#c8ff00]/5" />
             <div className="relative z-10">
               <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
-                READY TO <span className="text-[#b8e600]">JOIN?</span>
+                READY TO <span className="text-[#c8ff00]">JOIN?</span>
               </h2>
               <p className="text-white/60 text-lg mb-8 max-w-2xl mx-auto">
                 Whether you want to pre-order, back our crowdfunding, or become a franchise partner, 
@@ -629,7 +629,7 @@ export default function Home() {
                 <Button
                   onClick={() => setLocation("/join")}
                   variant="outline"
-                  className="btn-shiny text-[#b8e600] font-bold px-8 h-14 text-lg rounded-xl"
+                  className="btn-shiny text-[#c8ff00] font-bold px-8 h-14 text-lg rounded-xl"
                 >
                   BECOME A PARTNER
                 </Button>
@@ -645,10 +645,10 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div>
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#b8e600] to-[#8fb800] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#c8ff00] to-[#a8e000] flex items-center justify-center">
                   <Zap className="w-5 h-5 text-black" />
                 </div>
-                <span className="text-xl font-black font-vice text-[#b8e600]">NEON®</span>
+                <span className="text-xl font-black font-vice text-[#c8ff00]">NEON®</span>
               </div>
               <p className="text-white/50 text-sm leading-relaxed">
                 Clean energy for a new generation. Join the movement and fuel your potential.
@@ -659,7 +659,7 @@ export default function Home() {
               <h4 className="font-bold text-white mb-4">COMPANY</h4>
               <div className="space-y-3">
                 {["About", "Products", "Franchise", "Blog"].map((item) => (
-                  <button key={item} className="block text-white/50 hover:text-[#b8e600] transition-colors text-sm">
+                  <button key={item} className="block text-white/50 hover:text-[#c8ff00] transition-colors text-sm">
                     {item}
                   </button>
                 ))}
@@ -670,7 +670,7 @@ export default function Home() {
               <h4 className="font-bold text-white mb-4">SUPPORT</h4>
               <div className="space-y-3">
                 {["FAQ", "Contact", "Shipping", "Returns"].map((item) => (
-                  <button key={item} className="block text-white/50 hover:text-[#b8e600] transition-colors text-sm">
+                  <button key={item} className="block text-white/50 hover:text-[#c8ff00] transition-colors text-sm">
                     {item}
                   </button>
                 ))}
@@ -681,7 +681,7 @@ export default function Home() {
               <h4 className="font-bold text-white mb-4">LEGAL</h4>
               <div className="space-y-3">
                 {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((item) => (
-                  <button key={item} className="block text-white/50 hover:text-[#b8e600] transition-colors text-sm">
+                  <button key={item} className="block text-white/50 hover:text-[#c8ff00] transition-colors text-sm">
                     {item}
                   </button>
                 ))}
@@ -699,7 +699,7 @@ export default function Home() {
               {["Twitter", "Instagram", "Facebook", "YouTube"].map((social) => (
                 <button
                   key={social}
-                  className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-white/50 hover:text-[#b8e600] hover:bg-[#b8e600]/10 transition-all"
+                  className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-white/50 hover:text-[#c8ff00] hover:bg-[#c8ff00]/10 transition-all"
                 >
                   <span className="text-xs font-bold">{social[0]}</span>
                 </button>

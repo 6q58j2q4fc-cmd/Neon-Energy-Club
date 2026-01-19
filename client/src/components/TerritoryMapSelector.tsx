@@ -45,8 +45,15 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
   // Fetch claimed territories
   const { data: claimedTerritories = [] } = trpc.territory.getClaimedTerritories.useQuery();
   
-  // LLM mutation for territory analysis
-  const analyzeTerritoryMutation = trpc.territory.analyzeTerritory.useMutation();
+  // LLM mutation for territory analysis - with timeout handling
+  const analyzeTerritoryMutation = trpc.territory.analyzeTerritory.useMutation({
+    onError: (error) => {
+      console.warn("Territory analysis timed out or failed:", error);
+    },
+  });
+  
+  // Debounce timer ref for analysis
+  const analysisTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const [territory, setTerritory] = useState<TerritoryData>({
     center: { lat: 40.7128, lng: -74.0060 },
@@ -165,40 +172,59 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
     return Math.round(sqMiles * 100) / 100;
   }, []);
 
-  // Analyze territory with LLM
+  // Analyze territory with LLM - debounced and with timeout
   const analyzeTerritory = useCallback(async (
     center: { lat: number; lng: number },
     squareMiles: number,
     address: string
   ) => {
-    setIsAnalyzing(true);
-    try {
-      const result = await analyzeTerritoryMutation.mutateAsync({
-        centerLat: center.lat,
-        centerLng: center.lng,
-        squareMiles,
-        address,
+    // Cancel any pending analysis
+    if (analysisTimeoutRef.current) {
+      clearTimeout(analysisTimeoutRef.current);
+    }
+    
+    // Debounce the analysis by 500ms to avoid multiple rapid calls
+    analysisTimeoutRef.current = setTimeout(async () => {
+      setIsAnalyzing(true);
+      
+      // Create a timeout promise
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Analysis timeout')), 8000);
       });
       
-      if (result.crossStreets) {
-        setCrossStreets(result.crossStreets);
+      try {
+        const analysisPromise = analyzeTerritoryMutation.mutateAsync({
+          centerLat: center.lat,
+          centerLng: center.lng,
+          squareMiles,
+          address,
+        });
+        
+        // Race between analysis and timeout
+        const result = await Promise.race([analysisPromise, timeoutPromise]) as {
+          crossStreets?: string[];
+          adjustedSquareMiles?: number;
+        };
+        
+        if (result.crossStreets) {
+          setCrossStreets(result.crossStreets);
+        }
+        if (result.adjustedSquareMiles) {
+          setTerritory(prev => ({
+            ...prev,
+            squareMiles: result.adjustedSquareMiles || prev.squareMiles,
+            crossStreets: result.crossStreets,
+          }));
+        }
+        
+        toast.success("Territory analyzed!");
+      } catch (error) {
+        console.warn("Territory analysis skipped:", error);
+        // Don't show error toast - just use estimated values silently
+      } finally {
+        setIsAnalyzing(false);
       }
-      if (result.adjustedSquareMiles) {
-        // Update territory with LLM-adjusted values
-        setTerritory(prev => ({
-          ...prev,
-          squareMiles: result.adjustedSquareMiles || prev.squareMiles,
-          crossStreets: result.crossStreets,
-        }));
-      }
-      
-      toast.success("Territory analyzed successfully!");
-    } catch (error) {
-      console.error("Territory analysis failed:", error);
-      toast.error("Could not analyze territory. Using estimated values.");
-    } finally {
-      setIsAnalyzing(false);
-    }
+    }, 500);
   }, [analyzeTerritoryMutation]);
 
   const updateTerritory = useCallback((
@@ -325,8 +351,7 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
             updateTerritory(newCenter, territory.radiusMiles, formattedAddress, zipCode);
             toast.success(`Found: ${formattedAddress}`);
             
-            // Trigger LLM analysis
-            analyzeTerritory(newCenter, territory.squareMiles, formattedAddress);
+            // LLM analysis is now optional - triggered by "Analyze" button
           } else {
             console.error("Geocode failed:", status);
             toast.error(`Location not found. Try a different search term.`);
@@ -425,8 +450,7 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
       // Update territory
       updateTerritory(center, equivalentRadius, territory.address, territory.zipCode, squareMiles, coords);
 
-      // Trigger LLM analysis
-      analyzeTerritory(center, squareMiles, territory.address);
+      // LLM analysis is optional - user can click "Analyze" button
 
       // Stop drawing mode
       drawingManager.setDrawingMode(null);
@@ -486,7 +510,7 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
             if (status === "OK" && results && results[0]) {
               const zipCode = extractZipCode(results);
               updateTerritory(newCenter, radiusMiles, results[0].formatted_address, zipCode);
-              analyzeTerritory(newCenter, Math.PI * radiusMiles * radiusMiles, results[0].formatted_address);
+              // LLM analysis is optional - user can click "Analyze" button
             } else {
               updateTerritory(newCenter, radiusMiles);
             }
@@ -1006,6 +1030,22 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
                   )}
                 </div>
               </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => analyzeTerritory(territory.center, territory.squareMiles, territory.address)}
+                disabled={isAnalyzing}
+                className="border-[#00ffff]/30 text-[#00ffff] hover:bg-[#00ffff]/10 hover:border-[#00ffff]"
+              >
+                {isAnalyzing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <Info className="w-4 h-4 mr-1" />
+                    Analyze
+                  </>
+                )}
+              </Button>
             </div>
           </div>
 

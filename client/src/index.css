@@ -80,7 +80,7 @@
   --sidebar-ring: oklch(0.623 0.214 259.815);
   
   /* Vice City Colors */
-  --neon-green: #b8e600;
+  --neon-green: #c8ff00;
   --vice-pink: #ff0080;
   --vice-cyan: #00ffff;
   --vice-purple: #9d4edd;
@@ -135,7 +135,7 @@
 
 /* Button styles - simplified, no animations */
 .btn-neon {
-  background: linear-gradient(135deg, #b8e600 0%, #8fb800 100%);
+  background: linear-gradient(135deg, #c8ff00 0%, #a8e000 100%);
   color: #000;
   font-weight: 700;
   padding: 0.75rem 1.5rem;
@@ -175,8 +175,8 @@
 
 .btn-outline-neon {
   background: transparent;
-  border: 2px solid #b8e600;
-  color: #b8e600;
+  border: 2px solid #c8ff00;
+  color: #c8ff00;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
@@ -184,14 +184,14 @@
 }
 
 .btn-outline-neon:hover {
-  background: #b8e600;
+  background: #c8ff00;
   color: #000;
 }
 
 /* Text glow - static, no animation */
 .text-neon-glow {
-  color: #b8e600;
-  text-shadow: 0 0 10px rgba(184, 230, 0, 0.5);
+  color: #c8ff00;
+  text-shadow: 0 0 10px rgba(200, 255, 0, 0.5);
 }
 
 .text-vice-pink-glow {

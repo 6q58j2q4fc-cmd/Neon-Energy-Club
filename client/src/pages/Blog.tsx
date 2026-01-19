@@ -56,10 +56,10 @@ export default function Blog() {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setLocation("/")}>
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#b8e600] to-[#8fb800] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#c8ff00] to-[#a8e000] flex items-center justify-center">
                 <Zap className="w-5 h-5 text-black" />
               </div>
-              <span className="text-xl font-black font-vice text-[#b8e600]">NEON®</span>
+              <span className="text-xl font-black font-vice text-[#c8ff00]">NEON®</span>
             </div>
 
             <nav className="hidden lg:flex items-center gap-1">
@@ -69,7 +69,7 @@ export default function Blog() {
                   onClick={() => setLocation(item.path)}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
                     item.path === "/blog" 
-                      ? "text-[#b8e600] bg-[#b8e600]/10" 
+                      ? "text-[#c8ff00] bg-[#c8ff00]/10" 
                       : "text-white/70 hover:text-white hover:bg-white/5"
                   }`}
                 >
@@ -112,7 +112,7 @@ export default function Blog() {
                       setLocation(item.path);
                       setMobileMenuOpen(false);
                     }}
-                    className="py-3 px-4 text-left text-white/80 hover:text-[#b8e600] hover:bg-white/5 rounded-lg transition-all"
+                    className="py-3 px-4 text-left text-white/80 hover:text-[#c8ff00] hover:bg-white/5 rounded-lg transition-all"
                   >
                     {item.label}
                   </button>
@@ -132,7 +132,7 @@ export default function Blog() {
             <h1 className="text-4xl md:text-6xl font-black mb-6">
               <span className="text-white">INSIGHTS &</span>
               <br />
-              <span className="text-[#b8e600]">INSPIRATION</span>
+              <span className="text-[#c8ff00]">INSPIRATION</span>
             </h1>
             <p className="text-white/60 text-lg">
               Stay updated with the latest news, health tips, business insights, 
@@ -155,7 +155,7 @@ export default function Blog() {
                   placeholder="Search articles..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white placeholder-white/40 focus:border-[#b8e600]/50 focus:outline-none transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white placeholder-white/40 focus:border-[#c8ff00]/50 focus:outline-none transition-all"
                 />
               </div>
 
@@ -167,7 +167,7 @@ export default function Blog() {
                     onClick={() => setSelectedCategory(cat.value)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                       selectedCategory === cat.value
-                        ? "bg-[#b8e600] text-black"
+                        ? "bg-[#c8ff00] text-black"
                         : "bg-white/5 text-white/70 hover:bg-white/10"
                     }`}
                   >
@@ -205,7 +205,7 @@ export default function Blog() {
                   className="glass-card rounded-2xl overflow-hidden cursor-pointer hover-lift group"
                 >
                   {/* Featured Image */}
-                  <div className="h-48 bg-gradient-to-br from-[#b8e600]/20 to-[#9d4edd]/20 relative overflow-hidden">
+                  <div className="h-48 bg-gradient-to-br from-[#c8ff00]/20 to-[#9d4edd]/20 relative overflow-hidden">
                     {post.featuredImage ? (
                       <img 
                         src={post.featuredImage} 
@@ -214,7 +214,7 @@ export default function Blog() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <Zap className="w-16 h-16 text-[#b8e600]/30" />
+                        <Zap className="w-16 h-16 text-[#c8ff00]/30" />
                       </div>
                     )}
                     <div className="absolute top-4 left-4">
@@ -237,7 +237,7 @@ export default function Blog() {
                       </span>
                     </div>
 
-                    <h2 className="text-lg font-bold text-white mb-2 group-hover:text-[#b8e600] transition-colors line-clamp-2">
+                    <h2 className="text-lg font-bold text-white mb-2 group-hover:text-[#c8ff00] transition-colors line-clamp-2">
                       {post.title}
                     </h2>
 
@@ -245,7 +245,7 @@ export default function Blog() {
                       {post.excerpt}
                     </p>
 
-                    <div className="flex items-center text-[#b8e600] text-sm font-medium group-hover:gap-2 transition-all">
+                    <div className="flex items-center text-[#c8ff00] text-sm font-medium group-hover:gap-2 transition-all">
                       Read More
                       <ArrowRight className="w-4 h-4 ml-1" />
                     </div>
@@ -255,8 +255,8 @@ export default function Blog() {
             </div>
           ) : (
             <div className="text-center py-20">
-              <div className="w-20 h-20 rounded-full bg-[#b8e600]/10 flex items-center justify-center mx-auto mb-6">
-                <Zap className="w-10 h-10 text-[#b8e600]/50" />
+              <div className="w-20 h-20 rounded-full bg-[#c8ff00]/10 flex items-center justify-center mx-auto mb-6">
+                <Zap className="w-10 h-10 text-[#c8ff00]/50" />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">No Posts Yet</h3>
               <p className="text-white/60 mb-6">
@@ -278,7 +278,7 @@ export default function Blog() {
         <div className="container mx-auto px-6">
           <div className="glass-card-neon rounded-3xl p-8 md:p-12 text-center">
             <h2 className="text-3xl font-black text-white mb-4">
-              NEVER MISS AN <span className="text-[#b8e600]">UPDATE</span>
+              NEVER MISS AN <span className="text-[#c8ff00]">UPDATE</span>
             </h2>
             <p className="text-white/60 mb-8 max-w-xl mx-auto">
               Subscribe to our newsletter and get the latest NEON news, exclusive offers, 
@@ -288,7 +288,7 @@ export default function Blog() {
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="flex-1 px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white placeholder-white/40 focus:border-[#b8e600]/50 focus:outline-none"
+                className="flex-1 px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white placeholder-white/40 focus:border-[#c8ff00]/50 focus:outline-none"
               />
               <Button className="btn-primary-shiny text-black font-bold px-8">
                 SUBSCRIBE
@@ -303,10 +303,10 @@ export default function Blog() {
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#b8e600] to-[#8fb800] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#c8ff00] to-[#a8e000] flex items-center justify-center">
                 <Zap className="w-4 h-4 text-black" />
               </div>
-              <span className="font-bold text-[#b8e600]">NEON®</span>
+              <span className="font-bold text-[#c8ff00]">NEON®</span>
             </div>
             <p className="text-white/40 text-sm">
               © 2026 NEON Energy Drink. All rights reserved.

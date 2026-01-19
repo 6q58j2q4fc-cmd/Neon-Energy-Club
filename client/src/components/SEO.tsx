@@ -53,7 +53,7 @@ export function SEO({
     setMeta("author", author);
     setMeta("robots", "index, follow");
     setMeta("viewport", "width=device-width, initial-scale=1.0");
-    setMeta("theme-color", "#b8e600");
+    setMeta("theme-color", "#c8ff00");
 
     // Open Graph Tags
     setMeta("og:title", fullTitle, true);

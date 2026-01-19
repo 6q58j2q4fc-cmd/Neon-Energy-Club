@@ -76,13 +76,13 @@ export default function Compensation() {
             onClick={() => setLocation("/")}
           >
             <span className="text-2xl md:text-3xl font-black tracking-tight neon-logo-text">NEON</span>
-            <span className="text-[#b8e600]/60 text-xs ml-1">®</span>
+            <span className="text-[#c8ff00]/60 text-xs ml-1">®</span>
           </div>
           <nav className="hidden md:flex gap-6 items-center">
-            <button onClick={() => setLocation("/")} className="text-white/80 hover:text-[#b8e600] font-semibold transition-all">Home</button>
-            <button onClick={() => setLocation("/shop")} className="text-white/80 hover:text-[#b8e600] font-semibold transition-all">Shop</button>
-            <button onClick={() => setLocation("/products")} className="text-white/80 hover:text-[#b8e600] font-semibold transition-all">Products</button>
-            <button onClick={() => setLocation("/vending")} className="text-white/80 hover:text-[#b8e600] font-semibold transition-all">Vending</button>
+            <button onClick={() => setLocation("/")} className="text-white/80 hover:text-[#c8ff00] font-semibold transition-all">Home</button>
+            <button onClick={() => setLocation("/shop")} className="text-white/80 hover:text-[#c8ff00] font-semibold transition-all">Shop</button>
+            <button onClick={() => setLocation("/products")} className="text-white/80 hover:text-[#c8ff00] font-semibold transition-all">Products</button>
+            <button onClick={() => setLocation("/vending")} className="text-white/80 hover:text-[#c8ff00] font-semibold transition-all">Vending</button>
             <Button 
               onClick={() => setLocation("/join")}
               className="btn-vice-pink text-white font-bold"
@@ -116,7 +116,7 @@ export default function Compensation() {
             </p>
             <div className="flex flex-wrap justify-center gap-8 text-center">
               <div>
-                <div className="text-4xl font-black text-[#b8e600]">40-45%</div>
+                <div className="text-4xl font-black text-[#c8ff00]">40-45%</div>
                 <div className="text-gray-400">Total Payout</div>
               </div>
               <div>
@@ -194,10 +194,10 @@ export default function Compensation() {
                 animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card className={`${'highlight' in way && way.highlight ? 'bg-gradient-to-br from-[#c8ff00]/20 to-[#00ff00]/10 border-[#c8ff00] shadow-[0_0_20px_rgba(200,255,0,0.3)]' : 'glass-card-vice'} hover:border-[#b8e600]/50 transition-all h-full text-center`}>
+                <Card className={`${'highlight' in way && way.highlight ? 'bg-gradient-to-br from-[#c8ff00]/20 to-[#00ff00]/10 border-[#c8ff00] shadow-[0_0_20px_rgba(200,255,0,0.3)]' : 'glass-card-vice'} hover:border-[#c8ff00]/50 transition-all h-full text-center`}>
                   <CardContent className="p-6">
-                    <div className={`w-12 h-12 rounded-full ${'highlight' in way && way.highlight ? 'bg-[#c8ff00]/30' : 'bg-[#b8e600]/20'} flex items-center justify-center mx-auto mb-4`}>
-                      <way.icon className="w-6 h-6 text-[#b8e600]" />
+                    <div className={`w-12 h-12 rounded-full ${'highlight' in way && way.highlight ? 'bg-[#c8ff00]/30' : 'bg-[#c8ff00]/20'} flex items-center justify-center mx-auto mb-4`}>
+                      <way.icon className="w-6 h-6 text-[#c8ff00]" />
                     </div>
                     <div className="text-[#ff0080] font-bold text-sm mb-2">WAY #{way.num}</div>
                     <h3 className="text-lg font-bold text-white mb-2">{way.title}</h3>

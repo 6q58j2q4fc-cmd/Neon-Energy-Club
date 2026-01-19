@@ -1093,3 +1093,15 @@
 - [x] Add leaderboard to searchable pages
 - [x] Write vitest tests for leaderboard functionality (24 tests)
 - [x] All 134 tests passing
+
+## Bug Fixes & Improvements (Jan 19)
+
+- [x] Fix territory selector timeout/slowness issues (made LLM analysis optional with debounce, 8s timeout)
+- [x] Update "Back the Relaunch" button to brighter neon green (#c8ff00) matching the can
+- [x] Update NEON logo to brighter neon green (#c8ff00) matching the can
+- [x] Update all #b8e600 references to #c8ff00 across entire codebase
+- [x] Improve live order notifications to cycle through varied names, locations, and product types
+- [x] Added 4 notification types: crowdfunding, franchise, preorder, distributor
+- [x] Added 64 unique first names and 20 last initials for variety
+- [x] Added 40 US locations for geographic diversity
+- [x] Added random timing intervals (10-15s) for natural feel

@@ -113,16 +113,16 @@ export default function Celebrities() {
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-6 relative overflow-hidden">
         <div className="absolute inset-0 animated-grid opacity-20" />
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-[#b8e600]/10 rounded-full blur-[100px]" />
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-[#c8ff00]/10 rounded-full blur-[100px]" />
         
         {/* Subtle Background Glow */}
-        <div className="absolute -left-40 top-1/3 w-80 h-80 bg-[#b8e600]/5 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute -left-40 top-1/3 w-80 h-80 bg-[#c8ff00]/5 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute -right-20 bottom-0 w-60 h-60 bg-[#9d4edd]/4 rounded-full blur-[80px] pointer-events-none" />
         
         <div className={`container mx-auto max-w-6xl text-center relative z-10 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
           <span className="badge-neon mb-4 inline-block">AS SEEN IN MUSIC VIDEOS</span>
           <h1 className="text-5xl md:text-7xl font-black mb-6">
-            <span className="text-[#b8e600]">CELEBRITY</span> FANS
+            <span className="text-[#c8ff00]">CELEBRITY</span> FANS
           </h1>
           <p className="text-xl text-white/60 leading-relaxed max-w-3xl mx-auto">
             From A-list music videos to blockbuster events, NEON has been featured alongside 
@@ -142,8 +142,8 @@ export default function Celebrities() {
               { icon: TrendingUp, value: "15%", label: "Global Population Reached" },
             ].map((stat, i) => (
               <div key={i} className="glass-card rounded-2xl p-6 text-center hover-lift">
-                <stat.icon className="w-10 h-10 text-[#b8e600] mx-auto mb-4" />
-                <div className="text-4xl font-black text-[#b8e600] mb-1">{stat.value}</div>
+                <stat.icon className="w-10 h-10 text-[#c8ff00] mx-auto mb-4" />
+                <div className="text-4xl font-black text-[#c8ff00] mb-1">{stat.value}</div>
                 <div className="text-white/50 text-sm">{stat.label}</div>
               </div>
             ))}
@@ -157,7 +157,7 @@ export default function Celebrities() {
           <div className="text-center mb-12">
             <span className="badge-neon mb-4 inline-block">WATCH NOW</span>
             <h2 className="text-4xl font-black">
-              FEATURED <span className="text-[#b8e600]">MUSIC VIDEOS</span>
+              FEATURED <span className="text-[#c8ff00]">MUSIC VIDEOS</span>
             </h2>
             <p className="text-white/60 mt-4 max-w-2xl mx-auto">
               Click to play the actual music videos featuring NEON Energy Drink
@@ -186,20 +186,20 @@ export default function Celebrities() {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h3 className="text-xl font-bold text-white mb-1">{video.title}</h3>
-                      <p className="text-[#b8e600] font-semibold mb-2">{video.artist}</p>
+                      <p className="text-[#c8ff00] font-semibold mb-2">{video.artist}</p>
                       <p className="text-white/60 text-sm">{video.description}</p>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/10">
-                    <span className="text-[#b8e600] font-bold">{video.views} views</span>
+                    <span className="text-[#c8ff00] font-bold">{video.views} views</span>
                     <span className="text-white/40">•</span>
                     <span className="text-white/50">{video.year}</span>
                     <a
                       href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-auto flex items-center gap-2 text-white/60 hover:text-[#b8e600] transition-colors"
+                      className="ml-auto flex items-center gap-2 text-white/60 hover:text-[#c8ff00] transition-colors"
                     >
                       <ExternalLink className="w-4 h-4" />
                       <span className="text-sm">Open in YouTube</span>
@@ -214,12 +214,12 @@ export default function Celebrities() {
 
       {/* Celebrity Grid */}
       <section className="py-16 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#b8e600]/5 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#c8ff00]/5 to-transparent" />
         
         <div className="container mx-auto max-w-6xl relative z-10">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-black">
-              CELEBRITY <span className="text-[#b8e600]">AMBASSADORS</span>
+              CELEBRITY <span className="text-[#c8ff00]">AMBASSADORS</span>
             </h2>
           </div>
 
@@ -227,7 +227,7 @@ export default function Celebrities() {
             {celebrities.map((celebrity, index) => (
               <Card
                 key={celebrity.name}
-                className="bg-black/50 border-[#b8e600]/20 hover:border-[#b8e600]/50 overflow-hidden group transition-all duration-300 hover-lift"
+                className="bg-black/50 border-[#c8ff00]/20 hover:border-[#c8ff00]/50 overflow-hidden group transition-all duration-300 hover-lift"
               >
                 {/* Thumbnail with Play Button */}
                 <div className="relative aspect-video bg-black cursor-pointer" onClick={() => setActiveVideo(activeVideo === celebrity.youtubeId ? null : celebrity.youtubeId)}>
@@ -247,7 +247,7 @@ export default function Celebrities() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/20 transition-colors">
-                        <div className="w-16 h-16 rounded-full bg-[#b8e600] flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                        <div className="w-16 h-16 rounded-full bg-[#c8ff00] flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
                           <Play className="w-8 h-8 text-black ml-1" fill="black" />
                         </div>
                       </div>
@@ -257,12 +257,12 @@ export default function Celebrities() {
 
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-1">
-                    <Star className="w-4 h-4 text-[#b8e600]" />
-                    <span className="text-xs text-[#b8e600] font-semibold">{celebrity.category}</span>
+                    <Star className="w-4 h-4 text-[#c8ff00]" />
+                    <span className="text-xs text-[#c8ff00] font-semibold">{celebrity.category}</span>
                   </div>
                   <h4 className="text-lg font-bold text-white">{celebrity.name}</h4>
                   <p className="text-white/50 text-sm mt-1">{celebrity.feature}</p>
-                  <p className="text-[#b8e600] font-semibold text-sm mt-2">{celebrity.views} views</p>
+                  <p className="text-[#c8ff00] font-semibold text-sm mt-2">{celebrity.views} views</p>
                 </CardContent>
               </Card>
             ))}
@@ -275,19 +275,19 @@ export default function Celebrities() {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-black">
-              MAJOR <span className="text-[#b8e600]">EVENTS</span>
+              MAJOR <span className="text-[#c8ff00]">EVENTS</span>
             </h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <Card className="glass-card border-[#b8e600]/20 hover-lift">
+            <Card className="glass-card border-[#c8ff00]/20 hover-lift">
               <CardContent className="p-8">
                 <div className="flex items-start gap-6">
-                  <div className="w-20 h-20 bg-[#b8e600]/10 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Music className="w-10 h-10 text-[#b8e600]" />
+                  <div className="w-20 h-20 bg-[#c8ff00]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Music className="w-10 h-10 text-[#c8ff00]" />
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold text-[#b8e600] mb-2">Five More Hours World Tour</h4>
+                    <h4 className="text-xl font-bold text-[#c8ff00] mb-2">Five More Hours World Tour</h4>
                     <p className="text-white/60 leading-relaxed">
                       Deorro and Chris Brown's massive hit "Five More Hours" prominently featured NEON Energy Drink, 
                       reaching over 350 million views on YouTube and introducing NEON to a global audience.
@@ -297,14 +297,14 @@ export default function Celebrities() {
               </CardContent>
             </Card>
 
-            <Card className="glass-card border-[#b8e600]/20 hover-lift">
+            <Card className="glass-card border-[#c8ff00]/20 hover-lift">
               <CardContent className="p-8">
                 <div className="flex items-start gap-6">
-                  <div className="w-20 h-20 bg-[#b8e600]/10 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Star className="w-10 h-10 text-[#b8e600]" />
+                  <div className="w-20 h-20 bg-[#c8ff00]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Star className="w-10 h-10 text-[#c8ff00]" />
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold text-[#b8e600] mb-2">Christina Milian Partnership</h4>
+                    <h4 className="text-xl font-bold text-[#c8ff00] mb-2">Christina Milian Partnership</h4>
                     <p className="text-white/60 leading-relaxed">
                       Pop star Christina Milian became a brand ambassador for NEON, featuring the drink 
                       in multiple music videos including her collaboration with Snoop Dogg.
@@ -319,11 +319,11 @@ export default function Celebrities() {
 
       {/* CTA Section */}
       <section className="py-20 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-[#b8e600]/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#c8ff00]/10 to-transparent" />
         
         <div className="container mx-auto max-w-4xl text-center relative z-10">
           <h2 className="text-4xl md:text-5xl font-black mb-6">
-            JOIN THE <span className="text-[#b8e600]">MOVEMENT</span>
+            JOIN THE <span className="text-[#c8ff00]">MOVEMENT</span>
           </h2>
           <p className="text-xl text-white/60 mb-8">
             Be part of the NEON relaunch and join celebrities who love clean energy.
@@ -338,7 +338,7 @@ export default function Celebrities() {
             <Button
               onClick={() => setLocation("/franchise")}
               variant="outline"
-              className="btn-shiny text-[#b8e600] font-bold px-8 h-14 text-lg rounded-xl"
+              className="btn-shiny text-[#c8ff00] font-bold px-8 h-14 text-lg rounded-xl"
             >
               BECOME A PARTNER
             </Button>
@@ -351,10 +351,10 @@ export default function Celebrities() {
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#b8e600] to-[#8fb800] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#c8ff00] to-[#a8e000] flex items-center justify-center">
                 <Zap className="w-5 h-5 text-black" />
               </div>
-              <span className="text-xl font-black font-vice text-[#b8e600]">NEON®</span>
+              <span className="text-xl font-black font-vice text-[#c8ff00]">NEON®</span>
             </div>
             <p className="text-white/40 text-sm">
               © 2026 NEON Energy Drink. All rights reserved.
