@@ -701,3 +701,18 @@
 - [x] Add copy-to-clipboard for NFT share links
 - [x] Create individual NFT detail page (/nft/:tokenId)
 - [x] All 40 tests passing
+
+## Text Contrast & Mobile Menu Fixes (Jan 19)
+
+### Text Contrast Issues
+- [x] Fix transparent/unreadable text on compensation plan page
+- [x] Ensure all text has proper contrast against backgrounds (bg-black/80)
+- [x] Fix opportunity section text visibility (text-gray-300)
+- [x] Make all text fully readable with contrasting colors
+
+### Mobile Menu Consistency
+- [x] Fix sliding bar menu running off screen on mobile (max-w-[320px])
+- [x] Ensure consistent menu across all pages (Header component)
+- [x] Fix menu appearing differently after place order vs main screen
+- [x] Test mobile menu on all pages
+- [x] All 40 tests passing

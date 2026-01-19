@@ -1,4 +1,3 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -9,7 +8,7 @@ import ViralNewsletterPopup, { shouldShowPopup, markPopupShown } from "@/compone
 import Header from "@/components/Header";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
-
+import { useAuth } from "@/_core/hooks/useAuth";
 
 export default function Home() {
   const [, setLocation] = useLocation();

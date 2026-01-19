@@ -60,10 +60,10 @@ export default function Compensation() {
       {/* Vice City Background */}
       <div className="fixed inset-0 z-0">
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30"
           style={{ backgroundImage: 'url(/vice-city-bg-vibrant.png)' }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1a0a2e]/80 via-[#1a0a2e]/90 to-[#0d0418]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0d0418]/95 via-[#0d0418]/98 to-[#0d0418]" />
       </div>
 
       {/* Header */}
@@ -169,7 +169,7 @@ export default function Compensation() {
       </section>
 
       {/* Detailed Compensation Tabs */}
-      <section className="py-20 px-4 bg-[#0a0a0a]">
+      <section className="py-20 px-4 bg-[#0a0a0a] relative z-10">
         <div className="container mx-auto max-w-6xl">
           <Tabs defaultValue="unilevel" className="w-full">
             <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 mb-12 bg-black/50 border border-[#c8ff00]/30">
@@ -197,8 +197,8 @@ export default function Compensation() {
             <TabsContent value="unilevel">
               <div className="grid md:grid-cols-2 gap-12 items-center">
                 <div>
-                  <h3 className="text-3xl font-bold mb-6">Unilevel Commissions</h3>
-                  <p className="text-gray-400 mb-8">
+                  <h3 className="text-3xl font-bold mb-6 text-white">Unilevel Commissions</h3>
+                  <p className="text-gray-300 mb-8">
                     Earn commissions on the sales volume of your entire team, up to 5 levels deep. 
                     The more you help your team succeed, the more you earn.
                   </p>
@@ -217,7 +217,7 @@ export default function Compensation() {
                         </div>
                         <div className="flex-1">
                           <div className="font-bold text-white">{level.name}</div>
-                          <div className="text-gray-400 text-sm">{level.description}</div>
+                          <div className="text-gray-300 text-sm">{level.description}</div>
                         </div>
                         <div className="text-2xl font-black text-[#c8ff00]">{level.rate}</div>
                       </motion.div>
@@ -226,26 +226,26 @@ export default function Compensation() {
                 </div>
 
                 <div className="bg-gradient-to-br from-[#c8ff00]/10 to-transparent border border-[#c8ff00]/30 rounded-2xl p-8">
-                  <h4 className="text-xl font-bold mb-6 text-center">Example Earnings</h4>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center border-b border-gray-800 pb-4">
-                      <span className="text-gray-400">Your Personal Sales</span>
-                      <span className="font-bold">$1,000 × 25% = <span className="text-[#c8ff00]">$250</span></span>
+                  <h4 className="text-xl font-bold mb-6 text-center text-white">Example Earnings</h4>
+                  <div className="space-y-4 bg-black/80 rounded-xl p-6">
+                    <div className="flex justify-between items-center border-b border-gray-700 pb-4">
+                      <span className="text-gray-300">Your Personal Sales</span>
+                      <span className="font-bold text-white">$1,000 × 25% = <span className="text-[#c8ff00]">$250</span></span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-gray-800 pb-4">
-                      <span className="text-gray-400">Level 1 Team (5 people)</span>
-                      <span className="font-bold">$5,000 × 10% = <span className="text-[#c8ff00]">$500</span></span>
+                    <div className="flex justify-between items-center border-b border-gray-700 pb-4">
+                      <span className="text-gray-300">Level 1 Team (5 people)</span>
+                      <span className="font-bold text-white">$5,000 × 10% = <span className="text-[#c8ff00]">$500</span></span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-gray-800 pb-4">
-                      <span className="text-gray-400">Level 2 Team (25 people)</span>
-                      <span className="font-bold">$25,000 × 5% = <span className="text-[#c8ff00]">$1,250</span></span>
+                    <div className="flex justify-between items-center border-b border-gray-700 pb-4">
+                      <span className="text-gray-300">Level 2 Team (25 people)</span>
+                      <span className="font-bold text-white">$25,000 × 5% = <span className="text-[#c8ff00]">$1,250</span></span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-gray-800 pb-4">
-                      <span className="text-gray-400">Levels 3-5 Combined</span>
-                      <span className="font-bold">$100,000 × 3% = <span className="text-[#c8ff00]">$3,000</span></span>
+                    <div className="flex justify-between items-center border-b border-gray-700 pb-4">
+                      <span className="text-gray-300">Levels 3-5 Combined</span>
+                      <span className="font-bold text-white">$100,000 × 3% = <span className="text-[#c8ff00]">$3,000</span></span>
                     </div>
                     <div className="flex justify-between items-center pt-4">
-                      <span className="text-xl font-bold">Weekly Total</span>
+                      <span className="text-xl font-bold text-white">Weekly Total</span>
                       <span className="text-3xl font-black text-[#c8ff00]">$5,000</span>
                     </div>
                   </div>
