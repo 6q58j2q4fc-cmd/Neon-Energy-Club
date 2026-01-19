@@ -512,6 +512,108 @@ export const appRouter = router({
       return await getAllClaimedTerritories();
     }),
 
+    // Analyze territory with LLM to get cross streets and adjusted area
+    analyzeTerritory: publicProcedure
+      .input(
+        z.object({
+          centerLat: z.number(),
+          centerLng: z.number(),
+          squareMiles: z.number(),
+          address: z.string(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { invokeLLM } = await import("./_core/llm");
+        
+        try {
+          const response = await invokeLLM({
+            messages: [
+              {
+                role: "system",
+                content: `You are a geographic analysis assistant. Given a location and area, provide:
+1. Major cross streets or landmarks that define the territory boundaries
+2. An adjusted square mile estimate based on typical urban/suburban density
+3. Key neighborhoods or districts within the area
+
+Respond in JSON format with:
+- crossStreets: array of 4-6 major street names or landmarks
+- adjustedSquareMiles: number (your estimate of the actual usable area)
+- neighborhoods: array of neighborhood names
+- notes: brief description of the territory`
+              },
+              {
+                role: "user",
+                content: `Analyze this territory:
+Location: ${input.address}
+Coordinates: ${input.centerLat}, ${input.centerLng}
+Selected Area: ${input.squareMiles} square miles
+
+Provide cross streets, adjusted area estimate, and key neighborhoods.`
+              }
+            ],
+            response_format: {
+              type: "json_schema",
+              json_schema: {
+                name: "territory_analysis",
+                strict: true,
+                schema: {
+                  type: "object",
+                  properties: {
+                    crossStreets: {
+                      type: "array",
+                      items: { type: "string" },
+                      description: "Major cross streets or landmarks defining the territory"
+                    },
+                    adjustedSquareMiles: {
+                      type: "number",
+                      description: "Adjusted square mile estimate"
+                    },
+                    neighborhoods: {
+                      type: "array",
+                      items: { type: "string" },
+                      description: "Key neighborhoods within the territory"
+                    },
+                    notes: {
+                      type: "string",
+                      description: "Brief description of the territory"
+                    }
+                  },
+                  required: ["crossStreets", "adjustedSquareMiles", "neighborhoods", "notes"],
+                  additionalProperties: false
+                }
+              }
+            }
+          });
+          
+          const content = response.choices[0]?.message?.content;
+          if (typeof content === "string") {
+            const parsed = JSON.parse(content);
+            return {
+              crossStreets: parsed.crossStreets || [],
+              adjustedSquareMiles: parsed.adjustedSquareMiles || input.squareMiles,
+              neighborhoods: parsed.neighborhoods || [],
+              notes: parsed.notes || ""
+            };
+          }
+          
+          return {
+            crossStreets: [],
+            adjustedSquareMiles: input.squareMiles,
+            neighborhoods: [],
+            notes: ""
+          };
+        } catch (error) {
+          console.error("Territory analysis failed:", error);
+          // Return defaults on error
+          return {
+            crossStreets: [],
+            adjustedSquareMiles: input.squareMiles,
+            neighborhoods: [],
+            notes: ""
+          };
+        }
+      }),
+
     // Start a new territory application
     startApplication: publicProcedure
       .input(

@@ -911,3 +911,32 @@
 - [x] Created getOrdersByUserEmail database function
 - [x] Created getNftsByEmail database function
 - [x] All 67 vitest tests passing
+
+
+## January 19, 2026 - Territory Selector & Vending Machine Updates
+
+### Territory Selector Fixes
+- [x] Debug and fix map functionality
+- [x] Enable full Google Maps features with drawing library
+- [x] Allow users to draw custom polygons for territory selection
+- [x] Integrate LLM for square mile calculations and analysis
+- [x] Use LLM to identify cross streets within territory
+- [x] Update territory display with calculated area and neighborhoods
+- [x] Added analyzeTerritory tRPC endpoint with LLM integration
+- [x] Circle drawing mode with adjustable radius
+- [x] Polygon drawing mode for custom shapes
+- [x] Real-time area calculation display
+
+### Vending Machine Territory Clarifications
+- [x] Add notice that territories are for vending machines only
+- [x] Clarify that other distributors can sell without vending machines
+- [x] Add explanatory text to territory selection page
+- [x] Added prominent disclaimer banner in TerritoryMapSelector
+
+### Profit Sharing Pool Information
+- [x] Add profit sharing pool description to territory page
+- [x] Update compensation plan page with vending profit sharing details
+- [x] Explain that all active/qualified distributors share in vending sales
+- [x] Added "Vending Pool" as 6th way to earn (highlighted with NEW badge)
+- [x] Added profit sharing pool banner with 5% contribution, monthly payouts
+- [x] All 74 vitest tests passing

@@ -17,7 +17,9 @@ import {
   Gift,
   ArrowRight,
   Check,
-  ChevronRight
+  ChevronRight,
+  Building2,
+  Coins
 } from "lucide-react";
 
 // Rank definitions
@@ -130,21 +132,61 @@ export default function Compensation() {
         </div>
       </section>
 
-      {/* 5 Ways to Earn */}
+      {/* Vending Machine Profit Sharing Pool Banner */}
+      <section className="py-12 px-4 relative z-10">
+        <div className="container mx-auto max-w-6xl">
+          <Card className="bg-gradient-to-r from-[#c8ff00]/20 via-[#00ff00]/10 to-[#c8ff00]/20 border-2 border-[#c8ff00]/50 overflow-hidden">
+            <CardContent className="p-8">
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="p-4 rounded-2xl bg-[#c8ff00]/20 flex-shrink-0">
+                  <Building2 className="w-12 h-12 text-[#c8ff00]" />
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h3 className="text-2xl font-black text-white mb-2">
+                    <span className="text-[#c8ff00]">VENDING MACHINE</span> PROFIT SHARING POOL
+                  </h3>
+                  <p className="text-gray-300 mb-4">
+                    All <strong className="text-[#c8ff00]">active and qualified distributors</strong> participate in a profit sharing pool 
+                    from <strong>all vending machine sales across the entire NEON network</strong>. This means you can earn from 
+                    the collective success of NEON vending operations—even if you don't own a vending territory.
+                  </p>
+                  <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                    <div className="bg-black/30 rounded-lg px-4 py-2 border border-[#c8ff00]/30">
+                      <div className="text-xs text-gray-400">Pool Contribution</div>
+                      <div className="text-lg font-bold text-[#c8ff00]">5% of All Vending Sales</div>
+                    </div>
+                    <div className="bg-black/30 rounded-lg px-4 py-2 border border-[#00ffff]/30">
+                      <div className="text-xs text-gray-400">Distribution</div>
+                      <div className="text-lg font-bold text-[#00ffff]">Monthly Payouts</div>
+                    </div>
+                    <div className="bg-black/30 rounded-lg px-4 py-2 border border-[#ff0080]/30">
+                      <div className="text-xs text-gray-400">Qualification</div>
+                      <div className="text-lg font-bold text-[#ff0080]">Active Status Required</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* 6 Ways to Earn */}
       <section className="py-20 px-4 relative z-10">
         <div className="container mx-auto max-w-6xl">
-          <h2 className="text-4xl font-bold text-center mb-4">5 Ways to Earn</h2>
+          <h2 className="text-4xl font-bold text-center mb-4">6 Ways to Earn</h2>
           <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">
             Multiple income streams designed to reward every aspect of your business
           </p>
 
-          <div className="grid md:grid-cols-5 gap-6">
+          <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
             {[
               { num: 1, title: "Retail Profit", desc: "20-30% on personal sales", icon: DollarSign },
               { num: 2, title: "Fast Start", desc: "Bonuses on new enrollments", icon: Zap },
               { num: 3, title: "Team Commissions", desc: "5 levels deep unilevel", icon: Users },
               { num: 4, title: "Binary Bonus", desc: "10% on weaker leg volume", icon: TrendingUp },
               { num: 5, title: "Rank Bonuses", desc: "Up to $25,000 one-time", icon: Award },
+              { num: 6, title: "Vending Pool", desc: "Share of all vending sales", icon: Coins, highlight: true },
             ].map((way, index) => (
               <motion.div
                 key={way.num}
@@ -152,14 +194,19 @@ export default function Compensation() {
                 animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card className="glass-card-vice hover:border-[#b8e600]/50 transition-all h-full text-center">
+                <Card className={`${'highlight' in way && way.highlight ? 'bg-gradient-to-br from-[#c8ff00]/20 to-[#00ff00]/10 border-[#c8ff00] shadow-[0_0_20px_rgba(200,255,0,0.3)]' : 'glass-card-vice'} hover:border-[#b8e600]/50 transition-all h-full text-center`}>
                   <CardContent className="p-6">
-                    <div className="w-12 h-12 rounded-full bg-[#b8e600]/20 flex items-center justify-center mx-auto mb-4">
+                    <div className={`w-12 h-12 rounded-full ${'highlight' in way && way.highlight ? 'bg-[#c8ff00]/30' : 'bg-[#b8e600]/20'} flex items-center justify-center mx-auto mb-4`}>
                       <way.icon className="w-6 h-6 text-[#b8e600]" />
                     </div>
                     <div className="text-[#ff0080] font-bold text-sm mb-2">WAY #{way.num}</div>
                     <h3 className="text-lg font-bold text-white mb-2">{way.title}</h3>
                     <p className="text-gray-400 text-sm">{way.desc}</p>
+                    {'highlight' in way && way.highlight && (
+                      <Badge className="mt-3 bg-[#c8ff00]/20 text-[#c8ff00] border-[#c8ff00]/30">
+                        NEW
+                      </Badge>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>
