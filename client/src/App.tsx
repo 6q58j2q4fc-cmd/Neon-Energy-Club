@@ -25,6 +25,9 @@ import VendingMachines from "./pages/VendingMachines";
 import AdminTerritories from "./pages/AdminTerritories";
 import NFTGallery from "./pages/NFTGallery";
 import NFTDetail from "./pages/NFTDetail";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Policies from "./pages/Policies";
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -65,7 +68,10 @@ function Router() {
         <Route path="/nft-gallery" component={NFTGallery} />
         <Route path="/nft/:tokenId" component={NFTDetail} />
         <Route path={"/nfts"} component={NFTGallery} />
-        <Route path={"/404"} component={NotFound} />
+        <Route path="/privacy" component={Privacy} />
+        <Route path="/terms" component={Terms} />
+        <Route path="/policies" component={Policies} />
+        <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>
     </>

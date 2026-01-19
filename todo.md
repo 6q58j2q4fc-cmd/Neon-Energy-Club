@@ -716,3 +716,80 @@
 - [x] Fix menu appearing differently after place order vs main screen
 - [x] Test mobile menu on all pages
 - [x] All 40 tests passing
+
+## NFT Updates, Legal Pages & Blockchain (Jan 19)
+
+### NFT Value Messaging Update
+- [ ] Update estimated value text to show values are expected to increase over time
+- [ ] Add disclaimer that estimates are projections not guarantees
+- [ ] Make value messaging dynamic rather than fixed
+
+### Social Media Share Buttons for NFTs
+- [ ] Add auto-share button after NFT is issued post-order
+- [ ] Include Twitter, Facebook, LinkedIn share buttons on NFT cards
+- [ ] Create shareable NFT preview images
+
+### Copyright Footer
+- [ ] Add "Property of Neon Corporation © 2026 All Rights Reserved" to footer
+- [ ] Ensure footer appears on all pages
+
+### Legal Pages
+- [ ] Create Privacy Policy page (/privacy)
+- [ ] Create Terms and Conditions page (/terms)
+- [ ] Create Policies and Procedures page (/policies)
+- [ ] Add links to legal pages in footer
+
+### SEO - Sitemap
+- [ ] Create sitemap.xml with all pages
+- [ ] Update robots.txt to reference sitemap
+- [ ] Add canonical URLs to pages
+
+### Blockchain NFT Integration
+- [ ] Set up Polygon/Ethereum integration
+- [ ] Create smart contract for NFT minting
+- [ ] Generate real blockchain token IDs
+- [ ] Enable trading on OpenSea
+- [ ] Store blockchain transaction hashes in database
+
+
+## January 19, 2026 - Legal, SEO & Blockchain Updates
+
+### NFT Value Messaging
+- [x] Update NFT estimated values to show "Current Est. Value" with growth indicator
+- [x] Add "↑ Expected to grow" messaging on NFT cards and detail pages
+- [x] Update NFT Gallery rarity explanation to show value appreciation potential
+
+### Copyright & Footer
+- [x] Create comprehensive Footer component with copyright notice
+- [x] Add "© 2026 Neon Corporation. All Rights Reserved." to all pages
+- [x] Include social media links in footer (Twitter, Instagram, Facebook)
+- [x] Add quick links to main pages in footer navigation
+
+### Legal Pages
+- [x] Create Privacy Policy page (/privacy) with comprehensive data handling policies
+- [x] Create Terms & Conditions page (/terms) covering pre-orders, NFTs, distributors
+- [x] Create Policies & Procedures page (/policies) for distributor guidelines
+- [x] Add legal pages to footer navigation
+- [x] Add routes for all legal pages in App.tsx
+
+### SEO Improvements
+- [x] Create sitemap.xml with all public pages
+- [x] Update robots.txt with proper crawl directives
+- [x] Add sitemap reference to robots.txt
+
+### Blockchain NFT Integration
+- [x] Install ethers.js v6 for blockchain interactions
+- [x] Create blockchain.ts service for Polygon network integration
+- [x] Implement NFT minting functions for on-chain minting
+- [x] Add OpenSea-compatible metadata generation
+- [x] Create API endpoints for blockchain operations (networkInfo, metadata, mintOnChain)
+- [x] Add batch minting capability for admin
+- [x] Add wallet balance checking for admin
+- [x] Add blockchain status display to NFT Gallery
+- [x] Write vitest tests for blockchain functions (15 tests passing)
+
+### Testing
+- [x] All 55 vitest tests passing
+- [x] Blockchain integration tests for rarity calculation, name generation, metadata
+- [x] Address validation tests
+- [x] Network info tests

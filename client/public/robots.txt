@@ -1,12 +1,31 @@
 # NEON Energy Drink Website
-# https://neon-energy.com
+# https://neonenergy.com
 
 User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://neon-energy.com/sitemap.xml
+Sitemap: https://neonenergy.com/sitemap.xml
 
-# Disallow admin and API routes
+# Disallow admin and private areas
 Disallow: /api/
 Disallow: /admin/
+Disallow: /portal
+Disallow: /distributor/dashboard
+
+# Allow search engines to crawl all public pages
+Allow: /about
+Allow: /products
+Allow: /shop
+Allow: /franchise
+Allow: /compensation
+Allow: /join
+Allow: /vending
+Allow: /crowdfund
+Allow: /nft-gallery
+Allow: /blog
+Allow: /faq
+Allow: /celebrities
+Allow: /privacy
+Allow: /terms
+Allow: /policies

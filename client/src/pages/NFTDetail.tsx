@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Twitter, Facebook, Linkedin, Link2, Share2, Gem, Crown, Star, Sparkles, Circle } from "lucide-react";
 
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 
 const rarityConfig: Record<string, { color: string; bgColor: string; icon: React.ElementType; gradient: string }> = {
@@ -172,10 +173,11 @@ export default function NFTDetail() {
                 </Card>
                 <Card className="bg-black/40 border-white/10">
                   <CardContent className="p-4">
-                    <p className="text-sm text-white/50 mb-1">Estimated Value</p>
+                    <p className="text-sm text-white/50 mb-1">Current Est. Value</p>
                     <p className="text-2xl font-bold text-[#00ffff]">
-                      ${Number(nft.estimatedValue).toLocaleString()}
+                      ${Number(nft.estimatedValue).toLocaleString()}+
                     </p>
+                    <p className="text-xs text-[#c8ff00] mt-1">↑ Expected to grow</p>
                   </CardContent>
                 </Card>
                 <Card className="bg-black/40 border-white/10">
@@ -260,6 +262,8 @@ export default function NFTDetail() {
           </div>
         </div>
       </main>
+      
+      <Footer />
     </div>
   );
 }

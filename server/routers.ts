@@ -742,6 +742,95 @@ export const appRouter = router({
         const { regenerateNftArtwork } = await import("./db");
         return await regenerateNftArtwork(input.tokenId);
       }),
+
+    // Get blockchain network info
+    networkInfo: publicProcedure.query(async () => {
+      const { getNetworkInfo } = await import("./blockchain");
+      return getNetworkInfo();
+    }),
+
+    // Get NFT metadata (OpenSea compatible)
+    metadata: publicProcedure
+      .input(z.object({ tokenId: z.number().int() }))
+      .query(async ({ input }) => {
+        const { getNftByTokenId } = await import("./db");
+        const { generateNftMetadata } = await import("./blockchain");
+        const nft = await getNftByTokenId(input.tokenId);
+        if (!nft) {
+          throw new Error("NFT not found");
+        }
+        return generateNftMetadata(nft);
+      }),
+
+    // Get OpenSea URL for an NFT
+    openSeaUrl: publicProcedure
+      .input(z.object({ tokenId: z.number().int() }))
+      .query(async ({ input }) => {
+        const { getOpenSeaUrl, getExplorerUrl } = await import("./blockchain");
+        const { getNftByTokenId } = await import("./db");
+        const nft = await getNftByTokenId(input.tokenId);
+        return {
+          openSeaUrl: getOpenSeaUrl(input.tokenId),
+          explorerUrl: nft?.txHash ? getExplorerUrl(nft.txHash) : null,
+          txHash: nft?.txHash || null,
+          blockchainStatus: nft?.blockchainStatus || "pending",
+        };
+      }),
+
+    // Mint NFT on blockchain (admin only)
+    mintOnChain: protectedProcedure
+      .input(z.object({
+        tokenId: z.number().int(),
+        recipientAddress: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized: Admin access required");
+        }
+        const { mintNftOnChain, isValidAddress } = await import("./blockchain");
+        
+        if (!isValidAddress(input.recipientAddress)) {
+          throw new Error("Invalid Ethereum address");
+        }
+        
+        return await mintNftOnChain(input.tokenId, input.recipientAddress);
+      }),
+
+    // Batch mint NFTs on blockchain (admin only)
+    batchMintOnChain: protectedProcedure
+      .input(z.object({
+        tokenIds: z.array(z.number().int()),
+        recipientAddress: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized: Admin access required");
+        }
+        const { batchMintNfts, isValidAddress } = await import("./blockchain");
+        
+        if (!isValidAddress(input.recipientAddress)) {
+          throw new Error("Invalid Ethereum address");
+        }
+        
+        return await batchMintNfts(input.tokenIds, input.recipientAddress);
+      }),
+
+    // Check blockchain status
+    checkOnChain: publicProcedure
+      .input(z.object({ tokenId: z.number().int() }))
+      .query(async ({ input }) => {
+        const { checkNftOnChain } = await import("./blockchain");
+        return await checkNftOnChain(input.tokenId);
+      }),
+
+    // Get wallet balance (admin only)
+    walletBalance: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new Error("Unauthorized: Admin access required");
+      }
+      const { getWalletBalance } = await import("./blockchain");
+      return { balance: await getWalletBalance() };
+    }),
   }),
 });
 

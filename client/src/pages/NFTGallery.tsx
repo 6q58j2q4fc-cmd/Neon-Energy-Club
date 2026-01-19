@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { Gem, Crown, Star, Sparkles, Trophy, ArrowLeft, ExternalLink, Info, Share2, Twitter } from "lucide-react";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
 
@@ -72,18 +73,25 @@ export default function NFTGallery() {
                 <h2 className="text-xl font-bold text-white">How Rarity Works</h2>
               </div>
               
-              <p className="text-white/70 mb-6">
+              <p className="text-white/70 mb-4">
                 NFT rarity is determined by your order number. Lower order numbers = higher rarity = greater estimated value. 
                 This creates a first-mover advantage where early supporters receive the most valuable collectibles.
               </p>
+              
+              <div className="p-3 rounded-lg bg-[#c8ff00]/10 border border-[#c8ff00]/30 mb-6">
+                <p className="text-[#c8ff00] text-sm">
+                  <strong>📈 Value Appreciation:</strong> Current estimates are baseline projections expected to increase significantly over time as NEON grows. 
+                  Early adopters historically see the greatest returns as brand value and demand increase.
+                </p>
+              </div>
 
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {[
-                  { tier: "legendary", range: "#1 - #10", value: "$5,000 - $10,000" },
-                  { tier: "epic", range: "#11 - #50", value: "$1,000 - $5,000" },
-                  { tier: "rare", range: "#51 - #200", value: "$250 - $1,000" },
-                  { tier: "uncommon", range: "#201 - #500", value: "$100 - $250" },
-                  { tier: "common", range: "#501+", value: "$50 - $100" },
+                  { tier: "legendary", range: "#1 - #10", value: "Est. $5,000+", note: "↑ Expected to grow" },
+                  { tier: "epic", range: "#11 - #50", value: "Est. $1,000+", note: "↑ Expected to grow" },
+                  { tier: "rare", range: "#51 - #200", value: "Est. $250+", note: "↑ Expected to grow" },
+                  { tier: "uncommon", range: "#201 - #500", value: "Est. $100+", note: "↑ Expected to grow" },
+                  { tier: "common", range: "#501+", value: "Est. $50+", note: "↑ Expected to grow" },
                 ].map((item) => {
                   const config = rarityConfig[item.tier as keyof typeof rarityConfig];
                   const Icon = config.icon;
@@ -97,7 +105,8 @@ export default function NFTGallery() {
                         <span className="text-sm font-bold" style={{ color: config.color }}>{config.label}</span>
                       </div>
                       <p className="text-white/80 text-sm">{item.range}</p>
-                      <p className="text-white/60 text-xs mt-1">{item.value}</p>
+                      <p className="text-white font-semibold text-sm mt-1">{item.value}</p>
+                      <p className="text-[#c8ff00] text-xs mt-0.5">{item.note}</p>
                     </div>
                   );
                 })}
@@ -298,15 +307,20 @@ export default function NFTGallery() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 border-t border-white/10">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-white/40 text-sm">
-            NEON Genesis NFTs are digital collectibles tied to your order. 
-            Future blockchain integration will enable trading and verification.
+      {/* Blockchain Info */}
+      <section className="py-8 px-4 border-t border-white/10">
+        <div className="container mx-auto max-w-6xl text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/30 mb-4">
+            <span className="text-purple-400 text-sm font-semibold">🔗 POLYGON BLOCKCHAIN</span>
+          </div>
+          <p className="text-white/60 text-sm max-w-2xl mx-auto">
+            NEON Genesis NFTs are minted on the Polygon blockchain for low-cost, fast transactions. 
+            Once minted on-chain, your NFT can be viewed on OpenSea and traded on any NFT marketplace.
           </p>
         </div>
-      </footer>
+      </section>
+
+      <Footer />
     </div>
   );
 }
