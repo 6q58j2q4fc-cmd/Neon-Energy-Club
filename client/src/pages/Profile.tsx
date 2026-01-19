@@ -1,16 +1,71 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
+import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
-import { User, Mail, Calendar, Shield, Package, Gem, ArrowLeft, Edit2 } from "lucide-react";
-import { useEffect } from "react";
+import { User, Mail, Calendar, Shield, Package, Gem, ArrowLeft, Edit2, Save, X, Phone, MapPin, Home, Check } from "lucide-react";
+import { useEffect, useState } from "react";
 import { getLoginUrl } from "@/const";
+import { toast } from "sonner";
 
 export default function Profile() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
+
+  
+  // Edit mode state
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "",
+  });
+
+  // Fetch full profile data
+  const { data: profile, isLoading: profileLoading, refetch } = trpc.user.profile.useQuery(undefined, {
+    enabled: !!user,
+  });
+
+  // Update profile mutation
+  const updateProfile = trpc.user.updateProfile.useMutation({
+    onSuccess: () => {
+      toast.success("Profile Updated", {
+        description: "Your profile has been saved successfully.",
+      });
+      setIsEditing(false);
+      refetch();
+    },
+    onError: (error) => {
+      toast.error("Update Failed", {
+        description: error.message || "Failed to update profile. Please try again.",
+      });
+    },
+  });
+
+  // Initialize form data when profile loads
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        name: profile.name || "",
+        phone: profile.phone || "",
+        addressLine1: profile.addressLine1 || "",
+        addressLine2: profile.addressLine2 || "",
+        city: profile.city || "",
+        state: profile.state || "",
+        postalCode: profile.postalCode || "",
+        country: profile.country || "",
+      });
+    }
+  }, [profile]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -18,7 +73,7 @@ export default function Profile() {
     }
   }, [loading, user]);
 
-  if (loading) {
+  if (loading || profileLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
@@ -40,6 +95,29 @@ export default function Profile() {
       day: "numeric",
     });
   };
+
+  const handleSave = () => {
+    updateProfile.mutate(formData);
+  };
+
+  const handleCancel = () => {
+    // Reset form data to profile values
+    if (profile) {
+      setFormData({
+        name: profile.name || "",
+        phone: profile.phone || "",
+        addressLine1: profile.addressLine1 || "",
+        addressLine2: profile.addressLine2 || "",
+        city: profile.city || "",
+        state: profile.state || "",
+        postalCode: profile.postalCode || "",
+        country: profile.country || "",
+      });
+    }
+    setIsEditing(false);
+  };
+
+  const hasShippingAddress = profile?.addressLine1 || profile?.city || profile?.state;
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -69,7 +147,7 @@ export default function Profile() {
             </div>
             <div className="flex-1">
               <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                {user.name || "NEON User"}
+                {profile?.name || user.name || "NEON User"}
               </h1>
               <p className="text-white/60">{user.email}</p>
               {user.role === "admin" && (
@@ -79,14 +157,39 @@ export default function Profile() {
                 </span>
               )}
             </div>
-            <Button
-              variant="outline"
-              className="border-[#c8ff00]/30 text-[#c8ff00] hover:bg-[#c8ff00]/10"
-              disabled
-            >
-              <Edit2 className="w-4 h-4 mr-2" />
-              Edit Profile (Coming Soon)
-            </Button>
+            {isEditing ? (
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleSave}
+                  className="bg-[#c8ff00] hover:bg-[#d4ff33] text-black"
+                  disabled={updateProfile.isPending}
+                >
+                  {updateProfile.isPending ? (
+                    <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin mr-2" />
+                  ) : (
+                    <Save className="w-4 h-4 mr-2" />
+                  )}
+                  Save Changes
+                </Button>
+                <Button
+                  onClick={handleCancel}
+                  variant="outline"
+                  className="border-white/20 text-white hover:bg-white/10"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Cancel
+                </Button>
+              </div>
+            ) : (
+              <Button
+                onClick={() => setIsEditing(true)}
+                variant="outline"
+                className="border-[#c8ff00]/30 text-[#c8ff00] hover:bg-[#c8ff00]/10"
+              >
+                <Edit2 className="w-4 h-4 mr-2" />
+                Edit Profile
+              </Button>
+            )}
           </div>
         </div>
       </section>
@@ -104,21 +207,151 @@ export default function Profile() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <label className="text-xs text-white/40 uppercase tracking-wide">Full Name</label>
-                  <p className="text-white font-medium">{user.name || "Not set"}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-white/40 uppercase tracking-wide">Email Address</label>
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-white/40" />
-                    <p className="text-white font-medium">{user.email || "Not set"}</p>
+                {isEditing ? (
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-xs text-white/60 uppercase tracking-wide">Full Name</Label>
+                      <Input
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="mt-1 bg-white/5 border-white/20 text-white"
+                        placeholder="Enter your name"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-white/60 uppercase tracking-wide">Phone Number</Label>
+                      <Input
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        className="mt-1 bg-white/5 border-white/20 text-white"
+                        placeholder="+1 (555) 000-0000"
+                      />
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <label className="text-xs text-white/40 uppercase tracking-wide">Account Role</label>
-                  <p className="text-white font-medium capitalize">{user.role}</p>
-                </div>
+                ) : (
+                  <>
+                    <div>
+                      <label className="text-xs text-white/40 uppercase tracking-wide">Full Name</label>
+                      <p className="text-white font-medium">{profile?.name || "Not set"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-white/40 uppercase tracking-wide">Email Address</label>
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-4 h-4 text-white/40" />
+                        <p className="text-white font-medium">{user.email || "Not set"}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs text-white/40 uppercase tracking-wide">Phone Number</label>
+                      <div className="flex items-center gap-2">
+                        <Phone className="w-4 h-4 text-white/40" />
+                        <p className="text-white font-medium">{profile?.phone || "Not set"}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs text-white/40 uppercase tracking-wide">Account Role</label>
+                      <p className="text-white font-medium capitalize">{user.role}</p>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Shipping Address */}
+            <Card className="bg-white/5 border-white/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <Home className="w-5 h-5 text-[#ff0080]" />
+                  Shipping Address
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {isEditing ? (
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-xs text-white/60 uppercase tracking-wide">Address Line 1</Label>
+                      <Input
+                        value={formData.addressLine1}
+                        onChange={(e) => setFormData({ ...formData, addressLine1: e.target.value })}
+                        className="mt-1 bg-white/5 border-white/20 text-white"
+                        placeholder="123 Main Street"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-white/60 uppercase tracking-wide">Address Line 2</Label>
+                      <Input
+                        value={formData.addressLine2}
+                        onChange={(e) => setFormData({ ...formData, addressLine2: e.target.value })}
+                        className="mt-1 bg-white/5 border-white/20 text-white"
+                        placeholder="Apt, Suite, Unit (optional)"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-xs text-white/60 uppercase tracking-wide">City</Label>
+                        <Input
+                          value={formData.city}
+                          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                          className="mt-1 bg-white/5 border-white/20 text-white"
+                          placeholder="City"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs text-white/60 uppercase tracking-wide">State</Label>
+                        <Input
+                          value={formData.state}
+                          onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                          className="mt-1 bg-white/5 border-white/20 text-white"
+                          placeholder="State"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-xs text-white/60 uppercase tracking-wide">ZIP Code</Label>
+                        <Input
+                          value={formData.postalCode}
+                          onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                          className="mt-1 bg-white/5 border-white/20 text-white"
+                          placeholder="12345"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs text-white/60 uppercase tracking-wide">Country</Label>
+                        <Input
+                          value={formData.country}
+                          onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                          className="mt-1 bg-white/5 border-white/20 text-white"
+                          placeholder="United States"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ) : hasShippingAddress ? (
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <MapPin className="w-4 h-4 text-white/40 mt-1" />
+                      <div>
+                        {profile?.addressLine1 && <p className="text-white">{profile.addressLine1}</p>}
+                        {profile?.addressLine2 && <p className="text-white/80">{profile.addressLine2}</p>}
+                        <p className="text-white/80">
+                          {[profile?.city, profile?.state, profile?.postalCode].filter(Boolean).join(", ")}
+                        </p>
+                        {profile?.country && <p className="text-white/60">{profile.country}</p>}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 mt-3 text-[#c8ff00]">
+                      <Check className="w-4 h-4" />
+                      <span className="text-sm">Address saved</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <MapPin className="w-8 h-8 text-white/20 mx-auto mb-2" />
+                    <p className="text-white/40 text-sm">No shipping address saved</p>
+                    <p className="text-white/60 text-xs mt-1">Click "Edit Profile" to add your address</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -145,20 +378,22 @@ export default function Profile() {
                 </div>
               </CardContent>
             </Card>
+          </div>
 
-            {/* Quick Actions */}
-            <Card className="bg-white/5 border-white/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white">
-                  <Shield className="w-5 h-5 text-[#ff0080]" />
-                  Quick Actions
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+          {/* Quick Actions */}
+          <Card className="mt-6 bg-white/5 border-white/10">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-white">
+                <Shield className="w-5 h-5 text-[#c8ff00]" />
+                Quick Actions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-3">
                 <Button
                   onClick={() => setLocation("/orders")}
                   variant="outline"
-                  className="w-full justify-start border-white/10 text-white hover:bg-white/5 hover:border-[#c8ff00]/30"
+                  className="justify-start border-white/10 text-white hover:bg-white/5 hover:border-[#c8ff00]/30"
                 >
                   <Package className="w-4 h-4 mr-2 text-[#c8ff00]" />
                   View My Orders
@@ -166,7 +401,7 @@ export default function Profile() {
                 <Button
                   onClick={() => setLocation("/nft-gallery")}
                   variant="outline"
-                  className="w-full justify-start border-white/10 text-white hover:bg-white/5 hover:border-[#00ffff]/30"
+                  className="justify-start border-white/10 text-white hover:bg-white/5 hover:border-[#00ffff]/30"
                 >
                   <Gem className="w-4 h-4 mr-2 text-[#00ffff]" />
                   View My NFTs
@@ -174,14 +409,22 @@ export default function Profile() {
                 <Button
                   onClick={() => setLocation("/shop")}
                   variant="outline"
-                  className="w-full justify-start border-white/10 text-white hover:bg-white/5 hover:border-[#ff0080]/30"
+                  className="justify-start border-white/10 text-white hover:bg-white/5 hover:border-[#ff0080]/30"
                 >
                   <Package className="w-4 h-4 mr-2 text-[#ff0080]" />
                   Shop Now
                 </Button>
-              </CardContent>
-            </Card>
-          </div>
+                <Button
+                  onClick={() => setLocation("/crowdfund")}
+                  variant="outline"
+                  className="justify-start border-white/10 text-white hover:bg-white/5 hover:border-yellow-400/30"
+                >
+                  <Shield className="w-4 h-4 mr-2 text-yellow-400" />
+                  Back the Relaunch
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Stats Section */}
           <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">

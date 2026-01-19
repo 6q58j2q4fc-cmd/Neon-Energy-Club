@@ -84,6 +84,32 @@ export const appRouter = router({
       const { getNftsByEmail } = await import("./db");
       return await getNftsByEmail(ctx.user.email);
     }),
+
+    // Update user profile
+    updateProfile: protectedProcedure
+      .input(
+        z.object({
+          name: z.string().min(1, "Name is required").optional(),
+          phone: z.string().optional(),
+          addressLine1: z.string().optional(),
+          addressLine2: z.string().optional(),
+          city: z.string().optional(),
+          state: z.string().optional(),
+          postalCode: z.string().optional(),
+          country: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const { updateUserProfile } = await import("./db");
+        await updateUserProfile(ctx.user.id, input);
+        return { success: true };
+      }),
+
+    // Get full profile with shipping address
+    profile: protectedProcedure.query(async ({ ctx }) => {
+      const { getUserProfile } = await import("./db");
+      return await getUserProfile(ctx.user.id);
+    }),
   }),
 
   franchise: router({

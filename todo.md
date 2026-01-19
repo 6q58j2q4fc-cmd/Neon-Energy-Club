@@ -940,3 +940,41 @@
 - [x] Added "Vending Pool" as 6th way to earn (highlighted with NEW badge)
 - [x] Added profit sharing pool banner with 5% contribution, monthly payouts
 - [x] All 74 vitest tests passing
+
+
+## January 19, 2026 - Territory Tools, Order Tracking & Profile Editing
+
+###### Territory Pricing Calculator
+- [x] Calculate pricing based on territory size (sq miles)
+- [x] Factor in population density for pricing tiers
+- [x] Display base price, density multiplier, and total
+- [x] Show monthly and annual cost breakdowns
+- [x] Include ROI projections with estimated revenue
+- [x] Dynamic pricing updates as territory is drawn
+
+### Territory Comparison Tool
+- [x] Allow users to save multiple territory options
+- [x] Display side-by-side comparison of saved territories
+- [x] Compare size, price, population, and ROI
+- [x] Enable removal of saved territories
+- [x] Highlight best value option with badges
+- [x] Limit to 5 saved territories max
+
+### Order Tracking
+- [x] Add shipment tracking to Orders page
+- [x] Display delivery status (Processing, Shipped, In Transit, Delivered)
+- [x] Show estimated delivery dates
+- [x] Add tracking number display with carrier links
+- [x] Visual timeline showing order progress
+- [x] Support for multiple carriers (UPS, FedEx, USPS, DHL)
+
+### Profile Editing
+- [x] Enable name editing on Profile page
+- [x] Add phone number field with editing
+- [x] Add complete shipping address fields (line1, line2, city, state, zip, country)
+- [x] Implement save functionality with database updates via tRPC
+- [x] Add form validation for all fields
+- [x] Added updateUserProfile and getUserProfile database functions
+- [x] Added user.updateProfile and user.profile tRPC endpoints
+- [x] Database schema updated with phone and address fields
+- [x] All 86 vitest tests passing

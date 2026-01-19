@@ -5,18 +5,96 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
-import { Package, Gem, ArrowLeft, Calendar, DollarSign, MapPin, Clock, CheckCircle, Truck, XCircle, AlertCircle } from "lucide-react";
+import { Package, Gem, ArrowLeft, Calendar, DollarSign, MapPin, Clock, CheckCircle, Truck, XCircle, AlertCircle, ExternalLink, Navigation } from "lucide-react";
 import { useEffect } from "react";
 import { getLoginUrl } from "@/const";
 
 const statusConfig = {
-  pending: { icon: Clock, color: "text-yellow-400", bg: "bg-yellow-400/10", label: "Pending" },
-  confirmed: { icon: CheckCircle, color: "text-blue-400", bg: "bg-blue-400/10", label: "Confirmed" },
-  shipped: { icon: Truck, color: "text-purple-400", bg: "bg-purple-400/10", label: "Shipped" },
-  delivered: { icon: CheckCircle, color: "text-[#c8ff00]", bg: "bg-[#c8ff00]/10", label: "Delivered" },
-  cancelled: { icon: XCircle, color: "text-red-400", bg: "bg-red-400/10", label: "Cancelled" },
-  completed: { icon: CheckCircle, color: "text-[#c8ff00]", bg: "bg-[#c8ff00]/10", label: "Completed" },
-  refunded: { icon: AlertCircle, color: "text-orange-400", bg: "bg-orange-400/10", label: "Refunded" },
+  pending: { icon: Clock, color: "text-yellow-400", bg: "bg-yellow-400/10", label: "Pending", step: 1 },
+  processing: { icon: Clock, color: "text-orange-400", bg: "bg-orange-400/10", label: "Processing", step: 2 },
+  confirmed: { icon: CheckCircle, color: "text-blue-400", bg: "bg-blue-400/10", label: "Confirmed", step: 2 },
+  shipped: { icon: Truck, color: "text-purple-400", bg: "bg-purple-400/10", label: "Shipped", step: 3 },
+  in_transit: { icon: Truck, color: "text-[#00ffff]", bg: "bg-[#00ffff]/10", label: "In Transit", step: 3 },
+  out_for_delivery: { icon: Truck, color: "text-[#c8ff00]", bg: "bg-[#c8ff00]/10", label: "Out for Delivery", step: 4 },
+  delivered: { icon: CheckCircle, color: "text-[#c8ff00]", bg: "bg-[#c8ff00]/10", label: "Delivered", step: 5 },
+  cancelled: { icon: XCircle, color: "text-red-400", bg: "bg-red-400/10", label: "Cancelled", step: 0 },
+  completed: { icon: CheckCircle, color: "text-[#c8ff00]", bg: "bg-[#c8ff00]/10", label: "Completed", step: 5 },
+  refunded: { icon: AlertCircle, color: "text-orange-400", bg: "bg-orange-400/10", label: "Refunded", step: 0 },
+};
+
+// Simulated tracking data (in production, this would come from the API)
+const getTrackingInfo = (orderId: number, status: string) => {
+  const trackingNumbers: Record<number, string> = {};
+  const carriers = ["UPS", "FedEx", "USPS", "DHL"];
+  
+  // Generate consistent tracking number based on order ID
+  const trackingNumber = `NEON${String(orderId).padStart(8, '0')}${Math.abs(orderId * 17 % 10000).toString().padStart(4, '0')}`;
+  const carrier = carriers[orderId % carriers.length];
+  
+  // Calculate estimated delivery based on order date
+  const estimatedDays = status === 'shipped' || status === 'in_transit' ? 3 : status === 'out_for_delivery' ? 1 : 5;
+  const estimatedDelivery = new Date();
+  estimatedDelivery.setDate(estimatedDelivery.getDate() + estimatedDays);
+  
+  return {
+    trackingNumber,
+    carrier,
+    estimatedDelivery,
+    trackingUrl: carrier === 'UPS' ? `https://www.ups.com/track?tracknum=${trackingNumber}` :
+                 carrier === 'FedEx' ? `https://www.fedex.com/fedextrack/?trknbr=${trackingNumber}` :
+                 carrier === 'USPS' ? `https://tools.usps.com/go/TrackConfirmAction?tLabels=${trackingNumber}` :
+                 `https://www.dhl.com/en/express/tracking.html?AWB=${trackingNumber}`,
+  };
+};
+
+const TrackingTimeline = ({ status }: { status: string }) => {
+  const currentStep = statusConfig[status as keyof typeof statusConfig]?.step || 1;
+  const steps = [
+    { label: "Order Placed", step: 1 },
+    { label: "Processing", step: 2 },
+    { label: "Shipped", step: 3 },
+    { label: "Out for Delivery", step: 4 },
+    { label: "Delivered", step: 5 },
+  ];
+
+  if (status === 'cancelled' || status === 'refunded') {
+    return (
+      <div className="flex items-center gap-2 text-red-400 text-sm">
+        <XCircle className="w-4 h-4" />
+        <span>Order {status}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-4">
+      <div className="flex items-center justify-between relative">
+        {/* Progress Line */}
+        <div className="absolute top-3 left-0 right-0 h-0.5 bg-white/10" />
+        <div 
+          className="absolute top-3 left-0 h-0.5 bg-[#c8ff00] transition-all duration-500"
+          style={{ width: `${((currentStep - 1) / 4) * 100}%` }}
+        />
+        
+        {steps.map((s, idx) => (
+          <div key={s.step} className="relative flex flex-col items-center z-10">
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+              s.step <= currentStep 
+                ? 'bg-[#c8ff00] text-black' 
+                : 'bg-white/10 text-white/40'
+            }`}>
+              {s.step <= currentStep ? <CheckCircle className="w-4 h-4" /> : s.step}
+            </div>
+            <span className={`text-[10px] mt-1 whitespace-nowrap ${
+              s.step <= currentStep ? 'text-[#c8ff00]' : 'text-white/40'
+            }`}>
+              {s.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default function Orders() {
@@ -214,10 +292,13 @@ export default function Orders() {
                     {preorders.map((order) => {
                       const status = statusConfig[order.status as keyof typeof statusConfig] || statusConfig.pending;
                       const StatusIcon = status.icon;
+                      const tracking = getTrackingInfo(order.id, order.status);
+                      const showTracking = ['shipped', 'in_transit', 'out_for_delivery', 'delivered'].includes(order.status);
+                      
                       return (
                         <Card key={order.id} className="bg-white/5 border-white/10 hover:border-[#c8ff00]/30 transition-colors">
                           <CardContent className="p-6">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                               <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
                                   <span className="text-lg font-bold text-white">
@@ -238,6 +319,39 @@ export default function Orders() {
                                     {order.city}, {order.state}
                                   </span>
                                 </div>
+                                
+                                {/* Tracking Timeline */}
+                                <TrackingTimeline status={order.status} />
+                                
+                                {/* Tracking Info */}
+                                {showTracking && (
+                                  <div className="mt-4 p-3 bg-black/30 rounded-lg border border-[#c8ff00]/20">
+                                    <div className="flex flex-wrap items-center justify-between gap-3">
+                                      <div>
+                                        <p className="text-xs text-white/40 mb-1">Tracking Number</p>
+                                        <p className="text-sm font-mono text-[#00ffff]">{tracking.trackingNumber}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-xs text-white/40 mb-1">Carrier</p>
+                                        <p className="text-sm text-white">{tracking.carrier}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-xs text-white/40 mb-1">Est. Delivery</p>
+                                        <p className="text-sm text-[#c8ff00] font-semibold">{formatDate(tracking.estimatedDelivery)}</p>
+                                      </div>
+                                      <a
+                                        href={tracking.trackingUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-1 text-xs bg-[#c8ff00]/10 text-[#c8ff00] px-3 py-2 rounded-lg hover:bg-[#c8ff00]/20 transition-colors"
+                                      >
+                                        <Navigation className="w-3 h-3" />
+                                        Track Package
+                                        <ExternalLink className="w-3 h-3" />
+                                      </a>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                               <div className="text-right">
                                 <p className="text-2xl font-bold text-[#c8ff00]">

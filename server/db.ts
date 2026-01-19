@@ -1062,3 +1062,56 @@ export async function getNftsByEmail(email: string) {
   
   return nfts;
 }
+
+
+/**
+ * Update user profile information
+ */
+export async function updateUserProfile(userId: number, data: {
+  name?: string;
+  phone?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const updateData: Record<string, unknown> = {};
+  
+  if (data.name !== undefined) updateData.name = data.name;
+  if (data.phone !== undefined) updateData.phone = data.phone;
+  if (data.addressLine1 !== undefined) updateData.addressLine1 = data.addressLine1;
+  if (data.addressLine2 !== undefined) updateData.addressLine2 = data.addressLine2;
+  if (data.city !== undefined) updateData.city = data.city;
+  if (data.state !== undefined) updateData.state = data.state;
+  if (data.postalCode !== undefined) updateData.postalCode = data.postalCode;
+  if (data.country !== undefined) updateData.country = data.country;
+  
+  if (Object.keys(updateData).length > 0) {
+    await db.update(users)
+      .set(updateData)
+      .where(eq(users.id, userId));
+  }
+  
+  return { success: true };
+}
+
+/**
+ * Get user profile with all fields including shipping address
+ */
+export async function getUserProfile(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select().from(users).where(eq(users.id, userId));
+  
+  if (result.length === 0) {
+    throw new Error("User not found");
+  }
+  
+  return result[0];
+}
