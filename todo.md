@@ -1480,3 +1480,50 @@
 - [x] Track licensing expiration dates (getTerritoriesExpiringSoon)
 - [x] Auto-adjust map based on real orders and expirations (activateTerritoryFromApplication)
 - [x] Admin procedures for territory tracking summary and status updates
+
+
+## Shopping Cart, Sound Effects & Video Fixes - January 20, 2026
+
+### Shopping Cart
+- [x] Create CartContext for global cart state
+- [x] Create CartDrawer component for cart sidebar
+- [x] Add shopping cart icon to HamburgerHeader with item count badge
+- [x] Display cart across all pages consistently
+
+### Sound Effects
+- [x] Create useSoundEffects hook for voice sounds
+- [x] Create SoundButton component for buttons with sound
+- [x] Create VoiceMuteButton for toggling sounds
+- [x] Add sound effects to Home page CTA buttons
+
+### Video Improvements
+- [x] Convert video to widescreen format (1280x720)
+- [x] Remove Sora watermark by cropping
+- [x] Enable video sound controls (mute/unmute)
+- [x] Add aspect-video class for proper widescreen display
+
+
+## Shopping Cart Fix (Jan 20)
+
+### Cart Icon Visibility
+- [x] Verify shopping cart icon visible in Header component (Home page)
+- [x] Verify shopping cart icon visible in HamburgerHeader component (all other pages)
+- [x] Cart icon shows item count badge when items in cart
+
+### Add to Cart Functionality
+- [x] Fix Shop page to use CartContext for adding items
+- [x] Import useCart hook in Shop.tsx
+- [x] Update handleCustomerPurchase to call addItem with product details
+- [x] Update handleDistributorPurchase to call addItem with package details
+- [x] Cart drawer opens automatically when item added
+- [x] Cart persists across page navigation (localStorage)
+
+### Voice Effects Verification
+- [x] Verify 6 voice effect files exist in /public/sounds/
+- [x] Verify useSoundEffects hook properly configured
+- [x] Verify VoiceMuteButton component working
+- [x] Voice mute state persists in localStorage
+
+### Testing
+- [x] All 161 vitest tests passing
+- [x] TypeScript compilation successful

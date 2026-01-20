@@ -6,9 +6,10 @@ import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { 
   Zap, Home, BookOpen, Store, Star, MapPin, Building2, Gem, Users, Trophy, 
-  Search, X, User, Package, LogOut, ChevronDown, Settings, ShoppingBag, TrendingUp
+  Search, X, User, Package, LogOut, ChevronDown, Settings, ShoppingBag, TrendingUp, ShoppingCart
 } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { useCart } from "@/contexts/CartContext";
 
 const navItems = [
   { label: "HOME", path: "/", icon: Home },
@@ -103,6 +104,7 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
   
   const { user, loading } = useAuth();
   const logoutMutation = trpc.auth.logout.useMutation();
+  const { totalItems, setIsOpen: setCartOpen } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -252,6 +254,20 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
                 aria-label="Search"
               >
                 <Search className="w-5 h-5" style={{ color: accentColor[variant] }} />
+              </button>
+
+              {/* Shopping Cart Button */}
+              <button
+                onClick={() => setCartOpen(true)}
+                className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/20 hover:bg-white/10 hover:border-white/30 transition-all duration-200"
+                aria-label="Shopping Cart"
+              >
+                <ShoppingCart className="w-5 h-5" style={{ color: accentColor[variant] }} />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#ff0080] text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                    {totalItems > 9 ? '9+' : totalItems}
+                  </span>
+                )}
               </button>
 
               {/* User Account Button */}

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ShoppingCart } from "lucide-react";
 import NeonLogo from "./NeonLogo";
 import MobileMenu from "./MobileMenu";
+import { useCart } from "@/contexts/CartContext";
 
 const navItems = [
   { label: "HOME", path: "/" },
@@ -19,6 +20,7 @@ export default function Header() {
   const [location, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { totalItems, setIsOpen: setCartOpen } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -76,6 +78,19 @@ export default function Header() {
 
             {/* Desktop CTA Buttons */}
             <div className="hidden lg:flex items-center gap-2">
+              {/* Shopping Cart Button */}
+              <button
+                onClick={() => setCartOpen(true)}
+                className="relative w-10 h-10 flex items-center justify-center rounded-lg bg-[#0d2818]/50 border border-[#c8ff00]/20 hover:border-[#c8ff00]/40 hover:bg-[#0d2818]/70 transition-all duration-200"
+                aria-label="Shopping Cart"
+              >
+                <ShoppingCart className="w-5 h-5 text-[#c8ff00]" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#ff0080] text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                    {totalItems > 9 ? '9+' : totalItems}
+                  </span>
+                )}
+              </button>
               <Button
                 onClick={() => setLocation("/join")}
                 variant="outline"
@@ -91,18 +106,34 @@ export default function Header() {
               </Button>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              className="lg:hidden w-10 h-10 flex items-center justify-center rounded-lg bg-[#0d2818]/50 border border-[#c8ff00]/20 active:scale-95 transition-all hover:border-[#c8ff00]/40 hover:bg-[#0d2818]/70"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? (
-                <X className="w-5 h-5 text-[#c8ff00]" />
-              ) : (
-                <Menu className="w-5 h-5 text-[#c8ff00]" />
-              )}
-            </button>
+            {/* Mobile Cart & Menu Buttons */}
+            <div className="lg:hidden flex items-center gap-2">
+              {/* Mobile Shopping Cart Button */}
+              <button
+                onClick={() => setCartOpen(true)}
+                className="relative w-10 h-10 flex items-center justify-center rounded-lg bg-[#0d2818]/50 border border-[#c8ff00]/20 hover:border-[#c8ff00]/40 hover:bg-[#0d2818]/70 transition-all duration-200"
+                aria-label="Shopping Cart"
+              >
+                <ShoppingCart className="w-5 h-5 text-[#c8ff00]" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#ff0080] text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                    {totalItems > 9 ? '9+' : totalItems}
+                  </span>
+                )}
+              </button>
+              {/* Mobile Menu Button */}
+              <button
+                className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#0d2818]/50 border border-[#c8ff00]/20 active:scale-95 transition-all hover:border-[#c8ff00]/40 hover:bg-[#0d2818]/70"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-5 h-5 text-[#c8ff00]" />
+                ) : (
+                  <Menu className="w-5 h-5 text-[#c8ff00]" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </header>

@@ -9,10 +9,12 @@ import Header from "@/components/Header";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useSoundEffects } from "@/hooks/useSoundEffects";
 
 export default function Home() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
+  const { playSound } = useSoundEffects();
   const [isVisible, setIsVisible] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [showNewsletter, setShowNewsletter] = useState(false);
@@ -181,16 +183,16 @@ export default function Home() {
               {/* CTA Buttons */}
               <div className="flex flex-wrap gap-4">
                 <Button
-                  onClick={() => setLocation("/crowdfund")}
+                  onClick={() => { playSound('back'); setLocation("/crowdfund"); }}
                   className="bg-[#c8ff00] hover:bg-[#d4ff33] text-black font-bold px-8 h-14 text-lg rounded-xl shadow-[0_0_20px_rgba(200,255,0,0.4)] hover:shadow-[0_0_30px_rgba(200,255,0,0.6)] transition-all"
                 >
                   <Gift className="w-5 h-5 mr-2" />
                   BACK THE RELAUNCH
                 </Button>
                 <Button
-                  onClick={() => setLocation("/shop")}
+                  onClick={() => { playSound('preorder'); setLocation("/products"); }}
                   variant="outline"
-                  className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10 font-bold px-8 h-14 text-lg rounded-xl"
+                  className="border-2 border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10 font-bold px-8 h-14 text-lg rounded-xl"
                 >
                   <Play className="w-5 h-5 mr-2" />
                   PRE-ORDER NOW
@@ -299,14 +301,14 @@ export default function Home() {
               </p>
             </div>
             
-            <div className="promo-video-container relative group">
+            <div className="promo-video-container relative group aspect-video">
               <video
                 ref={(el) => { if (el) videoRef[1](el); }}
                 autoPlay
                 muted={videoMuted}
                 loop
                 playsInline
-                className="w-full rounded-2xl cursor-pointer"
+                className="w-full h-full object-cover rounded-2xl cursor-pointer"
                 poster="/neon-can-new.png"
                 onClick={() => {
                   const video = videoRef[0];
@@ -776,13 +778,13 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Button
-                  onClick={() => setLocation("/shop")}
+                  onClick={() => { playSound('preorder'); setLocation("/shop"); }}
                   className="btn-primary-shiny text-black font-bold px-8 h-14 text-lg rounded-xl"
                 >
                   PRE-ORDER NOW
                 </Button>
                 <Button
-                  onClick={() => setLocation("/join")}
+                  onClick={() => { playSound('join'); setLocation("/join"); }}
                   variant="outline"
                   className="btn-shiny text-[#c8ff00] font-bold px-8 h-14 text-lg rounded-xl"
                 >

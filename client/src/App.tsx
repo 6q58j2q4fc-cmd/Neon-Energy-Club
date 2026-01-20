@@ -34,6 +34,8 @@ import Leaderboard from "./pages/Leaderboard";
 import Investors from "./pages/Investors";
 import AmbientSoundToggle from "./components/AmbientSoundToggle";
 import FloatingChatBot from "./components/FloatingChatBot";
+import CartDrawer from "./components/CartDrawer";
+import VoiceMuteButton from "./components/VoiceMuteButton";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
 // Scroll to top on route change
@@ -98,6 +100,8 @@ function App() {
           <TooltipProvider>
             <Toaster />
             <Router />
+            <CartDrawer />
+            <VoiceMuteButton />
             <AmbientSoundToggle />
             <FloatingChatBot />
           </TooltipProvider>

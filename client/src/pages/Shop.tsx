@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import HamburgerHeader from "@/components/HamburgerHeader";
+import { useCart } from "@/contexts/CartContext";
 
 // Distributor Packages
 const distributorPackages = [
@@ -142,6 +143,7 @@ export default function Shop() {
   const [isVisible, setIsVisible] = useState(false);
   const [autoShip, setAutoShip] = useState(false);
   const [selectedFlavor, setSelectedFlavor] = useState<"original" | "organic" | "mixed">("mixed");
+  const { addItem } = useCart();
 
   useEffect(() => {
     setIsVisible(true);
@@ -153,14 +155,27 @@ export default function Shop() {
       setLocation("/join");
       return;
     }
-    toast.success(`Added ${pkg.name} to cart! Redirecting to checkout...`);
-    // Would integrate with Stripe checkout
+    addItem({
+      id: `distributor-${pkg.id}`,
+      name: pkg.name,
+      price: pkg.price,
+      type: "package",
+      image: "/neon-can.png"
+    });
+    toast.success(`Added ${pkg.name} to cart!`);
   };
 
   const handleCustomerPurchase = (pkg: typeof customerPackages[0]) => {
     const finalPrice = autoShip ? pkg.price * (1 - AUTO_SHIP_DISCOUNT) : pkg.price;
+    addItem({
+      id: `customer-${pkg.id}-${selectedFlavor}${autoShip ? '-autoship' : ''}`,
+      name: `${pkg.name}${autoShip ? ' (Auto-Ship)' : ''} - ${selectedFlavor.charAt(0).toUpperCase() + selectedFlavor.slice(1)}`,
+      price: finalPrice,
+      type: "product",
+      flavor: selectedFlavor,
+      image: "/neon-can.png"
+    });
     toast.success(`Added ${pkg.name} to cart! ${autoShip ? "(Auto-Ship enabled - 15% OFF)" : ""}`);
-    // Would integrate with Stripe checkout
   };
 
   return (
