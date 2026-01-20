@@ -1293,3 +1293,26 @@
 - [x] Toast notifications via sonner
 - [x] Consistent button styles (btn-primary-shiny, etc.)
 - [x] FloatingChatBot on all pages
+
+## Branding & UI Updates (Jan 20) - COMPLETED
+
+### Bug Fixes
+- [x] Fix View Compensation Plan button on main page - verified working (navigates to /compensation)
+
+### Chatbot Styling
+- [x] Add neon green border (#c8ff00) to chatbot window with glow effect
+
+### Can Design Label
+- [x] Add "Fresh New Can Design" label near the NEON can on homepage (✨ sparkle badge)
+
+### Rainforest Alliance
+- [x] Add Rainforest Alliance Certified Supporter icon in footer (green checkmark badge)
+
+### Disney Partnership Branding
+- [x] Add "AS SEEN ON Disney®" badge with gradient neon text
+- [x] Add "NEON Energy Drink® — Official Advertising Partner of Disney Campaign Manager"
+- [x] Add trademark statement: "Disney® is a registered trademark of The Walt Disney Company. NEON Energy Drink® is a registered trademark of Neon Corporation. All other trademarks, service marks, and logos are the property of their respective owners."
+
+### Additional Certifications Added
+- [x] Add Non-GMO Verified badge (orange badge)
+- [x] Add 100% Vegan Plant-Based badge (neon green badge)

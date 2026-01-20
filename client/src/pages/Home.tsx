@@ -235,6 +235,13 @@ export default function Home() {
                 />
               </div>
 
+              {/* Fresh New Can Design Label */}
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
+                <div className="bg-gradient-to-r from-[#c8ff00] to-[#00ffff] text-black font-bold px-4 py-2 rounded-full text-sm shadow-lg shadow-[#c8ff00]/30 animate-pulse">
+                  ✨ FRESH NEW CAN DESIGN
+                </div>
+              </div>
+
               {/* Floating Stats - Vice City Style */}
               <div className="absolute top-20 right-0 glass-card-vice rounded-xl p-4 animate-float-slow" style={{ animationDelay: "0.5s" }}>
                 <div className="flex items-center gap-3">
@@ -713,6 +720,60 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Partner Logos & Certifications */}
+          <div className="border-t border-[#c8ff00]/10 pt-8 mb-8">
+            <div className="flex flex-col items-center gap-6">
+              {/* Disney Partnership */}
+              <div className="flex flex-col items-center gap-2">
+                <p className="text-[#00ffff] text-xs font-semibold tracking-wider">AS SEEN ON</p>
+                <div className="flex items-center gap-3 bg-gradient-to-r from-[#1a1a2e]/80 to-[#16213e]/80 px-6 py-3 rounded-xl border border-[#00ffff]/30">
+                  <span className="text-2xl font-black bg-gradient-to-r from-[#00ffff] via-[#c8ff00] to-[#ff0080] bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">
+                    Disney®
+                  </span>
+                </div>
+                <p className="text-[#c8ff00] text-xs font-bold mt-1">NEON Energy Drink® — Official Advertising Partner of Disney Campaign Manager</p>
+              </div>
+              
+              {/* Certifications Row */}
+              <div className="flex flex-wrap justify-center items-center gap-6">
+                {/* Rainforest Alliance */}
+                <div className="flex items-center gap-2 bg-[#0d2818]/50 px-4 py-2 rounded-lg border border-[#c8ff00]/20">
+                  <div className="w-8 h-8 rounded-full bg-[#00a651] flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-[#00a651] text-xs font-bold">RAINFOREST ALLIANCE</p>
+                    <p className="text-white/50 text-[10px]">Certified Supporter</p>
+                  </div>
+                </div>
+                
+                {/* Non-GMO */}
+                <div className="flex items-center gap-2 bg-[#0d2818]/50 px-4 py-2 rounded-lg border border-[#c8ff00]/20">
+                  <div className="w-8 h-8 rounded-full bg-[#f5a623] flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">NON</span>
+                  </div>
+                  <div>
+                    <p className="text-[#f5a623] text-xs font-bold">NON-GMO</p>
+                    <p className="text-white/50 text-[10px]">Verified</p>
+                  </div>
+                </div>
+                
+                {/* Vegan */}
+                <div className="flex items-center gap-2 bg-[#0d2818]/50 px-4 py-2 rounded-lg border border-[#c8ff00]/20">
+                  <div className="w-8 h-8 rounded-full bg-[#c8ff00] flex items-center justify-center">
+                    <span className="text-black text-xs font-bold">V</span>
+                  </div>
+                  <div>
+                    <p className="text-[#c8ff00] text-xs font-bold">100% VEGAN</p>
+                    <p className="text-white/50 text-[10px]">Plant-Based</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="neon-divider mb-8" />
 
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
@@ -729,6 +790,15 @@ export default function Home() {
                 </button>
               ))}
             </div>
+          </div>
+          
+          {/* Trademark Statement */}
+          <div className="mt-6 pt-4 border-t border-[#c8ff00]/5">
+            <p className="text-white/30 text-[10px] text-center leading-relaxed">
+              Disney® is a registered trademark of The Walt Disney Company. NEON Energy Drink® is a registered trademark of Neon Corporation. 
+              All other trademarks, service marks, and logos are the property of their respective owners. 
+              Use of third-party trademarks does not imply endorsement or affiliation unless expressly stated.
+            </p>
           </div>
         </div>
       </footer>

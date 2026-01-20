@@ -160,7 +160,7 @@ export function FloatingChatBot() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-36 right-4 z-50 w-[380px] max-w-[calc(100vw-2rem)] bg-[#0d1a0d] border border-[#c8ff00]/30 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="fixed bottom-36 right-4 z-50 w-[380px] max-w-[calc(100vw-2rem)] bg-[#0d1a0d] border-2 border-[#c8ff00] rounded-2xl shadow-2xl shadow-[#c8ff00]/20 overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-[#0d2818] to-[#1a3a2a] p-4 border-b border-[#c8ff00]/20">
             <div className="flex items-center gap-3">
