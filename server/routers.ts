@@ -326,6 +326,12 @@ export const appRouter = router({
       };
     }),
 
+    // Get recent contributions for social proof (public, anonymized)
+    recentContributions: publicProcedure.query(async () => {
+      const { getRecentCrowdfundingContributions } = await import("./db");
+      return await getRecentCrowdfundingContributions(10); // Last 10 contributions
+    }),
+
     // Admin: List all contributions
     list: protectedProcedure.query(async ({ ctx }) => {
       if (ctx.user.role !== "admin") {
@@ -460,6 +466,12 @@ export const appRouter = router({
     affiliateLinks: protectedProcedure.query(async ({ ctx }) => {
       const { getAffiliateLinks } = await import("./db");
       return await getAffiliateLinks(ctx.user.id);
+    }),
+
+    // Get recent enrollments for social proof (public, anonymized)
+    recentEnrollments: publicProcedure.query(async () => {
+      const { getRecentDistributorEnrollments } = await import("./db");
+      return await getRecentDistributorEnrollments(10); // Last 10 enrollments
     }),
   }),
 

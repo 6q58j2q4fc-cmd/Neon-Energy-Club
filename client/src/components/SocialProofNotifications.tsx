@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, MapPin, DollarSign, ShoppingCart, Zap, Gift } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
-type NotificationType = "crowdfunding" | "franchise" | "preorder" | "distributor";
+type NotificationType = "crowdfunding" | "franchise" | "preorder" | "distributor" | "newsletter";
 
 interface Notification {
   id: string;
@@ -14,128 +15,6 @@ interface Notification {
   product?: string;
   quantity?: number;
   timestamp: Date;
-}
-
-// Expanded name pools for variety
-const firstNames = [
-  "Sarah", "Michael", "Jennifer", "David", "Amanda", "Robert", "Emily", "Chris",
-  "Jessica", "James", "Ashley", "Daniel", "Stephanie", "Matthew", "Nicole", "Andrew",
-  "Michelle", "Joshua", "Kimberly", "Ryan", "Elizabeth", "Brandon", "Megan", "Justin",
-  "Rachel", "Kevin", "Lauren", "Brian", "Samantha", "Tyler", "Heather", "Jason",
-  "Brittany", "Aaron", "Christina", "Eric", "Amber", "Adam", "Tiffany", "Nathan",
-  "Rebecca", "Patrick", "Kayla", "Sean", "Victoria", "Derek", "Melissa", "Kyle",
-  "Maria", "Carlos", "Ana", "Luis", "Sofia", "Diego", "Isabella", "Marco",
-  "Yuki", "Kenji", "Sakura", "Hiroshi", "Aisha", "Omar", "Fatima", "Hassan",
-  "Priya", "Raj", "Ananya", "Vikram", "Chen", "Wei", "Mei", "Li"
-];
-
-const lastInitials = ["M", "R", "K", "L", "T", "P", "W", "B", "S", "H", "J", "D", "C", "G", "N", "F", "V", "Z", "A", "E"];
-
-// Expanded location pools
-const locations = [
-  "Los Angeles, CA", "New York, NY", "Miami, FL", "Chicago, IL", "Houston, TX",
-  "Phoenix, AZ", "San Diego, CA", "Dallas, TX", "Austin, TX", "San Francisco, CA",
-  "Seattle, WA", "Denver, CO", "Boston, MA", "Atlanta, GA", "Nashville, TN",
-  "Portland, OR", "Las Vegas, NV", "San Jose, CA", "Charlotte, NC", "Detroit, MI",
-  "Minneapolis, MN", "Tampa, FL", "Orlando, FL", "Philadelphia, PA", "Washington, DC",
-  "Baltimore, MD", "Cleveland, OH", "Pittsburgh, PA", "Cincinnati, OH", "Indianapolis, IN",
-  "Kansas City, MO", "St. Louis, MO", "New Orleans, LA", "Salt Lake City, UT", "Honolulu, HI",
-  "Anchorage, AK", "Sacramento, CA", "San Antonio, TX", "Fort Worth, TX", "Jacksonville, FL"
-];
-
-// Product types
-const products = [
-  { name: "NEON Original 12-Pack", quantity: 1 },
-  { name: "NEON Organic 12-Pack", quantity: 1 },
-  { name: "NEON Original 24-Pack", quantity: 1 },
-  { name: "NEON Organic 24-Pack", quantity: 1 },
-  { name: "NEON Variety Pack", quantity: 1 },
-  { name: "NEON Original", quantity: 6 },
-  { name: "NEON Organic", quantity: 6 },
-  { name: "NEON Starter Bundle", quantity: 1 },
-  { name: "NEON Pro Bundle", quantity: 1 },
-  { name: "NEON Elite Bundle", quantity: 1 },
-];
-
-// Crowdfunding tiers
-const crowdfundingTiers = [
-  { tier: "SUPPORTER", amount: 25 },
-  { tier: "SUPPORTER", amount: 50 },
-  { tier: "ENERGIZER", amount: 100 },
-  { tier: "ENERGIZER", amount: 150 },
-  { tier: "VIP INSIDER", amount: 500 },
-  { tier: "VIP INSIDER", amount: 750 },
-  { tier: "FOUNDING MEMBER", amount: 2500 },
-  { tier: "FOUNDING MEMBER", amount: 5000 },
-];
-
-// Generate a random notification
-function generateNotification(): Notification {
-  const types: NotificationType[] = ["crowdfunding", "franchise", "preorder", "distributor"];
-  const type = types[Math.floor(Math.random() * types.length)];
-  
-  const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-  const lastInitial = lastInitials[Math.floor(Math.random() * lastInitials.length)];
-  const name = `${firstName} ${lastInitial}.`;
-  
-  const location = locations[Math.floor(Math.random() * locations.length)];
-  
-  // Random timestamp within the last 30 minutes
-  const minutesAgo = Math.floor(Math.random() * 30) + 1;
-  const timestamp = new Date(Date.now() - minutesAgo * 60 * 1000);
-  
-  const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  
-  switch (type) {
-    case "crowdfunding": {
-      const tierData = crowdfundingTiers[Math.floor(Math.random() * crowdfundingTiers.length)];
-      return {
-        id,
-        type,
-        name,
-        amount: tierData.amount,
-        tier: tierData.tier,
-        timestamp,
-      };
-    }
-    case "franchise":
-      return {
-        id,
-        type,
-        name,
-        location,
-        timestamp,
-      };
-    case "preorder": {
-      const product = products[Math.floor(Math.random() * products.length)];
-      return {
-        id,
-        type,
-        name,
-        product: product.name,
-        quantity: product.quantity,
-        location,
-        timestamp,
-      };
-    }
-    case "distributor":
-      return {
-        id,
-        type,
-        name,
-        location,
-        timestamp,
-      };
-    default:
-      return {
-        id,
-        type: "crowdfunding",
-        name,
-        amount: 100,
-        tier: "ENERGIZER",
-        timestamp,
-      };
-  }
 }
 
 function getTimeAgo(date: Date): string {
@@ -160,6 +39,8 @@ function getNotificationIcon(type: NotificationType) {
       return <ShoppingCart className="w-5 h-5 text-[#00ffff]" />;
     case "distributor":
       return <Zap className="w-5 h-5 text-[#9d4edd]" />;
+    case "newsletter":
+      return <Gift className="w-5 h-5 text-[#c8ff00]" />;
     default:
       return <Gift className="w-5 h-5 text-[#c8ff00]" />;
   }
@@ -175,6 +56,8 @@ function getIconBgColor(type: NotificationType) {
       return "bg-[#00ffff]/20";
     case "distributor":
       return "bg-[#9d4edd]/20";
+    case "newsletter":
+      return "bg-[#c8ff00]/20";
     default:
       return "bg-[#c8ff00]/20";
   }
@@ -190,6 +73,8 @@ function getAccentColor(type: NotificationType) {
       return "text-[#00ffff]";
     case "distributor":
       return "text-[#9d4edd]";
+    case "newsletter":
+      return "text-[#c8ff00]";
     default:
       return "text-[#c8ff00]";
   }
@@ -205,56 +90,111 @@ function getPulseColor(type: NotificationType) {
       return "bg-[#00ffff]";
     case "distributor":
       return "bg-[#9d4edd]";
+    case "newsletter":
+      return "bg-[#c8ff00]";
     default:
       return "bg-[#c8ff00]";
   }
 }
 
+// Anonymize name for privacy (show first name and last initial)
+function anonymizeName(fullName: string | null | undefined, email?: string | null): string {
+  if (fullName) {
+    const parts = fullName.trim().split(' ');
+    if (parts.length >= 2) {
+      return `${parts[0]} ${parts[parts.length - 1][0]}.`;
+    }
+    return parts[0];
+  }
+  if (email) {
+    const localPart = email.split('@')[0];
+    return localPart.charAt(0).toUpperCase() + localPart.slice(1, 4) + '...';
+  }
+  return 'Someone';
+}
+
 export default function SocialProofNotifications() {
   const [currentNotification, setCurrentNotification] = useState<Notification | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [notificationQueue, setNotificationQueue] = useState<Notification[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cycleRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Fetch real data from the database
+  const recentContributions = trpc.crowdfunding.recentContributions.useQuery(undefined, {
+    refetchInterval: 60000, // Refetch every minute
+  });
   
-  // Track shown notifications to avoid immediate repeats
-  const shownNamesRef = useRef<Set<string>>(new Set());
+  const recentDistributors = trpc.distributor.recentEnrollments.useQuery(undefined, {
+    refetchInterval: 60000,
+  });
+
+  // Build notification queue from real data
+  useEffect(() => {
+    const notifications: Notification[] = [];
+    
+    // Add real crowdfunding contributions
+    if (recentContributions.data) {
+      recentContributions.data.forEach((contribution: { id: number; name: string | null; email: string | null; amount: number; tier: string | null; createdAt: Date }) => {
+        notifications.push({
+          id: `crowdfund-${contribution.id}`,
+          type: "crowdfunding",
+          name: anonymizeName(contribution.name, contribution.email),
+          amount: contribution.amount,
+          tier: contribution.tier ?? undefined,
+          timestamp: new Date(contribution.createdAt),
+        });
+      });
+    }
+    
+    // Add real distributor enrollments
+    if (recentDistributors.data) {
+      recentDistributors.data.forEach((distributor: { id: number; name: string | null; city: string | null; state: string | null; createdAt: Date }) => {
+        notifications.push({
+          id: `distributor-${distributor.id}`,
+          type: "distributor",
+          name: anonymizeName(distributor.name),
+          location: distributor.city && distributor.state 
+            ? `${distributor.city}, ${distributor.state}` 
+            : undefined,
+          timestamp: new Date(distributor.createdAt),
+        });
+      });
+    }
+    
+    // Sort by timestamp (most recent first) and limit to last 20
+    notifications.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    setNotificationQueue(notifications.slice(0, 20));
+  }, [recentContributions.data, recentDistributors.data]);
 
   const showNextNotification = useCallback(() => {
-    // Generate a new unique notification
-    let notification = generateNotification();
-    let attempts = 0;
-    
-    // Try to avoid showing the same name twice in a row (up to 5 attempts)
-    while (shownNamesRef.current.has(notification.name) && attempts < 5) {
-      notification = generateNotification();
-      attempts++;
+    if (notificationQueue.length === 0) {
+      // No real notifications to show - don't show anything
+      return;
     }
     
-    // Track this name
-    shownNamesRef.current.add(notification.name);
-    
-    // Keep only last 10 names to allow recycling
-    if (shownNamesRef.current.size > 10) {
-      const names = Array.from(shownNamesRef.current);
-      shownNamesRef.current = new Set(names.slice(-10));
-    }
-    
+    const notification = notificationQueue[currentIndex % notificationQueue.length];
     setCurrentNotification(notification);
     setIsVisible(true);
+    setCurrentIndex((prev) => prev + 1);
     
     // Hide after 5 seconds
     timeoutRef.current = setTimeout(() => {
       setIsVisible(false);
     }, 5000);
     
-    // Schedule next notification after 10-15 seconds (random interval for natural feel)
-    const nextDelay = 10000 + Math.random() * 5000;
+    // Schedule next notification after 15-25 seconds (longer interval for real notifications)
+    const nextDelay = 15000 + Math.random() * 10000;
     cycleRef.current = setTimeout(showNextNotification, nextDelay);
-  }, []);
+  }, [notificationQueue, currentIndex]);
 
   useEffect(() => {
-    // Show first notification after 4-6 seconds (random)
-    const initialDelay = 4000 + Math.random() * 2000;
+    // Only start showing notifications if we have real data
+    if (notificationQueue.length === 0) return;
+    
+    // Show first notification after 6-10 seconds
+    const initialDelay = 6000 + Math.random() * 4000;
     const initialTimeout = setTimeout(showNextNotification, initialDelay);
 
     return () => {
@@ -262,7 +202,7 @@ export default function SocialProofNotifications() {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (cycleRef.current) clearTimeout(cycleRef.current);
     };
-  }, [showNextNotification]);
+  }, [notificationQueue.length, showNextNotification]);
 
   const renderNotificationContent = (notification: Notification) => {
     const accentColor = getAccentColor(notification.type);
@@ -280,8 +220,10 @@ export default function SocialProofNotifications() {
       case "franchise":
         return (
           <p className="text-gray-300 text-sm">
-            applied for franchise in{" "}
-            <span className={`${accentColor} font-semibold`}>{notification.location}</span>
+            applied for franchise
+            {notification.location && (
+              <> in <span className={`${accentColor} font-semibold`}>{notification.location}</span></>
+            )}
           </p>
         );
       case "preorder":
@@ -297,14 +239,27 @@ export default function SocialProofNotifications() {
       case "distributor":
         return (
           <p className="text-gray-300 text-sm">
-            joined as distributor in{" "}
-            <span className={`${accentColor} font-semibold`}>{notification.location}</span>
+            joined as distributor
+            {notification.location && (
+              <> in <span className={`${accentColor} font-semibold`}>{notification.location}</span></>
+            )}
+          </p>
+        );
+      case "newsletter":
+        return (
+          <p className="text-gray-300 text-sm">
+            subscribed to the newsletter
           </p>
         );
       default:
         return null;
     }
   };
+
+  // Don't render anything if no real notifications
+  if (notificationQueue.length === 0) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-6 left-6 z-50 pointer-events-none">

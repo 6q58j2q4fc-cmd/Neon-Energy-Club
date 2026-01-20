@@ -9,6 +9,8 @@ import { trpc } from "@/lib/trpc";
 import { TerritoryApplicationForm } from "./TerritoryApplicationForm";
 import { toast } from "sonner";
 
+export type TerritoryType = 'premium_urban' | 'urban' | 'suburban' | 'rural';
+
 export interface TerritoryData {
   center: { lat: number; lng: number };
   address: string;
@@ -22,6 +24,9 @@ export interface TerritoryData {
   crossStreets?: string[];
   polygonCoords?: Array<{ lat: number; lng: number }>;
   isCustomShape?: boolean;
+  territoryType?: TerritoryType;
+  trafficMultiplier?: number;
+  minimumApplied?: boolean;
 }
 
 interface TerritoryMapSelectorProps {
@@ -121,17 +126,84 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
   // Minimum licensing fee - industry standard for beverage market territory licensing
   const MINIMUM_LICENSE_FEE = 2500;
   
+  // Territory type determination for tiered pricing
+  const getTerritoryType = useCallback((demandMultiplier: number): TerritoryType => {
+    if (demandMultiplier >= 1.8) return 'premium_urban'; // Major metros (NYC, LA, SF, Miami)
+    if (demandMultiplier >= 1.5) return 'urban'; // Large cities
+    if (demandMultiplier >= 1.2) return 'suburban'; // Suburban areas
+    return 'rural'; // Rural areas
+  }, []);
+  
+  const getTerritoryTypeLabel = (type: TerritoryType): string => {
+    switch (type) {
+      case 'premium_urban': return 'Premium Urban';
+      case 'urban': return 'Urban';
+      case 'suburban': return 'Suburban';
+      case 'rural': return 'Rural';
+    }
+  };
+  
+  const getTerritoryTypeColor = (type: TerritoryType): string => {
+    switch (type) {
+      case 'premium_urban': return 'text-[#ff0080]'; // Hot pink for premium
+      case 'urban': return 'text-[#c8ff00]'; // Neon green for urban
+      case 'suburban': return 'text-[#00ffff]'; // Cyan for suburban
+      case 'rural': return 'text-white/70'; // Gray for rural
+    }
+  };
+  
+  // Tiered base pricing per square mile by territory type
+  const getBasePriceByType = (type: TerritoryType): number => {
+    switch (type) {
+      case 'premium_urban': return 75; // $75/sq mi - highest demand
+      case 'urban': return 60; // $60/sq mi - high demand
+      case 'suburban': return 45; // $45/sq mi - moderate demand
+      case 'rural': return 30; // $30/sq mi - lower demand but larger areas
+    }
+  };
+  
+  // Traffic multiplier based on territory type
+  const getTrafficMultiplier = (type: TerritoryType): number => {
+    switch (type) {
+      case 'premium_urban': return 1.5; // High foot traffic
+      case 'urban': return 1.3; // Good foot traffic
+      case 'suburban': return 1.1; // Moderate traffic
+      case 'rural': return 1.0; // Base traffic
+    }
+  };
+  
   const calculatePrice = useCallback((radiusMiles: number, lat: number, lng: number, customSquareMiles?: number) => {
     const squareMiles = customSquareMiles || Math.PI * radiusMiles * radiusMiles;
-    const basePrice = 50; // $50 per square mile base rate
     const demandMultiplier = getDemandMultiplier(lat, lng);
-    const calculatedPrice = Math.round(squareMiles * basePrice * demandMultiplier);
+    
+    // Determine territory type based on demand
+    const territoryType = getTerritoryType(demandMultiplier);
+    
+    // Get tiered base price
+    const basePrice = getBasePriceByType(territoryType);
+    
+    // Get traffic multiplier
+    const trafficMultiplier = getTrafficMultiplier(territoryType);
+    
+    // Calculate price with tiered pricing: base * area * demand * traffic
+    const calculatedPrice = Math.round(squareMiles * basePrice * demandMultiplier * trafficMultiplier);
+    
     // Apply minimum licensing fee - ensures minimum revenue regardless of territory size
     const totalPrice = Math.max(calculatedPrice, MINIMUM_LICENSE_FEE);
     const populationDensity = getPopulationDensity(demandMultiplier);
     const estimatedPopulation = Math.round(squareMiles * populationDensity);
-    return { squareMiles: Math.round(squareMiles * 100) / 100, basePrice, demandMultiplier, totalPrice, estimatedPopulation, minimumApplied: calculatedPrice < MINIMUM_LICENSE_FEE };
-  }, [getDemandMultiplier]);
+    
+    return { 
+      squareMiles: Math.round(squareMiles * 100) / 100, 
+      basePrice, 
+      demandMultiplier, 
+      totalPrice, 
+      estimatedPopulation, 
+      minimumApplied: calculatedPrice < MINIMUM_LICENSE_FEE,
+      territoryType,
+      trafficMultiplier,
+    };
+  }, [getDemandMultiplier, getTerritoryType]);
 
   const calculatePolygonArea = useCallback((coords: Array<{ lat: number; lng: number }>): number => {
     if (coords.length < 3) return 0;
@@ -791,33 +863,70 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
             </div>
           )}
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-black/30 rounded-lg p-4 border border-[#c8ff00]/20 text-center">
+          {/* Territory Type Badge */}
+          {territory.territoryType && (
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className={`px-4 py-2 rounded-full text-sm font-bold border ${territory.territoryType === 'premium_urban' ? 'bg-[#ff0080]/20 border-[#ff0080] text-[#ff0080]' : territory.territoryType === 'urban' ? 'bg-[#c8ff00]/20 border-[#c8ff00] text-[#c8ff00]' : territory.territoryType === 'suburban' ? 'bg-[#00ffff]/20 border-[#00ffff] text-[#00ffff]' : 'bg-white/10 border-white/30 text-white/70'}`}>
+                {getTerritoryTypeLabel(territory.territoryType)} Territory
+              </span>
+              <span className="text-gray-400 text-sm">
+                ${territory.basePrice}/sq mi base rate
+              </span>
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div className="bg-black/30 rounded-lg p-3 border border-[#c8ff00]/20 text-center">
               <p className="text-gray-400 text-xs mb-1">Area</p>
-              <p className="text-[#c8ff00] font-bold text-xl">{territory.squareMiles} sq mi</p>
+              <p className="text-[#c8ff00] font-bold text-lg">{territory.squareMiles} sq mi</p>
             </div>
-            <div className="bg-black/30 rounded-lg p-4 border border-[#c8ff00]/20 text-center">
+            <div className="bg-black/30 rounded-lg p-3 border border-[#c8ff00]/20 text-center">
               <p className="text-gray-400 text-xs mb-1">Est. Population</p>
-              <p className="text-[#c8ff00] font-bold text-xl">{territory.estimatedPopulation.toLocaleString()}</p>
+              <p className="text-[#c8ff00] font-bold text-lg">{territory.estimatedPopulation.toLocaleString()}</p>
             </div>
-            <div className="bg-black/30 rounded-lg p-4 border border-[#c8ff00]/20 text-center">
+            <div className="bg-black/30 rounded-lg p-3 border border-[#c8ff00]/20 text-center">
               <p className="text-gray-400 text-xs mb-1">Demand Factor</p>
-              <p className="text-[#c8ff00] font-bold text-xl">{territory.demandMultiplier}x</p>
+              <p className="text-[#c8ff00] font-bold text-lg">{territory.demandMultiplier}x</p>
             </div>
-            <div className="bg-black/30 rounded-lg p-4 border border-[#c8ff00]/20 text-center">
+            <div className="bg-black/30 rounded-lg p-3 border border-[#c8ff00]/20 text-center">
+              <p className="text-gray-400 text-xs mb-1">Traffic Multiplier</p>
+              <p className="text-[#c8ff00] font-bold text-lg">{territory.trafficMultiplier || 1.0}x</p>
+            </div>
+            <div className="bg-black/30 rounded-lg p-3 border border-[#c8ff00]/20 text-center">
               <p className="text-gray-400 text-xs mb-1">License Fee</p>
-              <p className="text-[#c8ff00] font-bold text-xl">${territory.totalPrice.toLocaleString()}</p>
-              {territory.totalPrice === 2500 && territory.squareMiles < 50 && (
+              <p className="text-[#c8ff00] font-bold text-lg">${territory.totalPrice.toLocaleString()}</p>
+              {territory.minimumApplied && (
                 <p className="text-yellow-400 text-xs mt-1">Min. fee applied</p>
               )}
             </div>
           </div>
           
-          {/* Minimum License Fee Notice */}
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 flex items-start gap-2">
-            <Info className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-            <p className="text-gray-300 text-xs">
-              <span className="text-blue-400 font-semibold">Minimum License Fee:</span> $2,500 applies to all territories regardless of size. This is the industry standard for beverage market territory licensing.
+          {/* Tiered Pricing Info */}
+          <div className="bg-gradient-to-r from-[#0d2818]/50 to-[#0a1a1a]/50 border border-[#c8ff00]/20 rounded-lg p-4">
+            <h4 className="text-white font-bold text-sm mb-3 flex items-center gap-2">
+              <Info className="w-4 h-4 text-[#c8ff00]" />
+              Tiered Territory Pricing
+            </h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+              <div className="bg-[#ff0080]/10 border border-[#ff0080]/30 rounded p-2 text-center">
+                <p className="text-[#ff0080] font-bold">Premium Urban</p>
+                <p className="text-gray-400">$75/sq mi × 1.5x traffic</p>
+              </div>
+              <div className="bg-[#c8ff00]/10 border border-[#c8ff00]/30 rounded p-2 text-center">
+                <p className="text-[#c8ff00] font-bold">Urban</p>
+                <p className="text-gray-400">$60/sq mi × 1.3x traffic</p>
+              </div>
+              <div className="bg-[#00ffff]/10 border border-[#00ffff]/30 rounded p-2 text-center">
+                <p className="text-[#00ffff] font-bold">Suburban</p>
+                <p className="text-gray-400">$45/sq mi × 1.1x traffic</p>
+              </div>
+              <div className="bg-white/5 border border-white/20 rounded p-2 text-center">
+                <p className="text-white/70 font-bold">Rural</p>
+                <p className="text-gray-400">$30/sq mi × 1.0x traffic</p>
+              </div>
+            </div>
+            <p className="text-gray-400 text-xs mt-3">
+              <span className="text-blue-400 font-semibold">Minimum License Fee:</span> $2,500 applies to all territories regardless of size.
             </p>
           </div>
 

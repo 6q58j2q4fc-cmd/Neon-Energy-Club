@@ -198,6 +198,27 @@ export async function getAllCrowdfundingContributions() {
   return await db.select().from(crowdfunding).orderBy(desc(crowdfunding.createdAt));
 }
 
+// Get recent contributions for social proof (public, limited fields for privacy)
+export async function getRecentCrowdfundingContributions(limit: number = 10) {
+  const db = await getDb();
+  if (!db) {
+    return [];
+  }
+  
+  return await db.select({
+    id: crowdfunding.id,
+    name: crowdfunding.name,
+    email: crowdfunding.email,
+    amount: crowdfunding.amount,
+    tier: crowdfunding.rewardTier,
+    createdAt: crowdfunding.createdAt,
+  })
+  .from(crowdfunding)
+  .where(eq(crowdfunding.status, "completed"))
+  .orderBy(desc(crowdfunding.createdAt))
+  .limit(limit);
+}
+
 export async function getCrowdfundingStats() {
   const db = await getDb();
   if (!db) {
@@ -367,6 +388,29 @@ export async function getDistributorByUserId(userId: number) {
   
   const result = await db.select().from(distributors).where(eq(distributors.userId, userId)).limit(1);
   return result[0] || null;
+}
+
+// Get recent distributor enrollments for social proof (public, limited fields for privacy)
+export async function getRecentDistributorEnrollments(limit: number = 10) {
+  const db = await getDb();
+  if (!db) {
+    return [];
+  }
+  
+  // Join with users to get names and location info
+  const result = await db.select({
+    id: distributors.id,
+    name: users.name,
+    city: users.city,
+    state: users.state,
+    createdAt: distributors.createdAt,
+  })
+  .from(distributors)
+  .leftJoin(users, eq(distributors.userId, users.id))
+  .orderBy(desc(distributors.createdAt))
+  .limit(limit);
+  
+  return result;
 }
 
 export async function getDistributorStats(userId: number) {

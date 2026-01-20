@@ -1438,3 +1438,21 @@
 - [x] Add minimum licensing fee constant to franchise pricing ($2,500)
 - [x] Update pricing calculation to enforce minimum fee regardless of territory size
 - [x] Update UI to display minimum fee information
+
+
+## Video, Notifications & Tiered Pricing - January 20, 2026
+
+### Video Improvements
+- [x] Remove Sora watermarks from homepage video (cropped right side)
+- [x] Add click to play/pause functionality
+- [x] Add volume controls to video
+
+### Notifications
+- [x] Stop simulated subscriber/customer notifications
+- [x] Only show notifications for real subscribers and customers from database
+
+### Tiered Territory Pricing
+- [x] Minimum licensing fee set to $2,500
+- [x] Add tiered pricing for territory types (Premium Urban, Urban, Suburban, Rural)
+- [x] Add traffic multipliers (1.5x, 1.3x, 1.1x, 1.0x) for different territory types
+- [x] Display territory type badge and pricing breakdown in UI
