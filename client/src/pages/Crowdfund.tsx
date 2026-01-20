@@ -10,6 +10,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Check, Star, Zap, Crown, Gift, ArrowLeft, TrendingUp, Users, Clock } from "lucide-react";
 import HamburgerHeader from "@/components/HamburgerHeader";
+import { SEO } from "@/components/SEO";
 
 // Reward tiers
 const rewardTiers = [
@@ -129,6 +130,13 @@ export default function Crowdfund() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a] text-white relative overflow-hidden">
+      <SEO 
+        title="Back the Relaunch - NEON Energy Drink Crowdfunding"
+        description="Join the NEON Energy Drink revolution! Back our crowdfunding campaign and get exclusive rewards, limited edition cans, and be part of the biggest energy drink comeback."
+        image="/og-crowdfund.png"
+        url="/crowdfund"
+        keywords="NEON crowdfunding, energy drink campaign, back the relaunch, exclusive rewards, limited edition, energy drink investment"
+      />
       {/* Background Graphics */}
       <div className="synthwave-grid-bg" />
       <div className="floating-neon-orb green w-96 h-96 -top-48 -left-48" style={{ animationDelay: '0s' }} />

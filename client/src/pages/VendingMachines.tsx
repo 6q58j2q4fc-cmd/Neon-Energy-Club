@@ -59,6 +59,9 @@ export default function VendingMachines() {
       <SEO 
         title="NEON Vending Machines | Micro-Franchise Opportunity"
         description="Start your own NEON Energy vending machine business. Earn $600+ monthly profit per machine with our turnkey micro-franchise opportunity."
+        image="/og-vending.png"
+        url="/vending"
+        keywords="NEON vending machines, passive income, micro-franchise, vending business, energy drink vending, AI vending machine"
       />
       
       <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a]">

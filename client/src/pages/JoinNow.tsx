@@ -9,6 +9,7 @@ import { useLocation } from "wouter";
 import { Check, Users, ShoppingCart, TrendingUp, DollarSign, Gift, Sparkles, ArrowRight, Zap } from "lucide-react";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
+import { SEO } from "@/components/SEO";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -42,6 +43,13 @@ export default function JoinNow() {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      <SEO 
+        title="Join NEON - Become a Customer or Distributor"
+        description="Join the NEON Energy Drink movement! Become a customer for exclusive perks or a distributor to build your own energy drink empire. Start your journey today."
+        image="/og-join.png"
+        url="/join"
+        keywords="join NEON, NEON distributor, NEON customer, energy drink business, MLM opportunity, network marketing, build your empire"
+      />
       <HamburgerHeader variant="default" />
 
       {/* Choose Account Type */}

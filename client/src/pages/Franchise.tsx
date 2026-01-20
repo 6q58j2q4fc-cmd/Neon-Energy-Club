@@ -13,6 +13,7 @@ import TerritoryMapSelector from "@/components/TerritoryMapSelector";
 import type { TerritoryData } from "@/components/TerritoryMapSelector";
 import { useAuth } from "@/_core/hooks/useAuth";
 import HamburgerHeader from "@/components/HamburgerHeader";
+import { SEO } from "@/components/SEO";
 
 // Territory pricing data (price per square mile per month)
 const territoryPricing = {
@@ -90,6 +91,13 @@ export default function Franchise() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a] text-white relative overflow-hidden">
+      <SEO 
+        title="Franchise Opportunity - NEON Energy Drink"
+        description="Own your territory with NEON Energy Drink franchise. Select your market, set your radius, and build your energy drink empire. Territory licensing starting at $75/sq mi."
+        image="/og-franchise.png"
+        url="/franchise"
+        keywords="NEON franchise, energy drink franchise, territory licensing, business opportunity, passive income, energy drink distribution"
+      />
       {/* Background Graphics */}
       <div className="synthwave-grid-bg" />
       <div className="floating-neon-orb green w-96 h-96 -top-48 -left-48" style={{ animationDelay: '0s' }} />

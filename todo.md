@@ -1413,3 +1413,21 @@
 - [x] Add hashtags (hidden: #visalus, #vi, #vineon)
 - [x] Add hashtags (public: #EnergyDrinks, #NeonEnergyDrink, #Neon)
 - [x] Optimize all blog articles for search engines
+
+
+## Open Graph Images for Social Sharing (Jan 20)
+
+### Key Page OG Images
+- [x] Create OG image for Homepage (1200x630px)
+- [x] Create OG image for Products page
+- [x] Create OG image for Franchise page
+- [x] Create OG image for Blog page
+- [x] Create OG image for Crowdfund page
+- [x] Create OG image for Vending Machines page
+- [x] Create OG image for Join Now page
+- [x] Create OG image for About/Story page
+
+### Implementation
+- [x] Save OG images to client/public folder
+- [x] Update SEO component to reference page-specific OG images
+- [x] Test social sharing preview on key pages

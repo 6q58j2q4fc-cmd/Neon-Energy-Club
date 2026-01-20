@@ -40,6 +40,7 @@ export default function Blog() {
       <SEO 
         title="Blog - NEON Energy Drink News & Insights"
         description="Stay updated with the latest NEON Energy Drink news, health tips, business insights, franchise success stories, and distributor updates. #NeonEnergyDrink #EnergyDrinks #CleanEnergy"
+        image="/og-blog.png"
         keywords="NEON blog, NEON energy drink, energy drink news, health tips, franchise success, distributor stories, natural energy, clean energy, energy drink relaunch, NEON franchise, NEON distributor, energy drink business, healthy energy drink, organic energy, zero sugar energy, no crash energy, fitness energy, pre workout energy"
         url="/blog"
         type="website"

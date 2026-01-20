@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
+import { SEO } from "@/components/SEO";
 
 export default function About() {
   const [, setLocation] = useLocation();
@@ -13,6 +14,13 @@ export default function About() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a] text-white relative overflow-hidden">
+      <SEO 
+        title="Our Story - NEON Energy Drink"
+        description="Discover the NEON Energy Drink story. From founding to global expansion across 48 states and 14 countries. Learn about our mission to revolutionize clean energy."
+        image="/og-about.png"
+        url="/about"
+        keywords="NEON story, energy drink history, NEON founding, clean energy mission, natural energy drink brand"
+      />
       {/* Background Graphics - Tropical */}
       <div className="jungle-canopy-overlay" />
       <div className="synthwave-grid-bg" />

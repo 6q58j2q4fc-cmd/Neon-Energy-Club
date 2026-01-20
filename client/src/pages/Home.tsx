@@ -77,7 +77,7 @@ export default function Home() {
       <SEO 
         title="NEON Energy Drink - The Relaunch"
         description="Be part of the NEON Energy Drink relaunch. Pre-order now, join our crowdfunding campaign, or become a franchise partner. Clean, natural energy is coming back."
-        image="/og-image.png"
+        image="/og-home.png"
         url="/"
         keywords="NEON energy drink, energy drink relaunch, crowdfunding, franchise opportunity, natural energy, clean energy drink, pre-order"
       />

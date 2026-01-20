@@ -2,6 +2,7 @@ import { Check, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import HamburgerHeader from "@/components/HamburgerHeader";
+import { SEO } from "@/components/SEO";
 
 export default function Products() {
   const [, setLocation] = useLocation();
@@ -13,6 +14,13 @@ export default function Products() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a] text-white">
+      <SEO 
+        title="Products - NEON Energy Drink"
+        description="Discover NEON Original and NEON Organic energy drinks. Clean energy with natural ingredients, zero sugar, and no crash. Fuel your potential."
+        image="/og-products.png"
+        url="/products"
+        keywords="NEON products, energy drink flavors, NEON Original, NEON Organic, natural energy drink, zero sugar energy"
+      />
       <HamburgerHeader variant="vice" />
 
       {/* Hero Section - Vice City Style */}
