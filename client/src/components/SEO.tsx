@@ -16,10 +16,69 @@ const BASE_URL = "https://neonenergy.com";
 const DEFAULT_IMAGE = "/og-image.png";
 const SITE_NAME = "NEON Energy Drink";
 
+// SEO Keywords and Hashtags
+// Public hashtags (visible in meta tags)
+const PUBLIC_HASHTAGS = [
+  "#NeonEnergyDrink",
+  "#Neon",
+  "#EnergyDrinks",
+  "#CleanEnergy",
+  "#NaturalEnergy",
+  "#HealthyEnergy",
+  "#EnergyBoost",
+  "#FitnessEnergy",
+  "#PreWorkout",
+  "#NoCrash",
+  "#ZeroSugar",
+  "#OrganicEnergy",
+  "#GreenEnergy",
+  "#SustainableEnergy",
+  "#EnergyDrinkRelaunch",
+];
+
+// Hidden hashtags (embedded in page but not displayed)
+const HIDDEN_HASHTAGS = [
+  "visalus",
+  "vi",
+  "vineon",
+];
+
+// Comprehensive SEO keywords
+const COMPREHENSIVE_KEYWORDS = [
+  "NEON energy drink",
+  "natural energy drink",
+  "clean energy drink",
+  "healthy energy drink",
+  "organic energy drink",
+  "energy drink relaunch",
+  "energy drink franchise",
+  "energy drink distributor",
+  "energy drink pre-order",
+  "energy drink crowdfunding",
+  "zero sugar energy drink",
+  "no crash energy drink",
+  "green tea energy drink",
+  "natural caffeine",
+  "B vitamins energy",
+  "taurine energy drink",
+  "fitness energy drink",
+  "pre workout energy",
+  "sustainable energy drink",
+  "vegan energy drink",
+  "plant-based energy",
+  "energy drink business opportunity",
+  "energy drink MLM",
+  "energy drink network marketing",
+  "NEON franchise",
+  "NEON distributor",
+  "NEON vending machines",
+  "NEON NFT",
+];
+
 export function SEO({
   title,
   description,
-  keywords = "energy drink, NEON, natural energy, organic energy drink, healthy energy, caffeine, taurine, B vitamins, pre-order, crowdfunding, franchise, distributor",
+  keywords = COMPREHENSIVE_KEYWORDS.join(", "),
   image = DEFAULT_IMAGE,
   url = "",
   type = "website",
@@ -54,6 +113,22 @@ export function SEO({
     setMeta("robots", "index, follow");
     setMeta("viewport", "width=device-width, initial-scale=1.0");
     setMeta("theme-color", "#c8ff00");
+    
+    // Public Hashtags (visible in meta)
+    setMeta("hashtags", PUBLIC_HASHTAGS.join(" "));
+    
+    // Hidden SEO terms (embedded but not displayed)
+    setMeta("hidden-keywords", HIDDEN_HASHTAGS.join(", "));
+    
+    // Additional SEO meta tags
+    setMeta("news_keywords", "NEON energy drink, energy drink relaunch, natural energy, clean energy");
+    setMeta("classification", "Energy Drinks, Health & Wellness, Beverages");
+    setMeta("category", "Energy Drinks");
+    setMeta("coverage", "Worldwide");
+    setMeta("distribution", "Global");
+    setMeta("rating", "General");
+    setMeta("revisit-after", "1 day");
+    setMeta("language", "en");
 
     // Open Graph Tags
     setMeta("og:title", fullTitle, true);

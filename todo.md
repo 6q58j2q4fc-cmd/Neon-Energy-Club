@@ -1382,3 +1382,34 @@
 - [x] Fix navigation panel disappearing on some pages
 - [x] Ensure consistent navigation across all pages
 - [x] Test navigation on all major pages
+
+
+## Homepage Video & Ingredients Update (Jan 20)
+
+### Ingredient Images
+- [x] Add Cherry image to Natural Ingredients carousel
+- [x] Add Cranberry image to Natural Ingredients carousel
+- [x] Add Raspberry image to Natural Ingredients carousel
+- [x] Add Strawberry image to Natural Ingredients carousel
+- [x] Add Gotu Kola image to Natural Ingredients carousel
+
+### Homepage Video
+- [x] Add promotional video to homepage
+- [x] Remove watermarks from video (cropped top portion)
+
+### Our Story Page
+- [x] Remove green lines from Our Story page
+
+### Smooth Transitions
+- [x] Add smooth page transitions across all pages
+- [x] Ensure all pages have consistent animations
+
+### Full Site Debug
+- [x] Debug and fix any issues on all pages
+- [x] Test all functionality end-to-end
+
+### Blog SEO Optimization
+- [x] Add SEO meta tags for blog pages
+- [x] Add hashtags (hidden: #visalus, #vi, #vineon)
+- [x] Add hashtags (public: #EnergyDrinks, #NeonEnergyDrink, #Neon)
+- [x] Optimize all blog articles for search engines

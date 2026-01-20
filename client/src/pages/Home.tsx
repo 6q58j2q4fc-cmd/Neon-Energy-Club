@@ -281,6 +281,39 @@ export default function Home() {
         </button>
       </section>
 
+      {/* Promotional Video Section */}
+      <section className="py-16 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a1a1a] via-[#0d2818]/50 to-[#0a1a1a]" />
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <span className="badge-neon mb-4 inline-block">EXPERIENCE NEON</span>
+              <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
+                FEEL THE <span className="text-[#c8ff00]">ENERGY</span>
+              </h2>
+              <p className="text-white/60 max-w-xl mx-auto">
+                Immerse yourself in the world of NEON - where nature meets innovation.
+              </p>
+            </div>
+            
+            <div className="promo-video-container">
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full rounded-2xl"
+                poster="/neon-can-new.png"
+              >
+                <source src="/neon-promo.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              <div className="promo-video-overlay" />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Funding Progress Section - Vice City Style */}
       <section id="crowdfunding-section" className="py-20 relative scroll-mt-20">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#ff0080]/5 to-transparent" />
@@ -465,57 +498,87 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-8">
-            {[
-              {
-                image: "/images/passion-fruit.jpg",
-                name: "Passion Fruit",
-                benefit: "Heart health support with vitamins A, B6, B12 & C",
-              },
-              {
-                image: "/images/prickly-pear.jpg",
-                name: "Prickly Pear",
-                benefit: "Blood glucose regulation with natural pectin & fiber",
-              },
-              {
-                image: "/images/green-tea-leaves.jpg",
-                name: "Green Tea Extract",
-                benefit: "150mg natural caffeine with powerful antioxidants",
-              },
-              {
-                image: "/images/blueberries.png",
-                name: "Blueberry",
-                benefit: "Vitamin C & antioxidants for immune support",
-              },
-            ].map((ingredient, i) => (
-              <div
-                key={i}
-                className="group text-center"
-              >
-                <div className="relative mb-6 mx-auto w-40 h-40">
-                  {/* Glow Effect */}
-                  <div className="absolute inset-0 bg-[#c8ff00]/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
-                  {/* Image Container */}
-                  <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-[#c8ff00]/30 group-hover:border-[#c8ff00] transition-all duration-300 shadow-lg">
-                    <img
-                      src={ingredient.image}
-                      alt={ingredient.name}
-                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                  
-
+          {/* Scrolling Ingredients Carousel */}
+          <div className="relative overflow-hidden">
+            <div className="flex animate-scroll-ingredients gap-8 py-4" style={{ width: 'max-content' }}>
+              {[...Array(2)].map((_, setIndex) => (
+                <div key={setIndex} className="flex gap-8">
+                  {[
+                    {
+                      image: "/images/passion-fruit.jpg",
+                      name: "Passion Fruit",
+                      benefit: "Heart health support with vitamins A, B6, B12 & C",
+                    },
+                    {
+                      image: "/images/prickly-pear.jpg",
+                      name: "Prickly Pear",
+                      benefit: "Blood glucose regulation with natural pectin & fiber",
+                    },
+                    {
+                      image: "/images/green-tea-leaves.jpg",
+                      name: "Green Tea Extract",
+                      benefit: "150mg natural caffeine with powerful antioxidants",
+                    },
+                    {
+                      image: "/images/blueberries.png",
+                      name: "Blueberry",
+                      benefit: "Vitamin C & antioxidants for immune support",
+                    },
+                    {
+                      image: "/cherry.jpg",
+                      name: "Cherry",
+                      benefit: "Rich in antioxidants & natural anti-inflammatory compounds",
+                    },
+                    {
+                      image: "/cranberry.png",
+                      name: "Cranberry",
+                      benefit: "Urinary tract health & immune-boosting vitamin C",
+                    },
+                    {
+                      image: "/raspberry.png",
+                      name: "Raspberry",
+                      benefit: "High fiber content & metabolism-boosting ketones",
+                    },
+                    {
+                      image: "/strawberry.png",
+                      name: "Strawberry",
+                      benefit: "Heart-healthy folate & skin-nourishing vitamin C",
+                    },
+                    {
+                      image: "/gotu-kola.jpg",
+                      name: "Gotu Kola",
+                      benefit: "Brain function support & natural stress relief",
+                    },
+                  ].map((ingredient, i) => (
+                    <div
+                      key={`${setIndex}-${i}`}
+                      className="group text-center flex-shrink-0 w-48"
+                    >
+                      <div className="relative mb-6 mx-auto w-40 h-40">
+                        {/* Glow Effect */}
+                        <div className="absolute inset-0 bg-[#c8ff00]/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        
+                        {/* Image Container */}
+                        <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-[#c8ff00]/30 group-hover:border-[#c8ff00] transition-all duration-300 shadow-lg">
+                          <img
+                            src={ingredient.image}
+                            alt={ingredient.name}
+                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                          />
+                        </div>
+                      </div>
+                      
+                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#c8ff00] transition-colors">
+                        {ingredient.name}
+                      </h3>
+                      <p className="text-white/60 text-sm leading-relaxed max-w-[180px] mx-auto">
+                        {ingredient.benefit}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-                
-                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#c8ff00] transition-colors">
-                  {ingredient.name}
-                </h3>
-                <p className="text-white/60 text-sm leading-relaxed">
-                  {ingredient.benefit}
-                </p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           {/* Bottom Tagline */}

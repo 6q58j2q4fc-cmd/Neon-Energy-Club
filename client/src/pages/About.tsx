@@ -30,10 +30,6 @@ export default function About() {
 
       {/* Hero Section - Vice City Style */}
       <section className="pt-32 pb-16 px-4 relative z-10">
-        {/* Neon Lines */}
-        <div className="neon-line-horizontal w-1/3 left-0 top-1/4" />
-        <div className="neon-line-horizontal w-1/4 right-0 bottom-1/3" />
-        
         <div className={`container mx-auto max-w-4xl text-center relative z-10 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
           <h2 className="text-5xl md:text-7xl font-black mb-6 font-vice">
             OUR <span className="gradient-text-vice drop-shadow-[0_0_20px_rgba(255,0,128,0.5)]">STORY</span>

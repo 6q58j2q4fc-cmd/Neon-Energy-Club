@@ -38,10 +38,11 @@ export default function Blog() {
   return (
     <div className="min-h-screen vice-bg text-white">
       <SEO 
-        title="Blog - NEON Energy Drink"
-        description="Stay updated with the latest news, health tips, business insights, and success stories from the NEON Energy Drink community."
-        keywords="NEON blog, energy drink news, health tips, franchise success, distributor stories, natural energy"
+        title="Blog - NEON Energy Drink News & Insights"
+        description="Stay updated with the latest NEON Energy Drink news, health tips, business insights, franchise success stories, and distributor updates. #NeonEnergyDrink #EnergyDrinks #CleanEnergy"
+        keywords="NEON blog, NEON energy drink, energy drink news, health tips, franchise success, distributor stories, natural energy, clean energy, energy drink relaunch, NEON franchise, NEON distributor, energy drink business, healthy energy drink, organic energy, zero sugar energy, no crash energy, fitness energy, pre workout energy"
         url="/blog"
+        type="website"
       />
 
       <HamburgerHeader variant="default" />

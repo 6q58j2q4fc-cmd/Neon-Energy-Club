@@ -943,3 +943,91 @@ th {
               radial-gradient(ellipse 55% 22% at 70% 60%, rgba(45, 90, 61, 0.45) 0%, transparent 100%),
               radial-gradient(ellipse 50% 20% at 40% 80%, rgba(45, 90, 61, 0.35) 0%, transparent 100%);
 }
+
+
+/* Scrolling Ingredients Carousel Animation */
+@keyframes scroll-ingredients {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-scroll-ingredients {
+  animation: scroll-ingredients 40s linear infinite;
+}
+
+.animate-scroll-ingredients:hover {
+  animation-play-state: paused;
+}
+
+/* Smooth Page Transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 300ms ease-in, transform 300ms ease-in;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Fade-in animation for sections */
+.fade-in-section {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.fade-in-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger animation for grid items */
+.stagger-item {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+.stagger-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Video container styles */
+.promo-video-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  box-shadow: 0 0 40px rgba(200, 255, 0, 0.3);
+}
+
+.promo-video-container video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.promo-video-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10, 26, 26, 0.8) 0%, transparent 50%);
+  pointer-events: none;
+}
