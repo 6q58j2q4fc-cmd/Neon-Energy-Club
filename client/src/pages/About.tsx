@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import HamburgerHeader from "@/components/HamburgerHeader";
+import Footer from "@/components/Footer";
 
 export default function About() {
   const [, setLocation] = useLocation();
@@ -18,6 +19,9 @@ export default function About() {
       <div className="floating-neon-orb green w-96 h-96 -top-48 -left-48" style={{ animationDelay: '0s' }} />
       <div className="floating-neon-orb pink w-80 h-80 top-1/4 -right-40" style={{ animationDelay: '-5s' }} />
       <div className="floating-neon-orb jungle w-72 h-72 bottom-1/3 -left-36" style={{ animationDelay: '-10s' }} />
+      
+      {/* Cascade Mountain Range Silhouette */}
+      <div className="cascade-mountains" />
       
       {/* Decorative Palm Trees */}
       <img src="/neon-palm-tree.png" alt="" className="palm-tree-left hidden lg:block" />
@@ -124,7 +128,7 @@ export default function About() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 px-4 bg-gradient-to-b from-black to-[#0a0a0a] animated-bg">
+      <section className="py-16 px-4 bg-gradient-to-b from-black/50 to-[#0a1a1a]">
         <div className="container mx-auto max-w-2xl text-center space-y-6">
           <h3 className="text-4xl font-bold text-white">
             Be Part of the <span className="text-[#c8ff00] neon-text">Relaunch</span>
@@ -142,11 +146,7 @@ export default function About() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 border-t border-[#c8ff00]/20">
-        <div className="container mx-auto text-center text-gray-400">
-          <p>&copy; 2025 NEON Energy Drink. All rights reserved.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

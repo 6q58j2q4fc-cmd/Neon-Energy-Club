@@ -1316,3 +1316,26 @@
 ### Additional Certifications Added
 - [x] Add Non-GMO Verified badge (orange badge)
 - [x] Add 100% Vegan Plant-Based badge (neon green badge)
+
+
+## Music, Navigation & Visual Updates (Jan 20)
+
+### Auto-Play Ambient Music
+- [x] Enable auto-play for jungle ambient sounds on page load
+- [x] Ensure audio plays automatically when user visits site (with user interaction fallback)
+
+### Navigation Bar Consistency
+- [x] Fix navigation bar to appear on all pages (Story, Products, etc.)
+- [x] Ensure same Vice City theme across all page headers (HamburgerHeader component)
+- [x] Maintain consistent lighting and background throughout
+
+### Cascade Mountain Silhouette
+- [x] Add neon silhouette of Cascade mountain range to Story page background
+- [x] Style mountains with neon glow effect matching Vice City theme (cascade-mountains class)
+
+### Fruit Images Update
+- [x] Update fruit images on main page to match ingredients document:
+  - Passion Fruit (passion-fruit.jpg)
+  - Prickly Pear (prickly-pear.jpg)
+  - Green Tea Extract (green-tea-leaves.jpg)
+  - Blueberry (blueberries.png)

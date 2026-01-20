@@ -7,6 +7,7 @@ export function AmbientSoundToggle() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.3);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -16,7 +17,6 @@ export function AmbientSoundToggle() {
     audioRef.current.volume = volume;
 
     // Check localStorage for saved preference
-    const savedPreference = localStorage.getItem("neon-ambient-sound");
     const savedVolume = localStorage.getItem("neon-ambient-volume");
     
     if (savedVolume) {
@@ -27,13 +27,47 @@ export function AmbientSoundToggle() {
       }
     }
 
-    // Auto-play if user previously enabled it
-    if (savedPreference === "enabled") {
-      // Need user interaction first, so we'll just set the state
-      // The actual play will happen on first user interaction
-    }
+    // Auto-play function - tries to play immediately
+    const attemptAutoPlay = async () => {
+      if (!audioRef.current) return;
+      
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+        setHasUserInteracted(true);
+        localStorage.setItem("neon-ambient-sound", "enabled");
+      } catch (error) {
+        // Auto-play was blocked - wait for user interaction
+        console.log("Auto-play blocked, waiting for user interaction");
+        
+        // Set up one-time click listener to enable audio
+        const enableAudio = async () => {
+          if (audioRef.current && !hasUserInteracted) {
+            try {
+              await audioRef.current.play();
+              setIsPlaying(true);
+              setHasUserInteracted(true);
+              localStorage.setItem("neon-ambient-sound", "enabled");
+            } catch (e) {
+              console.error("Audio playback failed:", e);
+            }
+          }
+          document.removeEventListener("click", enableAudio);
+          document.removeEventListener("touchstart", enableAudio);
+          document.removeEventListener("keydown", enableAudio);
+        };
+        
+        document.addEventListener("click", enableAudio, { once: true });
+        document.addEventListener("touchstart", enableAudio, { once: true });
+        document.addEventListener("keydown", enableAudio, { once: true });
+      }
+    };
+
+    // Attempt auto-play after a short delay
+    const timer = setTimeout(attemptAutoPlay, 500);
 
     return () => {
+      clearTimeout(timer);
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
@@ -59,6 +93,7 @@ export function AmbientSoundToggle() {
       } else {
         await audioRef.current.play();
         setIsPlaying(true);
+        setHasUserInteracted(true);
         localStorage.setItem("neon-ambient-sound", "enabled");
       }
     } catch (error) {

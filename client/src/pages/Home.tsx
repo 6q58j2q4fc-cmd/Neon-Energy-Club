@@ -468,24 +468,24 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8">
             {[
               {
-                image: "/images/lime-splash.jpg",
-                name: "Fresh Lime",
-                benefit: "Natural citrus flavor with vitamin C boost",
+                image: "/images/passion-fruit.jpg",
+                name: "Passion Fruit",
+                benefit: "Heart health support with vitamins A, B6, B12 & C",
               },
               {
-                image: "/images/apple-splash.jpg",
-                name: "Green Apple",
-                benefit: "Crisp, refreshing taste with natural sweetness",
+                image: "/images/prickly-pear.jpg",
+                name: "Prickly Pear",
+                benefit: "Blood glucose regulation with natural pectin & fiber",
               },
               {
-                image: "/images/citrus-slices.png",
-                name: "Citrus Blend",
-                benefit: "Energizing citrus complex for mental clarity",
+                image: "/images/green-tea-leaves.jpg",
+                name: "Green Tea Extract",
+                benefit: "150mg natural caffeine with powerful antioxidants",
               },
               {
-                image: "/images/green-apple-splash.jpg",
-                name: "Natural Caffeine",
-                benefit: "150mg from green tea for smooth energy",
+                image: "/images/blueberries.png",
+                name: "Blueberry",
+                benefit: "Vitamin C & antioxidants for immune support",
               },
             ].map((ingredient, i) => (
               <div
