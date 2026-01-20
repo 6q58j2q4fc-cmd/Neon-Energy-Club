@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { Gem, Crown, Star, Sparkles, Trophy, ArrowLeft, ExternalLink, Info, Share2, Twitter, Facebook } from "lucide-react";
-import Header from "@/components/Header";
+import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
@@ -45,7 +45,7 @@ export default function NFTGallery() {
       <img src="/neon-palm-tree.png" alt="" className="palm-tree-left hidden lg:block" style={{ bottom: '20%' }} />
       <img src="/neon-palm-tree.png" alt="" className="palm-tree-right hidden lg:block" style={{ bottom: '30%' }} />
       
-      <Header />
+      <HamburgerHeader variant="default" />
 
       {/* Hero Section */}
       <section className="pt-24 pb-12 px-4 relative z-10">

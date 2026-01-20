@@ -7,6 +7,8 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { Check, Users, ShoppingCart, TrendingUp, DollarSign, Gift, Sparkles, ArrowRight, Zap } from "lucide-react";
+import HamburgerHeader from "@/components/HamburgerHeader";
+import Footer from "@/components/Footer";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -40,22 +42,7 @@ export default function JoinNow() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="border-b border-[#c8ff00]/20 py-4">
-        <div className="container px-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setLocation("/")}>
-              <div className="w-10 h-10 rounded-lg bg-[#c8ff00] flex items-center justify-center">
-                <Zap className="w-6 h-6 text-black" />
-              </div>
-              <span className="text-xl font-black neon-text">NEON®</span>
-            </div>
-            <Button variant="outline" onClick={() => setLocation("/")} className="border-[#c8ff00]/30 text-white">
-              Back to Home
-            </Button>
-          </div>
-        </div>
-      </header>
+      <HamburgerHeader variant="default" />
 
       {/* Choose Account Type */}
       {step === "choose" && (
@@ -197,6 +184,8 @@ export default function JoinNow() {
       {step === "signup" && user && accountType === "distributor" && (
         <DistributorSignupForm user={user} />
       )}
+
+      <Footer />
     </div>
   );
 }

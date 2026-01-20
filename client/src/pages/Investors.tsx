@@ -22,7 +22,7 @@ import {
   Phone,
   Briefcase
 } from "lucide-react";
-import Header from "@/components/Header";
+import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
 
 export default function Investors() {
@@ -86,7 +86,7 @@ export default function Investors() {
 
   return (
     <div className="min-h-screen bg-[#0a1a1a]">
-      <Header />
+      <HamburgerHeader variant="default" />
       
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">

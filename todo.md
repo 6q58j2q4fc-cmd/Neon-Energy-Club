@@ -1369,3 +1369,16 @@
 ### UI Improvements
 - [x] Move "Fresh New Can Design" badge below can (bottom right corner position)
 
+
+
+## Territory Map & Navigation Fixes (Jan 20)
+
+### Territory Map Search Flow
+- [x] Fix map not smoothly updating when searching for locations
+- [x] Ensure map pans and zooms to searched location immediately
+- [x] Fix search result not properly updating territory display
+
+### Navigation Panel Visibility
+- [x] Fix navigation panel disappearing on some pages
+- [x] Ensure consistent navigation across all pages
+- [x] Test navigation on all major pages

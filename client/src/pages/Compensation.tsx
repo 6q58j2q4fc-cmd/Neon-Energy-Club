@@ -21,6 +21,8 @@ import {
   Building2,
   Coins
 } from "lucide-react";
+import HamburgerHeader from "@/components/HamburgerHeader";
+import Footer from "@/components/Footer";
 
 // Rank definitions
 const ranks = [
@@ -68,30 +70,7 @@ export default function Compensation() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#0d0418]/95 via-[#0d0418]/98 to-[#0d0418]" />
       </div>
 
-      {/* Header */}
-      <header className="fixed top-0 w-full z-50 bg-[#0d2818]/90 backdrop-blur-xl border-b border-[#ff0080]/30">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div 
-            className="cursor-pointer" 
-            onClick={() => setLocation("/")}
-          >
-            <span className="text-2xl md:text-3xl font-black tracking-tight neon-logo-text">NEON</span>
-            <span className="text-[#c8ff00]/60 text-xs ml-1">®</span>
-          </div>
-          <nav className="hidden md:flex gap-6 items-center">
-            <button onClick={() => setLocation("/")} className="text-white/80 hover:text-[#c8ff00] font-semibold transition-all">Home</button>
-            <button onClick={() => setLocation("/shop")} className="text-white/80 hover:text-[#c8ff00] font-semibold transition-all">Shop</button>
-            <button onClick={() => setLocation("/products")} className="text-white/80 hover:text-[#c8ff00] font-semibold transition-all">Products</button>
-            <button onClick={() => setLocation("/vending")} className="text-white/80 hover:text-[#c8ff00] font-semibold transition-all">Vending</button>
-            <Button 
-              onClick={() => setLocation("/join")}
-              className="btn-vice-pink text-white font-bold"
-            >
-              Join Now
-            </Button>
-          </nav>
-        </div>
-      </header>
+      <HamburgerHeader variant="vice" />
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 relative overflow-hidden z-10">
@@ -481,15 +460,7 @@ export default function Compensation() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-[#c8ff00]/20 py-8 px-4 bg-black">
-        <div className="container mx-auto text-center text-gray-500 text-sm">
-          <p className="mb-2">© 2026 NEON Energy Drink. All rights reserved.</p>
-          <p className="text-xs">
-            Income examples are illustrative only. Individual results will vary based on effort, skill, and market conditions.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

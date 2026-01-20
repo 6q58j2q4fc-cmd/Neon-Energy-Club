@@ -23,6 +23,8 @@ import {
   Mail
 } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import HamburgerHeader from "@/components/HamburgerHeader";
+import Footer from "@/components/Footer";
 
 export default function VendingMachines() {
   const [dailySales, setDailySales] = useState(20);
@@ -60,23 +62,7 @@ export default function VendingMachines() {
       />
       
       <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a]">
-        {/* Header */}
-        <header className="fixed top-0 left-0 right-0 z-50 bg-[#0a1a1a]/90 backdrop-blur-md border-b border-[#c8ff00]/20">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/">
-              <span className="text-2xl font-black neon-text-glow cursor-pointer">NEON</span>
-            </Link>
-            <nav className="hidden md:flex items-center gap-6">
-              <Link href="/products"><span className="text-gray-300 hover:text-[#c8ff00] transition-colors cursor-pointer">Products</span></Link>
-              <Link href="/franchise"><span className="text-gray-300 hover:text-[#c8ff00] transition-colors cursor-pointer">Franchise</span></Link>
-              <Link href="/compensation"><span className="text-gray-300 hover:text-[#c8ff00] transition-colors cursor-pointer">Comp Plan</span></Link>
-              <Link href="/crowdfunding"><span className="text-gray-300 hover:text-[#c8ff00] transition-colors cursor-pointer">Invest</span></Link>
-            </nav>
-            <Button asChild className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold">
-              <Link href="/franchise">Get Started</Link>
-            </Button>
-          </div>
-        </header>
+        <HamburgerHeader variant="default" />
 
         {/* Hero Section */}
         <section className="pt-32 pb-20 relative overflow-hidden">
@@ -463,15 +449,7 @@ export default function VendingMachines() {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="py-12 bg-black border-t border-[#c8ff00]/20">
-          <div className="container mx-auto px-4 text-center">
-            <Link href="/">
-              <span className="text-3xl font-black neon-text-glow cursor-pointer">NEON</span>
-            </Link>
-            <p className="text-gray-500 mt-4">© 2025 NEON Energy. All rights reserved.</p>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </>
   );
