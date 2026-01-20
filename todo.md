@@ -1431,3 +1431,10 @@
 - [x] Save OG images to client/public folder
 - [x] Update SEO component to reference page-specific OG images
 - [x] Test social sharing preview on key pages
+
+
+## Minimum Licensing Fee - January 20, 2026
+
+- [x] Add minimum licensing fee constant to franchise pricing ($2,500)
+- [x] Update pricing calculation to enforce minimum fee regardless of territory size
+- [x] Update UI to display minimum fee information

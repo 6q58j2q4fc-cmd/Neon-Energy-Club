@@ -118,14 +118,19 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
     return 1.0;
   }, []);
 
+  // Minimum licensing fee - industry standard for beverage market territory licensing
+  const MINIMUM_LICENSE_FEE = 2500;
+  
   const calculatePrice = useCallback((radiusMiles: number, lat: number, lng: number, customSquareMiles?: number) => {
     const squareMiles = customSquareMiles || Math.PI * radiusMiles * radiusMiles;
-    const basePrice = 50;
+    const basePrice = 50; // $50 per square mile base rate
     const demandMultiplier = getDemandMultiplier(lat, lng);
-    const totalPrice = Math.round(squareMiles * basePrice * demandMultiplier);
+    const calculatedPrice = Math.round(squareMiles * basePrice * demandMultiplier);
+    // Apply minimum licensing fee - ensures minimum revenue regardless of territory size
+    const totalPrice = Math.max(calculatedPrice, MINIMUM_LICENSE_FEE);
     const populationDensity = getPopulationDensity(demandMultiplier);
     const estimatedPopulation = Math.round(squareMiles * populationDensity);
-    return { squareMiles: Math.round(squareMiles * 100) / 100, basePrice, demandMultiplier, totalPrice, estimatedPopulation };
+    return { squareMiles: Math.round(squareMiles * 100) / 100, basePrice, demandMultiplier, totalPrice, estimatedPopulation, minimumApplied: calculatedPrice < MINIMUM_LICENSE_FEE };
   }, [getDemandMultiplier]);
 
   const calculatePolygonArea = useCallback((coords: Array<{ lat: number; lng: number }>): number => {
@@ -802,7 +807,18 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
             <div className="bg-black/30 rounded-lg p-4 border border-[#c8ff00]/20 text-center">
               <p className="text-gray-400 text-xs mb-1">License Fee</p>
               <p className="text-[#c8ff00] font-bold text-xl">${territory.totalPrice.toLocaleString()}</p>
+              {territory.totalPrice === 2500 && territory.squareMiles < 50 && (
+                <p className="text-yellow-400 text-xs mt-1">Min. fee applied</p>
+              )}
             </div>
+          </div>
+          
+          {/* Minimum License Fee Notice */}
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 flex items-start gap-2">
+            <Info className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+            <p className="text-gray-300 text-xs">
+              <span className="text-blue-400 font-semibold">Minimum License Fee:</span> $2,500 applies to all territories regardless of size. This is the industry standard for beverage market territory licensing.
+            </p>
           </div>
 
           {territoryAvailable ? (
