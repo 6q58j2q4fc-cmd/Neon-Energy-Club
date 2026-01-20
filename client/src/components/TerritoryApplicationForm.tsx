@@ -11,19 +11,24 @@ import { toast } from "sonner";
 import { CheckCircle, MapPin, User, Building, FileText, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 
 interface TerritoryData {
-  centerLat: number;
-  centerLng: number;
+  center: { lat: number; lng: number };
+  address: string;
+  zipCode: string;
   radiusMiles: number;
-  territoryName: string;
+  squareMiles: number;
+  basePrice: number;
+  demandMultiplier: number;
+  totalPrice: number;
   estimatedPopulation: number;
-  termMonths: number;
-  totalCost: number;
+  crossStreets?: string[];
+  polygonCoords?: Array<{ lat: number; lng: number }>;
+  isCustomShape?: boolean;
 }
 
 interface TerritoryApplicationFormProps {
-  territoryData: TerritoryData;
+  territory: TerritoryData;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }
 
 const steps = [
@@ -33,7 +38,17 @@ const steps = [
   { id: 4, title: "Review", icon: FileText },
 ];
 
-export function TerritoryApplicationForm({ territoryData, onClose, onSuccess }: TerritoryApplicationFormProps) {
+export function TerritoryApplicationForm({ territory, onClose, onSuccess }: TerritoryApplicationFormProps) {
+  // Map territory to internal format
+  const territoryData = {
+    centerLat: territory.center.lat,
+    centerLng: territory.center.lng,
+    radiusMiles: territory.radiusMiles,
+    territoryName: territory.address,
+    estimatedPopulation: territory.estimatedPopulation,
+    termMonths: 12,
+    totalCost: territory.totalPrice,
+  };
   const [currentStep, setCurrentStep] = useState(1);
   const [applicationId, setApplicationId] = useState<number | null>(null);
   
@@ -131,7 +146,8 @@ export function TerritoryApplicationForm({ territoryData, onClose, onSuccess }: 
           signature,
         });
         toast.success("Application submitted successfully! We'll be in touch soon.");
-        onSuccess();
+        onSuccess?.();
+        onClose();
       } catch (error) {
         toast.error("Failed to submit application. Please try again.");
       }

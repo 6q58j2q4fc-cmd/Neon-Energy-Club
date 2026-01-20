@@ -235,8 +235,8 @@ export default function Home() {
                 />
               </div>
 
-              {/* Fresh New Can Design Label */}
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
+              {/* Fresh New Can Design Label - Below the can, bottom right */}
+              <div className="absolute bottom-8 right-0 z-20">
                 <div className="bg-gradient-to-r from-[#c8ff00] to-[#00ffff] text-black font-bold px-4 py-2 rounded-full text-sm shadow-lg shadow-[#c8ff00]/30 animate-pulse">
                   ✨ FRESH NEW CAN DESIGN
                 </div>

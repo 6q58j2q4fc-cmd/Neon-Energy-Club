@@ -431,6 +431,10 @@ export const claimedTerritories = mysqlTable("claimed_territories", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   /** Expiration timestamp */
   expiresAt: timestamp("expiresAt"),
+  /** Renewal date */
+  renewalDate: timestamp("renewalDate"),
+  /** License expiration date */
+  expirationDate: timestamp("expirationDate"),
 });
 
 export type ClaimedTerritory = typeof claimedTerritories.$inferSelect;

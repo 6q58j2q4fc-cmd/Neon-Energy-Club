@@ -1339,3 +1339,33 @@
   - Prickly Pear (prickly-pear.jpg)
   - Green Tea Extract (green-tea-leaves.jpg)
   - Blueberry (blueberries.png)
+
+
+## Territory Map Complete Rebuild (Jan 20) - COMPLETED
+
+### Critical Bug Fixes
+- [x] Fix map freezing/loading issues on initialization (optimized with lazy loading)
+- [x] Fix zip code population - ensure zip codes display correctly when searching (Google Places Autocomplete)
+- [x] Fix map location updates - make map properly center on selected locations (setCenter/setZoom on search)
+- [x] Fix custom draw feature - implement working polygon/circle drawing tools (DrawingManager)
+
+### Territory Status Visualization
+- [x] Red overlay for licensed/booked territories (#ff3333 with 0.3 opacity)
+- [x] Transparent gray for available/free spaces (default map background)
+- [x] Neon green for user-selected radius/territory (#c8ff00 with 0.25 opacity)
+- [x] Custom draw areas also in neon green (polygon and circle modes)
+
+### LLM Integration
+- [x] Add LLM-powered territory analysis (analyzeTerritory procedure)
+- [x] Market insights and demographics (population, income estimates)
+- [x] Revenue potential estimation (monthly revenue projection)
+
+### Territory Booking Tracking
+- [x] Track booked markets in database (claimedTerritories table)
+- [x] Store estimated renewal dates (renewalDate field added to schema)
+- [x] Store expiration dates (expirationDate field added to schema)
+- [x] Display territory status on map (info window with dates)
+
+### UI Improvements
+- [x] Move "Fresh New Can Design" badge below can (bottom right corner position)
+

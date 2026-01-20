@@ -85,6 +85,13 @@
       "when": 1768831759899,
       "tag": "0011_small_katie_power",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1768922154608,
+      "tag": "0012_closed_vampiro",
+      "breakpoints": true
     }
   ]
 }
