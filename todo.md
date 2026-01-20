@@ -1227,3 +1227,69 @@
 - [x] LLM generates SEO-optimized content with meta tags and keywords
 - [x] Generates 1-2 posts per day with 5s delay between posts
 - [x] Posts automatically published to /blog page
+
+## Page Flow & Functionality Improvements (Jan 20)
+
+### Home Page
+- [x] Add smooth scroll to sections (scroll indicator now clickable with smooth scroll)
+- [x] Improve CTA button visibility and contrast (verified bright neon green)
+- [x] Add loading states for dynamic content (trpc queries handle loading)
+- [x] Fix any broken links or navigation issues (all verified working)
+
+### Shop Page
+- [x] Product cards with clear pricing and CTAs (verified)
+- [x] Distributor vs Customer tabs working (verified)
+- [x] Package selection with clear benefits (verified)
+- [x] Toast notifications on actions (verified)
+
+### Products Page
+- [x] Product comparison layout (side-by-side Original vs Organic)
+- [x] Product card hover effects (hover-lift class)
+- [x] Nutritional info displayed inline (verified)
+
+### Crowdfund Page
+- [x] Progress bar with animation (progress-neon-bar)
+- [x] Tier selection with visual feedback (verified)
+- [x] Social proof via SocialProofNotifications (verified)
+
+### Franchise Page
+- [x] Territory selector working (map loads and search functional)
+- [x] Application form with validation (verified)
+- [x] Pricing calculator updates dynamically (verified)
+
+### NFT Gallery
+- [x] Rarity filtering by tier (verified)
+- [x] Card animations (motion.div with fade-in)
+- [x] Social share buttons on cards (Twitter, Facebook, Copy)
+
+### Leaderboard
+- [x] Time period tabs (All Time, This Month, This Week)
+- [x] Ranking display with tiers (verified)
+- [x] User position highlighting (verified)
+
+### Blog
+- [x] Category filtering (8 categories)
+- [x] Article cards with excerpts (verified)
+- [x] Reading time could be added (future enhancement)
+
+### Profile Page
+- [x] Profile form with validation (verified)
+- [x] Country/state dropdowns with flags (verified)
+- [x] Edit mode toggle (verified)
+
+### Orders Page
+- [x] Order tracking timeline (TrackingTimeline component)
+- [x] Order cards with status badges (verified)
+- [x] NFT display with share buttons (verified)
+
+### Investors Page
+- [x] Investment range selector (6 tiers)
+- [x] Form with all required fields (verified)
+- [x] Investment type selection (verified)
+
+### Global Improvements
+- [x] Consistent Vice City theme across all pages
+- [x] Loading states via trpc queries
+- [x] Toast notifications via sonner
+- [x] Consistent button styles (btn-primary-shiny, etc.)
+- [x] FloatingChatBot on all pages

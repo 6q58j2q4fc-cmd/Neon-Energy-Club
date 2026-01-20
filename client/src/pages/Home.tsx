@@ -263,15 +263,19 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
-          <span className="text-xs text-white/40 font-medium">SCROLL</span>
-          <ChevronDown className="w-5 h-5 text-[#c8ff00]/50" />
-        </div>
+        {/* Scroll Indicator - Clickable with smooth scroll */}
+        <button 
+          onClick={() => document.getElementById('crowdfunding-section')?.scrollIntoView({ behavior: 'smooth' })}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce cursor-pointer hover:scale-110 transition-transform group"
+          aria-label="Scroll to next section"
+        >
+          <span className="text-xs text-white/40 font-medium group-hover:text-[#c8ff00] transition-colors">SCROLL</span>
+          <ChevronDown className="w-5 h-5 text-[#c8ff00]/50 group-hover:text-[#c8ff00] transition-colors" />
+        </button>
       </section>
 
       {/* Funding Progress Section - Vice City Style */}
-      <section className="py-20 relative">
+      <section id="crowdfunding-section" className="py-20 relative scroll-mt-20">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#ff0080]/5 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#00ffff]/3 via-transparent to-[#9d4edd]/3" />
         <div className="container mx-auto px-6 relative z-10">
