@@ -1456,3 +1456,27 @@
 - [x] Add tiered pricing for territory types (Premium Urban, Urban, Suburban, Rural)
 - [x] Add traffic multipliers (1.5x, 1.3x, 1.1x, 1.0x) for different territory types
 - [x] Display territory type badge and pricing breakdown in UI
+
+
+## Sales Popups, Disclaimer & Territory Tracking - January 20, 2026
+
+### Simulated Sales Popups
+- [x] Re-enable simulated sales popups for perception of active sales
+- [x] Keep email notifications only for real events (no simulated emails)
+- [x] Ensure variety in names, locations, and products for authenticity (60+ names, 48 locations, 9 products)
+
+### Income Disclaimer
+- [x] Add "*Results May Vary" disclaimer to vending page income calculator
+- [x] Display in fine print near calculator
+
+### Sample Claimed Territories
+- [x] Add sample claimed territories to database (15 major cities)
+- [x] Show red overlays on map for licensed areas
+- [x] Include renewal and expiration dates
+
+### Internal Tracking System
+- [x] Create order tracking system for territory licenses
+- [x] Implement automatic map availability updates (updateExpiredTerritories)
+- [x] Track licensing expiration dates (getTerritoriesExpiringSoon)
+- [x] Auto-adjust map based on real orders and expirations (activateTerritoryFromApplication)
+- [x] Admin procedures for territory tracking summary and status updates

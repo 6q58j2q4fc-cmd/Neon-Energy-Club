@@ -338,6 +338,12 @@ export default function VendingMachines() {
                           <span className="text-black font-semibold">Payback Period</span>
                           <span className="text-3xl font-black text-black">{paybackMonths} months</span>
                         </div>
+                        
+                        {/* Income Disclaimer */}
+                        <p className="text-xs text-gray-500 mt-4 text-center italic">
+                          *Results May Vary. Actual earnings depend on location, foot traffic, operating hours, and market conditions. 
+                          These projections are estimates based on average performance data and are not guaranteed.
+                        </p>
                       </div>
                     </div>
                   </div>

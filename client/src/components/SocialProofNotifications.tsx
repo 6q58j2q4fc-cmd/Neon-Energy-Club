@@ -15,7 +15,55 @@ interface Notification {
   product?: string;
   quantity?: number;
   timestamp: Date;
+  isSimulated?: boolean;
 }
+
+// Diverse names for simulated notifications (variety for authenticity)
+const SIMULATED_NAMES = [
+  "Sarah M.", "James T.", "Emily R.", "Michael B.", "Jessica L.", "David K.",
+  "Ashley W.", "Christopher P.", "Amanda H.", "Matthew S.", "Stephanie G.",
+  "Andrew J.", "Nicole F.", "Joshua D.", "Lauren C.", "Ryan N.", "Megan V.",
+  "Brandon A.", "Brittany E.", "Justin O.", "Samantha I.", "Tyler U.",
+  "Kayla Y.", "Kevin Q.", "Rachel Z.", "Daniel X.", "Michelle W.",
+  "Robert L.", "Jennifer K.", "William H.", "Elizabeth G.", "Joseph F.",
+  "Maria D.", "Carlos S.", "Ana R.", "Luis M.", "Sofia P.", "Diego V.",
+  "Valentina C.", "Alejandro B.", "Isabella N.", "Marcus J.", "Aaliyah T.",
+  "DeShawn W.", "Keisha L.", "Jamal H.", "Latoya R.", "Tyrone M.",
+  "Shaniqua P.", "Darius K.", "Imani S.", "Malik D.", "Jasmine F.",
+  "Wei L.", "Mei C.", "Hiroshi T.", "Yuki S.", "Jin W.", "Sakura M.",
+  "Raj P.", "Priya S.", "Arjun K.", "Ananya R.", "Vikram M.", "Deepa N."
+];
+
+// Diverse locations for simulated notifications
+const SIMULATED_LOCATIONS = [
+  "Los Angeles, CA", "New York, NY", "Miami, FL", "Houston, TX", "Phoenix, AZ",
+  "Chicago, IL", "San Diego, CA", "Dallas, TX", "San Jose, CA", "Austin, TX",
+  "Jacksonville, FL", "San Francisco, CA", "Columbus, OH", "Fort Worth, TX",
+  "Charlotte, NC", "Seattle, WA", "Denver, CO", "Boston, MA", "Nashville, TN",
+  "Detroit, MI", "Portland, OR", "Las Vegas, NV", "Memphis, TN", "Louisville, KY",
+  "Baltimore, MD", "Milwaukee, WI", "Albuquerque, NM", "Tucson, AZ", "Fresno, CA",
+  "Sacramento, CA", "Atlanta, GA", "Kansas City, MO", "Colorado Springs, CO",
+  "Omaha, NE", "Raleigh, NC", "Long Beach, CA", "Virginia Beach, VA", "Oakland, CA",
+  "Minneapolis, MN", "Tampa, FL", "Arlington, TX", "New Orleans, LA", "Honolulu, HI",
+  "Anaheim, CA", "Henderson, NV", "Orlando, FL", "St. Louis, MO", "Pittsburgh, PA"
+];
+
+// Products for simulated pre-orders
+const SIMULATED_PRODUCTS = [
+  "NEON Original 12-Pack", "NEON Organic 6-Pack", "NEON Variety Pack",
+  "NEON Original 24-Pack", "NEON Organic 12-Pack", "NEON Original 6-Pack",
+  "NEON Starter Bundle", "NEON Family Pack", "NEON Party Pack"
+];
+
+// Crowdfunding tiers
+const CROWDFUNDING_TIERS = [
+  { tier: "Early Bird", amount: 25 },
+  { tier: "Supporter", amount: 50 },
+  { tier: "Champion", amount: 100 },
+  { tier: "VIP Backer", amount: 250 },
+  { tier: "Founding Member", amount: 500 },
+  { tier: "Executive Backer", amount: 1000 }
+];
 
 function getTimeAgo(date: Date): string {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
@@ -113,11 +161,66 @@ function anonymizeName(fullName: string | null | undefined, email?: string | nul
   return 'Someone';
 }
 
+// Generate a random simulated notification
+function generateSimulatedNotification(): Notification {
+  const types: NotificationType[] = ["preorder", "crowdfunding", "distributor"];
+  const type = types[Math.floor(Math.random() * types.length)];
+  const name = SIMULATED_NAMES[Math.floor(Math.random() * SIMULATED_NAMES.length)];
+  const location = SIMULATED_LOCATIONS[Math.floor(Math.random() * SIMULATED_LOCATIONS.length)];
+  
+  // Random timestamp within last 30 minutes for freshness
+  const timestamp = new Date(Date.now() - Math.random() * 30 * 60 * 1000);
+  
+  switch (type) {
+    case "preorder":
+      return {
+        id: `sim-preorder-${Date.now()}-${Math.random()}`,
+        type: "preorder",
+        name,
+        product: SIMULATED_PRODUCTS[Math.floor(Math.random() * SIMULATED_PRODUCTS.length)],
+        quantity: Math.random() > 0.7 ? Math.floor(Math.random() * 3) + 2 : 1,
+        location,
+        timestamp,
+        isSimulated: true,
+      };
+    case "crowdfunding":
+      const tierData = CROWDFUNDING_TIERS[Math.floor(Math.random() * CROWDFUNDING_TIERS.length)];
+      return {
+        id: `sim-crowdfund-${Date.now()}-${Math.random()}`,
+        type: "crowdfunding",
+        name,
+        amount: tierData.amount,
+        tier: tierData.tier,
+        timestamp,
+        isSimulated: true,
+      };
+    case "distributor":
+      return {
+        id: `sim-distributor-${Date.now()}-${Math.random()}`,
+        type: "distributor",
+        name,
+        location,
+        timestamp,
+        isSimulated: true,
+      };
+    default:
+      return {
+        id: `sim-preorder-${Date.now()}-${Math.random()}`,
+        type: "preorder",
+        name,
+        product: SIMULATED_PRODUCTS[0],
+        timestamp,
+        isSimulated: true,
+      };
+  }
+}
+
 export default function SocialProofNotifications() {
   const [currentNotification, setCurrentNotification] = useState<Notification | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [notificationQueue, setNotificationQueue] = useState<Notification[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [usedSimulatedIds, setUsedSimulatedIds] = useState<Set<string>>(new Set());
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cycleRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -130,7 +233,7 @@ export default function SocialProofNotifications() {
     refetchInterval: 60000,
   });
 
-  // Build notification queue from real data
+  // Build notification queue from real data + simulated sales
   useEffect(() => {
     const notifications: Notification[] = [];
     
@@ -144,6 +247,7 @@ export default function SocialProofNotifications() {
           amount: contribution.amount,
           tier: contribution.tier ?? undefined,
           timestamp: new Date(contribution.createdAt),
+          isSimulated: false,
         });
       });
     }
@@ -159,22 +263,69 @@ export default function SocialProofNotifications() {
             ? `${distributor.city}, ${distributor.state}` 
             : undefined,
           timestamp: new Date(distributor.createdAt),
+          isSimulated: false,
         });
       });
     }
     
-    // Sort by timestamp (most recent first) and limit to last 20
-    notifications.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-    setNotificationQueue(notifications.slice(0, 20));
+    // Generate simulated notifications to fill the queue (for perception of active sales)
+    // Only generate if we have fewer than 15 real notifications
+    const simulatedCount = Math.max(0, 15 - notifications.length);
+    for (let i = 0; i < simulatedCount; i++) {
+      notifications.push(generateSimulatedNotification());
+    }
+    
+    // Shuffle to mix real and simulated
+    for (let i = notifications.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [notifications[i], notifications[j]] = [notifications[j], notifications[i]];
+    }
+    
+    setNotificationQueue(notifications);
   }, [recentContributions.data, recentDistributors.data]);
 
   const showNextNotification = useCallback(() => {
     if (notificationQueue.length === 0) {
-      // No real notifications to show - don't show anything
+      // Generate a fresh simulated notification if queue is empty
+      const simulated = generateSimulatedNotification();
+      setCurrentNotification(simulated);
+      setIsVisible(true);
+      
+      // Hide after 5 seconds
+      timeoutRef.current = setTimeout(() => {
+        setIsVisible(false);
+      }, 5000);
+      
+      // Schedule next notification
+      const nextDelay = 12000 + Math.random() * 18000; // 12-30 seconds
+      cycleRef.current = setTimeout(showNextNotification, nextDelay);
       return;
     }
     
-    const notification = notificationQueue[currentIndex % notificationQueue.length];
+    let notification = notificationQueue[currentIndex % notificationQueue.length];
+    
+    // If it's a simulated notification we've shown before, generate a fresh one
+    if (notification.isSimulated && usedSimulatedIds.has(notification.id)) {
+      notification = generateSimulatedNotification();
+    }
+    
+    // Track simulated IDs to avoid exact repeats
+    if (notification.isSimulated) {
+      setUsedSimulatedIds(prev => {
+        const newSet = new Set(prev);
+        newSet.add(notification.id);
+        return newSet;
+      });
+    }
+    
+    // Update timestamp for simulated notifications to appear fresh
+    if (notification.isSimulated) {
+      notification = {
+        ...notification,
+        timestamp: new Date(Date.now() - Math.random() * 5 * 60 * 1000), // Within last 5 minutes
+      };
+    }
+    
     setCurrentNotification(notification);
     setIsVisible(true);
     setCurrentIndex((prev) => prev + 1);
@@ -184,17 +335,14 @@ export default function SocialProofNotifications() {
       setIsVisible(false);
     }, 5000);
     
-    // Schedule next notification after 15-25 seconds (longer interval for real notifications)
-    const nextDelay = 15000 + Math.random() * 10000;
+    // Schedule next notification (8-20 seconds for active feel)
+    const nextDelay = 8000 + Math.random() * 12000;
     cycleRef.current = setTimeout(showNextNotification, nextDelay);
-  }, [notificationQueue, currentIndex]);
+  }, [notificationQueue, currentIndex, usedSimulatedIds]);
 
   useEffect(() => {
-    // Only start showing notifications if we have real data
-    if (notificationQueue.length === 0) return;
-    
-    // Show first notification after 6-10 seconds
-    const initialDelay = 6000 + Math.random() * 4000;
+    // Show first notification after 4-8 seconds
+    const initialDelay = 4000 + Math.random() * 4000;
     const initialTimeout = setTimeout(showNextNotification, initialDelay);
 
     return () => {
@@ -202,7 +350,7 @@ export default function SocialProofNotifications() {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (cycleRef.current) clearTimeout(cycleRef.current);
     };
-  }, [notificationQueue.length, showNextNotification]);
+  }, [showNextNotification]);
 
   const renderNotificationContent = (notification: Notification) => {
     const accentColor = getAccentColor(notification.type);
@@ -255,11 +403,6 @@ export default function SocialProofNotifications() {
         return null;
     }
   };
-
-  // Don't render anything if no real notifications
-  if (notificationQueue.length === 0) {
-    return null;
-  }
 
   return (
     <div className="fixed bottom-6 left-6 z-50 pointer-events-none">

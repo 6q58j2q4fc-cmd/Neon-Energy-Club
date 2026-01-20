@@ -886,6 +886,88 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
       return await getAllTerritoryApplications();
     }),
 
+    // Get territory tracking summary (admin)
+    trackingSummary: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new Error("Unauthorized: Admin access required");
+      }
+      const { getTerritoryTrackingSummary } = await import("./db");
+      return await getTerritoryTrackingSummary();
+    }),
+
+    // Get territories expiring soon (admin)
+    expiringSoon: protectedProcedure
+      .input(z.object({ daysAhead: z.number().int().min(1).max(365).optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized: Admin access required");
+        }
+        const { getTerritoriesExpiringSoon } = await import("./db");
+        return await getTerritoriesExpiringSoon(input?.daysAhead || 30);
+      }),
+
+    // Get territories due for renewal (admin)
+    dueForRenewal: protectedProcedure
+      .input(z.object({ daysAhead: z.number().int().min(1).max(365).optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized: Admin access required");
+        }
+        const { getTerritoriesDueForRenewal } = await import("./db");
+        return await getTerritoriesDueForRenewal(input?.daysAhead || 30);
+      }),
+
+    // Update expired territories (admin - can be called manually or via cron)
+    processExpirations: protectedProcedure.mutation(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new Error("Unauthorized: Admin access required");
+      }
+      const { updateExpiredTerritories } = await import("./db");
+      return await updateExpiredTerritories();
+    }),
+
+    // Update territory status (admin)
+    updateStatus: protectedProcedure
+      .input(
+        z.object({
+          territoryId: z.number().int(),
+          status: z.enum(["pending", "active", "expired"]),
+          renewalDate: z.date().optional(),
+          expirationDate: z.date().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized: Admin access required");
+        }
+        const { updateTerritoryStatus } = await import("./db");
+        return await updateTerritoryStatus(
+          input.territoryId,
+          input.status,
+          input.renewalDate,
+          input.expirationDate
+        );
+      }),
+
+    // Activate territory from approved application (admin)
+    activateFromApplication: protectedProcedure
+      .input(
+        z.object({
+          applicationId: z.number().int(),
+          termMonths: z.number().int().min(1).max(60).optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized: Admin access required");
+        }
+        const { activateTerritoryFromApplication } = await import("./db");
+        return await activateTerritoryFromApplication(
+          input.applicationId,
+          input.termMonths || 12
+        );
+      }),
+
     // Admin: Approve/reject application
     updateApplicationStatus: protectedProcedure
       .input(

@@ -852,6 +852,178 @@ export async function getAllTerritoryApplications() {
   return applications;
 }
 
+/**
+ * Update claimed territory status based on expiration dates
+ * Called automatically to keep map availability current
+ */
+export async function updateExpiredTerritories() {
+  const db = await getDb();
+  if (!db) return { updated: 0 };
+  
+  const now = new Date();
+  
+  // Mark expired territories
+  const result = await db.update(claimedTerritories)
+    .set({ status: "expired" })
+    .where(
+      and(
+        eq(claimedTerritories.status, "active"),
+        sql`${claimedTerritories.expirationDate} < ${now}`
+      )
+    );
+  
+  return { updated: result[0]?.affectedRows || 0 };
+}
+
+/**
+ * Get territories expiring soon (within specified days)
+ */
+export async function getTerritoriesExpiringSoon(daysAhead: number = 30) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const now = new Date();
+  const futureDate = new Date(now.getTime() + daysAhead * 24 * 60 * 60 * 1000);
+  
+  const territories = await db.select().from(claimedTerritories)
+    .where(
+      and(
+        eq(claimedTerritories.status, "active"),
+        sql`${claimedTerritories.expirationDate} BETWEEN ${now} AND ${futureDate}`
+      )
+    )
+    .orderBy(claimedTerritories.expirationDate);
+  
+  return territories;
+}
+
+/**
+ * Get territories due for renewal (within specified days)
+ */
+export async function getTerritoriesDueForRenewal(daysAhead: number = 30) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const now = new Date();
+  const futureDate = new Date(now.getTime() + daysAhead * 24 * 60 * 60 * 1000);
+  
+  const territories = await db.select().from(claimedTerritories)
+    .where(
+      and(
+        eq(claimedTerritories.status, "active"),
+        sql`${claimedTerritories.renewalDate} BETWEEN ${now} AND ${futureDate}`
+      )
+    )
+    .orderBy(claimedTerritories.renewalDate);
+  
+  return territories;
+}
+
+/**
+ * Update territory status (for order tracking integration)
+ */
+export async function updateTerritoryStatus(
+  territoryId: number, 
+  status: "pending" | "active" | "expired",
+  renewalDate?: Date,
+  expirationDate?: Date
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const updateData: Record<string, unknown> = { status };
+  if (renewalDate) updateData.renewalDate = renewalDate;
+  if (expirationDate) updateData.expirationDate = expirationDate;
+  
+  await db.update(claimedTerritories)
+    .set(updateData)
+    .where(eq(claimedTerritories.id, territoryId));
+  
+  return { success: true };
+}
+
+/**
+ * Activate a territory when payment is confirmed
+ * Links territory application to claimed territory
+ */
+export async function activateTerritoryFromApplication(
+  applicationId: number,
+  termMonths: number = 12
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get the application
+  const application = await getTerritoryApplication(applicationId);
+  if (!application) throw new Error("Application not found");
+  
+  // Calculate dates
+  const now = new Date();
+  const renewalDate = new Date(now.getTime() + (termMonths - 1) * 30 * 24 * 60 * 60 * 1000);
+  const expirationDate = new Date(now.getTime() + termMonths * 30 * 24 * 60 * 60 * 1000);
+  
+  // Create claimed territory
+  const claimedData: Omit<InsertClaimedTerritory, "id" | "createdAt"> = {
+    territoryLicenseId: applicationId,
+    centerLat: application.centerLat?.toString() || "0",
+    centerLng: application.centerLng?.toString() || "0",
+    radiusMiles: application.radiusMiles || 5,
+    territoryName: application.territoryName || "Unknown Territory",
+    zipCode: application.zipCode || null,
+    city: application.city || null,
+    state: application.state || null,
+    status: "active",
+    renewalDate,
+    expirationDate,
+  };
+  
+  const result = await createClaimedTerritory(claimedData);
+  
+  // Update application status
+  await updateTerritoryApplication(applicationId, { status: "approved" });
+  
+  return { 
+    claimedTerritoryId: result.id,
+    renewalDate,
+    expirationDate
+  };
+}
+
+/**
+ * Get territory tracking summary for admin dashboard
+ */
+export async function getTerritoryTrackingSummary() {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const [activeCount] = await db.select({ count: sql<number>`COUNT(*)` })
+    .from(claimedTerritories)
+    .where(eq(claimedTerritories.status, "active"));
+  
+  const [pendingCount] = await db.select({ count: sql<number>`COUNT(*)` })
+    .from(claimedTerritories)
+    .where(eq(claimedTerritories.status, "pending"));
+  
+  const [expiredCount] = await db.select({ count: sql<number>`COUNT(*)` })
+    .from(claimedTerritories)
+    .where(eq(claimedTerritories.status, "expired"));
+  
+  const expiringSoon = await getTerritoriesExpiringSoon(30);
+  const dueForRenewal = await getTerritoriesDueForRenewal(30);
+  
+  return {
+    active: activeCount?.count || 0,
+    pending: pendingCount?.count || 0,
+    expired: expiredCount?.count || 0,
+    expiringSoon: expiringSoon.length,
+    dueForRenewal: dueForRenewal.length,
+    territories: {
+      expiringSoon,
+      dueForRenewal
+    }
+  };
+}
+
 
 // ============ NFT Functions ============
 
