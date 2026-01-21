@@ -1817,3 +1817,32 @@
 - [x] Send confirmation email on successful redemption
 - [x] Update reward status after redemption
 - [x] Write vitest tests for reward redemption (19 tests passing)
+
+## Unified Login System & UX Audit (Jan 21)
+
+### Profile Dropdown & Login Types
+- [x] Create unified ProfileDropdown component with all user types
+- [x] Add Customer login option to dropdown
+- [x] Add Distributor login option to dropdown
+- [x] Add Franchise/Vending Owner login option to dropdown
+- [x] Add profile icon to header on all pages
+- [x] Show user-specific dashboard links when logged in
+- [x] Display user role badge in dropdown (Admin, Distributor rank, Franchise)
+
+### Portal Sync with Admin Panel
+- [x] Sync Customer Portal data with admin controls
+- [x] Sync Distributor Portal data with admin controls
+- [x] Sync Franchise Owner Portal data with admin controls
+- [x] Ensure all user data displays correctly in admin panel
+- [x] Add real-time data updates between portals and admin (via tRPC)
+
+### UX Audit & Navigation Improvements
+- [x] Audit all page navigation flows
+- [x] Improve header navigation consistency (Header.tsx, MobileMenu.tsx, ProfileDropdown.tsx)
+- [x] Add breadcrumbs where appropriate
+- [x] Ensure mobile navigation works smoothly
+- [x] Fix broken links (fixed /distributor -> /portal)
+- [x] Add quick-access shortcuts for common actions (Quick Actions in dropdown)
+- [x] Improve page transition smoothness
+- [x] Ensure intuitive user journey from landing to conversion
+- [x] Created FranchiseDashboard page for franchise/vending owners

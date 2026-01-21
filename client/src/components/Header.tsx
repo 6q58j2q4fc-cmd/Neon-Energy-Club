@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ShoppingCart, User, Users } from "lucide-react";
+import { Menu, X, ShoppingCart, User, Users, Building2, Heart, MapPin, Settings, LogOut, Crown, Gift, BarChart3 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -105,7 +105,7 @@ export default function Header() {
                   </span>
                 )}
               </button>
-              {/* Login/Account Dropdown */}
+              {/* Login/Account Dropdown - All User Types */}
               {user ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -117,26 +117,81 @@ export default function Header() {
                         {user.name?.split(' ')[0] || 'Account'}
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56 bg-[#0a1a1a] border-[#c8ff00]/30">
-                      <DropdownMenuItem 
-                        onClick={() => setLocation("/portal")}
-                        className="text-white hover:text-[#c8ff00] hover:bg-[#c8ff00]/10 cursor-pointer"
-                      >
-                        <Users className="w-4 h-4 mr-2" />
-                        Distributor Portal
-                      </DropdownMenuItem>
+                    <DropdownMenuContent align="end" className="w-64 bg-[#0a1a1a] border-[#c8ff00]/30">
+                      {/* User Info Header */}
+                      <div className="px-3 py-2 border-b border-[#c8ff00]/20">
+                        <p className="text-sm font-bold text-white">{user.name || 'User'}</p>
+                        <p className="text-xs text-white/50">{user.email}</p>
+                      </div>
+                      
+                      {/* Customer Portal */}
                       <DropdownMenuItem 
                         onClick={() => setLocation("/customer-portal")}
                         className="text-white hover:text-[#c8ff00] hover:bg-[#c8ff00]/10 cursor-pointer"
                       >
-                        <User className="w-4 h-4 mr-2" />
+                        <Heart className="w-4 h-4 mr-2 text-[#c8ff00]" />
                         Customer Portal
+                        <span className="ml-auto text-[10px] text-[#c8ff00]/70">3-for-Free</span>
                       </DropdownMenuItem>
+                      
+                      {/* Distributor Portal */}
+                      <DropdownMenuItem 
+                        onClick={() => setLocation("/portal")}
+                        className="text-white hover:text-[#00ffff] hover:bg-[#00ffff]/10 cursor-pointer"
+                      >
+                        <Users className="w-4 h-4 mr-2 text-[#00ffff]" />
+                        Distributor Portal
+                        <span className="ml-auto text-[10px] text-[#00ffff]/70">MLM</span>
+                      </DropdownMenuItem>
+                      
+                      {/* Franchise/Vending Portal */}
+                      <DropdownMenuItem 
+                        onClick={() => setLocation("/franchise/dashboard")}
+                        className="text-white hover:text-[#ff0080] hover:bg-[#ff0080]/10 cursor-pointer"
+                      >
+                        <Building2 className="w-4 h-4 mr-2 text-[#ff0080]" />
+                        Franchise Portal
+                        <span className="ml-auto text-[10px] text-[#ff0080]/70">Territory</span>
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuSeparator className="bg-[#c8ff00]/20" />
+                      
+                      {/* Quick Links */}
+                      <DropdownMenuItem 
+                        onClick={() => setLocation("/orders")}
+                        className="text-white/70 hover:text-white hover:bg-white/5 cursor-pointer"
+                      >
+                        <Gift className="w-4 h-4 mr-2" />
+                        My Orders
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => setLocation("/profile")}
+                        className="text-white/70 hover:text-white hover:bg-white/5 cursor-pointer"
+                      >
+                        <Settings className="w-4 h-4 mr-2" />
+                        Profile & Settings
+                      </DropdownMenuItem>
+                      
+                      {/* Admin Link - Only for admins */}
+                      {user.role === 'admin' && (
+                        <>
+                          <DropdownMenuSeparator className="bg-[#ff0080]/20" />
+                          <DropdownMenuItem 
+                            onClick={() => setLocation("/admin")}
+                            className="text-[#ff0080] hover:bg-[#ff0080]/10 cursor-pointer"
+                          >
+                            <Crown className="w-4 h-4 mr-2" />
+                            Admin Panel
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                      
                       <DropdownMenuSeparator className="bg-[#c8ff00]/20" />
                       <DropdownMenuItem 
                         onClick={() => logoutMutation.mutate()}
                         className="text-red-400 hover:text-red-300 hover:bg-red-500/10 cursor-pointer"
                       >
+                        <LogOut className="w-4 h-4 mr-2" />
                         Sign Out
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -152,28 +207,67 @@ export default function Header() {
                         LOGIN
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56 bg-[#0a1a1a] border-[#c8ff00]/30">
+                    <DropdownMenuContent align="end" className="w-64 bg-[#0a1a1a] border-[#c8ff00]/30">
+                      {/* Login Header */}
+                      <div className="px-3 py-2 border-b border-[#c8ff00]/20">
+                        <p className="text-sm font-bold text-white">Welcome to NEON</p>
+                        <p className="text-xs text-white/50">Choose how you'd like to sign in</p>
+                      </div>
+                      
+                      {/* Customer Login */}
                       <DropdownMenuItem 
                         onClick={() => window.location.href = getLoginUrl()}
-                        className="text-white hover:text-[#c8ff00] hover:bg-[#c8ff00]/10 cursor-pointer"
+                        className="text-white hover:text-[#c8ff00] hover:bg-[#c8ff00]/10 cursor-pointer py-3"
                       >
-                        <User className="w-4 h-4 mr-2" />
-                        Customer Login
+                        <Heart className="w-4 h-4 mr-2 text-[#c8ff00]" />
+                        <div className="flex flex-col">
+                          <span className="font-semibold">Customer</span>
+                          <span className="text-[10px] text-white/50">Shop, earn rewards, refer friends</span>
+                        </div>
                       </DropdownMenuItem>
+                      
+                      {/* Distributor Login */}
                       <DropdownMenuItem 
                         onClick={() => window.location.href = getLoginUrl()}
-                        className="text-white hover:text-[#00ffff] hover:bg-[#00ffff]/10 cursor-pointer"
+                        className="text-white hover:text-[#00ffff] hover:bg-[#00ffff]/10 cursor-pointer py-3"
                       >
-                        <Users className="w-4 h-4 mr-2" />
-                        Distributor Login
+                        <Users className="w-4 h-4 mr-2 text-[#00ffff]" />
+                        <div className="flex flex-col">
+                          <span className="font-semibold">Distributor</span>
+                          <span className="text-[10px] text-white/50">Build your team, earn commissions</span>
+                        </div>
                       </DropdownMenuItem>
+                      
+                      {/* Franchise Owner Login */}
+                      <DropdownMenuItem 
+                        onClick={() => window.location.href = getLoginUrl()}
+                        className="text-white hover:text-[#ff0080] hover:bg-[#ff0080]/10 cursor-pointer py-3"
+                      >
+                        <Building2 className="w-4 h-4 mr-2 text-[#ff0080]" />
+                        <div className="flex flex-col">
+                          <span className="font-semibold">Franchise Owner</span>
+                          <span className="text-[10px] text-white/50">Manage territory & vending machines</span>
+                        </div>
+                      </DropdownMenuItem>
+                      
                       <DropdownMenuSeparator className="bg-[#c8ff00]/20" />
-                      <DropdownMenuItem 
-                        onClick={() => setLocation("/join")}
-                        className="text-[#c8ff00] hover:bg-[#c8ff00]/10 cursor-pointer font-semibold"
-                      >
-                        Create Account
-                      </DropdownMenuItem>
+                      
+                      {/* Sign Up Options */}
+                      <div className="p-2 space-y-1">
+                        <DropdownMenuItem 
+                          onClick={() => setLocation("/join")}
+                          className="text-[#c8ff00] hover:bg-[#c8ff00]/10 cursor-pointer font-semibold justify-center"
+                        >
+                          Create Account
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => setLocation("/franchise")}
+                          className="text-[#ff0080] hover:bg-[#ff0080]/10 cursor-pointer font-semibold justify-center"
+                        >
+                          <MapPin className="w-4 h-4 mr-1" />
+                          Explore Franchise
+                        </DropdownMenuItem>
+                      </div>
                     </DropdownMenuContent>
                   </DropdownMenu>
               )}

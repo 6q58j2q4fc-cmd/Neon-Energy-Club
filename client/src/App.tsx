@@ -36,6 +36,7 @@ import DistributorLeaderboard from "./pages/DistributorLeaderboard";
 import Investors from "./pages/Investors";
 import CustomerPortal from "./pages/CustomerPortal";
 import MLMAdminPanel from "./pages/MLMAdminPanel";
+import FranchiseDashboard from "./pages/FranchiseDashboard";
 import AmbientSoundToggle from "./components/AmbientSoundToggle";
 import FloatingChatBot from "./components/FloatingChatBot";
 import CartDrawer from "./components/CartDrawer";
@@ -94,6 +95,8 @@ function Router() {
         <Route path="/invest" component={Investors} />
         <Route path="/customer-portal" component={CustomerPortal} />
         <Route path="/my-rewards" component={CustomerPortal} />
+        <Route path="/franchise/dashboard" component={FranchiseDashboard} />
+        <Route path="/distributor" component={DistributorPortal} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

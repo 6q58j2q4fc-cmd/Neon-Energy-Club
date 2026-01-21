@@ -8,6 +8,7 @@ import {
   Zap, Home, BookOpen, Store, Star, MapPin, Building2, Gem, Users, Trophy, 
   Search, X, User, Package, LogOut, ChevronDown, Settings, ShoppingBag, TrendingUp, ShoppingCart
 } from "lucide-react";
+import ProfileDropdown from "./ProfileDropdown";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useCart } from "@/contexts/CartContext";
 
@@ -270,97 +271,8 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
                 )}
               </button>
 
-              {/* User Account Button */}
-              <div className="relative" ref={userMenuRef}>
-                {loading ? (
-                  <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/20 animate-pulse" />
-                ) : user ? (
-                  <button
-                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-200 ${
-                      userMenuOpen
-                        ? "bg-[#c8ff00]/20 border-2 border-[#c8ff00]"
-                        : "bg-white/5 border border-white/20 hover:bg-white/10 hover:border-white/30"
-                    }`}
-                    aria-label="User menu"
-                  >
-                    <User className="w-5 h-5" style={{ color: accentColor[variant] }} />
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleLogin}
-                    className="h-10 px-4 flex items-center gap-2 rounded-xl bg-[#c8ff00]/20 border border-[#c8ff00]/50 hover:bg-[#c8ff00]/30 transition-all duration-200"
-                  >
-                    <User className="w-4 h-4 text-[#c8ff00]" />
-                    <span className="text-sm font-bold text-[#c8ff00] hidden sm:inline">Login</span>
-                  </button>
-                )}
-
-                {/* User Dropdown Menu */}
-                {userMenuOpen && user && (
-                  <div className="absolute top-full right-0 mt-2 w-56 bg-[#0a0318]/98 backdrop-blur-xl rounded-xl border border-[#c8ff00]/30 shadow-2xl shadow-black/50 overflow-hidden z-50">
-                    <div className="h-1 bg-gradient-to-r from-[#ff0080] via-[#c8ff00] to-[#00ffff]" />
-                    
-                    {/* User Info */}
-                    <div className="p-4 border-b border-white/10">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-[#c8ff00]/20 flex items-center justify-center">
-                          <User className="w-5 h-5 text-[#c8ff00]" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-white truncate">{user.name || "User"}</p>
-                          <p className="text-xs text-white/50 truncate">{user.email}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Menu Items */}
-                    <div className="p-2">
-                      <button
-                        onClick={() => handleNavClick("/profile")}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-all"
-                      >
-                        <User className="w-4 h-4" />
-                        <span className="text-sm font-medium">Profile</span>
-                      </button>
-                      <button
-                        onClick={() => handleNavClick("/orders")}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-all"
-                      >
-                        <ShoppingBag className="w-4 h-4" />
-                        <span className="text-sm font-medium">Orders</span>
-                      </button>
-                      <button
-                        onClick={() => handleNavClick("/nft-gallery")}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-all"
-                      >
-                        <Gem className="w-4 h-4" />
-                        <span className="text-sm font-medium">My NFTs</span>
-                      </button>
-                      {user.role === "admin" && (
-                        <button
-                          onClick={() => handleNavClick("/admin")}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-all"
-                        >
-                          <Settings className="w-4 h-4" />
-                          <span className="text-sm font-medium">Admin Dashboard</span>
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Logout */}
-                    <div className="p-2 border-t border-white/10">
-                      <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#ff0080] hover:bg-[#ff0080]/10 transition-all"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span className="text-sm font-medium">Logout</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+              {/* User Account Button with Full Portal Access */}
+              <ProfileDropdown accentColor={accentColor[variant]} />
 
               {/* Hamburger Menu Button */}
               <button
