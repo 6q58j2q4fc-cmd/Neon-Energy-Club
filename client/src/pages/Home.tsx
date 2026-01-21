@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { Zap, MapPin, DollarSign, Clock, TrendingUp, Users, Star, Sparkles, ArrowRight, Gift, Target, Trophy, ChevronDown, Play, Pause, Volume2, VolumeX, Shield, Leaf, Heart } from "lucide-react";
 import SocialProofNotifications from "@/components/SocialProofNotifications";
 import ViralNewsletterPopup, { shouldShowPopup, markPopupShown } from "@/components/ViralNewsletterPopup";
@@ -842,6 +842,9 @@ export default function Home() {
                     {item}
                   </button>
                 ))}
+                <Link href="/admin/territories" className="block text-white/30 hover:text-white/50 transition-colors text-xs mt-4">
+                  Admin Portal
+                </Link>
               </div>
             </div>
           </div>
