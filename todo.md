@@ -1876,3 +1876,29 @@
 - [x] Remove simulated activity feed (now shows real orders, payouts, territory apps)
 - [x] Display real order data
 - [x] Show actual rank distribution from database (shows 0 until distributors join)
+
+## Subdomain, Reward Fulfillment & Leaderboard (Jan 21)
+
+### Subdomain/Referral URL Fix
+- [x] Change referral URL format from subdomain to path-based
+- [x] Update URL to neonenergyclub.com/uniquereferralid format
+- [x] Update DistributorPortal affiliate link generation
+- [x] Update all referral link displays across the site
+- [x] Ensure tracking works with new URL format
+
+### Admin Reward Fulfillment Dashboard
+- [x] Create reward fulfillment section in admin panel (Reward Fulfillment in sidebar)
+- [x] Display pending reward redemptions with filters
+- [x] Add shipping status update functionality (pending/processing/shipped/delivered)
+- [x] Add tracking number input field for shipped items
+- [x] Send notification emails on status updates
+- [x] Show fulfillment stats (total, pending, processing, shipped, delivered, by type)
+
+### Public Distributor Leaderboard
+- [x] Create leaderboard API endpoint (leaderboard.getTopDistributors)
+- [x] Build public leaderboard page (/leaderboard)
+- [x] Show top distributors by sales volume
+- [x] Show top distributors by team size
+- [x] Add time period filters (weekly, monthly, all-time)
+- [x] Display rank badges and achievements
+- [x] Anonymize names for privacy

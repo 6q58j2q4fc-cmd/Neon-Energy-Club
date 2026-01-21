@@ -189,9 +189,11 @@ export default function DistributorPortal() {
     date: c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "Recently"
   }));
 
+  // Use neonenergyclub.com domain for referral links
+  const referralDomain = "https://neonenergyclub.com";
   const affiliateLink = distributorProfile?.distributorCode 
-    ? `${window.location.origin}/ref/${distributorProfile.distributorCode}`
-    : `${window.location.origin}/ref/${user?.id || 'demo'}`;
+    ? `${referralDomain}/${distributorProfile.distributorCode}`
+    : `${referralDomain}/${user?.id || 'demo'}`;
 
   const subdomain = distributorProfile?.subdomain 
     ? `${distributorProfile.subdomain}.neon.energy`

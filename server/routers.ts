@@ -2400,6 +2400,136 @@ Always be helpful, enthusiastic, and guide users toward making a purchase or inv
       }),
   }),
 
+  // Admin reward fulfillment router
+  adminRewards: router({
+    // Get all reward redemptions for admin
+    listRedemptions: protectedProcedure
+      .input(z.object({
+        status: z.enum(['all', 'pending', 'processing', 'shipped', 'delivered']).optional(),
+        type: z.enum(['all', 'customer', 'distributor']).optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        const { getAllRewardRedemptions } = await import('./db');
+        const allRedemptions = await getAllRewardRedemptions();
+        
+        // Filter by status and type if provided
+        let filtered = allRedemptions;
+        if (input?.status && input.status !== 'all') {
+          filtered = filtered.filter((r: any) => r.status === input.status);
+        }
+        if (input?.type && input.type !== 'all') {
+          filtered = filtered.filter((r: any) => r.rewardType === input.type);
+        }
+        return filtered;
+      }),
+
+    // Update redemption status
+    updateRedemptionStatus: protectedProcedure
+      .input(z.object({
+        redemptionId: z.number(),
+        status: z.enum(['pending', 'processing', 'shipped', 'delivered']),
+        trackingNumber: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        const { updateRewardRedemptionStatus, getRewardRedemptionById } = await import('./db');
+        
+        const redemption = await getRewardRedemptionById(input.redemptionId);
+        if (!redemption) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Redemption not found' });
+        }
+        
+        await updateRewardRedemptionStatus(
+          input.redemptionId, 
+          input.status, 
+          input.trackingNumber
+        );
+        
+        // Send email notification for status updates
+        if (input.status === 'shipped' && input.trackingNumber) {
+          try {
+            const { sendShippingNotification } = await import('./emailNotifications');
+            await sendShippingNotification({
+              customerName: redemption.name,
+              customerEmail: redemption.email,
+              orderId: redemption.id,
+              orderType: 'preorder', // Using preorder type for reward shipments
+              shippingAddress: `${redemption.addressLine1}, ${redemption.city}, ${redemption.state} ${redemption.postalCode}`,
+              trackingNumber: input.trackingNumber,
+            });
+          } catch (emailError) {
+            console.warn('[AdminRewards] Failed to send shipping notification:', emailError);
+          }
+        } else if (input.status === 'delivered') {
+          try {
+            const { sendDeliveryNotification } = await import('./emailNotifications');
+            await sendDeliveryNotification({
+              customerName: redemption.name,
+              customerEmail: redemption.email,
+              orderId: redemption.id,
+              orderType: 'preorder', // Using preorder type for reward deliveries
+            });
+          } catch (emailError) {
+            console.warn('[AdminRewards] Failed to send delivery notification:', emailError);
+          }
+        }
+        
+        return { success: true };
+      }),
+
+    // Get redemption stats for dashboard
+    getStats: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+      }
+      const { getRewardRedemptionStats } = await import('./db');
+      return await getRewardRedemptionStats();
+    }),
+  }),
+
+  // Public distributor leaderboard
+  leaderboard: router({
+    getTopDistributors: publicProcedure
+      .input(z.object({
+        period: z.enum(['weekly', 'monthly', 'all-time']).optional(),
+        limit: z.number().min(1).max(100).optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const { getTopDistributorsBySales, getTopDistributorsByTeamSize } = await import('./db');
+        const limit = input?.limit || 10;
+        const period = input?.period || 'all-time';
+        
+        const [bySales, byTeamSize] = await Promise.all([
+          getTopDistributorsBySales(limit, period),
+          getTopDistributorsByTeamSize(limit),
+        ]);
+        
+        // Anonymize names for privacy
+        const salesLeaders = bySales.map((d: any, index: number) => ({
+          rank: index + 1,
+          name: anonymizeName(d.name || 'Anonymous'),
+          distributorRank: d.rank || 'Starter',
+          totalSales: Number(d.totalSales) || 0,
+          teamSize: d.teamSize || 0,
+        }));
+        
+        const teamLeaders = byTeamSize.map((d: any, index: number) => ({
+          rank: index + 1,
+          name: anonymizeName(d.name || 'Anonymous'),
+          distributorRank: d.rank || 'Starter',
+          teamSize: d.teamSize || 0,
+          totalSales: Number(d.totalSales) || 0,
+        }));
+        
+        return { salesLeaders, teamLeaders, period };
+      }),
+  }),
+
 });
 
 // Helper function to anonymize names for privacy on public leaderboard

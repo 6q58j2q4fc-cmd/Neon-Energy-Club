@@ -53,9 +53,12 @@ export default function CustomerPortal() {
     },
   });
 
+  // Use neonenergyclub.com domain for referral links
+  const referralDomain = "https://neonenergyclub.com";
+  
   const copyReferralLink = () => {
     if (referralData?.referralCode) {
-      const link = `${window.location.origin}?ref=${referralData.referralCode}`;
+      const link = `${referralDomain}/${referralData.referralCode}`;
       navigator.clipboard.writeText(link);
       setCopied(true);
       toast.success("Link Copied!", {
@@ -103,7 +106,7 @@ export default function CustomerPortal() {
   const progress = Math.min((currentReferrals / referralsNeeded) * 100, 100);
   const freeCasesEarned = Math.floor(currentReferrals / referralsNeeded);
   const referralLink = referralData?.referralCode 
-    ? `${window.location.origin}?ref=${referralData.referralCode}` 
+    ? `${referralDomain}/${referralData.referralCode}` 
     : '';
 
   // Filter available rewards for redemption

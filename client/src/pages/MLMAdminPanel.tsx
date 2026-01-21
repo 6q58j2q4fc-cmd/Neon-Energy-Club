@@ -328,6 +328,7 @@ export default function MLMAdminPanel() {
     { id: "customers", label: "Customers", icon: Users },
     { id: "distributors", label: "Distributors", icon: Network },
     { id: "orders", label: "Orders", icon: ShoppingCart },
+    { id: "rewards", label: "Reward Fulfillment", icon: Gift },
     { id: "commissions", label: "Commissions", icon: DollarSign },
     { id: "payouts", label: "Payouts", icon: Wallet },
     { id: "ranks", label: "Ranks", icon: Award },
@@ -1744,6 +1745,11 @@ export default function MLMAdminPanel() {
             </div>
           )}
 
+          {/* Reward Fulfillment Section */}
+          {activeSection === "rewards" && (
+            <RewardFulfillmentSection />
+          )}
+
           {/* Reports Section */}
           {activeSection === "reports" && (
             <div className="space-y-6">
@@ -1919,6 +1925,325 @@ export default function MLMAdminPanel() {
           )}
         </main>
       </div>
+    </div>
+  );
+}
+
+// Reward Fulfillment Section Component
+function RewardFulfillmentSection() {
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [selectedRedemption, setSelectedRedemption] = useState<any>(null);
+  const [trackingNumber, setTrackingNumber] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const { data: redemptions, isLoading, refetch } = trpc.adminRewards.listRedemptions.useQuery({
+    status: statusFilter === "all" ? undefined : statusFilter as any,
+    type: typeFilter === "all" ? undefined : typeFilter as any,
+  });
+
+  const { data: stats } = trpc.adminRewards.getStats.useQuery();
+
+  const updateStatusMutation = trpc.adminRewards.updateRedemptionStatus.useMutation({
+    onSuccess: () => {
+      toast.success("Redemption status updated");
+      refetch();
+      setSelectedRedemption(null);
+      setTrackingNumber("");
+      setIsUpdating(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+      setIsUpdating(false);
+    },
+  });
+
+  const handleUpdateStatus = (redemptionId: number, status: string) => {
+    setIsUpdating(true);
+    updateStatusMutation.mutate({
+      redemptionId,
+      status: status as any,
+      trackingNumber: status === "shipped" ? trackingNumber : undefined,
+    });
+  };
+
+  const getStatusBadge = (status: string) => {
+    const styles: Record<string, string> = {
+      pending: "bg-yellow-500/20 text-yellow-500",
+      processing: "bg-blue-500/20 text-blue-500",
+      shipped: "bg-purple-500/20 text-purple-500",
+      delivered: "bg-green-500/20 text-green-500",
+    };
+    return <Badge className={styles[status] || "bg-gray-500/20 text-gray-500"}>{status}</Badge>;
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Reward Fulfillment</h1>
+          <p className="text-gray-400">Manage and ship free case rewards to customers and distributors</p>
+        </div>
+        <Button onClick={() => refetch()} variant="outline" className="border-[#c8ff00]/20 text-[#c8ff00]">
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Refresh
+        </Button>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+        <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
+          <CardContent className="p-4 text-center">
+            <Gift className="w-6 h-6 text-[#c8ff00] mx-auto mb-2" />
+            <div className="text-2xl font-bold text-white">{stats?.total || 0}</div>
+            <div className="text-xs text-gray-400">Total</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-[#0a0a0a] border-yellow-500/20">
+          <CardContent className="p-4 text-center">
+            <Clock className="w-6 h-6 text-yellow-500 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-yellow-500">{stats?.pending || 0}</div>
+            <div className="text-xs text-gray-400">Pending</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-[#0a0a0a] border-blue-500/20">
+          <CardContent className="p-4 text-center">
+            <Package className="w-6 h-6 text-blue-500 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-blue-500">{stats?.processing || 0}</div>
+            <div className="text-xs text-gray-400">Processing</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-[#0a0a0a] border-purple-500/20">
+          <CardContent className="p-4 text-center">
+            <Truck className="w-6 h-6 text-purple-500 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-purple-500">{stats?.shipped || 0}</div>
+            <div className="text-xs text-gray-400">Shipped</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-[#0a0a0a] border-green-500/20">
+          <CardContent className="p-4 text-center">
+            <CheckCircle className="w-6 h-6 text-green-500 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-green-500">{stats?.delivered || 0}</div>
+            <div className="text-xs text-gray-400">Delivered</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-[#0a0a0a] border-cyan-500/20">
+          <CardContent className="p-4 text-center">
+            <Users className="w-6 h-6 text-cyan-500 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-cyan-500">{stats?.customerRedemptions || 0}</div>
+            <div className="text-xs text-gray-400">Customer</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-[#0a0a0a] border-pink-500/20">
+          <CardContent className="p-4 text-center">
+            <Network className="w-6 h-6 text-pink-500 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-pink-500">{stats?.distributorRedemptions || 0}</div>
+            <div className="text-xs text-gray-400">Distributor</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
+        <CardContent className="p-4">
+          <div className="flex flex-wrap gap-4">
+            <div className="flex-1 min-w-[200px]">
+              <Label className="text-gray-400 text-sm">Status</Label>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="bg-[#111] border-[#c8ff00]/20 text-white">
+                  <SelectValue placeholder="All Statuses" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#111] border-[#c8ff00]/20">
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="processing">Processing</SelectItem>
+                  <SelectItem value="shipped">Shipped</SelectItem>
+                  <SelectItem value="delivered">Delivered</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1 min-w-[200px]">
+              <Label className="text-gray-400 text-sm">Type</Label>
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="bg-[#111] border-[#c8ff00]/20 text-white">
+                  <SelectValue placeholder="All Types" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#111] border-[#c8ff00]/20">
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="customer">Customer (3-for-Free)</SelectItem>
+                  <SelectItem value="distributor">Distributor (Autoship)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Redemptions Table */}
+      <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Gift className="w-5 h-5 text-[#c8ff00]" />
+            Reward Redemptions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-[#c8ff00]" />
+            </div>
+          ) : redemptions && redemptions.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow className="border-[#c8ff00]/10">
+                  <TableHead className="text-gray-400">ID</TableHead>
+                  <TableHead className="text-gray-400">Type</TableHead>
+                  <TableHead className="text-gray-400">Recipient</TableHead>
+                  <TableHead className="text-gray-400">Address</TableHead>
+                  <TableHead className="text-gray-400">Status</TableHead>
+                  <TableHead className="text-gray-400">Date</TableHead>
+                  <TableHead className="text-gray-400">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {redemptions.map((redemption: any) => (
+                  <TableRow key={redemption.id} className="border-[#c8ff00]/10 hover:bg-white/5">
+                    <TableCell className="text-white font-mono">#{redemption.id}</TableCell>
+                    <TableCell>
+                      <Badge className={redemption.rewardType === 'customer' ? 'bg-cyan-500/20 text-cyan-500' : 'bg-pink-500/20 text-pink-500'}>
+                        {redemption.rewardType === 'customer' ? '3-for-Free' : 'Autoship'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-white">{redemption.name}</div>
+                      <div className="text-gray-500 text-sm">{redemption.email}</div>
+                    </TableCell>
+                    <TableCell className="text-gray-400 text-sm max-w-[200px] truncate">
+                      {redemption.addressLine1}, {redemption.city}, {redemption.state} {redemption.postalCode}
+                    </TableCell>
+                    <TableCell>{getStatusBadge(redemption.status)}</TableCell>
+                    <TableCell className="text-gray-400 text-sm">
+                      {new Date(redemption.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-[#c8ff00]/20 text-[#c8ff00]"
+                            onClick={() => setSelectedRedemption(redemption)}
+                          >
+                            <Edit className="w-3 h-3 mr-1" />
+                            Update
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-[#0a0a0a] border-[#c8ff00]/20">
+                          <DialogHeader>
+                            <DialogTitle className="text-white">Update Redemption #{redemption.id}</DialogTitle>
+                            <DialogDescription>Update the fulfillment status and add tracking information</DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4 py-4">
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <Label className="text-gray-400">Recipient</Label>
+                                <p className="text-white">{redemption.name}</p>
+                              </div>
+                              <div>
+                                <Label className="text-gray-400">Email</Label>
+                                <p className="text-white">{redemption.email}</p>
+                              </div>
+                              <div className="col-span-2">
+                                <Label className="text-gray-400">Shipping Address</Label>
+                                <p className="text-white">
+                                  {redemption.addressLine1}<br />
+                                  {redemption.addressLine2 && <>{redemption.addressLine2}<br /></>}
+                                  {redemption.city}, {redemption.state} {redemption.postalCode}<br />
+                                  {redemption.country}
+                                </p>
+                              </div>
+                              {redemption.phone && (
+                                <div>
+                                  <Label className="text-gray-400">Phone</Label>
+                                  <p className="text-white">{redemption.phone}</p>
+                                </div>
+                              )}
+                            </div>
+                            <Separator className="bg-[#c8ff00]/10" />
+                            <div>
+                              <Label className="text-gray-400">Current Status</Label>
+                              <div className="mt-1">{getStatusBadge(redemption.status)}</div>
+                            </div>
+                            {redemption.status !== 'delivered' && (
+                              <>
+                                {redemption.status === 'pending' && (
+                                  <Button 
+                                    className="w-full bg-blue-600 hover:bg-blue-700"
+                                    onClick={() => handleUpdateStatus(redemption.id, 'processing')}
+                                    disabled={isUpdating}
+                                  >
+                                    {isUpdating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Package className="w-4 h-4 mr-2" />}
+                                    Mark as Processing
+                                  </Button>
+                                )}
+                                {redemption.status === 'processing' && (
+                                  <div className="space-y-3">
+                                    <div>
+                                      <Label className="text-gray-400">Tracking Number</Label>
+                                      <Input
+                                        value={trackingNumber}
+                                        onChange={(e) => setTrackingNumber(e.target.value)}
+                                        placeholder="Enter tracking number"
+                                        className="bg-[#111] border-[#c8ff00]/20 text-white"
+                                      />
+                                    </div>
+                                    <Button 
+                                      className="w-full bg-purple-600 hover:bg-purple-700"
+                                      onClick={() => handleUpdateStatus(redemption.id, 'shipped')}
+                                      disabled={isUpdating || !trackingNumber}
+                                    >
+                                      {isUpdating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Truck className="w-4 h-4 mr-2" />}
+                                      Mark as Shipped
+                                    </Button>
+                                  </div>
+                                )}
+                                {redemption.status === 'shipped' && (
+                                  <>
+                                    {redemption.trackingNumber && (
+                                      <div>
+                                        <Label className="text-gray-400">Tracking Number</Label>
+                                        <p className="text-white font-mono">{redemption.trackingNumber}</p>
+                                      </div>
+                                    )}
+                                    <Button 
+                                      className="w-full bg-green-600 hover:bg-green-700"
+                                      onClick={() => handleUpdateStatus(redemption.id, 'delivered')}
+                                      disabled={isUpdating}
+                                    >
+                                      {isUpdating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CheckCircle className="w-4 h-4 mr-2" />}
+                                      Mark as Delivered
+                                    </Button>
+                                  </>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="text-center py-12">
+              <Gift className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-white mb-2">No Redemptions Yet</h3>
+              <p className="text-gray-400">Reward redemptions will appear here when customers or distributors claim their free cases.</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

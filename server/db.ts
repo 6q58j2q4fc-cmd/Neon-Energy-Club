@@ -3548,3 +3548,93 @@ export async function updateRewardRedemptionStatus(
 
   return true;
 }
+
+
+/**
+ * Get reward redemption by ID
+ */
+export async function getRewardRedemptionById(redemptionId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.select()
+    .from(rewardRedemptions)
+    .where(eq(rewardRedemptions.id, redemptionId))
+    .limit(1);
+
+  return result[0] || null;
+}
+
+/**
+ * Get reward redemption stats for admin dashboard
+ */
+export async function getRewardRedemptionStats() {
+  const db = await getDb();
+  if (!db) return {
+    total: 0,
+    pending: 0,
+    processing: 0,
+    shipped: 0,
+    delivered: 0,
+    customerRedemptions: 0,
+    distributorRedemptions: 0,
+  };
+
+  const allRedemptions = await db.select().from(rewardRedemptions);
+  
+  return {
+    total: allRedemptions.length,
+    pending: allRedemptions.filter(r => r.status === 'pending').length,
+    processing: allRedemptions.filter(r => r.status === 'processing').length,
+    shipped: allRedemptions.filter(r => r.status === 'shipped').length,
+    delivered: allRedemptions.filter(r => r.status === 'delivered').length,
+    customerRedemptions: allRedemptions.filter(r => r.rewardType === 'customer').length,
+    distributorRedemptions: allRedemptions.filter(r => r.rewardType === 'distributor').length,
+  };
+}
+
+/**
+ * Get top distributors by sales volume
+ */
+export async function getTopDistributorsBySales(limit: number = 10, period: string = 'all-time') {
+  const db = await getDb();
+  if (!db) return [];
+
+  // For now, use total sales. In production, filter by date range for weekly/monthly
+  const results = await db.select({
+    id: distributors.id,
+    name: users.name,
+    rank: distributors.rank,
+    totalSales: distributors.personalSales,
+    teamSize: sql<number>`(SELECT COUNT(*) FROM distributors d2 WHERE d2.sponsorId = ${distributors.id})`,
+  })
+    .from(distributors)
+    .leftJoin(users, eq(distributors.userId, users.id))
+    .orderBy(desc(distributors.personalSales))
+    .limit(limit);
+
+  return results;
+}
+
+/**
+ * Get top distributors by team size
+ */
+export async function getTopDistributorsByTeamSize(limit: number = 10) {
+  const db = await getDb();
+  if (!db) return [];
+
+  // Get distributors with their team counts
+  const results = await db.select({
+    id: distributors.id,
+    name: users.name,
+    rank: distributors.rank,
+    totalSales: distributors.personalSales,
+    teamSize: sql<number>`(SELECT COUNT(*) FROM distributors d2 WHERE d2.sponsorId = ${distributors.id})`,
+  })
+    .from(distributors)
+    .leftJoin(users, eq(distributors.userId, users.id))
+    .orderBy(desc(sql`(SELECT COUNT(*) FROM distributors d2 WHERE d2.sponsorId = ${distributors.id})`))
+    .limit(limit);
+
+  return results;
+}
