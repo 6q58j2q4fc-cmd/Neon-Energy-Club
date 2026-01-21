@@ -12,6 +12,50 @@ import { useAuth } from "@/_core/hooks/useAuth";
 export default function DistributorLeaderboard() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("rank");
+  
+  // Check if user has access (distributor, franchise owner, vending owner, or admin)
+  const { data: distributorProfile, isLoading: loadingDistributor } = trpc.distributor.me.useQuery(undefined, {
+    enabled: !!user,
+  });
+  const { data: territoryApps, isLoading: loadingTerritory } = trpc.territory.listApplications.useQuery(undefined, {
+    enabled: !!user,
+  });
+  
+  const isCheckingAccess = loadingDistributor || loadingTerritory;
+  
+  const hasAccess = user && (
+    user.role === 'admin' || 
+    !!distributorProfile || 
+    (territoryApps && territoryApps.length > 0)
+  );
+  
+  // Show access denied message if not authorized
+  if (!isCheckingAccess && !hasAccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#0a0a0a] via-[#111] to-[#0a0a0a]">
+        <HamburgerHeader />
+        <div className="container mx-auto px-4 py-32 text-center">
+          <Trophy className="w-20 h-20 text-[#c8ff00]/30 mx-auto mb-6" />
+          <h1 className="text-4xl font-black text-white mb-4">Distributor Leaderboard</h1>
+          <p className="text-xl text-gray-400 mb-8 max-w-md mx-auto">
+            This leaderboard is exclusively available to NEON distributors, franchise owners, and vending machine operators.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <a href="/join" className="px-6 py-3 bg-[#c8ff00] text-black font-bold rounded-lg hover:bg-[#a8d600] transition-colors">
+              Become a Distributor
+            </a>
+            <a href="/franchise" className="px-6 py-3 border border-[#c8ff00] text-[#c8ff00] font-bold rounded-lg hover:bg-[#c8ff00]/10 transition-colors">
+              Franchise Opportunities
+            </a>
+            <a href="/vending" className="px-6 py-3 border border-[#c8ff00] text-[#c8ff00] font-bold rounded-lg hover:bg-[#c8ff00]/10 transition-colors">
+              Vending Machines
+            </a>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   const { data: byRank, isLoading: loadingRank } = trpc.distributor.leaderboardByRank.useQuery({ limit: 50 });
   const { data: byVolume, isLoading: loadingVolume } = trpc.distributor.leaderboardByVolume.useQuery({ limit: 50 });

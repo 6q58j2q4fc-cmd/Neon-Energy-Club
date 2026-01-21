@@ -1902,3 +1902,27 @@
 - [x] Add time period filters (weekly, monthly, all-time)
 - [x] Display rank badges and achievements
 - [x] Anonymize names for privacy
+
+## Bug Fixes & Access Control (Jan 21)
+
+### Vending Page Button Fixes
+- [x] Fix Apply Now button on vending page (now links to /franchise)
+- [x] Fix Schedule Call button on vending page (now links to Calendly)
+- [x] Ensure buttons link to correct destinations
+
+### Site-Wide Link Audit
+- [x] Audit all buttons and links across the site
+- [x] Fix any broken or non-functional links
+- [x] Ensure all CTAs work correctly
+
+### Email Notification Fixes
+- [x] Stop sending emails for simulated investor inquiries
+- [x] Stop sending emails for simulated orders
+- [x] Only send emails for real user actions (production mode only)
+- [x] Remove test/demo email triggers (notifyOwner now checks NODE_ENV)
+
+### Leaderboard Access Restriction
+- [x] Restrict leaderboard to distributors only
+- [x] Restrict leaderboard to franchise owners only
+- [x] Restrict leaderboard to vending machine owners only
+- [x] Block public/customer access to leaderboard (shows access denied message)

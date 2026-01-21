@@ -97,14 +97,16 @@ export default function VendingMachines() {
                 </p>
                 
                 <div className="flex flex-wrap gap-4">
-                  <Button size="lg" className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold text-lg px-8">
-                    <Link href="/franchise" className="flex items-center gap-2">
-                      Apply Now <ArrowRight className="w-5 h-5" />
-                    </Link>
-                  </Button>
-                  <Button size="lg" variant="outline" className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10 font-bold text-lg px-8">
-                    <Phone className="w-5 h-5 mr-2" /> Schedule Call
-                  </Button>
+                  <Link href="/franchise">
+                    <Button size="lg" className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold text-lg px-8">
+                      Apply Now <ArrowRight className="w-5 h-5 ml-2" />
+                    </Button>
+                  </Link>
+                  <a href="https://calendly.com/neonenergy/vending-consultation" target="_blank" rel="noopener noreferrer">
+                    <Button size="lg" variant="outline" className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10 font-bold text-lg px-8">
+                      <Phone className="w-5 h-5 mr-2" /> Schedule Call
+                    </Button>
+                  </a>
                 </div>
               </motion.div>
               

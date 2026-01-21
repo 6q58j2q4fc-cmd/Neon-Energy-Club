@@ -62,10 +62,18 @@ const validatePayload = (input: NotificationPayload): NotificationPayload => {
  * Returns `true` if the request was accepted, `false` when the upstream service
  * cannot be reached (callers can fall back to email/slack). Validation errors
  * bubble up as TRPC errors so callers can fix the payload.
+ * 
+ * NOTE: Only sends notifications in production mode to prevent simulated/test notifications.
  */
 export async function notifyOwner(
   payload: NotificationPayload
 ): Promise<boolean> {
+  // Skip notifications in development/test mode to prevent simulated notifications
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`[Notification] Skipping (dev mode): ${payload.title}`);
+    return true; // Return true to not break the flow
+  }
+  
   const { title, content } = validatePayload(payload);
 
   if (!ENV.forgeApiUrl) {
