@@ -162,10 +162,9 @@ export default function FranchiseDashboard() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <Store className="w-5 h-5 text-[#c8ff00]" />
-                  <span className="text-[10px] text-[#c8ff00] flex items-center">
-                    <ArrowUpRight className="w-3 h-3" />
-                    12%
-                  </span>
+                  <Badge variant="outline" className="text-[10px] border-[#c8ff00]/50 text-[#c8ff00]">
+                    Active
+                  </Badge>
                 </div>
                 <p className="text-2xl font-black text-white">0</p>
                 <p className="text-xs text-white/50">Vending Machines</p>
@@ -176,10 +175,9 @@ export default function FranchiseDashboard() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <DollarSign className="w-5 h-5 text-[#00ffff]" />
-                  <span className="text-[10px] text-[#00ffff] flex items-center">
-                    <ArrowUpRight className="w-3 h-3" />
-                    8%
-                  </span>
+                  <Badge variant="outline" className="text-[10px] border-[#00ffff]/50 text-[#00ffff]">
+                    MTD
+                  </Badge>
                 </div>
                 <p className="text-2xl font-black text-white">$0</p>
                 <p className="text-xs text-white/50">Monthly Revenue</p>

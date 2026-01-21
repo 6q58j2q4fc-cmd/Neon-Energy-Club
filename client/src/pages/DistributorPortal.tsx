@@ -40,7 +40,9 @@ import {
   Package,
   ShoppingCart,
   Repeat,
-  LogOut
+  LogOut,
+  Loader2,
+  AlertCircle
 } from "lucide-react";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
@@ -56,8 +58,26 @@ export default function DistributorPortal() {
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  // Use user data directly - distributor profile is linked to user account
-  const distributorData = user ? { affiliateCode: user.id?.toString() || 'demo' } : null;
+  // Fetch real distributor data from API
+  const { data: distributorProfile, isLoading: profileLoading } = trpc.distributor.me.useQuery(undefined, {
+    enabled: !!user,
+  });
+
+  const { data: distributorStats, isLoading: statsLoading } = trpc.distributor.stats.useQuery(undefined, {
+    enabled: !!user,
+  });
+
+  const { data: teamData, isLoading: teamLoading } = trpc.distributor.team.useQuery(undefined, {
+    enabled: !!user,
+  });
+
+  const { data: commissions, isLoading: commissionsLoading } = trpc.distributor.commissions.useQuery(undefined, {
+    enabled: !!user,
+  });
+
+  const { data: rankProgress, isLoading: rankLoading } = trpc.distributor.rankProgress.useQuery(undefined, {
+    enabled: !!user,
+  });
 
   useEffect(() => {
     setIsVisible(true);
@@ -93,37 +113,90 @@ export default function DistributorPortal() {
     );
   }
 
-  // Mock data for demonstration (would come from API)
+  // Loading state
+  if (loading || profileLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-[#c8ff00] animate-spin mx-auto mb-4" />
+          <p className="text-gray-400">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Not a distributor yet
+  if (!distributorProfile) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <Card className="bg-[#0a0a0a] border-[#c8ff00]/30 max-w-md w-full mx-4">
+          <CardHeader className="text-center">
+            <AlertCircle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+            <CardTitle className="text-2xl">Not Yet a Distributor</CardTitle>
+            <CardDescription>
+              You haven't enrolled as a NEON distributor yet. Join now to start building your business!
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button 
+              onClick={() => setLocation("/join")}
+              className="w-full bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold"
+            >
+              Become a Distributor
+            </Button>
+            <Button 
+              onClick={() => setLocation("/customer-portal")}
+              variant="outline"
+              className="w-full border-gray-600 text-gray-400"
+            >
+              Go to Customer Portal
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Use real data from API, with fallbacks to 0
+  // rankProgress is an object with personalPV, teamPV, legVolume details
+  const rankProgressData = rankProgress as any;
+  const overallProgress = rankProgressData?.personalPV?.percentage || 0;
+  const statsData = distributorStats as any;
+  const distributorInfo = statsData?.distributor || {};
+  
   const stats = {
-    personalVolume: 350,
-    groupVolume: 12500,
-    leftLegVolume: 8500,
-    rightLegVolume: 4000,
-    teamSize: 47,
-    personallyEnrolled: 8,
-    rank: "Director",
-    nextRank: "Executive",
-    rankProgress: 65,
-    weeklyEarnings: 2450,
-    monthlyEarnings: 9800,
-    totalEarnings: 45600,
-    pendingCommissions: 1250
+    personalVolume: distributorInfo?.personalVolume || 0,
+    groupVolume: distributorInfo?.groupVolume || 0,
+    leftLegVolume: distributorInfo?.leftLegVolume || 0,
+    rightLegVolume: distributorInfo?.rightLegVolume || 0,
+    teamSize: statsData?.teamSize || teamData?.length || 0,
+    personallyEnrolled: distributorInfo?.personallyEnrolled || 0,
+    rank: distributorProfile?.rank || "Brand Partner",
+    nextRank: rankProgressData?.nextRank || "Senior Partner",
+    rankProgress: overallProgress,
+    weeklyEarnings: (commissions?.totals as any)?.thisWeek || 0,
+    monthlyEarnings: (commissions?.totals as any)?.thisMonth || 0,
+    totalEarnings: commissions?.totals?.total || 0,
+    pendingCommissions: commissions?.totals?.pending || 0
   };
 
-  const recentActivity = [
-    { type: "sale", description: "New customer order", amount: 72, date: "2 hours ago" },
-    { type: "enrollment", description: "Sarah M. joined your team", amount: 499, date: "5 hours ago" },
-    { type: "commission", description: "Binary bonus paid", amount: 850, date: "1 day ago" },
-    { type: "sale", description: "Auto-ship renewal", amount: 36, date: "1 day ago" },
-    { type: "enrollment", description: "Mike R. joined your team", amount: 199, date: "2 days ago" },
-  ];
+  // Get recent activity from real commissions data
+  const commissionsList = commissions?.commissions || [];
+  const recentActivity = commissionsList.slice(0, 5).map((c: any) => ({
+    type: c.commissionType || "commission",
+    description: c.description || `${c.commissionType} commission`,
+    amount: Number(c.amount) || 0,
+    date: c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "Recently"
+  }));
 
-  const affiliateLink = distributorData?.affiliateCode 
-    ? `https://neon.energy/ref/${distributorData.affiliateCode}`
-    : `https://neon.energy/ref/${user?.id || 'demo'}`;
+  const affiliateLink = distributorProfile?.distributorCode 
+    ? `${window.location.origin}/ref/${distributorProfile.distributorCode}`
+    : `${window.location.origin}/ref/${user?.id || 'demo'}`;
 
-  const subdomain = distributorData?.affiliateCode 
-    ? `${distributorData.affiliateCode}.neon.energy`
+  const subdomain = distributorProfile?.subdomain 
+    ? `${distributorProfile.subdomain}.neon.energy`
+    : distributorProfile?.username
+    ? `${distributorProfile.username}.neon.energy`
     : `${user?.name?.toLowerCase().replace(/\s+/g, '') || 'demo'}.neon.energy`;
 
   const copyToClipboard = (text: string, label: string) => {
@@ -312,108 +385,182 @@ export default function DistributorPortal() {
                       <Crown className="w-5 h-5 text-[#c8ff00]" />
                       Rank Progress
                     </CardTitle>
+                    <CardDescription>
+                      {stats.rank} → {stats.nextRank}
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-gray-400">{stats.rank}</span>
-                      <span className="text-[#c8ff00]">{stats.nextRank}</span>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between text-sm mb-2">
+                          <span className="text-gray-400">Progress to {stats.nextRank}</span>
+                          <span className="text-[#c8ff00]">{stats.rankProgress}%</span>
+                        </div>
+                        <Progress value={stats.rankProgress} className="h-3" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 pt-4">
+                        <div className="text-center p-3 bg-black/50 rounded-lg">
+                          <div className="text-lg font-bold text-white">{stats.personalVolume}</div>
+                          <div className="text-xs text-gray-500">Personal PV</div>
+                        </div>
+                        <div className="text-center p-3 bg-black/50 rounded-lg">
+                          <div className="text-lg font-bold text-white">{stats.personallyEnrolled}</div>
+                          <div className="text-xs text-gray-500">Personally Enrolled</div>
+                        </div>
+                      </div>
                     </div>
-                    <Progress value={stats.rankProgress} className="h-3 mb-4" />
-                    <p className="text-sm text-gray-500">
-                      {100 - stats.rankProgress}% more to reach {stats.nextRank}
-                    </p>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-[#c8ff00]" />
+                      <Target className="w-5 h-5 text-blue-500" />
                       Binary Legs
                     </CardTitle>
+                    <CardDescription>Team volume distribution</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex justify-between items-center">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-green-500">{stats.leftLegVolume.toLocaleString()}</div>
-                        <div className="text-xs text-gray-500">Left Leg</div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                        <div className="text-2xl font-bold text-blue-400">{stats.leftLegVolume.toLocaleString()}</div>
+                        <div className="text-sm text-gray-400">Left Leg</div>
                       </div>
-                      <div className="text-gray-600">VS</div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-500">{stats.rightLegVolume.toLocaleString()}</div>
-                        <div className="text-xs text-gray-500">Right Leg</div>
+                      <div className="text-center p-4 bg-green-500/10 rounded-lg border border-green-500/20">
+                        <div className="text-2xl font-bold text-green-400">{stats.rightLegVolume.toLocaleString()}</div>
+                        <div className="text-sm text-gray-400">Right Leg</div>
                       </div>
                     </div>
                     <div className="mt-4 text-center">
-                      <div className="text-sm text-gray-400">Weaker leg commission:</div>
-                      <div className="text-xl font-bold text-[#c8ff00]">${(Math.min(stats.leftLegVolume, stats.rightLegVolume) * 0.1).toLocaleString()}</div>
+                      <div className="text-sm text-gray-500">
+                        Weaker leg: {stats.leftLegVolume <= stats.rightLegVolume ? 'Left' : 'Right'}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
-              {/* Quick Links & Activity */}
-              <div className="grid md:grid-cols-3 gap-6">
-                {/* Quick Links */}
+              {/* Recent Activity & Earnings */}
+              <div className="grid md:grid-cols-2 gap-6">
                 <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
                   <CardHeader>
-                    <CardTitle>Quick Links</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="w-5 h-5 text-[#c8ff00]" />
+                      Recent Activity
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="p-3 bg-black/50 rounded-lg">
-                      <div className="text-xs text-gray-500 mb-1">Your Website</div>
-                      <div className="flex items-center gap-2">
-                        <Globe className="w-4 h-4 text-[#c8ff00]" />
-                        <span className="text-sm text-white truncate flex-1">{subdomain}</span>
-                        <Button size="sm" variant="ghost" onClick={() => copyToClipboard(`https://${subdomain}`, 'Website')}>
-                          <Copy className="w-4 h-4" />
-                        </Button>
+                  <CardContent>
+                    {recentActivity.length > 0 ? (
+                      <div className="space-y-3">
+                        {recentActivity.map((activity, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-black/50 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                activity.type === 'sale' ? 'bg-green-500/20' :
+                                activity.type === 'enrollment' ? 'bg-blue-500/20' :
+                                'bg-[#c8ff00]/20'
+                              }`}>
+                                {activity.type === 'sale' && <ShoppingCart className="w-4 h-4 text-green-500" />}
+                                {activity.type === 'enrollment' && <Users className="w-4 h-4 text-blue-500" />}
+                                {activity.type === 'commission' && <DollarSign className="w-4 h-4 text-[#c8ff00]" />}
+                              </div>
+                              <div>
+                                <div className="text-sm text-white">{activity.description}</div>
+                                <div className="text-xs text-gray-500">{activity.date}</div>
+                              </div>
+                            </div>
+                            <div className="text-[#c8ff00] font-bold">+${activity.amount}</div>
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                    <div className="p-3 bg-black/50 rounded-lg">
-                      <div className="text-xs text-gray-500 mb-1">Affiliate Link</div>
-                      <div className="flex items-center gap-2">
-                        <Link className="w-4 h-4 text-[#c8ff00]" />
-                        <span className="text-sm text-white truncate flex-1">{affiliateLink}</span>
-                        <Button size="sm" variant="ghost" onClick={() => copyToClipboard(affiliateLink, 'Affiliate link')}>
-                          <Copy className="w-4 h-4" />
-                        </Button>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                        <p>No recent activity</p>
+                        <p className="text-sm">Start building your team to see activity here!</p>
                       </div>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
 
-                {/* Recent Activity */}
-                <Card className="bg-[#0a0a0a] border-[#c8ff00]/20 md:col-span-2">
+                <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
                   <CardHeader>
-                    <CardTitle>Recent Activity</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                      <DollarSign className="w-5 h-5 text-green-500" />
+                      Earnings Summary
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-3">
-                      {recentActivity.map((activity, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-black/50 rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                              activity.type === 'sale' ? 'bg-green-500/20 text-green-500' :
-                              activity.type === 'enrollment' ? 'bg-blue-500/20 text-blue-500' :
-                              'bg-[#c8ff00]/20 text-[#c8ff00]'
-                            }`}>
-                              {activity.type === 'sale' && <ShoppingCart className="w-4 h-4" />}
-                              {activity.type === 'enrollment' && <Users className="w-4 h-4" />}
-                              {activity.type === 'commission' && <DollarSign className="w-4 h-4" />}
-                            </div>
-                            <div>
-                              <div className="text-sm text-white">{activity.description}</div>
-                              <div className="text-xs text-gray-500">{activity.date}</div>
-                            </div>
-                          </div>
-                          <div className="text-[#c8ff00] font-bold">${activity.amount}</div>
-                        </div>
-                      ))}
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center p-3 bg-black/50 rounded-lg">
+                        <span className="text-gray-400">This Week</span>
+                        <span className="text-xl font-bold text-white">${stats.weeklyEarnings.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-black/50 rounded-lg">
+                        <span className="text-gray-400">This Month</span>
+                        <span className="text-xl font-bold text-white">${stats.monthlyEarnings.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-black/50 rounded-lg">
+                        <span className="text-gray-400">Lifetime</span>
+                        <span className="text-xl font-bold text-[#c8ff00]">${stats.totalEarnings.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                        <span className="text-yellow-400">Pending</span>
+                        <span className="text-xl font-bold text-yellow-400">${stats.pendingCommissions.toLocaleString()}</span>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Quick Links */}
+              <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Link className="w-5 h-5 text-[#c8ff00]" />
+                    Your Links
+                  </CardTitle>
+                  <CardDescription>Share these links to grow your business</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm text-gray-400">Affiliate Link</label>
+                      <div className="flex gap-2">
+                        <Input 
+                          value={affiliateLink} 
+                          readOnly 
+                          className="bg-black/50 border-gray-700 text-white"
+                        />
+                        <Button 
+                          onClick={() => copyToClipboard(affiliateLink, "Affiliate link")}
+                          variant="outline"
+                          className="border-[#c8ff00]/30 text-[#c8ff00]"
+                        >
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm text-gray-400">Your Subdomain</label>
+                      <div className="flex gap-2">
+                        <Input 
+                          value={subdomain} 
+                          readOnly 
+                          className="bg-black/50 border-gray-700 text-white"
+                        />
+                        <Button 
+                          onClick={() => copyToClipboard(`https://${subdomain}`, "Subdomain")}
+                          variant="outline"
+                          className="border-[#c8ff00]/30 text-[#c8ff00]"
+                        >
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </motion.div>
           )}
 
@@ -422,45 +569,123 @@ export default function DistributorPortal() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+            >
+              <GenealogyTree />
+            </motion.div>
+          )}
+
+          {/* Sales Tab */}
+          {activeTab === "sales" && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               className="space-y-6"
             >
-              <div className="grid md:grid-cols-3 gap-4 mb-6">
-                <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
-                  <CardContent className="p-4 text-center">
-                    <div className="text-3xl font-bold text-white">{stats.teamSize}</div>
-                    <div className="text-gray-500">Total Team</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
-                  <CardContent className="p-4 text-center">
-                    <div className="text-3xl font-bold text-[#c8ff00]">{stats.personallyEnrolled}</div>
-                    <div className="text-gray-500">Personally Enrolled</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
-                  <CardContent className="p-4 text-center">
-                    <div className="text-3xl font-bold text-green-500">12</div>
-                    <div className="text-gray-500">Active This Month</div>
-                  </CardContent>
-                </Card>
-              </div>
-
               <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
                 <CardHeader>
-                  <CardTitle>Team Genealogy</CardTitle>
-                  <CardDescription>Visual representation of your organization</CardDescription>
+                  <CardTitle>Sales Overview</CardTitle>
+                  <CardDescription>Track your personal and team sales</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <GenealogyTree 
-                    rootDistributor={{ id: 1, distributorCode: 'NEON001', rank: 'Director', personalSales: 5000 }}
-                    team={[
-                      { id: 2, sponsorId: 1, distributorCode: 'NEON002', rank: 'Manager', personalSales: 2500 },
-                      { id: 3, sponsorId: 1, distributorCode: 'NEON003', rank: 'Associate', personalSales: 1200 },
-                      { id: 4, sponsorId: 2, distributorCode: 'NEON004', rank: 'Associate', personalSales: 800 },
-                    ]}
-                  />
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center p-4 bg-black/50 rounded-lg">
+                      <div className="text-2xl font-bold text-[#c8ff00]">{stats.personalVolume}</div>
+                      <div className="text-sm text-gray-500">Personal Volume</div>
+                    </div>
+                    <div className="text-center p-4 bg-black/50 rounded-lg">
+                      <div className="text-2xl font-bold text-green-400">{stats.groupVolume.toLocaleString()}</div>
+                      <div className="text-sm text-gray-500">Group Volume</div>
+                    </div>
+                    <div className="text-center p-4 bg-black/50 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-400">{stats.leftLegVolume.toLocaleString()}</div>
+                      <div className="text-sm text-gray-500">Left Leg</div>
+                    </div>
+                    <div className="text-center p-4 bg-black/50 rounded-lg">
+                      <div className="text-2xl font-bold text-purple-400">{stats.rightLegVolume.toLocaleString()}</div>
+                      <div className="text-sm text-gray-500">Right Leg</div>
+                    </div>
+                  </div>
+                  {stats.groupVolume === 0 && (
+                    <div className="mt-6 text-center py-8 bg-black/30 rounded-lg">
+                      <ShoppingCart className="w-12 h-12 mx-auto mb-3 text-gray-600" />
+                      <p className="text-gray-400">No sales yet</p>
+                      <p className="text-sm text-gray-500">Share your affiliate link to start earning!</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
+            </motion.div>
+          )}
+
+          {/* Commissions Tab */}
+          {activeTab === "commissions" && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-6"
+            >
+              <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
+                <CardHeader>
+                  <CardTitle>Commission History</CardTitle>
+                  <CardDescription>Your earnings from sales and team building</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {commissionsLoading ? (
+                    <div className="text-center py-8">
+                      <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#c8ff00]" />
+                    </div>
+                  ) : commissionsList && commissionsList.length > 0 ? (
+                    <div className="space-y-3">
+                      {commissionsList.map((commission: any, index: number) => (
+                        <div key={commission.id || index} className="flex items-center justify-between p-4 bg-black/50 rounded-lg">
+                          <div>
+                            <div className="font-medium text-white">{commission.description || commission.commissionType}</div>
+                            <div className="text-sm text-gray-500">
+                              {commission.createdAt ? new Date(commission.createdAt).toLocaleDateString() : 'Recently'}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-lg font-bold text-[#c8ff00]">+${Number(commission.amount).toFixed(2)}</div>
+                            <Badge variant="outline" className={
+                              commission.status === 'paid' ? 'border-green-500 text-green-500' :
+                              commission.status === 'pending' ? 'border-yellow-500 text-yellow-500' :
+                              'border-gray-500 text-gray-500'
+                            }>
+                              {commission.status || 'pending'}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <DollarSign className="w-12 h-12 mx-auto mb-3 text-gray-600" />
+                      <p className="text-gray-400">No commissions yet</p>
+                      <p className="text-sm text-gray-500">Build your team and make sales to earn commissions!</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+
+          {/* Payouts Tab */}
+          {activeTab === "payouts" && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <PayoutManager />
+            </motion.div>
+          )}
+
+          {/* Rank History Tab */}
+          {activeTab === "rank-history" && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <RankHistory />
             </motion.div>
           )}
 
@@ -471,89 +696,63 @@ export default function DistributorPortal() {
               animate={{ opacity: 1, y: 0 }}
               className="space-y-6"
             >
-              {/* Affiliate Links */}
               <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
                 <CardHeader>
-                  <CardTitle>Your Marketing Links</CardTitle>
-                  <CardDescription>Share these links to earn commissions on referrals</CardDescription>
+                  <CardTitle className="flex items-center gap-2">
+                    <Share2 className="w-5 h-5 text-[#c8ff00]" />
+                    Marketing Materials
+                  </CardTitle>
+                  <CardDescription>Resources to help you grow your business</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="p-4 bg-black/50 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[#c8ff00] font-medium">Personal Website</span>
-                      <Button size="sm" onClick={() => window.open(`https://${subdomain}`, '_blank')}>
+                <CardContent>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div className="p-4 bg-black/50 rounded-lg text-center">
+                      <FileText className="w-8 h-8 mx-auto mb-2 text-[#c8ff00]" />
+                      <h4 className="font-medium text-white">Product Brochures</h4>
+                      <p className="text-sm text-gray-500 mb-3">Download PDF brochures</p>
+                      <Button variant="outline" size="sm" className="border-[#c8ff00]/30 text-[#c8ff00]">
+                        <Download className="w-4 h-4 mr-2" />
+                        Download
+                      </Button>
+                    </div>
+                    <div className="p-4 bg-black/50 rounded-lg text-center">
+                      <Video className="w-8 h-8 mx-auto mb-2 text-blue-500" />
+                      <h4 className="font-medium text-white">Video Library</h4>
+                      <p className="text-sm text-gray-500 mb-3">Promotional videos</p>
+                      <Button variant="outline" size="sm" className="border-blue-500/30 text-blue-500">
                         <ExternalLink className="w-4 h-4 mr-2" />
-                        Visit
+                        View
                       </Button>
                     </div>
-                    <div className="flex items-center gap-2 bg-black rounded-lg p-3">
-                      <Globe className="w-5 h-5 text-gray-500" />
-                      <code className="flex-1 text-sm text-white">{subdomain}</code>
-                      <Button size="sm" variant="ghost" onClick={() => copyToClipboard(`https://${subdomain}`, 'Website')}>
-                        <Copy className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-black/50 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[#c8ff00] font-medium">Affiliate Link</span>
-                      <Badge className="bg-green-500/20 text-green-500">Tracks all sales</Badge>
-                    </div>
-                    <div className="flex items-center gap-2 bg-black rounded-lg p-3">
-                      <Link className="w-5 h-5 text-gray-500" />
-                      <code className="flex-1 text-sm text-white">{affiliateLink}</code>
-                      <Button size="sm" variant="ghost" onClick={() => copyToClipboard(affiliateLink, 'Affiliate link')}>
-                        <Copy className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-black/50 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[#c8ff00] font-medium">Enrollment Link</span>
-                      <Badge className="bg-blue-500/20 text-blue-500">For new distributors</Badge>
-                    </div>
-                    <div className="flex items-center gap-2 bg-black rounded-lg p-3">
-                      <Users className="w-5 h-5 text-gray-500" />
-                      <code className="flex-1 text-sm text-white">{affiliateLink}/join</code>
-                      <Button size="sm" variant="ghost" onClick={() => copyToClipboard(`${affiliateLink}/join`, 'Enrollment link')}>
-                        <Copy className="w-4 h-4" />
+                    <div className="p-4 bg-black/50 rounded-lg text-center">
+                      <Globe className="w-8 h-8 mx-auto mb-2 text-green-500" />
+                      <h4 className="font-medium text-white">Social Media Kit</h4>
+                      <p className="text-sm text-gray-500 mb-3">Images & templates</p>
+                      <Button variant="outline" size="sm" className="border-green-500/30 text-green-500">
+                        <Download className="w-4 h-4 mr-2" />
+                        Download
                       </Button>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Marketing Materials */}
+              {/* Your Links */}
               <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
                 <CardHeader>
-                  <CardTitle>Marketing Materials</CardTitle>
-                  <CardDescription>Download branded assets for your promotions</CardDescription>
+                  <CardTitle>Your Sharing Links</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-3 gap-4">
-                    {[
-                      { name: "Social Media Kit", type: "ZIP", size: "15 MB", icon: Share2 },
-                      { name: "Product Images", type: "ZIP", size: "8 MB", icon: Package },
-                      { name: "Presentation Deck", type: "PDF", size: "5 MB", icon: FileText },
-                      { name: "Video Ads", type: "ZIP", size: "120 MB", icon: Video },
-                      { name: "Email Templates", type: "ZIP", size: "2 MB", icon: FileText },
-                      { name: "Business Cards", type: "PDF", size: "1 MB", icon: CreditCard },
-                    ].map((item, index) => (
-                      <div key={index} className="p-4 bg-black/50 rounded-lg flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <item.icon className="w-8 h-8 text-[#c8ff00]" />
-                          <div>
-                            <div className="font-medium text-white">{item.name}</div>
-                            <div className="text-xs text-gray-500">{item.type} • {item.size}</div>
-                          </div>
-                        </div>
-                        <Button size="sm" variant="ghost">
-                          <Download className="w-4 h-4" />
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-sm text-gray-400">Main Affiliate Link</label>
+                      <div className="flex gap-2">
+                        <Input value={affiliateLink} readOnly className="bg-black/50 border-gray-700" />
+                        <Button onClick={() => copyToClipboard(affiliateLink, "Link")} className="bg-[#c8ff00] text-black">
+                          <Copy className="w-4 h-4" />
                         </Button>
                       </div>
-                    ))}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -567,98 +766,59 @@ export default function DistributorPortal() {
               animate={{ opacity: 1, y: 0 }}
               className="space-y-6"
             >
-              <div className="grid md:grid-cols-2 gap-6">
-                {[
-                  { title: "Getting Started", lessons: 5, duration: "45 min", progress: 100 },
-                  { title: "Product Knowledge", lessons: 8, duration: "1.5 hrs", progress: 60 },
-                  { title: "Sales Mastery", lessons: 12, duration: "2 hrs", progress: 30 },
-                  { title: "Team Building", lessons: 10, duration: "1.5 hrs", progress: 0 },
-                  { title: "Social Media Marketing", lessons: 6, duration: "1 hr", progress: 0 },
-                  { title: "Leadership Development", lessons: 8, duration: "2 hrs", progress: 0 },
-                ].map((course, index) => (
-                  <Card key={index} className="bg-[#0a0a0a] border-[#c8ff00]/20">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <h3 className="font-bold text-white text-lg">{course.title}</h3>
-                          <p className="text-gray-500 text-sm">{course.lessons} lessons • {course.duration}</p>
-                        </div>
-                        {course.progress === 100 && (
-                          <Badge className="bg-green-500/20 text-green-500">Completed</Badge>
-                        )}
-                      </div>
-                      <Progress value={course.progress} className="h-2 mb-4" />
-                      <Button 
-                        className={course.progress === 100 ? 'bg-gray-700' : 'bg-[#c8ff00] text-black hover:bg-[#a8d600]'}
-                        disabled={course.progress === 100}
-                      >
-                        {course.progress === 0 ? 'Start Course' : course.progress === 100 ? 'Completed' : 'Continue'}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Commissions Tab */}
-          {activeTab === "commissions" && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
-            >
-              <div className="grid md:grid-cols-4 gap-4">
-                <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
-                  <CardContent className="p-4 text-center">
-                    <div className="text-3xl font-bold text-[#c8ff00]">${stats.pendingCommissions.toLocaleString()}</div>
-                    <div className="text-gray-500">Pending</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
-                  <CardContent className="p-4 text-center">
-                    <div className="text-3xl font-bold text-white">${stats.weeklyEarnings.toLocaleString()}</div>
-                    <div className="text-gray-500">This Week</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
-                  <CardContent className="p-4 text-center">
-                    <div className="text-3xl font-bold text-white">${stats.monthlyEarnings.toLocaleString()}</div>
-                    <div className="text-gray-500">This Month</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
-                  <CardContent className="p-4 text-center">
-                    <div className="text-3xl font-bold text-green-500">${stats.totalEarnings.toLocaleString()}</div>
-                    <div className="text-gray-500">All Time</div>
-                  </CardContent>
-                </Card>
-              </div>
-
               <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
                 <CardHeader>
-                  <CardTitle>Commission History</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-[#c8ff00]" />
+                    Training Center
+                  </CardTitle>
+                  <CardDescription>Learn how to build your NEON business</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {[
-                      { type: "Binary Bonus", amount: 850, date: "Jan 15, 2026", status: "Paid" },
-                      { type: "Retail Profit", amount: 320, date: "Jan 14, 2026", status: "Paid" },
-                      { type: "Fast Start Bonus", amount: 100, date: "Jan 13, 2026", status: "Paid" },
-                      { type: "Team Commission", amount: 450, date: "Jan 12, 2026", status: "Paid" },
-                      { type: "Binary Bonus", amount: 730, date: "Jan 8, 2026", status: "Paid" },
-                    ].map((commission, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 bg-black/50 rounded-lg">
-                        <div>
-                          <div className="font-medium text-white">{commission.type}</div>
-                          <div className="text-sm text-gray-500">{commission.date}</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-bold text-[#c8ff00]">${commission.amount}</div>
-                          <Badge className="bg-green-500/20 text-green-500 text-xs">{commission.status}</Badge>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="p-4 bg-black/50 rounded-lg">
+                      <h4 className="font-medium text-white mb-2">Getting Started Guide</h4>
+                      <p className="text-sm text-gray-500 mb-3">Learn the basics of your NEON business</p>
+                      <Button variant="outline" size="sm" className="border-[#c8ff00]/30 text-[#c8ff00]">
+                        Start Learning
+                      </Button>
+                    </div>
+                    <div className="p-4 bg-black/50 rounded-lg">
+                      <h4 className="font-medium text-white mb-2">Compensation Plan</h4>
+                      <p className="text-sm text-gray-500 mb-3">Understand how you earn</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="border-[#c8ff00]/30 text-[#c8ff00]"
+                        onClick={() => setLocation("/compensation")}
+                      >
+                        View Plan
+                      </Button>
+                    </div>
+                    <div className="p-4 bg-black/50 rounded-lg">
+                      <h4 className="font-medium text-white mb-2">Product Knowledge</h4>
+                      <p className="text-sm text-gray-500 mb-3">Learn about NEON products</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="border-[#c8ff00]/30 text-[#c8ff00]"
+                        onClick={() => setLocation("/products")}
+                      >
+                        View Products
+                      </Button>
+                    </div>
+                    <div className="p-4 bg-black/50 rounded-lg">
+                      <h4 className="font-medium text-white mb-2">FAQ</h4>
+                      <p className="text-sm text-gray-500 mb-3">Common questions answered</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="border-[#c8ff00]/30 text-[#c8ff00]"
+                        onClick={() => setLocation("/faq")}
+                      >
+                        View FAQ
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -670,96 +830,20 @@ export default function DistributorPortal() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
             >
               <AutoshipManager />
             </motion.div>
           )}
 
-          {/* Payouts Tab */}
-          {activeTab === "payouts" && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
-            >
-              <PayoutManager />
-            </motion.div>
-          )}
-
-          {/* Rank History Tab */}
-          {activeTab === "rank-history" && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
-            >
-              <RankHistory />
-            </motion.div>
-          )}
-
-          {/* 3-for-Free Rewards Tab */}
+          {/* Rewards Tab */}
           {activeTab === "rewards" && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
             >
-              <DistributorRewards distributorId={user?.id || 0} />
-            </motion.div>
-          )}
-
-          {/* Sales Tab */}
-          {activeTab === "sales" && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
-            >
-              <div className="grid md:grid-cols-3 gap-4">
-                <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
-                  <CardContent className="p-4 text-center">
-                    <div className="text-3xl font-bold text-white">{stats.personalVolume}</div>
-                    <div className="text-gray-500">Personal Volume</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
-                  <CardContent className="p-4 text-center">
-                    <div className="text-3xl font-bold text-[#c8ff00]">23</div>
-                    <div className="text-gray-500">Orders This Month</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
-                  <CardContent className="p-4 text-center">
-                    <div className="text-3xl font-bold text-green-500">8</div>
-                    <div className="text-gray-500">Retail Customers</div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
-                <CardHeader>
-                  <CardTitle>Recent Orders</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {[
-                      { customer: "John D.", product: "24-Pack", amount: 72, date: "2 hours ago" },
-                      { customer: "Sarah M.", product: "Pro Pack", amount: 499, date: "5 hours ago" },
-                      { customer: "Mike R.", product: "12-Pack", amount: 42, date: "1 day ago" },
-                      { customer: "Lisa K.", product: "Auto-Ship", amount: 36, date: "1 day ago" },
-                    ].map((order, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 bg-black/50 rounded-lg">
-                        <div>
-                          <div className="font-medium text-white">{order.customer}</div>
-                          <div className="text-sm text-gray-500">{order.product} • {order.date}</div>
-                        </div>
-                        <div className="font-bold text-[#c8ff00]">${order.amount}</div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              {distributorProfile && (
+                <DistributorRewards distributorId={distributorProfile.id} />
+              )}
             </motion.div>
           )}
 
@@ -772,41 +856,67 @@ export default function DistributorPortal() {
             >
               <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
                 <CardHeader>
-                  <CardTitle>Profile Settings</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm text-gray-400 mb-2 block">Full Name</label>
-                      <Input defaultValue={user?.name || ''} className="bg-black border-gray-700" />
-                    </div>
-                    <div>
-                      <label className="text-sm text-gray-400 mb-2 block">Email</label>
-                      <Input defaultValue={user?.email || ''} className="bg-black border-gray-700" disabled />
-                    </div>
-                  </div>
-                  <Button className="bg-[#c8ff00] text-black hover:bg-[#a8d600]">
-                    Save Changes
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
-                <CardHeader>
-                  <CardTitle>Payment Information</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <Settings className="w-5 h-5 text-[#c8ff00]" />
+                    Account Settings
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-400 mb-4">Set up your payment method to receive commissions</p>
-                  <Button variant="outline" className="border-[#c8ff00] text-[#c8ff00]">
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    Add Payment Method
-                  </Button>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-black/50 rounded-lg">
+                      <h4 className="font-medium text-white mb-1">Profile Information</h4>
+                      <p className="text-sm text-gray-500 mb-3">Update your personal details</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="border-[#c8ff00]/30 text-[#c8ff00]"
+                        onClick={() => setLocation("/profile")}
+                      >
+                        Edit Profile
+                      </Button>
+                    </div>
+                    <div className="p-4 bg-black/50 rounded-lg">
+                      <h4 className="font-medium text-white mb-1">Payout Settings</h4>
+                      <p className="text-sm text-gray-500 mb-3">Manage your payout preferences</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="border-[#c8ff00]/30 text-[#c8ff00]"
+                        onClick={() => setActiveTab("payouts")}
+                      >
+                        Manage Payouts
+                      </Button>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
           )}
         </div>
       </main>
+
+      {/* Mobile Navigation */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#0a0a0a] border-t border-[#c8ff00]/20 px-4 py-2 z-50">
+        <div className="flex justify-around">
+          {[
+            { id: "dashboard", icon: BarChart3, label: "Home" },
+            { id: "team", icon: Users, label: "Team" },
+            { id: "commissions", icon: DollarSign, label: "Earnings" },
+            { id: "marketing", icon: Share2, label: "Share" },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`flex flex-col items-center py-2 px-3 rounded-lg ${
+                activeTab === item.id ? 'text-[#c8ff00]' : 'text-gray-500'
+              }`}
+            >
+              <item.icon className="w-5 h-5" />
+              <span className="text-xs mt-1">{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </nav>
     </div>
   );
 }

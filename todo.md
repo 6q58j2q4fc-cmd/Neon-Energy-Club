@@ -1846,3 +1846,33 @@
 - [x] Improve page transition smoothness
 - [x] Ensure intuitive user journey from landing to conversion
 - [x] Created FranchiseDashboard page for franchise/vending owners
+
+## Real Data Only - Remove Simulated Data (Jan 21)
+
+### Customer Portal
+- [x] Remove mock referral stats and use real database data
+- [x] Display only actual referrals from database
+- [x] Show real reward redemption history
+- [x] Remove any hardcoded sample data
+
+### Distributor Portal
+- [x] Remove mock sales figures and use real order data
+- [x] Display only actual team members from database
+- [x] Show real commission calculations from database (commissions.totals)
+- [x] Remove simulated rank progress data (now uses rankProgress API)
+- [x] Display actual binary leg volumes
+- [x] Show real payout history
+
+### Franchise Dashboard
+- [x] Remove mock territory stats (removed fake percentage indicators)
+- [x] Display only actual territory applications
+- [x] Show real vending machine data (shows 0 until machines added)
+- [x] Remove simulated revenue figures (shows $0 until revenue generated)
+
+### Admin MLM Control Center
+- [x] Remove mock customer/distributor counts
+- [x] Display only real signups from database
+- [x] Show actual commission data
+- [x] Remove simulated activity feed (now shows real orders, payouts, territory apps)
+- [x] Display real order data
+- [x] Show actual rank distribution from database (shows 0 until distributors join)

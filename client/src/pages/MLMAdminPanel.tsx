@@ -462,9 +462,9 @@ export default function MLMAdminPanel() {
                       <div>
                         <p className="text-sm text-gray-400">Total Revenue</p>
                         <p className="text-3xl font-bold text-white">${stats.totalRevenue.toLocaleString()}</p>
-                        <div className="flex items-center gap-1 mt-1 text-green-500 text-sm">
-                          <ArrowUpRight className="w-4 h-4" />
-                          <span>+12.5% from last month</span>
+                        <div className="flex items-center gap-1 mt-1 text-gray-500 text-sm">
+                          <Calendar className="w-4 h-4" />
+                          <span>All time</span>
                         </div>
                       </div>
                       <div className="w-12 h-12 bg-[#c8ff00]/20 rounded-full flex items-center justify-center">
@@ -479,10 +479,10 @@ export default function MLMAdminPanel() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-gray-400">Active Distributors</p>
-                        <p className="text-3xl font-bold text-white">{stats.totalDistributors || 156}</p>
-                        <div className="flex items-center gap-1 mt-1 text-green-500 text-sm">
-                          <ArrowUpRight className="w-4 h-4" />
-                          <span>+8 this week</span>
+                        <p className="text-3xl font-bold text-white">{stats.totalDistributors}</p>
+                        <div className="flex items-center gap-1 mt-1 text-gray-500 text-sm">
+                          <Users className="w-4 h-4" />
+                          <span>Registered</span>
                         </div>
                       </div>
                       <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
@@ -498,9 +498,9 @@ export default function MLMAdminPanel() {
                       <div>
                         <p className="text-sm text-gray-400">Total Customers</p>
                         <p className="text-3xl font-bold text-white">{stats.totalCustomers}</p>
-                        <div className="flex items-center gap-1 mt-1 text-green-500 text-sm">
-                          <ArrowUpRight className="w-4 h-4" />
-                          <span>+{stats.newSignupsToday} today</span>
+                        <div className="flex items-center gap-1 mt-1 text-gray-500 text-sm">
+                          <Calendar className="w-4 h-4" />
+                          <span>{stats.newSignupsToday} today</span>
                         </div>
                       </div>
                       <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
@@ -560,16 +560,16 @@ export default function MLMAdminPanel() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {MLM_RANKS.slice(0, 6).map((rank, index) => (
+                      {MLM_RANKS.slice(0, 6).map((rank) => (
                         <div key={rank.id} className="flex items-center gap-3">
                           <RankBadge rank={rank.id} size="sm" />
                           <div className="flex-1">
                             <div className="flex justify-between text-sm mb-1">
                               <span className="text-gray-400">{rank.name}</span>
-                              <span className="text-white">{Math.floor(Math.random() * 50) + 5}</span>
+                              <span className="text-white">0</span>
                             </div>
                             <Progress 
-                              value={Math.random() * 100} 
+                              value={0} 
                               className="h-2 bg-[#111]"
                             />
                           </div>
@@ -590,26 +590,68 @@ export default function MLMAdminPanel() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {[
-                      { type: "order", message: "New order #1234 from John D.", time: "2 min ago", icon: ShoppingCart, color: "text-green-500" },
-                      { type: "signup", message: "New distributor signup: Sarah M.", time: "15 min ago", icon: UserPlus, color: "text-blue-500" },
-                      { type: "rank", message: "Mike T. advanced to Gold rank", time: "1 hour ago", icon: Award, color: "text-yellow-500" },
-                      { type: "payout", message: "Payout request $500 from Lisa K.", time: "2 hours ago", icon: Wallet, color: "text-purple-500" },
-                      { type: "territory", message: "New territory application: Manhattan", time: "3 hours ago", icon: MapPin, color: "text-pink-500" },
-                    ].map((activity, index) => (
-                      <div key={index} className="flex items-center gap-4 p-3 bg-[#111] rounded-lg">
-                        <div className={`w-10 h-10 rounded-full bg-white/5 flex items-center justify-center ${activity.color}`}>
-                          <activity.icon className="w-5 h-5" />
+                    {(() => {
+                      // Combine real data from orders, payouts, and territories
+                      const activities: { type: string; message: string; time: string; icon: any; color: string }[] = [];
+                      
+                      // Add recent orders
+                      (preorders || []).slice(0, 3).forEach((order: any) => {
+                        activities.push({
+                          type: "order",
+                          message: `New order from ${order.name || 'Customer'}`,
+                          time: order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'Recently',
+                          icon: ShoppingCart,
+                          color: "text-green-500"
+                        });
+                      });
+                      
+                      // Add recent payout requests
+                      (allPayoutRequests || []).slice(0, 2).forEach((payout: any) => {
+                        activities.push({
+                          type: "payout",
+                          message: `Payout request $${Number(payout.amount).toFixed(2)}`,
+                          time: payout.createdAt ? new Date(payout.createdAt).toLocaleDateString() : 'Recently',
+                          icon: Wallet,
+                          color: "text-purple-500"
+                        });
+                      });
+                      
+                      // Add recent territory applications
+                      (territoryApplications || []).slice(0, 2).forEach((app: any) => {
+                        activities.push({
+                          type: "territory",
+                          message: `Territory application: ${app.city || app.territoryName || 'New Area'}`,
+                          time: app.createdAt ? new Date(app.createdAt).toLocaleDateString() : 'Recently',
+                          icon: MapPin,
+                          color: "text-pink-500"
+                        });
+                      });
+                      
+                      if (activities.length === 0) {
+                        return (
+                          <div className="text-center py-8 text-gray-500">
+                            <Activity className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                            <p>No recent activity</p>
+                            <p className="text-sm">Activity will appear here as orders and signups come in</p>
+                          </div>
+                        );
+                      }
+                      
+                      return activities.slice(0, 5).map((activity, index) => (
+                        <div key={index} className="flex items-center gap-4 p-3 bg-[#111] rounded-lg">
+                          <div className={`w-10 h-10 rounded-full bg-white/5 flex items-center justify-center ${activity.color}`}>
+                            <activity.icon className="w-5 h-5" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-white text-sm">{activity.message}</p>
+                            <p className="text-gray-500 text-xs">{activity.time}</p>
+                          </div>
+                          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                            <Eye className="w-4 h-4" />
+                          </Button>
                         </div>
-                        <div className="flex-1">
-                          <p className="text-white text-sm">{activity.message}</p>
-                          <p className="text-gray-500 text-xs">{activity.time}</p>
-                        </div>
-                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ))}
+                      ));
+                    })()}
                   </div>
                 </CardContent>
               </Card>
