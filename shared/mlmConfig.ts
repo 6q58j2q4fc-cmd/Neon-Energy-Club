@@ -259,3 +259,16 @@ export function getRankProgress(
     legVolumeProgress: Math.min(100, (lesserLegVolume / nextRankReqs.legVolume) * 100),
   };
 }
+
+
+// MLM_RANKS array for UI iteration
+export const MLM_RANKS = Object.entries(RANKS).map(([id, rank]) => ({
+  id,
+  ...rank,
+  requirements: {
+    personalPV: rank.personalPV,
+    teamPV: rank.teamPV,
+    activeLegs: rank.activeLegs,
+    legVolume: rank.legVolume,
+  },
+}));

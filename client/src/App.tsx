@@ -35,6 +35,7 @@ import Leaderboard from "./pages/Leaderboard";
 import DistributorLeaderboard from "./pages/DistributorLeaderboard";
 import Investors from "./pages/Investors";
 import CustomerPortal from "./pages/CustomerPortal";
+import MLMAdminPanel from "./pages/MLMAdminPanel";
 import AmbientSoundToggle from "./components/AmbientSoundToggle";
 import FloatingChatBot from "./components/FloatingChatBot";
 import CartDrawer from "./components/CartDrawer";
@@ -77,6 +78,7 @@ function Router() {
         <Route path={"/blog/:slug"} component={Blog} />
         <Route path={"/vending"} component={VendingMachines} />
         <Route path="/admin/dashboard" component={AdminDashboard} />
+        <Route path="/admin/mlm" component={MLMAdminPanel} />
         <Route path="/admin/territories" component={AdminTerritories} />
         <Route path="/nft-gallery" component={NFTGallery} />
         <Route path="/nft/:tokenId" component={NFTDetail} />

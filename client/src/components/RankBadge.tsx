@@ -76,6 +76,7 @@ interface RankBadgeProps {
   size?: "sm" | "md" | "lg";
   showIcon?: boolean;
   showTooltip?: boolean;
+  showLabel?: boolean;
   className?: string;
 }
 
@@ -84,6 +85,7 @@ export function RankBadge({
   size = "md", 
   showIcon = true, 
   showTooltip = true,
+  showLabel = true,
   className = "" 
 }: RankBadgeProps) {
   const rankKey = rank.toLowerCase() as RankKey;
@@ -111,8 +113,8 @@ export function RankBadge({
         backgroundColor: config.bgColor,
       }}
     >
-      {showIcon && <span className={`mr-1 ${iconSizes[size]}`}>{config.icon}</span>}
-      {config.name}
+      {showIcon && <span className={`${showLabel ? 'mr-1' : ''} ${iconSizes[size]}`}>{config.icon}</span>}
+      {showLabel && config.name}
     </Badge>
   );
 
