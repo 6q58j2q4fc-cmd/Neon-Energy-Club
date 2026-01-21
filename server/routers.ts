@@ -1,5 +1,6 @@
 import { COOKIE_NAME } from "@shared/const";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
@@ -403,6 +404,38 @@ export const appRouter = router({
       const { getNewsletterStats } = await import("./db");
       return await getNewsletterStats();
     }),
+
+    // List all subscriptions (admin only)
+    list: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+      const { listNewsletterSubscriptions } = await import("./db");
+      return await listNewsletterSubscriptions();
+    }),
+  }),
+
+  // Territory expiration management
+  territoryExpiration: router({
+    // Check for expiring territories and send reminders (admin only)
+    checkAndNotify: protectedProcedure
+      .input(z.object({ daysAhead: z.number().default(30) }).optional())
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { checkExpiringTerritories } = await import("./territoryExpirationJob");
+        return await checkExpiringTerritories(input?.daysAhead || 30);
+      }),
+
+    // Get expiration summary for dashboard
+    summary: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+      const { getTerritoryExpirationSummary } = await import("./territoryExpirationJob");
+      return await getTerritoryExpirationSummary();
+    }),
   }),
 
   distributor: router({
@@ -464,6 +497,103 @@ export const appRouter = router({
       const { getRecentDistributorEnrollments } = await import("./db");
       return await getRecentDistributorEnrollments(10); // Last 10 enrollments
     }),
+
+    // Set custom username
+    setUsername: protectedProcedure
+      .input(z.object({ username: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_]+$/) }))
+      .mutation(async ({ input, ctx }) => {
+        const { setDistributorUsername } = await import("./db");
+        return await setDistributorUsername(ctx.user.id, input.username);
+      }),
+
+    // Set custom subdomain
+    setSubdomain: protectedProcedure
+      .input(z.object({ subdomain: z.string().min(3).max(30).regex(/^[a-z0-9-]+$/) }))
+      .mutation(async ({ input, ctx }) => {
+        const { setDistributorSubdomain } = await import("./db");
+        return await setDistributorSubdomain(ctx.user.id, input.subdomain);
+      }),
+
+    // Check username availability
+    checkUsername: publicProcedure
+      .input(z.object({ username: z.string() }))
+      .query(async ({ input }) => {
+        const { checkUsernameAvailable } = await import("./db");
+        return await checkUsernameAvailable(input.username);
+      }),
+
+    // Check subdomain availability
+    checkSubdomain: publicProcedure
+      .input(z.object({ subdomain: z.string() }))
+      .query(async ({ input }) => {
+        const { checkSubdomainAvailable } = await import("./db");
+        return await checkSubdomainAvailable(input.subdomain);
+      }),
+
+    // Get genealogy tree
+    genealogy: protectedProcedure
+      .input(z.object({ depth: z.number().int().min(1).max(10).default(5) }).optional())
+      .query(async ({ ctx, input }) => {
+        const { getDistributorGenealogy } = await import("./db");
+        return await getDistributorGenealogy(ctx.user.id, input?.depth || 5);
+      }),
+
+    // Get rank progress
+    rankProgress: protectedProcedure.query(async ({ ctx }) => {
+        const { getDistributorRankProgress } = await import("./db");
+        return await getDistributorRankProgress(ctx.user.id);
+      }),
+
+    // Get activity status
+    activityStatus: protectedProcedure.query(async ({ ctx }) => {
+        const { getDistributorActivityStatus } = await import("./db");
+        return await getDistributorActivityStatus(ctx.user.id);
+      }),
+
+    // Get commission history
+    commissions: protectedProcedure
+      .input(z.object({ limit: z.number().int().min(1).max(100).default(50) }).optional())
+      .query(async ({ ctx, input }) => {
+        const { getDistributorCommissions } = await import("./db");
+        return await getDistributorCommissions(ctx.user.id, input?.limit || 50);
+      }),
+
+    // Get by subdomain (public - for affiliate sites)
+    getBySubdomain: publicProcedure
+      .input(z.object({ subdomain: z.string() }))
+      .query(async ({ input }) => {
+        const { getDistributorBySubdomain } = await import("./db");
+        return await getDistributorBySubdomain(input.subdomain);
+      }),
+
+    // Admin: List all distributors
+    listAll: protectedProcedure
+      .input(z.object({
+        status: z.enum(["active", "inactive", "suspended"]).optional(),
+        rank: z.string().optional(),
+        limit: z.number().int().min(1).max(500).default(100),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { listAllDistributors } = await import("./db");
+        return await listAllDistributors(input);
+      }),
+
+    // Admin: Update distributor status
+    updateStatus: protectedProcedure
+      .input(z.object({
+        distributorId: z.number(),
+        status: z.enum(["active", "inactive", "suspended"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { updateDistributorStatus } = await import("./db");
+        return await updateDistributorStatus(input.distributorId, input.status);
+      }),
   }),
 
   blog: router({

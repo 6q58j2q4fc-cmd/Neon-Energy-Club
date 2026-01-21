@@ -1564,3 +1564,50 @@
 - [x] Only send emails for real order confirmations (production mode only)
 - [x] Keep social proof popups working with simulated data (SocialProofNotifications unchanged)
 - [x] Separate popup display logic from email notification logic (already separate)
+
+
+## Comprehensive Admin Panel & MLM System (Jan 21)
+
+### Admin Panel Build-Out
+- [x] Create unified admin dashboard with overview stats (AdminDashboard.tsx)
+- [x] Add order management section (view, update status, refund)
+- [x] Add customer management section (view, edit, deactivate)
+- [x] Add distributor management section (view, edit, approve, deactivate)
+- [x] Add territory management with map view
+- [x] Add newsletter/subscriber management
+- [x] Add blog post management (existing)
+- [x] Add NFT management section (existing)
+- [x] Add investor inquiry management (existing)
+- [x] Create CRM integration hooks (webhook structure ready for Zoho, HubSpot, Salesforce)
+- [x] Add export functionality for all data types (CSV export)
+
+### Subscriber Dashboard
+- [x] Create subscriber stats overview (total, growth rate, referrals)
+- [x] Add referral tracking with leaderboard
+- [x] Show subscription trends over time (in admin dashboard)
+- [x] Display top referrers with counts
+- [x] Add subscriber search and filtering
+
+### Automated Territory Reminders
+- [x] Create territory expiration reminder email template (territory_expiring)
+- [x] Add 30-day warning notification system
+- [x] Create scheduled job for daily expiration checks (territoryExpirationJob.ts)
+- [x] Send renewal reminders to territory holders
+- [x] Track reminder sent status to avoid duplicates
+
+### MLM Distributor System Enhancement
+- [x] Add distributor username/password generation (setUsername endpoint)
+- [x] Create unique affiliate subdomain system (one per person)
+- [x] Allow distributors to choose their subdomain (setSubdomain endpoint)
+- [x] Link subdomain to affiliate ID and genealogy
+- [x] Create rank system with progress bars (8 ranks: starter to ambassador)
+- [x] Define rank qualifications based on sales (personalPV, teamPV, legVolume)
+- [x] Show activity requirements clearly (2x 24-packs = 48 PV monthly)
+- [x] Display active distributor requirements (1 active downline with 48 PV)
+- [x] Implement fast start bonuses for customers and new distributors (COMMISSION_RATES)
+- [x] Create balanced leg requirement for team commissions (40/60 ratio)
+- [x] Build fully functional genealogy tree visualization (GenealogyTree.tsx)
+- [x] Add commission tracking and payout history (commissions endpoint)
+- [x] Create distributor portal with all MLM features (DistributorPortal.tsx)
+- [x] Add training resources and marketing materials (existing)
+- [x] Write vitest tests for all new features (distributor-mlm.test.ts - 12 tests)

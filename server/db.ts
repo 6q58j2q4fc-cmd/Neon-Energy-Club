@@ -334,6 +334,16 @@ export async function getNewsletterStats() {
   return result[0] || { totalSubscribers: 0, activeSubscribers: 0, totalReferrals: 0 };
 }
 
+// List all newsletter subscriptions (admin)
+export async function listNewsletterSubscriptions() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  return await db.select().from(newsletterSubscriptions).orderBy(desc(newsletterSubscriptions.createdAt));
+}
+
 // Distributor functions
 export async function enrollDistributor(input: { userId: number; sponsorCode?: string }) {
   const db = await getDb();
@@ -1841,4 +1851,431 @@ export async function getBlogPostCountByCategory() {
   }).from(blogPosts)
     .where(eq(blogPosts.status, "published"))
     .groupBy(blogPosts.category);
+}
+
+
+// ============ Enhanced Distributor Functions ============
+
+/**
+ * Set distributor username
+ */
+export async function setDistributorUsername(userId: number, username: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Check if username is already taken
+  const existing = await db.select().from(distributors)
+    .where(eq(distributors.username, username));
+  
+  if (existing.length > 0) {
+    throw new Error("Username is already taken");
+  }
+  
+  const distributor = await getDistributorByUserId(userId);
+  if (!distributor) throw new Error("Distributor not found");
+  
+  await db.update(distributors)
+    .set({ username })
+    .where(eq(distributors.id, distributor.id));
+  
+  return { success: true, username };
+}
+
+/**
+ * Set distributor subdomain
+ */
+export async function setDistributorSubdomain(userId: number, subdomain: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Check if subdomain is already taken
+  const existing = await db.select().from(distributors)
+    .where(eq(distributors.subdomain, subdomain));
+  
+  if (existing.length > 0) {
+    throw new Error("Subdomain is already taken");
+  }
+  
+  // Validate subdomain format
+  if (!/^[a-z0-9-]+$/.test(subdomain)) {
+    throw new Error("Subdomain can only contain lowercase letters, numbers, and hyphens");
+  }
+  
+  const distributor = await getDistributorByUserId(userId);
+  if (!distributor) throw new Error("Distributor not found");
+  
+  await db.update(distributors)
+    .set({ subdomain })
+    .where(eq(distributors.id, distributor.id));
+  
+  return { success: true, subdomain, url: `https://${subdomain}.neonenergy.com` };
+}
+
+/**
+ * Check if username is available
+ */
+export async function checkUsernameAvailable(username: string) {
+  const db = await getDb();
+  if (!db) return { available: false };
+  
+  const existing = await db.select().from(distributors)
+    .where(eq(distributors.username, username));
+  
+  return { available: existing.length === 0 };
+}
+
+/**
+ * Check if subdomain is available
+ */
+export async function checkSubdomainAvailable(subdomain: string) {
+  const db = await getDb();
+  if (!db) return { available: false };
+  
+  // Reserved subdomains
+  const reserved = ["www", "api", "admin", "app", "mail", "support", "help", "shop", "store"];
+  if (reserved.includes(subdomain.toLowerCase())) {
+    return { available: false, reason: "Reserved subdomain" };
+  }
+  
+  const existing = await db.select().from(distributors)
+    .where(eq(distributors.subdomain, subdomain));
+  
+  return { available: existing.length === 0 };
+}
+
+/**
+ * Get distributor by subdomain (for affiliate sites)
+ */
+export async function getDistributorBySubdomain(subdomain: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select({
+    id: distributors.id,
+    distributorCode: distributors.distributorCode,
+    subdomain: distributors.subdomain,
+    rank: distributors.rank,
+    name: users.name,
+    createdAt: distributors.createdAt,
+  })
+  .from(distributors)
+  .leftJoin(users, eq(distributors.userId, users.id))
+  .where(eq(distributors.subdomain, subdomain))
+  .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Get distributor genealogy tree (recursive downline)
+ */
+export async function getDistributorGenealogy(userId: number, maxDepth: number = 5) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const distributor = await getDistributorByUserId(userId);
+  if (!distributor) throw new Error("Distributor not found");
+  
+  // Build genealogy tree recursively
+  async function buildTree(parentId: number, depth: number): Promise<any[]> {
+    if (depth > maxDepth) return [];
+    if (!db) return [];
+    
+    const children = await db.select({
+      id: distributors.id,
+      userId: distributors.userId,
+      distributorCode: distributors.distributorCode,
+      username: distributors.username,
+      subdomain: distributors.subdomain,
+      rank: distributors.rank,
+      personalSales: distributors.personalSales,
+      teamSales: distributors.teamSales,
+      leftLegVolume: distributors.leftLegVolume,
+      rightLegVolume: distributors.rightLegVolume,
+      monthlyPV: distributors.monthlyPV,
+      isActive: distributors.isActive,
+      placementPosition: distributors.placementPosition,
+      createdAt: distributors.createdAt,
+      name: users.name,
+      email: users.email,
+    })
+    .from(distributors)
+    .leftJoin(users, eq(distributors.userId, users.id))
+    .where(eq(distributors.sponsorId, parentId));
+    
+    const result = [];
+    for (const child of children) {
+      const downline = await buildTree(child.id, depth + 1);
+      result.push({
+        ...child,
+        depth,
+        children: downline,
+        childCount: downline.length,
+      });
+    }
+    
+    return result;
+  }
+  
+  const tree = await buildTree(distributor.id, 1);
+  
+  // Calculate totals
+  function countNodes(nodes: any[]): number {
+    return nodes.reduce((sum, node) => sum + 1 + countNodes(node.children || []), 0);
+  }
+  
+  return {
+    distributor: {
+      id: distributor.id,
+      distributorCode: distributor.distributorCode,
+      username: distributor.username,
+      subdomain: distributor.subdomain,
+      rank: distributor.rank,
+      personalSales: distributor.personalSales,
+      teamSales: distributor.teamSales,
+      leftLegVolume: distributor.leftLegVolume,
+      rightLegVolume: distributor.rightLegVolume,
+      monthlyPV: distributor.monthlyPV,
+      isActive: distributor.isActive,
+    },
+    tree,
+    totalDownline: countNodes(tree),
+    depth: maxDepth,
+  };
+}
+
+/**
+ * Get distributor rank progress
+ */
+export async function getDistributorRankProgress(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const distributor = await getDistributorByUserId(userId);
+  if (!distributor) throw new Error("Distributor not found");
+  
+  // Import rank config
+  const { RANKS, getRankProgress } = await import("../shared/mlmConfig");
+  
+  const currentRank = RANKS[distributor.rank as keyof typeof RANKS];
+  const lesserLeg = Math.min(distributor.leftLegVolume, distributor.rightLegVolume);
+  const progress = getRankProgress(
+    distributor.rank as any,
+    distributor.personalSales,
+    distributor.teamSales,
+    lesserLeg
+  );
+  
+  return {
+    currentRank: {
+      key: distributor.rank,
+      ...currentRank,
+    },
+    nextRank: progress.nextRank ? {
+      key: progress.nextRank,
+      ...RANKS[progress.nextRank],
+    } : null,
+    progress: {
+      personalPV: {
+        current: distributor.personalSales,
+        required: progress.nextRank ? RANKS[progress.nextRank].personalPV : 0,
+        percentage: progress.personalPVProgress,
+      },
+      teamPV: {
+        current: distributor.teamSales,
+        required: progress.nextRank ? RANKS[progress.nextRank].teamPV : 0,
+        percentage: progress.teamPVProgress,
+      },
+      legVolume: {
+        current: lesserLeg,
+        required: progress.nextRank ? RANKS[progress.nextRank].legVolume : 0,
+        percentage: progress.legVolumeProgress,
+        leftLeg: distributor.leftLegVolume,
+        rightLeg: distributor.rightLegVolume,
+      },
+    },
+  };
+}
+
+/**
+ * Get distributor activity status
+ */
+export async function getDistributorActivityStatus(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const distributor = await getDistributorByUserId(userId);
+  if (!distributor) throw new Error("Distributor not found");
+  
+  // Import activity requirements
+  const { ACTIVITY_REQUIREMENTS, isDistributorActive } = await import("../shared/mlmConfig");
+  
+  // Count active personally enrolled distributors
+  const activeDownline = await db.select({ count: sql<number>`COUNT(*)` })
+    .from(distributors)
+    .where(and(
+      eq(distributors.sponsorId, distributor.id),
+      eq(distributors.isActive, 1)
+    ));
+  
+  const activeDownlineCount = activeDownline[0]?.count || 0;
+  const isActive = isDistributorActive(
+    distributor.monthlyPV,
+    activeDownlineCount,
+    ACTIVITY_REQUIREMENTS.MIN_DOWNLINE_PV
+  );
+  
+  return {
+    isActive,
+    requirements: {
+      monthlyPV: {
+        required: ACTIVITY_REQUIREMENTS.MIN_MONTHLY_PV,
+        current: distributor.monthlyPV,
+        met: distributor.monthlyPV >= ACTIVITY_REQUIREMENTS.MIN_MONTHLY_PV,
+        description: "Monthly order of at least 2x 24-packs of NEON (48 PV)",
+      },
+      activeDownline: {
+        required: ACTIVITY_REQUIREMENTS.MIN_ACTIVE_DOWNLINE,
+        current: activeDownlineCount,
+        met: activeDownlineCount >= ACTIVITY_REQUIREMENTS.MIN_ACTIVE_DOWNLINE,
+        description: "At least 1 active personally enrolled distributor with 2x 24-packs monthly",
+      },
+    },
+    commissionEligibility: {
+      fastStartBonus: true, // Always eligible for fast start on personal sales
+      teamCommissions: isActive, // Must be active for team commissions
+      binaryCommissions: isActive && distributor.leftLegVolume > 0 && distributor.rightLegVolume > 0,
+      matchingBonus: isActive,
+    },
+    lastQualificationDate: distributor.lastQualificationDate,
+    fastStartEligibleUntil: distributor.fastStartEligibleUntil,
+  };
+}
+
+/**
+ * Get distributor commission history
+ */
+export async function getDistributorCommissions(userId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const distributor = await getDistributorByUserId(userId);
+  if (!distributor) throw new Error("Distributor not found");
+  
+  const commissionList = await db.select().from(commissions)
+    .where(eq(commissions.distributorId, distributor.id))
+    .orderBy(desc(commissions.createdAt))
+    .limit(limit);
+  
+  // Calculate totals by type
+  const totals = {
+    direct: 0,
+    team: 0,
+    rank_bonus: 0,
+    leadership: 0,
+    total: 0,
+    pending: 0,
+    paid: 0,
+  };
+  
+  for (const comm of commissionList) {
+    totals[comm.commissionType as keyof typeof totals] += comm.amount;
+    totals.total += comm.amount;
+    if (comm.status === "pending") totals.pending += comm.amount;
+    if (comm.status === "paid") totals.paid += comm.amount;
+  }
+  
+  return {
+    commissions: commissionList,
+    totals,
+    availableBalance: distributor.availableBalance,
+    totalEarnings: distributor.totalEarnings,
+  };
+}
+
+/**
+ * List all distributors (admin)
+ */
+export async function listAllDistributors(options?: {
+  status?: "active" | "inactive" | "suspended";
+  rank?: string;
+  limit?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { status, rank, limit = 100 } = options || {};
+  
+  let query = db.select({
+    id: distributors.id,
+    userId: distributors.userId,
+    distributorCode: distributors.distributorCode,
+    username: distributors.username,
+    subdomain: distributors.subdomain,
+    rank: distributors.rank,
+    personalSales: distributors.personalSales,
+    teamSales: distributors.teamSales,
+    totalEarnings: distributors.totalEarnings,
+    availableBalance: distributors.availableBalance,
+    monthlyPV: distributors.monthlyPV,
+    isActive: distributors.isActive,
+    status: distributors.status,
+    createdAt: distributors.createdAt,
+    name: users.name,
+    email: users.email,
+  })
+  .from(distributors)
+  .leftJoin(users, eq(distributors.userId, users.id))
+  .orderBy(desc(distributors.createdAt))
+  .limit(limit);
+  
+  // Apply filters
+  const conditions = [];
+  if (status) conditions.push(eq(distributors.status, status));
+  if (rank) conditions.push(eq(distributors.rank, rank as any));
+  
+  if (conditions.length > 0) {
+    return await db.select({
+      id: distributors.id,
+      userId: distributors.userId,
+      distributorCode: distributors.distributorCode,
+      username: distributors.username,
+      subdomain: distributors.subdomain,
+      rank: distributors.rank,
+      personalSales: distributors.personalSales,
+      teamSales: distributors.teamSales,
+      totalEarnings: distributors.totalEarnings,
+      availableBalance: distributors.availableBalance,
+      monthlyPV: distributors.monthlyPV,
+      isActive: distributors.isActive,
+      status: distributors.status,
+      createdAt: distributors.createdAt,
+      name: users.name,
+      email: users.email,
+    })
+    .from(distributors)
+    .leftJoin(users, eq(distributors.userId, users.id))
+    .where(and(...conditions))
+    .orderBy(desc(distributors.createdAt))
+    .limit(limit);
+  }
+  
+  return await query;
+}
+
+/**
+ * Update distributor status (admin)
+ */
+export async function updateDistributorStatus(
+  distributorId: number,
+  status: "active" | "inactive" | "suspended"
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(distributors)
+    .set({ status })
+    .where(eq(distributors.id, distributorId));
+  
+  return { success: true };
 }

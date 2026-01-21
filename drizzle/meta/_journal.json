@@ -92,6 +92,13 @@
       "when": 1768922154608,
       "tag": "0012_closed_vampiro",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1768994579380,
+      "tag": "0013_dazzling_silverclaw",
+      "breakpoints": true
     }
   ]
 }

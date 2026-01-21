@@ -13,6 +13,7 @@ export type EmailNotificationType =
   | "territory_submitted"
   | "territory_approved"
   | "territory_rejected"
+  | "territory_expiring"
   | "nft_minted"
   | "crowdfunding_received";
 
@@ -36,9 +37,11 @@ interface TerritoryEmailData {
   applicationId: number;
   territoryName: string;
   squareMiles: number;
-  status: "submitted" | "approved" | "rejected";
+  status: "submitted" | "approved" | "rejected" | "expiring";
   rejectionReason?: string;
   monthlyFee?: number;
+  expirationDate?: string;
+  daysUntilExpiration?: number;
 }
 
 interface NftEmailData {
@@ -257,6 +260,42 @@ The NEON Energy Team
     `.trim(),
   }),
 
+  territory_expiring: (data: TerritoryEmailData) => ({
+    title: `⚠️ NEON Territory License Expiring Soon - ${data.territoryName}`,
+    content: `
+**Territory License Expiration Reminder**
+
+Hello ${data.applicantName}!
+
+This is a friendly reminder that your NEON Territory License is expiring soon.
+
+**License Details:**
+- Territory: ${data.territoryName}
+- Size: ${data.squareMiles} square miles
+- Expiration Date: ${data.expirationDate || "Soon"}
+- Days Remaining: ${data.daysUntilExpiration || 30} days
+
+**Action Required:**
+To continue operating in your territory without interruption, please renew your license before the expiration date.
+
+**Renewal Options:**
+1. Log in to your account and navigate to Territory Management
+2. Contact our franchise team for renewal assistance
+3. Explore upgrade options for expanded territory coverage
+
+**Benefits of Renewal:**
+- Maintain exclusive rights to your territory
+- Continue earning commissions from vending machine sales
+- Access to new product launches and promotions
+- Priority support from the NEON franchise team
+
+Don't lose your territory! Renew today to keep your business growing.
+
+Best regards,
+The NEON Franchise Team
+    `.trim(),
+  }),
+
   crowdfunding_received: (data: OrderEmailData) => ({
     title: `💚 Thank You for Backing NEON! - Contribution #${data.orderId}`,
     content: `
@@ -321,6 +360,7 @@ export async function sendEmailNotification(
       case "territory_submitted":
       case "territory_approved":
       case "territory_rejected":
+      case "territory_expiring":
         template = emailTemplates[type](data as TerritoryEmailData);
         break;
       case "nft_minted":

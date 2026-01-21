@@ -159,18 +159,40 @@ export const distributors = mysqlTable("distributors", {
   userId: int("userId").notNull().unique(),
   /** Sponsor/upline distributor ID */
   sponsorId: int("sponsorId"),
+  /** Placement position in binary tree (left or right) */
+  placementPosition: mysqlEnum("placementPosition", ["left", "right"]),
   /** Unique distributor code for affiliate links */
   distributorCode: varchar("distributorCode", { length: 50 }).notNull().unique(),
+  /** Custom username for login */
+  username: varchar("username", { length: 50 }).unique(),
+  /** Unique subdomain for affiliate site (e.g., john.neonenergy.com) */
+  subdomain: varchar("subdomain", { length: 50 }).unique(),
   /** Current rank/level */
-  rank: mysqlEnum("rank", ["starter", "bronze", "silver", "gold", "platinum", "diamond"]).default("starter").notNull(),
-  /** Total personal sales volume */
+  rank: mysqlEnum("rank", ["starter", "bronze", "silver", "gold", "platinum", "diamond", "crown", "ambassador"]).default("starter").notNull(),
+  /** Total personal sales volume (PV) */
   personalSales: int("personalSales").default(0).notNull(),
-  /** Total team sales volume */
+  /** Total team sales volume (GV) */
   teamSales: int("teamSales").default(0).notNull(),
+  /** Left leg volume for binary tree */
+  leftLegVolume: int("leftLegVolume").default(0).notNull(),
+  /** Right leg volume for binary tree */
+  rightLegVolume: int("rightLegVolume").default(0).notNull(),
   /** Total earnings */
   totalEarnings: int("totalEarnings").default(0).notNull(),
   /** Available balance for withdrawal */
   availableBalance: int("availableBalance").default(0).notNull(),
+  /** Monthly personal volume (resets monthly) */
+  monthlyPV: int("monthlyPV").default(0).notNull(),
+  /** Monthly autoship volume */
+  monthlyAutoshipPV: int("monthlyAutoshipPV").default(0).notNull(),
+  /** Number of personally enrolled active distributors */
+  activeDownlineCount: int("activeDownlineCount").default(0).notNull(),
+  /** Is this distributor currently active (met monthly requirements) */
+  isActive: int("isActive").default(0).notNull(),
+  /** Last activity qualification date */
+  lastQualificationDate: timestamp("lastQualificationDate"),
+  /** Fast start bonus eligible until */
+  fastStartEligibleUntil: timestamp("fastStartEligibleUntil"),
   /** Account status */
   status: mysqlEnum("status", ["active", "inactive", "suspended"]).default("active").notNull(),
   /** Enrollment timestamp */

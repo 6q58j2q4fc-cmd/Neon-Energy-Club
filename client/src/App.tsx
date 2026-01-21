@@ -23,6 +23,7 @@ import DistributorPortal from "./pages/DistributorPortal";
 import Blog from "./pages/Blog";
 import VendingMachines from "./pages/VendingMachines";
 import AdminTerritories from "./pages/AdminTerritories";
+import AdminDashboard from "./pages/AdminDashboard";
 import NFTGallery from "./pages/NFTGallery";
 import NFTDetail from "./pages/NFTDetail";
 import Privacy from "./pages/Privacy";
@@ -73,7 +74,8 @@ function Router() {
         <Route path={"/blog"} component={Blog} />
         <Route path={"/blog/:slug"} component={Blog} />
         <Route path={"/vending"} component={VendingMachines} />
-        <Route path={"/admin/territories"} component={AdminTerritories} />
+        <Route path="/admin/dashboard" component={AdminDashboard} />
+        <Route path="/admin/territories" component={AdminTerritories} />
         <Route path="/nft-gallery" component={NFTGallery} />
         <Route path="/nft/:tokenId" component={NFTDetail} />
         <Route path={"/nfts"} component={NFTGallery} />
