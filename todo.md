@@ -1652,3 +1652,31 @@
 - [x] Integrate badges into genealogy tree nodes
 - [x] Add badge tooltips showing rank name and requirements
 - [x] Test rank badge display across all ranks
+
+
+## Rank Advancement & Leaderboard System (Jan 21)
+
+### Rank History Tracking
+- [x] Create rank_history database table (distributor_id, old_rank, new_rank, achieved_at)
+- [x] Add rank change detection logic
+- [x] Track rank progression with timestamps
+- [x] Create rank history query endpoints (rankHistory, getDistributorRankHistory)
+
+### Rank Advancement Notifications
+- [x] Create rank advancement email template (rank_advancement)
+- [x] Send email when distributor qualifies for new rank (sendRankAdvancementNotification)
+- [x] Add in-app notification for rank advancement (createNotification)
+- [x] Include congratulations message with new benefits
+
+### Leaderboard Page
+- [x] Create leaderboard database queries (top by rank, volume, PV)
+- [x] Build leaderboard page UI with tabs for different metrics (DistributorLeaderboard.tsx)
+- [x] Display top 50 performers with rank badges
+- [x] Add time period filters (weekly, monthly, all-time)
+- [x] Show user's own ranking position (myRankPosition endpoint)
+
+### Rank History UI
+- [x] Add rank history section to distributor portal (RankHistory.tsx)
+- [x] Display timeline of rank achievements
+- [x] Show dates achieved for each milestone
+- [x] Add progress indicator to next rank

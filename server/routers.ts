@@ -930,6 +930,88 @@ export const appRouter = router({
           failureReason: input.reason,
         });
       }),
+
+    // ============================================
+    // LEADERBOARD ENDPOINTS
+    // ============================================
+
+    // Get leaderboard by rank
+    leaderboardByRank: publicProcedure
+      .input(z.object({ limit: z.number().default(50) }).optional())
+      .query(async ({ input }) => {
+        const { getLeaderboardByRank } = await import("./db");
+        return await getLeaderboardByRank(input?.limit || 50);
+      }),
+
+    // Get leaderboard by team volume
+    leaderboardByVolume: publicProcedure
+      .input(z.object({ limit: z.number().default(50) }).optional())
+      .query(async ({ input }) => {
+        const { getLeaderboardByTeamVolume } = await import("./db");
+        return await getLeaderboardByTeamVolume(input?.limit || 50);
+      }),
+
+    // Get leaderboard by monthly PV
+    leaderboardByMonthlyPV: publicProcedure
+      .input(z.object({ limit: z.number().default(50) }).optional())
+      .query(async ({ input }) => {
+        const { getLeaderboardByMonthlyPV } = await import("./db");
+        return await getLeaderboardByMonthlyPV(input?.limit || 50);
+      }),
+
+    // Get current user's rank position
+    myRankPosition: protectedProcedure.query(async ({ ctx }) => {
+      const { getDistributorByUserId, getDistributorRankPosition } = await import("./db");
+      const distributor = await getDistributorByUserId(ctx.user.id);
+      if (!distributor) return null;
+      return await getDistributorRankPosition(distributor.id);
+    }),
+
+    // ============================================
+    // RANK HISTORY ENDPOINTS
+    // ============================================
+
+    // Get rank history for current distributor
+    rankHistory: protectedProcedure.query(async ({ ctx }) => {
+      const { getDistributorByUserId, getDistributorRankHistory } = await import("./db");
+      const distributor = await getDistributorByUserId(ctx.user.id);
+      if (!distributor) return [];
+      return await getDistributorRankHistory(distributor.id);
+    }),
+
+    // ============================================
+    // NOTIFICATION ENDPOINTS
+    // ============================================
+
+    // Get user notifications
+    notifications: protectedProcedure
+      .input(z.object({ limit: z.number().default(50) }).optional())
+      .query(async ({ ctx, input }) => {
+        const { getUserNotifications } = await import("./db");
+        return await getUserNotifications(ctx.user.id, input?.limit || 50);
+      }),
+
+    // Get unread notification count
+    unreadNotificationCount: protectedProcedure.query(async ({ ctx }) => {
+      const { getUnreadNotificationCount } = await import("./db");
+      return await getUnreadNotificationCount(ctx.user.id);
+    }),
+
+    // Mark notification as read
+    markNotificationRead: protectedProcedure
+      .input(z.object({ notificationId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { markNotificationRead } = await import("./db");
+        await markNotificationRead(input.notificationId);
+        return { success: true };
+      }),
+
+    // Mark all notifications as read
+    markAllNotificationsRead: protectedProcedure.mutation(async ({ ctx }) => {
+      const { markAllNotificationsRead } = await import("./db");
+      await markAllNotificationsRead(ctx.user.id);
+      return { success: true };
+    }),
   }),
 
   blog: router({

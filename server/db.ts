@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord } from "../drizzle/schema";
+import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -2787,4 +2787,267 @@ export async function getPayoutStatistics() {
     completed: { count: completed[0]?.count || 0, total: completed[0]?.total || 0 },
     thisMonth: { count: thisMonth[0]?.count || 0, total: thisMonth[0]?.total || 0 },
   };
+}
+
+
+// ============================================================================
+// RANK HISTORY FUNCTIONS
+// ============================================================================
+
+/**
+ * Record a rank change in history
+ */
+export async function recordRankChange(data: {
+  distributorId: number;
+  previousRank: string;
+  newRank: string;
+  personalPVAtChange: number;
+  teamPVAtChange: number;
+}): Promise<number | null> {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.insert(rankHistory).values({
+    distributorId: data.distributorId,
+    previousRank: data.previousRank,
+    newRank: data.newRank,
+    personalPVAtChange: data.personalPVAtChange,
+    teamPVAtChange: data.teamPVAtChange,
+    notificationSent: false,
+  });
+  
+  return result[0]?.insertId || null;
+}
+
+/**
+ * Get rank history for a distributor
+ */
+export async function getDistributorRankHistory(distributorId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select()
+    .from(rankHistory)
+    .where(eq(rankHistory.distributorId, distributorId))
+    .orderBy(desc(rankHistory.achievedAt));
+}
+
+/**
+ * Mark rank history notification as sent
+ */
+export async function markRankNotificationSent(historyId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.update(rankHistory)
+    .set({ notificationSent: true })
+    .where(eq(rankHistory.id, historyId));
+}
+
+/**
+ * Get pending rank notifications (not yet sent)
+ */
+export async function getPendingRankNotifications() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select()
+    .from(rankHistory)
+    .where(eq(rankHistory.notificationSent, false))
+    .orderBy(desc(rankHistory.achievedAt));
+}
+
+// ============================================================================
+// IN-APP NOTIFICATION FUNCTIONS
+// ============================================================================
+
+/**
+ * Create an in-app notification
+ */
+export async function createNotification(data: {
+  userId: number;
+  type: string;
+  title: string;
+  message: string;
+  data?: object;
+}): Promise<number | null> {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.insert(notifications).values({
+    userId: data.userId,
+    type: data.type,
+    title: data.title,
+    message: data.message,
+    data: data.data ? JSON.stringify(data.data) : null,
+    isRead: false,
+  });
+  
+  return result[0]?.insertId || null;
+}
+
+/**
+ * Get notifications for a user
+ */
+export async function getUserNotifications(userId: number, limit = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select()
+    .from(notifications)
+    .where(eq(notifications.userId, userId))
+    .orderBy(desc(notifications.createdAt))
+    .limit(limit);
+}
+
+/**
+ * Get unread notification count for a user
+ */
+export async function getUnreadNotificationCount(userId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  const result = await db.select({ count: sql<number>`COUNT(*)` })
+    .from(notifications)
+    .where(and(
+      eq(notifications.userId, userId),
+      eq(notifications.isRead, false)
+    ));
+  
+  return result[0]?.count || 0;
+}
+
+/**
+ * Mark notification as read
+ */
+export async function markNotificationRead(notificationId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.update(notifications)
+    .set({ isRead: true, readAt: new Date() })
+    .where(eq(notifications.id, notificationId));
+}
+
+/**
+ * Mark all notifications as read for a user
+ */
+export async function markAllNotificationsRead(userId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.update(notifications)
+    .set({ isRead: true, readAt: new Date() })
+    .where(and(
+      eq(notifications.userId, userId),
+      eq(notifications.isRead, false)
+    ));
+}
+
+// ============================================================================
+// LEADERBOARD FUNCTIONS
+// ============================================================================
+
+/**
+ * Get top distributors by rank
+ */
+export async function getLeaderboardByRank(limit = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // Rank order for sorting
+  const rankOrder = sql`CASE 
+    WHEN rank = 'ambassador' THEN 8
+    WHEN rank = 'crown' THEN 7
+    WHEN rank = 'diamond' THEN 6
+    WHEN rank = 'platinum' THEN 5
+    WHEN rank = 'gold' THEN 4
+    WHEN rank = 'silver' THEN 3
+    WHEN rank = 'bronze' THEN 2
+    ELSE 1
+  END`;
+  
+  return db.select({
+    id: distributors.id,
+    distributorCode: distributors.distributorCode,
+    username: distributors.username,
+    rank: distributors.rank,
+    personalSales: distributors.personalSales,
+    teamSales: distributors.teamSales,
+    monthlyPV: distributors.monthlyPV,
+    isActive: distributors.isActive,
+    createdAt: distributors.createdAt,
+  })
+    .from(distributors)
+    .orderBy(desc(rankOrder), desc(distributors.teamSales))
+    .limit(limit);
+}
+
+/**
+ * Get top distributors by team volume
+ */
+export async function getLeaderboardByTeamVolume(limit = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select({
+    id: distributors.id,
+    distributorCode: distributors.distributorCode,
+    username: distributors.username,
+    rank: distributors.rank,
+    personalSales: distributors.personalSales,
+    teamSales: distributors.teamSales,
+    monthlyPV: distributors.monthlyPV,
+    leftLegVolume: distributors.leftLegVolume,
+    rightLegVolume: distributors.rightLegVolume,
+    isActive: distributors.isActive,
+  })
+    .from(distributors)
+    .orderBy(desc(distributors.teamSales))
+    .limit(limit);
+}
+
+/**
+ * Get top distributors by monthly PV
+ */
+export async function getLeaderboardByMonthlyPV(limit = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select({
+    id: distributors.id,
+    distributorCode: distributors.distributorCode,
+    username: distributors.username,
+    rank: distributors.rank,
+    personalSales: distributors.personalSales,
+    teamSales: distributors.teamSales,
+    monthlyPV: distributors.monthlyPV,
+    isActive: distributors.isActive,
+  })
+    .from(distributors)
+    .orderBy(desc(distributors.monthlyPV))
+    .limit(limit);
+}
+
+/**
+ * Get distributor's rank position
+ */
+export async function getDistributorRankPosition(distributorId: number): Promise<number | null> {
+  const db = await getDb();
+  if (!db) return null;
+  
+  // Get the distributor's team sales
+  const distributor = await db.select({ teamSales: distributors.teamSales })
+    .from(distributors)
+    .where(eq(distributors.id, distributorId))
+    .limit(1);
+  
+  if (!distributor[0]) return null;
+  
+  // Count how many distributors have higher team sales
+  const result = await db.select({ count: sql<number>`COUNT(*)` })
+    .from(distributors)
+    .where(gt(distributors.teamSales, distributor[0].teamSales));
+  
+  return (result[0]?.count || 0) + 1;
 }

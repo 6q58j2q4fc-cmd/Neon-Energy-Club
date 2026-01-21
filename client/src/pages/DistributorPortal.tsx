@@ -47,6 +47,7 @@ import { trpc } from "@/lib/trpc";
 import GenealogyTree from "@/components/GenealogyTree";
 import { AutoshipManager } from "@/components/AutoshipManager";
 import { PayoutManager } from "@/components/PayoutManager";
+import { RankHistory } from "@/components/RankHistory";
 
 export default function DistributorPortal() {
   const [, setLocation] = useLocation();
@@ -155,6 +156,7 @@ export default function DistributorPortal() {
             { id: "sales", icon: ShoppingCart, label: "Sales" },
             { id: "commissions", icon: DollarSign, label: "Commissions" },
             { id: "payouts", icon: CreditCard, label: "Payouts" },
+            { id: "rank-history", icon: Award, label: "Rank History" },
             { id: "marketing", icon: Share2, label: "Marketing" },
             { id: "training", icon: BookOpen, label: "Training" },
             { id: "autoship", icon: Repeat, label: "Auto-Ship" },
@@ -207,6 +209,8 @@ export default function DistributorPortal() {
                 {activeTab === "team" && "My Team"}
                 {activeTab === "sales" && "Sales"}
                 {activeTab === "commissions" && "Commissions"}
+                {activeTab === "payouts" && "Payouts"}
+                {activeTab === "rank-history" && "Rank History"}
                 {activeTab === "marketing" && "Marketing Tools"}
                 {activeTab === "training" && "Training Center"}
                 {activeTab === "autoship" && "Auto-Ship Management"}
@@ -677,6 +681,17 @@ export default function DistributorPortal() {
               className="space-y-6"
             >
               <PayoutManager />
+            </motion.div>
+          )}
+
+          {/* Rank History Tab */}
+          {activeTab === "rank-history" && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-6"
+            >
+              <RankHistory />
             </motion.div>
           )}
 

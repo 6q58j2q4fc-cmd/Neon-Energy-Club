@@ -15,7 +15,8 @@ export type EmailNotificationType =
   | "territory_rejected"
   | "territory_expiring"
   | "nft_minted"
-  | "crowdfunding_received";
+  | "crowdfunding_received"
+  | "rank_advancement";
 
 // Email template data interfaces
 interface OrderEmailData {
@@ -42,6 +43,19 @@ interface TerritoryEmailData {
   monthlyFee?: number;
   expirationDate?: string;
   daysUntilExpiration?: number;
+}
+
+interface RankAdvancementEmailData {
+  distributorName: string;
+  distributorEmail: string;
+  distributorCode: string;
+  previousRank: string;
+  newRank: string;
+  newRankIcon: string;
+  personalPV: number;
+  teamPV: number;
+  monthlyBonus: number;
+  newBenefits: string[];
 }
 
 interface NftEmailData {
@@ -296,6 +310,41 @@ The NEON Franchise Team
     `.trim(),
   }),
 
+  rank_advancement: (data: RankAdvancementEmailData) => ({
+    title: `🎉 Congratulations! You've Achieved ${data.newRank} Rank!`,
+    content: `
+**Rank Advancement Notification**
+
+Hello ${data.distributorName}!
+
+🎊 CONGRATULATIONS! 🎊
+
+You have been promoted from **${data.previousRank}** to **${data.newRankIcon} ${data.newRank}**!
+
+This is a tremendous achievement and a testament to your hard work and dedication to building your NEON business.
+
+**Your Current Stats:**
+- Personal PV: ${data.personalPV.toLocaleString()}
+- Team PV: ${data.teamPV.toLocaleString()}
+- Distributor Code: ${data.distributorCode}
+
+**New Benefits at ${data.newRank} Rank:**
+${data.newBenefits.map(b => `✓ ${b}`).join("\n")}
+
+**Monthly Rank Bonus:** $${data.monthlyBonus.toLocaleString()}
+
+**What's Next:**
+1. Log in to your Distributor Portal to see your updated rank badge
+2. Review the requirements for your next rank advancement
+3. Keep building your team and growing your business!
+
+Your success inspires others. Keep pushing forward!
+
+Best regards,
+The NEON Leadership Team
+    `.trim(),
+  }),
+
   crowdfunding_received: (data: OrderEmailData) => ({
     title: `💚 Thank You for Backing NEON! - Contribution #${data.orderId}`,
     content: `
@@ -339,7 +388,7 @@ const NOTIFICATIONS_ENABLED = process.env.NODE_ENV === "production";
  */
 export async function sendEmailNotification(
   type: EmailNotificationType,
-  data: OrderEmailData | TerritoryEmailData | NftEmailData
+  data: OrderEmailData | TerritoryEmailData | NftEmailData | RankAdvancementEmailData
 ): Promise<boolean> {
   // Skip notifications in development/test mode
   if (!NOTIFICATIONS_ENABLED) {
@@ -365,6 +414,9 @@ export async function sendEmailNotification(
         break;
       case "nft_minted":
         template = emailTemplates[type](data as NftEmailData);
+        break;
+      case "rank_advancement":
+        template = emailTemplates[type](data as RankAdvancementEmailData);
         break;
       default:
         console.error(`[Email] Unknown notification type: ${type}`);
@@ -446,6 +498,23 @@ export async function sendCrowdfundingNotification(data: OrderEmailData): Promis
   return sendEmailNotification("crowdfunding_received", data);
 }
 
+/**
+ * Send rank advancement notification email
+ */
+export async function sendRankAdvancementNotification(data: {
+  distributorName: string;
+  distributorEmail: string;
+  distributorCode: string;
+  previousRank: string;
+  newRank: string;
+  newRankIcon: string;
+  personalPV: number;
+  teamPV: number;
+  monthlyBonus: number;
+  newBenefits: string[];
+}): Promise<boolean> {
+  return sendEmailNotification("rank_advancement", data);
+}
 
 /**
  * Generate a styled HTML email template

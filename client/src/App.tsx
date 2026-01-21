@@ -32,6 +32,7 @@ import Policies from "./pages/Policies";
 import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
 import Leaderboard from "./pages/Leaderboard";
+import DistributorLeaderboard from "./pages/DistributorLeaderboard";
 import Investors from "./pages/Investors";
 import AmbientSoundToggle from "./components/AmbientSoundToggle";
 import FloatingChatBot from "./components/FloatingChatBot";
@@ -85,6 +86,7 @@ function Router() {
         <Route path="/profile" component={Profile} />
         <Route path="/orders" component={Orders} />
         <Route path="/leaderboard" component={Leaderboard} />
+        <Route path="/distributor-leaderboard" component={DistributorLeaderboard} />
         <Route path="/investors" component={Investors} />
         <Route path="/invest" component={Investors} />
         <Route path="/404" component={NotFound} />

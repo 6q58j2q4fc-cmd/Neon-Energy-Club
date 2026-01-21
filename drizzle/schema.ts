@@ -1,4 +1,4 @@
-import { decimal, int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { decimal, int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -1004,3 +1004,55 @@ export const payoutHistory = mysqlTable("payout_history", {
 
 export type PayoutHistoryRecord = typeof payoutHistory.$inferSelect;
 export type InsertPayoutHistoryRecord = typeof payoutHistory.$inferInsert;
+
+
+/**
+ * Rank history table for tracking distributor rank progressions.
+ * Records each rank change with timestamps for milestone tracking.
+ */
+export const rankHistory = mysqlTable("rank_history", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Reference to distributor */
+  distributorId: int("distributorId").notNull(),
+  /** Previous rank before change */
+  previousRank: varchar("previousRank", { length: 50 }).notNull(),
+  /** New rank after change */
+  newRank: varchar("newRank", { length: 50 }).notNull(),
+  /** Personal PV at time of rank change */
+  personalPVAtChange: int("personalPVAtChange").default(0),
+  /** Team PV at time of rank change */
+  teamPVAtChange: int("teamPVAtChange").default(0),
+  /** Whether notification was sent */
+  notificationSent: boolean("notificationSent").default(false),
+  /** When the rank change occurred */
+  achievedAt: timestamp("achievedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type RankHistoryRecord = typeof rankHistory.$inferSelect;
+export type InsertRankHistoryRecord = typeof rankHistory.$inferInsert;
+
+/**
+ * In-app notifications table for user alerts.
+ */
+export const notifications = mysqlTable("notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Reference to user */
+  userId: int("userId").notNull(),
+  /** Notification type (rank_advancement, commission_paid, etc.) */
+  type: varchar("type", { length: 50 }).notNull(),
+  /** Notification title */
+  title: varchar("title", { length: 255 }).notNull(),
+  /** Notification message */
+  message: text("message").notNull(),
+  /** Additional data as JSON */
+  data: text("data"),
+  /** Whether notification has been read */
+  isRead: boolean("isRead").default(false),
+  /** When notification was read */
+  readAt: timestamp("readAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;
