@@ -1181,3 +1181,45 @@ export const customerReferralCodes = mysqlTable("customer_referral_codes", {
 });
 export type CustomerReferralCode = typeof customerReferralCodes.$inferSelect;
 export type InsertCustomerReferralCode = typeof customerReferralCodes.$inferInsert;
+
+
+/**
+ * Reward redemptions tracking table.
+ * Tracks shipping info and fulfillment status for redeemed rewards.
+ */
+export const rewardRedemptions = mysqlTable("reward_redemptions", {
+  id: int("id").autoincrement().primaryKey(),
+  /** ID of the reward being redeemed */
+  rewardId: int("rewardId").notNull(),
+  /** Type of reward: customer or distributor */
+  rewardType: mysqlEnum("rewardType", ["customer", "distributor"]).notNull(),
+  /** Recipient name */
+  name: varchar("name", { length: 255 }).notNull(),
+  /** Recipient email */
+  email: varchar("email", { length: 320 }).notNull(),
+  /** Recipient phone */
+  phone: varchar("phone", { length: 50 }),
+  /** Shipping address line 1 */
+  addressLine1: text("addressLine1").notNull(),
+  /** Shipping address line 2 */
+  addressLine2: text("addressLine2"),
+  /** City */
+  city: varchar("city", { length: 100 }).notNull(),
+  /** State */
+  state: varchar("state", { length: 100 }).notNull(),
+  /** Postal code */
+  postalCode: varchar("postalCode", { length: 20 }).notNull(),
+  /** Country */
+  country: varchar("country", { length: 100 }).notNull(),
+  /** Fulfillment status */
+  status: mysqlEnum("status", ["pending", "processing", "shipped", "delivered"]).default("pending").notNull(),
+  /** Tracking number */
+  trackingNumber: varchar("trackingNumber", { length: 100 }),
+  /** When the order was shipped */
+  shippedAt: timestamp("shippedAt"),
+  /** When the order was delivered */
+  deliveredAt: timestamp("deliveredAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type RewardRedemption = typeof rewardRedemptions.$inferSelect;
+export type InsertRewardRedemption = typeof rewardRedemptions.$inferInsert;

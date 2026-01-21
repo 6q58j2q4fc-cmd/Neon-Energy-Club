@@ -1,0 +1,20 @@
+CREATE TABLE `reward_redemptions` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`rewardId` int NOT NULL,
+	`rewardType` enum('customer','distributor') NOT NULL,
+	`name` varchar(255) NOT NULL,
+	`email` varchar(320) NOT NULL,
+	`phone` varchar(50),
+	`addressLine1` text NOT NULL,
+	`addressLine2` text,
+	`city` varchar(100) NOT NULL,
+	`state` varchar(100) NOT NULL,
+	`postalCode` varchar(20) NOT NULL,
+	`country` varchar(100) NOT NULL,
+	`status` enum('pending','processing','shipped','delivered') NOT NULL DEFAULT 'pending',
+	`trackingNumber` varchar(100),
+	`shippedAt` timestamp,
+	`deliveredAt` timestamp,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `reward_redemptions_id` PRIMARY KEY(`id`)
+);

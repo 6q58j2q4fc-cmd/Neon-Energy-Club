@@ -1059,6 +1059,65 @@ export const appRouter = router({
         const earnedFreeCase = await checkAndAwardDistributorFreeCase(input.distributorId);
         return { success: true, earnedFreeCase };
       }),
+
+    // Redeem a free reward with shipping info
+    redeemFreeRewardWithShipping: protectedProcedure
+      .input(z.object({
+        rewardId: z.number(),
+        shippingInfo: z.object({
+          name: z.string().min(1),
+          email: z.string().email(),
+          phone: z.string().optional(),
+          addressLine1: z.string().min(1),
+          addressLine2: z.string().optional(),
+          city: z.string().min(1),
+          state: z.string().min(1),
+          postalCode: z.string().min(1),
+          country: z.string().min(1),
+        }),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { redeemDistributorRewardWithShipping, getDistributorFreeRewardById, getDistributorByUserId } = await import("./db");
+        
+        // Get the distributor
+        const distributor = await getDistributorByUserId(ctx.user.id);
+        if (!distributor) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Distributor not found' });
+        }
+        
+        // Get the reward to verify ownership and status
+        const reward = await getDistributorFreeRewardById(input.rewardId);
+        if (!reward) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Reward not found' });
+        }
+        if (reward.distributorId !== distributor.id) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'This reward belongs to another distributor' });
+        }
+        if (reward.status !== 'pending') {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'This reward has already been redeemed' });
+        }
+        
+        // Process the redemption
+        const success = await redeemDistributorRewardWithShipping(input.rewardId, input.shippingInfo);
+        
+        if (success) {
+          // Send confirmation email
+          try {
+            const { sendRewardRedemptionConfirmation } = await import("./emailNotifications");
+            await sendRewardRedemptionConfirmation({
+              customerName: input.shippingInfo.name,
+              customerEmail: input.shippingInfo.email,
+              rewardDescription: `3-for-Free Distributor Reward (${reward.earnedMonth})`,
+              rewardValue: '42.00',
+              shippingAddress: `${input.shippingInfo.addressLine1}${input.shippingInfo.addressLine2 ? ', ' + input.shippingInfo.addressLine2 : ''}, ${input.shippingInfo.city}, ${input.shippingInfo.state} ${input.shippingInfo.postalCode}, ${input.shippingInfo.country}`,
+            });
+          } catch (emailError) {
+            console.warn("[DistributorRewardRedemption] Failed to send confirmation email:", emailError);
+          }
+        }
+        
+        return { success };
+      }),
   }),
 
   blog: router({
@@ -2284,6 +2343,59 @@ Always be helpful, enthusiastic, and guide users toward making a purchase or inv
       .mutation(async ({ input }) => {
         const { redeemCustomerReward } = await import("./db");
         const success = await redeemCustomerReward(input.rewardId, input.orderId);
+        return { success };
+      }),
+
+    // Redeem a reward with shipping info (for free case claims)
+    redeemRewardWithShipping: protectedProcedure
+      .input(z.object({
+        rewardId: z.number(),
+        shippingInfo: z.object({
+          name: z.string().min(1),
+          email: z.string().email(),
+          phone: z.string().optional(),
+          addressLine1: z.string().min(1),
+          addressLine2: z.string().optional(),
+          city: z.string().min(1),
+          state: z.string().min(1),
+          postalCode: z.string().min(1),
+          country: z.string().min(1),
+        }),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { redeemCustomerRewardWithShipping, getCustomerRewardById } = await import("./db");
+        
+        // Get the reward to verify ownership and status
+        const reward = await getCustomerRewardById(input.rewardId);
+        if (!reward) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Reward not found' });
+        }
+        if (reward.userId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'This reward belongs to another user' });
+        }
+        if (reward.status !== 'available') {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'This reward is not available for redemption' });
+        }
+        
+        // Process the redemption
+        const success = await redeemCustomerRewardWithShipping(input.rewardId, input.shippingInfo);
+        
+        if (success) {
+          // Send confirmation email
+          try {
+            const { sendRewardRedemptionConfirmation } = await import("./emailNotifications");
+            await sendRewardRedemptionConfirmation({
+              customerName: input.shippingInfo.name,
+              customerEmail: input.shippingInfo.email,
+              rewardDescription: reward.description,
+              rewardValue: reward.value,
+              shippingAddress: `${input.shippingInfo.addressLine1}${input.shippingInfo.addressLine2 ? ', ' + input.shippingInfo.addressLine2 : ''}, ${input.shippingInfo.city}, ${input.shippingInfo.state} ${input.shippingInfo.postalCode}, ${input.shippingInfo.country}`,
+            });
+          } catch (emailError) {
+            console.warn("[RewardRedemption] Failed to send confirmation email:", emailError);
+          }
+        }
+        
         return { success };
       }),
   }),

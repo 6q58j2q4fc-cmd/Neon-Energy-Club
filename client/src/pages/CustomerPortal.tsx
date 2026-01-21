@@ -8,6 +8,8 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
+import SocialShareButtons from "@/components/SocialShareButtons";
+import RewardRedemption from "@/components/RewardRedemption";
 import { 
   Gift, 
   Users, 
@@ -20,7 +22,8 @@ import {
   ArrowRight,
   Zap,
   Target,
-  Crown
+  Crown,
+  Sparkles
 } from "lucide-react";
 
 export default function CustomerPortal() {
@@ -29,13 +32,13 @@ export default function CustomerPortal() {
   const [copied, setCopied] = useState(false);
 
   // Fetch customer referral data
-  const { data: referralData, isLoading: referralLoading } = trpc.customer.getReferralStats.useQuery(
+  const { data: referralData, isLoading: referralLoading, refetch: refetchReferrals } = trpc.customer.getReferralStats.useQuery(
     undefined,
     { enabled: isAuthenticated }
   );
 
   // Fetch customer rewards
-  const { data: rewards, isLoading: rewardsLoading } = trpc.customer.getRewards.useQuery(
+  const { data: rewards, isLoading: rewardsLoading, refetch: refetchRewards } = trpc.customer.getRewards.useQuery(
     undefined,
     { enabled: isAuthenticated }
   );
@@ -46,6 +49,7 @@ export default function CustomerPortal() {
       toast.success("Referral Code Generated!", {
         description: "Your unique referral code is ready to share.",
       });
+      refetchReferrals();
     },
   });
 
@@ -59,6 +63,11 @@ export default function CustomerPortal() {
       });
       setTimeout(() => setCopied(false), 2000);
     }
+  };
+
+  const handleRewardRedeemed = () => {
+    refetchRewards();
+    refetchReferrals();
   };
 
   if (!isAuthenticated) {
@@ -93,6 +102,12 @@ export default function CustomerPortal() {
   const currentReferrals = referralData?.successfulReferrals || 0;
   const progress = Math.min((currentReferrals / referralsNeeded) * 100, 100);
   const freeCasesEarned = Math.floor(currentReferrals / referralsNeeded);
+  const referralLink = referralData?.referralCode 
+    ? `${window.location.origin}?ref=${referralData.referralCode}` 
+    : '';
+
+  // Filter available rewards for redemption
+  const availableRewards = rewards?.filter((r: any) => r.status === 'available') || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a]">
@@ -151,7 +166,7 @@ export default function CustomerPortal() {
                   {referralData?.referralCode ? (
                     <div className="flex gap-2">
                       <Input
-                        value={`${window.location.origin}?ref=${referralData.referralCode}`}
+                        value={referralLink}
                         readOnly
                         className="bg-black/30 border-[#c8ff00]/30 text-white"
                       />
@@ -196,6 +211,28 @@ export default function CustomerPortal() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Social Share Section */}
+          {referralData?.referralCode && (
+            <Card className="bg-[#0d2818]/50 border-[#c8ff00]/20 mb-8">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Share2 className="w-5 h-5 text-[#c8ff00]" />
+                  Share & Earn
+                </CardTitle>
+                <CardDescription className="text-white/60">
+                  Share your referral link on social media to reach more friends!
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SocialShareButtons 
+                  referralCode={referralData.referralCode}
+                  referralLink={referralLink}
+                  userName={user?.name || undefined}
+                />
+              </CardContent>
+            </Card>
+          )}
 
           {/* How It Works */}
           <div className="grid md:grid-cols-3 gap-6 mb-12">
@@ -277,20 +314,35 @@ export default function CustomerPortal() {
                               <div className="text-sm text-white/60">Value: ${reward.value}</div>
                             </div>
                           </div>
-                          <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                            reward.status === 'available' 
-                              ? 'bg-[#c8ff00] text-black' 
-                              : reward.status === 'redeemed'
-                              ? 'bg-green-500 text-white'
-                              : 'bg-white/20 text-white/60'
-                          }`}>
-                            {reward.status.toUpperCase()}
-                          </div>
+                          {reward.status === 'available' ? (
+                            <RewardRedemption 
+                              reward={reward}
+                              userInfo={{
+                                name: user?.name || undefined,
+                                email: user?.email || undefined,
+                                phone: user?.phone || undefined,
+                                addressLine1: user?.addressLine1 || undefined,
+                                addressLine2: user?.addressLine2 || undefined,
+                                city: user?.city || undefined,
+                                state: user?.state || undefined,
+                                postalCode: user?.postalCode || undefined,
+                                country: user?.country || undefined,
+                              }}
+                              onRedeemed={handleRewardRedeemed}
+                            />
+                          ) : (
+                            <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                              reward.status === 'redeemed'
+                                ? 'bg-green-500 text-white'
+                                : 'bg-white/20 text-white/60'
+                            }`}>
+                              {reward.status.toUpperCase()}
+                            </div>
+                          )}
                         </div>
-                        {reward.status === 'available' && reward.redemptionCode && (
-                          <div className="mt-3 p-2 bg-black/30 rounded-lg">
-                            <div className="text-xs text-white/40 mb-1">Redemption Code:</div>
-                            <div className="font-mono text-[#c8ff00] font-bold">{reward.redemptionCode}</div>
+                        {reward.status === 'redeemed' && reward.redeemedAt && (
+                          <div className="mt-3 text-xs text-white/40">
+                            Redeemed on {new Date(reward.redeemedAt).toLocaleDateString()}
                           </div>
                         )}
                       </div>
@@ -300,6 +352,26 @@ export default function CustomerPortal() {
                   <div className="text-center py-8">
                     <Gift className="w-12 h-12 text-white/20 mx-auto mb-3" />
                     <p className="text-white/40">No rewards yet. Start referring to earn!</p>
+                    <p className="text-white/30 text-sm mt-2">
+                      Refer 3 friends who purchase = 1 FREE case
+                    </p>
+                  </div>
+                )}
+
+                {/* Claim Available Rewards CTA */}
+                {availableRewards.length > 0 && (
+                  <div className="mt-6 p-4 bg-gradient-to-r from-[#c8ff00]/10 to-[#00ff88]/10 rounded-xl border border-[#c8ff00]/30">
+                    <div className="flex items-center gap-3">
+                      <Sparkles className="w-6 h-6 text-[#c8ff00]" />
+                      <div>
+                        <div className="font-semibold text-white">
+                          You have {availableRewards.length} reward{availableRewards.length > 1 ? 's' : ''} to claim!
+                        </div>
+                        <div className="text-sm text-white/60">
+                          Click "Claim Free Case" above to redeem your rewards.
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
               </CardContent>

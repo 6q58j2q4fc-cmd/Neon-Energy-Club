@@ -16,7 +16,8 @@ export type EmailNotificationType =
   | "territory_expiring"
   | "nft_minted"
   | "crowdfunding_received"
-  | "rank_advancement";
+  | "rank_advancement"
+  | "reward_redemption";
 
 // Email template data interfaces
 interface OrderEmailData {
@@ -65,6 +66,14 @@ interface NftEmailData {
   nftName: string;
   rarity: string;
   estimatedValue: number;
+}
+
+interface RewardRedemptionEmailData {
+  customerName: string;
+  customerEmail: string;
+  rewardDescription: string;
+  rewardValue: string;
+  shippingAddress: string;
 }
 
 // Email templates
@@ -345,6 +354,38 @@ The NEON Leadership Team
     `.trim(),
   }),
 
+  reward_redemption: (data: RewardRedemptionEmailData) => ({
+    title: `🎁 Your Free NEON Case is On Its Way!`,
+    content: `
+**Reward Redemption Confirmation**
+
+Hello ${data.customerName}!
+
+🎉 CONGRATULATIONS! Your reward has been successfully redeemed!
+
+**Reward Details:**
+- Reward: ${data.rewardDescription}
+- Value: $${data.rewardValue}
+- Status: Processing for Shipment
+
+**Shipping To:**
+${data.shippingAddress}
+
+**What Happens Next:**
+1. Your order is being prepared for shipment
+2. You'll receive a tracking number within 1-2 business days
+3. Expected delivery: 5-7 business days
+
+**Keep Earning!**
+Refer more friends to earn additional free cases. Every 3 successful referrals = 1 FREE case of NEON!
+
+Thank you for being part of the NEON community!
+
+Best regards,
+The NEON Energy Team
+    `.trim(),
+  }),
+
   crowdfunding_received: (data: OrderEmailData) => ({
     title: `💚 Thank You for Backing NEON! - Contribution #${data.orderId}`,
     content: `
@@ -388,7 +429,7 @@ const NOTIFICATIONS_ENABLED = process.env.NODE_ENV === "production";
  */
 export async function sendEmailNotification(
   type: EmailNotificationType,
-  data: OrderEmailData | TerritoryEmailData | NftEmailData | RankAdvancementEmailData
+  data: OrderEmailData | TerritoryEmailData | NftEmailData | RankAdvancementEmailData | RewardRedemptionEmailData
 ): Promise<boolean> {
   // Skip notifications in development/test mode
   if (!NOTIFICATIONS_ENABLED) {
@@ -417,6 +458,9 @@ export async function sendEmailNotification(
         break;
       case "rank_advancement":
         template = emailTemplates[type](data as RankAdvancementEmailData);
+        break;
+      case "reward_redemption":
+        template = emailTemplates[type](data as RewardRedemptionEmailData);
         break;
       default:
         console.error(`[Email] Unknown notification type: ${type}`);
@@ -698,4 +742,18 @@ export async function sendTerritoryApprovalNotification(data: {
     status: "rejected",
     rejectionReason: data.rejectionReason,
   });
+}
+
+
+/**
+ * Send reward redemption confirmation email
+ */
+export async function sendRewardRedemptionConfirmation(data: {
+  customerName: string;
+  customerEmail: string;
+  rewardDescription: string;
+  rewardValue: string;
+  shippingAddress: string;
+}): Promise<boolean> {
+  return sendEmailNotification("reward_redemption", data);
 }

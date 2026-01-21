@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward } from "../drizzle/schema";
+import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -3372,4 +3372,179 @@ export async function getDistributorRewardPointsHistory(distributorId: number) {
     .where(eq(distributorRewardPoints.distributorId, distributorId))
     .orderBy(desc(distributorRewardPoints.createdAt))
     .limit(50);
+}
+
+// ============================================
+// Reward Redemption Functions
+// ============================================
+
+/**
+ * Get a customer reward by ID
+ */
+export async function getCustomerRewardById(rewardId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.select()
+    .from(customerRewards)
+    .where(eq(customerRewards.id, rewardId))
+    .limit(1);
+
+  return result[0] || null;
+}
+
+/**
+ * Redeem a customer reward with shipping information
+ */
+export async function redeemCustomerRewardWithShipping(
+  rewardId: number,
+  shippingInfo: {
+    name: string;
+    email: string;
+    phone?: string;
+    addressLine1: string;
+    addressLine2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  }
+): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  // Update the reward status
+  await db.update(customerRewards)
+    .set({
+      status: "redeemed",
+      redeemedAt: new Date(),
+    })
+    .where(and(
+      eq(customerRewards.id, rewardId),
+      eq(customerRewards.status, "available")
+    ));
+
+  // Create a redemption order record
+  await db.insert(rewardRedemptions).values({
+    rewardId,
+    rewardType: 'customer',
+    name: shippingInfo.name,
+    email: shippingInfo.email,
+    phone: shippingInfo.phone || null,
+    addressLine1: shippingInfo.addressLine1,
+    addressLine2: shippingInfo.addressLine2 || null,
+    city: shippingInfo.city,
+    state: shippingInfo.state,
+    postalCode: shippingInfo.postalCode,
+    country: shippingInfo.country,
+    status: 'pending',
+  });
+
+  return true;
+}
+
+/**
+ * Get a distributor free reward by ID
+ */
+export async function getDistributorFreeRewardById(rewardId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.select()
+    .from(distributorFreeRewards)
+    .where(eq(distributorFreeRewards.id, rewardId))
+    .limit(1);
+
+  return result[0] || null;
+}
+
+/**
+ * Redeem a distributor free reward with shipping information
+ */
+export async function redeemDistributorRewardWithShipping(
+  rewardId: number,
+  shippingInfo: {
+    name: string;
+    email: string;
+    phone?: string;
+    addressLine1: string;
+    addressLine2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  }
+): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  // Update the reward status to shipped (pending fulfillment)
+  await db.update(distributorFreeRewards)
+    .set({
+      status: "shipped",
+      shippedAt: new Date(),
+    })
+    .where(and(
+      eq(distributorFreeRewards.id, rewardId),
+      eq(distributorFreeRewards.status, "pending")
+    ));
+
+  // Create a redemption order record
+  await db.insert(rewardRedemptions).values({
+    rewardId,
+    rewardType: 'distributor',
+    name: shippingInfo.name,
+    email: shippingInfo.email,
+    phone: shippingInfo.phone || null,
+    addressLine1: shippingInfo.addressLine1,
+    addressLine2: shippingInfo.addressLine2 || null,
+    city: shippingInfo.city,
+    state: shippingInfo.state,
+    postalCode: shippingInfo.postalCode,
+    country: shippingInfo.country,
+    status: 'pending',
+  });
+
+  return true;
+}
+
+/**
+ * Get all reward redemptions for admin
+ */
+export async function getAllRewardRedemptions() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select()
+    .from(rewardRedemptions)
+    .orderBy(desc(rewardRedemptions.createdAt));
+}
+
+/**
+ * Update reward redemption status
+ */
+export async function updateRewardRedemptionStatus(
+  redemptionId: number,
+  status: 'pending' | 'processing' | 'shipped' | 'delivered',
+  trackingNumber?: string
+): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  const updateData: any = { status };
+  
+  if (status === 'shipped' && trackingNumber) {
+    updateData.trackingNumber = trackingNumber;
+    updateData.shippedAt = new Date();
+  }
+  
+  if (status === 'delivered') {
+    updateData.deliveredAt = new Date();
+  }
+
+  await db.update(rewardRedemptions)
+    .set(updateData)
+    .where(eq(rewardRedemptions.id, redemptionId));
+
+  return true;
 }

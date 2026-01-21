@@ -1795,3 +1795,25 @@
 - [x] Implement notification settings
 - [x] Add system-wide announcements (structure ready)
 - [x] Create audit log viewer (structure ready)
+
+## Social Sharing & Reward Redemption (Jan 21)
+
+### Social Media Share Buttons
+- [x] Add Facebook share button to CustomerPortal referral section
+- [x] Add Twitter/X share button to CustomerPortal referral section
+- [x] Add WhatsApp share button to CustomerPortal referral section
+- [x] Create shareable referral message templates
+- [x] Add copy-to-clipboard functionality for referral link
+- [x] Add LinkedIn share button
+- [x] Add SMS/text share button
+- [x] Add Email share button
+
+### Reward Redemption Checkout Flow
+- [x] Create RewardRedemption component for customers (3-for-Free)
+- [x] Create RewardRedemption component for distributors (autoship rewards)
+- [x] Add shipping address collection for free case delivery
+- [x] Create reward redemption API endpoints
+- [x] Add redemption history tracking (rewardRedemptions table)
+- [x] Send confirmation email on successful redemption
+- [x] Update reward status after redemption
+- [x] Write vitest tests for reward redemption (19 tests passing)
