@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification } from "../drizzle/schema";
+import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -3050,4 +3050,326 @@ export async function getDistributorRankPosition(distributorId: number): Promise
     .where(gt(distributors.teamSales, distributor[0].teamSales));
   
   return (result[0]?.count || 0) + 1;
+}
+
+
+// ============================================
+// Customer Referral & Rewards Functions
+// ============================================
+
+/**
+ * Generate a unique referral code for a customer
+ */
+export async function generateCustomerReferralCode(userId: number): Promise<string | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  // Check if user already has a code
+  const existing = await db.select()
+    .from(customerReferralCodes)
+    .where(eq(customerReferralCodes.userId, userId))
+    .limit(1);
+
+  if (existing[0]) {
+    return existing[0].code;
+  }
+
+  // Generate unique code
+  const code = `NEON${userId}${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+  
+  await db.insert(customerReferralCodes).values({
+    userId,
+    code,
+    usageCount: 0,
+    successfulReferrals: 0,
+    isActive: true,
+  });
+
+  return code;
+}
+
+/**
+ * Get customer's referral code
+ */
+export async function getCustomerReferralCode(userId: number): Promise<string | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.select()
+    .from(customerReferralCodes)
+    .where(eq(customerReferralCodes.userId, userId))
+    .limit(1);
+
+  return result[0]?.code || null;
+}
+
+/**
+ * Get customer referral stats
+ */
+export async function getCustomerReferralStats(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  // Get referral code
+  const codeResult = await db.select()
+    .from(customerReferralCodes)
+    .where(eq(customerReferralCodes.userId, userId))
+    .limit(1);
+
+  const referralCode = codeResult[0]?.code || null;
+  const successfulReferrals = codeResult[0]?.successfulReferrals || 0;
+
+  // Get all referrals
+  const referrals = await db.select({
+    id: customerReferrals.id,
+    referredId: customerReferrals.referredId,
+    purchaseCompleted: customerReferrals.purchaseCompleted,
+    purchaseAmount: customerReferrals.purchaseAmount,
+    createdAt: customerReferrals.createdAt,
+  })
+    .from(customerReferrals)
+    .where(eq(customerReferrals.referrerId, userId))
+    .orderBy(desc(customerReferrals.createdAt));
+
+  // Count pending referrals
+  const pendingReferrals = referrals.filter(r => !r.purchaseCompleted).length;
+
+  return {
+    referralCode,
+    successfulReferrals,
+    pendingReferrals,
+    totalReferrals: referrals.length,
+    referrals,
+  };
+}
+
+/**
+ * Record a new customer referral
+ */
+export async function recordCustomerReferral(
+  referrerId: number,
+  referredId: number,
+  referralCode: string
+): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.insert(customerReferrals).values({
+    referrerId,
+    referredId,
+    referralCode,
+    purchaseCompleted: false,
+  });
+
+  // Update usage count
+  await db.update(customerReferralCodes)
+    .set({ usageCount: sql`${customerReferralCodes.usageCount} + 1` })
+    .where(eq(customerReferralCodes.code, referralCode));
+}
+
+/**
+ * Mark a referral as completed (purchase made)
+ */
+export async function completeCustomerReferral(
+  referredId: number,
+  orderId: number,
+  purchaseAmount: string
+): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  // Find the referral
+  const referral = await db.select()
+    .from(customerReferrals)
+    .where(and(
+      eq(customerReferrals.referredId, referredId),
+      eq(customerReferrals.purchaseCompleted, false)
+    ))
+    .limit(1);
+
+  if (!referral[0]) return;
+
+  // Update the referral
+  await db.update(customerReferrals)
+    .set({
+      purchaseCompleted: true,
+      orderId,
+      purchaseAmount,
+      purchaseCompletedAt: new Date(),
+    })
+    .where(eq(customerReferrals.id, referral[0].id));
+
+  // Update successful referrals count
+  await db.update(customerReferralCodes)
+    .set({ successfulReferrals: sql`${customerReferralCodes.successfulReferrals} + 1` })
+    .where(eq(customerReferralCodes.code, referral[0].referralCode));
+
+  // Check if referrer qualifies for a reward (every 3 referrals)
+  const codeResult = await db.select()
+    .from(customerReferralCodes)
+    .where(eq(customerReferralCodes.code, referral[0].referralCode))
+    .limit(1);
+
+  if (codeResult[0] && codeResult[0].successfulReferrals % 3 === 0) {
+    // Award a free case!
+    const rewardCode = `FREE${Date.now().toString(36).toUpperCase()}`;
+    await db.insert(customerRewards).values({
+      userId: referral[0].referrerId,
+      rewardType: "free_case",
+      description: "FREE 12-Pack Case - 3 for Free Reward",
+      value: "42.00",
+      referralCount: 3,
+      status: "available",
+      redemptionCode: rewardCode,
+      expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
+    });
+  }
+}
+
+/**
+ * Get customer rewards
+ */
+export async function getCustomerRewards(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select()
+    .from(customerRewards)
+    .where(eq(customerRewards.userId, userId))
+    .orderBy(desc(customerRewards.createdAt));
+}
+
+/**
+ * Redeem a customer reward
+ */
+export async function redeemCustomerReward(
+  rewardId: number,
+  orderId: number
+): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  const result = await db.update(customerRewards)
+    .set({
+      status: "redeemed",
+      redeemedAt: new Date(),
+      redeemedOrderId: orderId,
+    })
+    .where(and(
+      eq(customerRewards.id, rewardId),
+      eq(customerRewards.status, "available")
+    ));
+
+  return true;
+}
+
+// ============================================
+// Distributor 3-for-Free Reward Points Functions
+// ============================================
+
+/**
+ * Award reward points to a distributor for autoship sales
+ */
+export async function awardDistributorRewardPoints(
+  distributorId: number,
+  points: number,
+  source: string,
+  description: string,
+  relatedId?: number
+): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  const periodMonth = new Date().toISOString().substring(0, 7); // YYYY-MM
+
+  await db.insert(distributorRewardPoints).values({
+    distributorId,
+    points,
+    source,
+    description,
+    relatedId,
+    periodMonth,
+  });
+}
+
+/**
+ * Get distributor's reward points for current month
+ */
+export async function getDistributorMonthlyPoints(distributorId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const periodMonth = new Date().toISOString().substring(0, 7);
+
+  const result = await db.select({
+    total: sql<number>`COALESCE(SUM(${distributorRewardPoints.points}), 0)`,
+  })
+    .from(distributorRewardPoints)
+    .where(and(
+      eq(distributorRewardPoints.distributorId, distributorId),
+      eq(distributorRewardPoints.periodMonth, periodMonth)
+    ));
+
+  return result[0]?.total || 0;
+}
+
+/**
+ * Check and award free case if distributor qualifies (3+ points in a month)
+ */
+export async function checkAndAwardDistributorFreeCase(distributorId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  const monthlyPoints = await getDistributorMonthlyPoints(distributorId);
+  const periodMonth = new Date().toISOString().substring(0, 7);
+
+  // Check if already awarded this month
+  const existing = await db.select()
+    .from(distributorFreeRewards)
+    .where(and(
+      eq(distributorFreeRewards.distributorId, distributorId),
+      eq(distributorFreeRewards.earnedMonth, periodMonth)
+    ))
+    .limit(1);
+
+  if (existing[0]) return false; // Already awarded
+
+  if (monthlyPoints >= 3) {
+    await db.insert(distributorFreeRewards).values({
+      distributorId,
+      pointsRedeemed: 3,
+      earnedMonth: periodMonth,
+      status: "pending",
+    });
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Get distributor's free rewards history
+ */
+export async function getDistributorFreeRewards(distributorId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select()
+    .from(distributorFreeRewards)
+    .where(eq(distributorFreeRewards.distributorId, distributorId))
+    .orderBy(desc(distributorFreeRewards.createdAt));
+}
+
+/**
+ * Get distributor's reward points history
+ */
+export async function getDistributorRewardPointsHistory(distributorId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select()
+    .from(distributorRewardPoints)
+    .where(eq(distributorRewardPoints.distributorId, distributorId))
+    .orderBy(desc(distributorRewardPoints.createdAt))
+    .limit(50);
 }

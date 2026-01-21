@@ -1056,3 +1056,128 @@ export const notifications = mysqlTable("notifications", {
 
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;
+
+
+/**
+ * Customer referral tracking for 3-for-Free program.
+ * Customers earn a free case when 3 referred friends make purchases.
+ */
+export const customerReferrals = mysqlTable("customer_referrals", {
+  id: int("id").autoincrement().primaryKey(),
+  /** The customer who made the referral */
+  referrerId: int("referrerId").notNull(),
+  /** The referred customer (who made a purchase) */
+  referredId: int("referredId").notNull(),
+  /** Referral code used */
+  referralCode: varchar("referralCode", { length: 50 }).notNull(),
+  /** Whether the referred customer made a qualifying purchase */
+  purchaseCompleted: boolean("purchaseCompleted").default(false),
+  /** Order ID of the qualifying purchase */
+  orderId: int("orderId"),
+  /** Purchase amount */
+  purchaseAmount: decimal("purchaseAmount", { precision: 10, scale: 2 }),
+  /** When the referral was created */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** When the purchase was completed */
+  purchaseCompletedAt: timestamp("purchaseCompletedAt"),
+});
+export type CustomerReferral = typeof customerReferrals.$inferSelect;
+export type InsertCustomerReferral = typeof customerReferrals.$inferInsert;
+
+/**
+ * Customer rewards for the 3-for-Free program.
+ * Tracks earned free cases and redemption status.
+ */
+export const customerRewards = mysqlTable("customer_rewards", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Customer who earned the reward */
+  userId: int("userId").notNull(),
+  /** Type of reward (free_case, discount, etc.) */
+  rewardType: varchar("rewardType", { length: 50 }).notNull(),
+  /** Description of the reward */
+  description: varchar("description", { length: 255 }).notNull(),
+  /** Value of the reward (e.g., $42 for a free case) */
+  value: decimal("value", { precision: 10, scale: 2 }).notNull(),
+  /** Number of referrals that triggered this reward */
+  referralCount: int("referralCount").default(3),
+  /** Status: pending, available, redeemed, expired */
+  status: mysqlEnum("status", ["pending", "available", "redeemed", "expired"]).default("available").notNull(),
+  /** Redemption code for the reward */
+  redemptionCode: varchar("redemptionCode", { length: 50 }),
+  /** When the reward was redeemed */
+  redeemedAt: timestamp("redeemedAt"),
+  /** Order ID if redeemed on an order */
+  redeemedOrderId: int("redeemedOrderId"),
+  /** Expiration date for the reward */
+  expiresAt: timestamp("expiresAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type CustomerReward = typeof customerRewards.$inferSelect;
+export type InsertCustomerReward = typeof customerRewards.$inferInsert;
+
+/**
+ * Distributor NEON Reward Points for 3-for-Free autoship program.
+ * Distributors who sell 3 autoships per month earn points toward a free case.
+ */
+export const distributorRewardPoints = mysqlTable("distributor_reward_points", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Distributor who earned the points */
+  distributorId: int("distributorId").notNull(),
+  /** Points earned (1 point per qualifying autoship sale) */
+  points: int("points").default(0).notNull(),
+  /** Source of points (autoship_sale, bonus, etc.) */
+  source: varchar("source", { length: 50 }).notNull(),
+  /** Description of how points were earned */
+  description: varchar("description", { length: 255 }),
+  /** Related order or autoship ID */
+  relatedId: int("relatedId"),
+  /** Month/year for tracking (YYYY-MM format) */
+  periodMonth: varchar("periodMonth", { length: 7 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type DistributorRewardPoint = typeof distributorRewardPoints.$inferSelect;
+export type InsertDistributorRewardPoint = typeof distributorRewardPoints.$inferInsert;
+
+/**
+ * Distributor free case rewards earned through the 3-for-Free program.
+ */
+export const distributorFreeRewards = mysqlTable("distributor_free_rewards", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Distributor who earned the reward */
+  distributorId: int("distributorId").notNull(),
+  /** Points redeemed for this reward */
+  pointsRedeemed: int("pointsRedeemed").default(3).notNull(),
+  /** Month the reward was earned (YYYY-MM) */
+  earnedMonth: varchar("earnedMonth", { length: 7 }).notNull(),
+  /** Status: pending, shipped, delivered */
+  status: mysqlEnum("status", ["pending", "shipped", "delivered"]).default("pending").notNull(),
+  /** Shipping tracking number */
+  trackingNumber: varchar("trackingNumber", { length: 100 }),
+  /** When the reward was shipped */
+  shippedAt: timestamp("shippedAt"),
+  /** When the reward was delivered */
+  deliveredAt: timestamp("deliveredAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type DistributorFreeReward = typeof distributorFreeRewards.$inferSelect;
+export type InsertDistributorFreeReward = typeof distributorFreeRewards.$inferInsert;
+
+/**
+ * Customer referral codes for tracking.
+ */
+export const customerReferralCodes = mysqlTable("customer_referral_codes", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User who owns this referral code */
+  userId: int("userId").notNull(),
+  /** Unique referral code */
+  code: varchar("code", { length: 50 }).notNull().unique(),
+  /** Number of times this code has been used */
+  usageCount: int("usageCount").default(0).notNull(),
+  /** Total successful referrals (purchases completed) */
+  successfulReferrals: int("successfulReferrals").default(0).notNull(),
+  /** Whether the code is active */
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type CustomerReferralCode = typeof customerReferralCodes.$inferSelect;
+export type InsertCustomerReferralCode = typeof customerReferralCodes.$inferInsert;

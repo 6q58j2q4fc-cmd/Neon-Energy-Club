@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useLocation, Link } from "wouter";
-import { Zap, MapPin, DollarSign, Clock, TrendingUp, Users, Star, Sparkles, ArrowRight, Gift, Target, Trophy, ChevronDown, Play, Pause, Volume2, VolumeX, Shield, Leaf, Heart } from "lucide-react";
+import { Zap, MapPin, DollarSign, Clock, TrendingUp, Users, Star, Sparkles, ArrowRight, Gift, Target, Trophy, ChevronDown, Shield, Leaf, Heart, Play } from "lucide-react";
+import { VideoPlayer } from "@/components/VideoPlayer";
 import SocialProofNotifications from "@/components/SocialProofNotifications";
 import ViralNewsletterPopup, { shouldShowPopup, markPopupShown } from "@/components/ViralNewsletterPopup";
 import Header from "@/components/Header";
@@ -18,9 +19,12 @@ export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [showNewsletter, setShowNewsletter] = useState(false);
-  const [videoPlaying, setVideoPlaying] = useState(true);
-  const [videoMuted, setVideoMuted] = useState(true);
-  const videoRef = useState<HTMLVideoElement | null>(null);
+  // Video playlist for the promo section
+  const neonVideos = [
+    { src: "/neon-promo.mp4", title: "NEON Energy - Feel The Power", poster: "/neon-can-new.png" },
+    { src: "/neon-promo.mp4", title: "NEON Energy - Natural Ingredients", poster: "/neon-can-new.png" },
+    { src: "/neon-promo.mp4", title: "NEON Energy - Join The Movement", poster: "/neon-can-new.png" },
+  ];
   
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -301,78 +305,13 @@ export default function Home() {
               </p>
             </div>
             
-            <div className="promo-video-container relative group aspect-video">
-              <video
-                ref={(el) => { if (el) videoRef[1](el); }}
-                autoPlay
-                muted={videoMuted}
-                loop
-                playsInline
-                className="w-full h-full object-cover rounded-2xl cursor-pointer"
-                poster="/neon-can-new.png"
-                onClick={() => {
-                  const video = videoRef[0];
-                  if (video) {
-                    if (video.paused) {
-                      video.play();
-                      setVideoPlaying(true);
-                    } else {
-                      video.pause();
-                      setVideoPlaying(false);
-                    }
-                  }
-                }}
-              >
-                <source src="/neon-promo.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-              <div className="promo-video-overlay pointer-events-none" />
-              
-              {/* Video Controls */}
-              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const video = videoRef[0];
-                    if (video) {
-                      if (video.paused) {
-                        video.play();
-                        setVideoPlaying(true);
-                      } else {
-                        video.pause();
-                        setVideoPlaying(false);
-                      }
-                    }
-                  }}
-                  className="p-3 bg-black/60 hover:bg-black/80 rounded-full text-white transition-colors"
-                >
-                  {videoPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                </button>
-                
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const video = videoRef[0];
-                    if (video) {
-                      video.muted = !video.muted;
-                      setVideoMuted(video.muted);
-                    }
-                  }}
-                  className="p-3 bg-black/60 hover:bg-black/80 rounded-full text-white transition-colors"
-                >
-                  {videoMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                </button>
-              </div>
-              
-              {/* Play/Pause indicator on click */}
-              {!videoPlaying && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="p-6 bg-black/60 rounded-full">
-                    <Play className="w-12 h-12 text-[#c8ff00]" />
-                  </div>
-                </div>
-              )}
-            </div>
+            {/* Enhanced Widescreen Video Player with Volume Control and Video Cycling */}
+            <VideoPlayer
+              videos={neonVideos}
+              className="aspect-[21/9] w-full"
+              autoPlay={true}
+              initialMuted={true}
+            />
           </div>
         </div>
       </section>

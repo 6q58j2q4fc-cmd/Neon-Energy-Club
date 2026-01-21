@@ -1,9 +1,19 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ShoppingCart } from "lucide-react";
+import { Menu, X, ShoppingCart, User, Users } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { getLoginUrl } from "@/const";
 import NeonLogo from "./NeonLogo";
 import MobileMenu from "./MobileMenu";
+import { trpc } from "@/lib/trpc";
 import { useCart } from "@/contexts/CartContext";
 
 const navItems = [
@@ -21,6 +31,10 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { totalItems, setIsOpen: setCartOpen } = useCart();
+  const { user, isAuthenticated } = useAuth();
+  const logoutMutation = trpc.auth.logout.useMutation({
+    onSuccess: () => window.location.reload(),
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -91,6 +105,78 @@ export default function Header() {
                   </span>
                 )}
               </button>
+              {/* Login/Account Dropdown */}
+              {user ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="text-[#c8ff00] border-[#c8ff00]/50 hover:bg-[#c8ff00]/10 hover:border-[#c8ff00] font-bold transition-all duration-200"
+                      >
+                        <User className="w-4 h-4 mr-2" />
+                        {user.name?.split(' ')[0] || 'Account'}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56 bg-[#0a1a1a] border-[#c8ff00]/30">
+                      <DropdownMenuItem 
+                        onClick={() => setLocation("/portal")}
+                        className="text-white hover:text-[#c8ff00] hover:bg-[#c8ff00]/10 cursor-pointer"
+                      >
+                        <Users className="w-4 h-4 mr-2" />
+                        Distributor Portal
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => setLocation("/customer-portal")}
+                        className="text-white hover:text-[#c8ff00] hover:bg-[#c8ff00]/10 cursor-pointer"
+                      >
+                        <User className="w-4 h-4 mr-2" />
+                        Customer Portal
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator className="bg-[#c8ff00]/20" />
+                      <DropdownMenuItem 
+                        onClick={() => logoutMutation.mutate()}
+                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10 cursor-pointer"
+                      >
+                        Sign Out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="text-[#00ffff] border-[#00ffff]/50 hover:bg-[#00ffff]/10 hover:border-[#00ffff] hover:shadow-[0_0_15px_rgba(0,255,255,0.3)] font-bold transition-all duration-200"
+                      >
+                        <User className="w-4 h-4 mr-2" />
+                        LOGIN
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56 bg-[#0a1a1a] border-[#c8ff00]/30">
+                      <DropdownMenuItem 
+                        onClick={() => window.location.href = getLoginUrl()}
+                        className="text-white hover:text-[#c8ff00] hover:bg-[#c8ff00]/10 cursor-pointer"
+                      >
+                        <User className="w-4 h-4 mr-2" />
+                        Customer Login
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => window.location.href = getLoginUrl()}
+                        className="text-white hover:text-[#00ffff] hover:bg-[#00ffff]/10 cursor-pointer"
+                      >
+                        <Users className="w-4 h-4 mr-2" />
+                        Distributor Login
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator className="bg-[#c8ff00]/20" />
+                      <DropdownMenuItem 
+                        onClick={() => setLocation("/join")}
+                        className="text-[#c8ff00] hover:bg-[#c8ff00]/10 cursor-pointer font-semibold"
+                      >
+                        Create Account
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+              )}
               <Button
                 onClick={() => setLocation("/join")}
                 variant="outline"

@@ -48,6 +48,7 @@ import GenealogyTree from "@/components/GenealogyTree";
 import { AutoshipManager } from "@/components/AutoshipManager";
 import { PayoutManager } from "@/components/PayoutManager";
 import { RankHistory } from "@/components/RankHistory";
+import DistributorRewards from "@/components/DistributorRewards";
 
 export default function DistributorPortal() {
   const [, setLocation] = useLocation();
@@ -160,6 +161,7 @@ export default function DistributorPortal() {
             { id: "marketing", icon: Share2, label: "Marketing" },
             { id: "training", icon: BookOpen, label: "Training" },
             { id: "autoship", icon: Repeat, label: "Auto-Ship" },
+            { id: "rewards", icon: Gift, label: "3-for-Free" },
             { id: "settings", icon: Settings, label: "Settings" },
           ].map((item) => (
             <button
@@ -214,6 +216,7 @@ export default function DistributorPortal() {
                 {activeTab === "marketing" && "Marketing Tools"}
                 {activeTab === "training" && "Training Center"}
                 {activeTab === "autoship" && "Auto-Ship Management"}
+                {activeTab === "rewards" && "3-for-Free Rewards"}
                 {activeTab === "settings" && "Settings"}
               </h2>
               <p className="text-gray-500 text-sm">Welcome back, {user?.name?.split(' ')[0] || 'Distributor'}!</p>
@@ -692,6 +695,17 @@ export default function DistributorPortal() {
               className="space-y-6"
             >
               <RankHistory />
+            </motion.div>
+          )}
+
+          {/* 3-for-Free Rewards Tab */}
+          {activeTab === "rewards" && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-6"
+            >
+              <DistributorRewards distributorId={user?.id || 0} />
             </motion.div>
           )}
 

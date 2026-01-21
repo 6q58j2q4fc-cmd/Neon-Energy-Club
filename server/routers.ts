@@ -1012,6 +1012,53 @@ export const appRouter = router({
       await markAllNotificationsRead(ctx.user.id);
       return { success: true };
     }),
+
+    // Get monthly reward points
+    getMonthlyRewardPoints: protectedProcedure
+      .input(z.object({ distributorId: z.number() }))
+      .query(async ({ input }) => {
+        const { getDistributorMonthlyPoints } = await import("./db");
+        const total = await getDistributorMonthlyPoints(input.distributorId);
+        return { total };
+      }),
+
+    // Get reward points history
+    getRewardPointsHistory: protectedProcedure
+      .input(z.object({ distributorId: z.number() }))
+      .query(async ({ input }) => {
+        const { getDistributorRewardPointsHistory } = await import("./db");
+        return getDistributorRewardPointsHistory(input.distributorId);
+      }),
+
+    // Get free rewards earned
+    getFreeRewards: protectedProcedure
+      .input(z.object({ distributorId: z.number() }))
+      .query(async ({ input }) => {
+        const { getDistributorFreeRewards } = await import("./db");
+        return getDistributorFreeRewards(input.distributorId);
+      }),
+
+    // Award reward point (called when autoship is enrolled)
+    awardRewardPoint: protectedProcedure
+      .input(z.object({
+        distributorId: z.number(),
+        source: z.enum(["customer_autoship", "distributor_autoship"]),
+        description: z.string(),
+        relatedId: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { awardDistributorRewardPoints, checkAndAwardDistributorFreeCase } = await import("./db");
+        await awardDistributorRewardPoints(
+          input.distributorId,
+          1, // 1 point per autoship
+          input.source,
+          input.description,
+          input.relatedId
+        );
+        // Check if they qualify for a free case
+        const earnedFreeCase = await checkAndAwardDistributorFreeCase(input.distributorId);
+        return { success: true, earnedFreeCase };
+      }),
   }),
 
   blog: router({
@@ -2160,6 +2207,84 @@ Always be helpful, enthusiastic, and guide users toward making a purchase or inv
           console.error("[Chat] LLM error:", error);
           return { message: "I'm having trouble connecting right now. Please try again or contact us directly at support@neonenergy.com" };
         }
+      }),
+  }),
+
+  // Customer referral and rewards router
+  customer: router({
+    // Generate referral code
+    generateReferralCode: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { generateCustomerReferralCode } = await import("./db");
+        const code = await generateCustomerReferralCode(ctx.user.id);
+        return { code };
+      }),
+
+    // Get referral stats
+    getReferralStats: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getCustomerReferralStats } = await import("./db");
+        return getCustomerReferralStats(ctx.user.id);
+      }),
+
+    // Get rewards
+    getRewards: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getCustomerRewards } = await import("./db");
+        return getCustomerRewards(ctx.user.id);
+      }),
+
+    // Record a referral (when someone uses a referral code)
+    recordReferral: publicProcedure
+      .input(z.object({
+        referralCode: z.string(),
+        referredUserId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        const { recordCustomerReferral, getCustomerReferralCode } = await import("./db");
+        const db = await import("./db").then(m => m.getDb());
+        if (!db) return { success: false };
+        
+        // Find the referrer by code
+        const { customerReferralCodes } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        const codeResult = await db.select()
+          .from(customerReferralCodes)
+          .where(eq(customerReferralCodes.code, input.referralCode))
+          .limit(1);
+        
+        if (!codeResult[0]) return { success: false };
+        
+        await recordCustomerReferral(
+          codeResult[0].userId,
+          input.referredUserId,
+          input.referralCode
+        );
+        return { success: true };
+      }),
+
+    // Complete a referral (when referred user makes a purchase)
+    completeReferral: protectedProcedure
+      .input(z.object({
+        orderId: z.number(),
+        purchaseAmount: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { completeCustomerReferral } = await import("./db");
+        await completeCustomerReferral(ctx.user.id, input.orderId, input.purchaseAmount);
+        return { success: true };
+      }),
+
+    // Redeem a reward
+    redeemReward: protectedProcedure
+      .input(z.object({
+        rewardId: z.number(),
+        orderId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        const { redeemCustomerReward } = await import("./db");
+        const success = await redeemCustomerReward(input.rewardId, input.orderId);
+        return { success };
       }),
   }),
 

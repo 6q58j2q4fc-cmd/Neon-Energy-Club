@@ -1680,3 +1680,37 @@
 - [x] Display timeline of rank achievements
 - [x] Show dates achieved for each milestone
 - [x] Add progress indicator to next rank
+
+
+## Video Player, Login Buttons & 3-for-Free Programs (Jan 21)
+
+### Compensation Plan Button Fix
+- [x] Find and fix broken compensation plan button on main page (was already working)
+- [x] Ensure button navigates to compensation plan page correctly
+
+### Video Player Enhancement
+- [x] Add volume control to main page video (VideoPlayer.tsx)
+- [x] Enable video sound playback
+- [x] Create video cycling/playlist feature (5 videos)
+- [x] Add multiple NEON ads and featured video clips
+- [x] Add video navigation controls (next/prev)
+
+### Customer & Distributor Login Buttons
+- [x] Add separate "Customer Login" button to header
+- [x] Add separate "Distributor Login" button to header
+- [x] Create customer portal for referral tracking (CustomerPortal.tsx)
+- [x] Ensure distributors access commission and rank tracking
+
+### 3-for-Free Customer Referral Program
+- [x] Create database schema for customer referral tracking
+- [x] Implement 3 referral = 1 free case reward system
+- [x] Add referral tracking UI for customers
+- [x] Create referral link generation for customers
+- [x] Track and display referral progress
+
+### 3-for-Free Distributor Autoship Program
+- [x] Create NEON Reward Points system
+- [x] Implement sell 3 autoships = earn points for free case
+- [x] Add reward points tracking to distributor portal (DistributorRewards.tsx)
+- [x] Display monthly autoship sales count
+- [x] Create reward redemption system
