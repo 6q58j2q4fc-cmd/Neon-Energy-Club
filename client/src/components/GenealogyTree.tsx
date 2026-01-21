@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Users, TrendingUp, Award, ZoomIn, ZoomOut, Maximize2, ChevronDown, ChevronRight, DollarSign, Activity, Target } from "lucide-react";
+import { Users, TrendingUp, Award, ZoomIn, ZoomOut, Maximize2, ChevronDown, ChevronRight, DollarSign, Activity, Target, Star } from "lucide-react";
+import { RankBadge, RankIcon, RankProgress, RANK_CONFIG } from "@/components/RankBadge";
 import { trpc } from "@/lib/trpc";
 
 interface TreeNode {
@@ -107,15 +108,9 @@ function TreeNodeCard({
             <div className="text-xs text-gray-400">{node.distributorCode.substring(0, 8)}</div>
           </div>
           
-          {/* Rank Badge */}
+          {/* Rank Badge with Icon */}
           <div className="flex justify-center mt-1">
-            <Badge 
-              variant="outline" 
-              className="text-[10px] uppercase"
-              style={{ borderColor: colors.border, color: colors.text }}
-            >
-              {node.rank}
-            </Badge>
+            <RankBadge rank={node.rank} size="sm" showTooltip={true} />
           </div>
           
           {/* Stats */}
@@ -511,16 +506,13 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true }: 
               </div>
             )}
             
-            {/* Legend */}
+            {/* Legend with Rank Icons */}
             <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm border border-[#c8ff00]/30 rounded-lg p-3 space-y-1">
-              <div className="text-xs font-bold text-[#c8ff00] mb-2">RANKS</div>
-              {Object.entries(RANK_COLORS).slice(0, 6).map(([rank, colors]) => (
+              <div className="text-xs font-bold text-[#c8ff00] mb-2">RANK BADGES</div>
+              {Object.entries(RANK_CONFIG).slice(0, 6).map(([rank, config]) => (
                 <div key={rank} className="flex items-center gap-2 text-xs">
-                  <div
-                    className="w-3 h-3 rounded-full border"
-                    style={{ backgroundColor: colors.bg, borderColor: colors.border }}
-                  />
-                  <span className="text-gray-300 capitalize">{rank}</span>
+                  <span className="text-sm">{config.icon}</span>
+                  <span className="text-gray-300" style={{ color: config.color }}>{config.name}</span>
                 </div>
               ))}
               <div className="border-t border-[#c8ff00]/20 pt-2 mt-2 space-y-1">
@@ -543,16 +535,11 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true }: 
         <Card className="bg-gradient-to-br from-[#c8ff00]/10 to-[#0a0a0a] border-[#c8ff00]">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>Distributor Details</span>
-              <Badge 
-                style={{ 
-                  backgroundColor: RANK_COLORS[selectedNode.rank]?.bg,
-                  borderColor: RANK_COLORS[selectedNode.rank]?.border,
-                  color: RANK_COLORS[selectedNode.rank]?.text,
-                }}
-              >
-                {selectedNode.rank.toUpperCase()}
-              </Badge>
+              <span className="flex items-center gap-2">
+                <RankIcon rank={selectedNode.rank} size="md" showTooltip={false} />
+                Distributor Details
+              </span>
+              <RankBadge rank={selectedNode.rank} size="lg" showTooltip={true} />
             </CardTitle>
           </CardHeader>
           <CardContent>
