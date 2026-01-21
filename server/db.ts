@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost } from "../drizzle/schema";
+import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -2278,4 +2278,513 @@ export async function updateDistributorStatus(
     .where(eq(distributors.id, distributorId));
   
   return { success: true };
+}
+
+
+// ============================================
+// AUTOSHIP FUNCTIONS
+// ============================================
+
+/**
+ * Create a new autoship for a distributor
+ */
+export async function createAutoship(data: InsertDistributorAutoship) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(distributorAutoships).values(data);
+  return { id: result[0].insertId };
+}
+
+/**
+ * Get autoship by ID
+ */
+export async function getAutoshipById(autoshipId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(distributorAutoships)
+    .where(eq(distributorAutoships.id, autoshipId))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Get autoship with items
+ */
+export async function getAutoshipWithItems(autoshipId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const autoship = await getAutoshipById(autoshipId);
+  if (!autoship) return null;
+  
+  const items = await db.select().from(autoshipItems)
+    .where(eq(autoshipItems.autoshipId, autoshipId));
+  
+  return { ...autoship, items };
+}
+
+/**
+ * Get distributor's autoships
+ */
+export async function getDistributorAutoships(distributorId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const autoships = await db.select().from(distributorAutoships)
+    .where(eq(distributorAutoships.distributorId, distributorId))
+    .orderBy(desc(distributorAutoships.createdAt));
+  
+  // Get items for each autoship
+  const result = await Promise.all(autoships.map(async (autoship) => {
+    const items = await db.select().from(autoshipItems)
+      .where(eq(autoshipItems.autoshipId, autoship.id));
+    return { ...autoship, items };
+  }));
+  
+  return result;
+}
+
+/**
+ * Update autoship
+ */
+export async function updateAutoship(
+  autoshipId: number,
+  data: Partial<InsertDistributorAutoship>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(distributorAutoships)
+    .set(data)
+    .where(eq(distributorAutoships.id, autoshipId));
+  
+  return { success: true };
+}
+
+/**
+ * Add item to autoship
+ */
+export async function addAutoshipItem(data: InsertAutoshipItem) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(autoshipItems).values(data);
+  
+  // Recalculate autoship totals
+  await recalculateAutoshipTotals(data.autoshipId);
+  
+  return { id: result[0].insertId };
+}
+
+/**
+ * Remove item from autoship
+ */
+export async function removeAutoshipItem(itemId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get the item first to know which autoship to update
+  const item = await db.select().from(autoshipItems)
+    .where(eq(autoshipItems.id, itemId))
+    .limit(1);
+  
+  if (!item[0]) throw new Error("Item not found");
+  
+  await db.delete(autoshipItems).where(eq(autoshipItems.id, itemId));
+  
+  // Recalculate autoship totals
+  await recalculateAutoshipTotals(item[0].autoshipId);
+  
+  return { success: true };
+}
+
+/**
+ * Update autoship item quantity
+ */
+export async function updateAutoshipItemQuantity(itemId: number, quantity: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const item = await db.select().from(autoshipItems)
+    .where(eq(autoshipItems.id, itemId))
+    .limit(1);
+  
+  if (!item[0]) throw new Error("Item not found");
+  
+  await db.update(autoshipItems)
+    .set({ quantity })
+    .where(eq(autoshipItems.id, itemId));
+  
+  // Recalculate autoship totals
+  await recalculateAutoshipTotals(item[0].autoshipId);
+  
+  return { success: true };
+}
+
+/**
+ * Recalculate autoship totals
+ */
+async function recalculateAutoshipTotals(autoshipId: number) {
+  const db = await getDb();
+  if (!db) return;
+  
+  const items = await db.select().from(autoshipItems)
+    .where(eq(autoshipItems.autoshipId, autoshipId));
+  
+  let totalPV = 0;
+  let totalPrice = 0;
+  
+  for (const item of items) {
+    totalPV += item.pvPerUnit * item.quantity;
+    totalPrice += item.pricePerUnit * item.quantity;
+  }
+  
+  await db.update(distributorAutoships)
+    .set({ totalPV, totalPrice })
+    .where(eq(distributorAutoships.id, autoshipId));
+}
+
+/**
+ * Get autoships due for processing
+ */
+export async function getAutoshipsDueForProcessing(processDay: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(distributorAutoships)
+    .where(and(
+      eq(distributorAutoships.status, "active"),
+      eq(distributorAutoships.processDay, processDay)
+    ));
+}
+
+/**
+ * Create autoship order
+ */
+export async function createAutoshipOrder(data: InsertAutoshipOrder) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(autoshipOrders).values(data);
+  return { id: result[0].insertId };
+}
+
+/**
+ * Get autoship order history
+ */
+export async function getAutoshipOrderHistory(autoshipId: number, limit: number = 12) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(autoshipOrders)
+    .where(eq(autoshipOrders.autoshipId, autoshipId))
+    .orderBy(desc(autoshipOrders.createdAt))
+    .limit(limit);
+}
+
+/**
+ * Update autoship order status
+ */
+export async function updateAutoshipOrderStatus(
+  orderId: number,
+  status: "pending" | "processing" | "completed" | "failed" | "refunded",
+  additionalData?: Partial<InsertAutoshipOrder>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(autoshipOrders)
+    .set({ status, ...additionalData })
+    .where(eq(autoshipOrders.id, orderId));
+  
+  return { success: true };
+}
+
+// ============================================
+// PAYOUT FUNCTIONS
+// ============================================
+
+/**
+ * Get or create payout settings for a distributor
+ */
+export async function getPayoutSettings(distributorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const existing = await db.select().from(payoutSettings)
+    .where(eq(payoutSettings.distributorId, distributorId))
+    .limit(1);
+  
+  if (existing[0]) return existing[0];
+  
+  // Create default settings
+  await db.insert(payoutSettings).values({ distributorId });
+  
+  const created = await db.select().from(payoutSettings)
+    .where(eq(payoutSettings.distributorId, distributorId))
+    .limit(1);
+  
+  return created[0];
+}
+
+/**
+ * Update payout settings
+ */
+export async function updatePayoutSettings(
+  distributorId: number,
+  data: Partial<InsertPayoutSetting>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(payoutSettings)
+    .set(data)
+    .where(eq(payoutSettings.distributorId, distributorId));
+  
+  return { success: true };
+}
+
+/**
+ * Create payout request
+ */
+export async function createPayoutRequest(data: InsertPayoutRequest) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(payoutRequests).values(data);
+  return { id: result[0].insertId };
+}
+
+/**
+ * Get payout request by ID
+ */
+export async function getPayoutRequestById(requestId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(payoutRequests)
+    .where(eq(payoutRequests.id, requestId))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Get distributor's payout requests
+ */
+export async function getDistributorPayoutRequests(distributorId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(payoutRequests)
+    .where(eq(payoutRequests.distributorId, distributorId))
+    .orderBy(desc(payoutRequests.createdAt))
+    .limit(limit);
+}
+
+/**
+ * Get pending payout requests (admin)
+ */
+export async function getPendingPayoutRequests() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select({
+    id: payoutRequests.id,
+    distributorId: payoutRequests.distributorId,
+    amount: payoutRequests.amount,
+    netAmount: payoutRequests.netAmount,
+    payoutMethod: payoutRequests.payoutMethod,
+    status: payoutRequests.status,
+    createdAt: payoutRequests.createdAt,
+    distributorCode: distributors.distributorCode,
+    distributorName: users.name,
+    distributorEmail: users.email,
+  })
+  .from(payoutRequests)
+  .leftJoin(distributors, eq(payoutRequests.distributorId, distributors.id))
+  .leftJoin(users, eq(distributors.userId, users.id))
+  .where(eq(payoutRequests.status, "pending"))
+  .orderBy(desc(payoutRequests.createdAt));
+}
+
+/**
+ * Update payout request status
+ */
+export async function updatePayoutRequestStatus(
+  requestId: number,
+  status: "pending" | "approved" | "processing" | "completed" | "failed" | "cancelled",
+  additionalData?: Partial<InsertPayoutRequest>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const updateData: any = { status, ...additionalData };
+  
+  // Set timestamp based on status
+  if (status === "approved") updateData.approvedAt = new Date();
+  if (status === "processing") updateData.processedAt = new Date();
+  if (status === "completed") updateData.completedAt = new Date();
+  
+  await db.update(payoutRequests)
+    .set(updateData)
+    .where(eq(payoutRequests.id, requestId));
+  
+  return { success: true };
+}
+
+/**
+ * Create payout history record
+ */
+export async function createPayoutHistoryRecord(data: InsertPayoutHistoryRecord) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(payoutHistory).values(data);
+  return { id: result[0].insertId };
+}
+
+/**
+ * Get distributor's payout history
+ */
+export async function getDistributorPayoutHistory(distributorId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(payoutHistory)
+    .where(eq(payoutHistory.distributorId, distributorId))
+    .orderBy(desc(payoutHistory.createdAt))
+    .limit(limit);
+}
+
+/**
+ * Get all payout requests (admin)
+ */
+export async function getAllPayoutRequests(options?: {
+  status?: string;
+  limit?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { status, limit = 100 } = options || {};
+  
+  let query = db.select({
+    id: payoutRequests.id,
+    distributorId: payoutRequests.distributorId,
+    amount: payoutRequests.amount,
+    processingFee: payoutRequests.processingFee,
+    netAmount: payoutRequests.netAmount,
+    payoutMethod: payoutRequests.payoutMethod,
+    status: payoutRequests.status,
+    stripeTransferId: payoutRequests.stripeTransferId,
+    paypalPayoutId: payoutRequests.paypalPayoutId,
+    checkNumber: payoutRequests.checkNumber,
+    approvedBy: payoutRequests.approvedBy,
+    approvedAt: payoutRequests.approvedAt,
+    processedAt: payoutRequests.processedAt,
+    completedAt: payoutRequests.completedAt,
+    failureReason: payoutRequests.failureReason,
+    notes: payoutRequests.notes,
+    createdAt: payoutRequests.createdAt,
+    distributorCode: distributors.distributorCode,
+    distributorName: users.name,
+    distributorEmail: users.email,
+  })
+  .from(payoutRequests)
+  .leftJoin(distributors, eq(payoutRequests.distributorId, distributors.id))
+  .leftJoin(users, eq(distributors.userId, users.id))
+  .orderBy(desc(payoutRequests.createdAt))
+  .limit(limit);
+  
+  if (status) {
+    return await db.select({
+      id: payoutRequests.id,
+      distributorId: payoutRequests.distributorId,
+      amount: payoutRequests.amount,
+      processingFee: payoutRequests.processingFee,
+      netAmount: payoutRequests.netAmount,
+      payoutMethod: payoutRequests.payoutMethod,
+      status: payoutRequests.status,
+      stripeTransferId: payoutRequests.stripeTransferId,
+      paypalPayoutId: payoutRequests.paypalPayoutId,
+      checkNumber: payoutRequests.checkNumber,
+      approvedBy: payoutRequests.approvedBy,
+      approvedAt: payoutRequests.approvedAt,
+      processedAt: payoutRequests.processedAt,
+      completedAt: payoutRequests.completedAt,
+      failureReason: payoutRequests.failureReason,
+      notes: payoutRequests.notes,
+      createdAt: payoutRequests.createdAt,
+      distributorCode: distributors.distributorCode,
+      distributorName: users.name,
+      distributorEmail: users.email,
+    })
+    .from(payoutRequests)
+    .leftJoin(distributors, eq(payoutRequests.distributorId, distributors.id))
+    .leftJoin(users, eq(distributors.userId, users.id))
+    .where(eq(payoutRequests.status, status as any))
+    .orderBy(desc(payoutRequests.createdAt))
+    .limit(limit);
+  }
+  
+  return await query;
+}
+
+/**
+ * Deduct from distributor available balance
+ */
+export async function deductDistributorBalance(distributorId: number, amount: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(distributors)
+    .set({
+      availableBalance: sql`${distributors.availableBalance} - ${amount}`,
+    })
+    .where(eq(distributors.id, distributorId));
+  
+  return { success: true };
+}
+
+/**
+ * Get payout statistics (admin)
+ */
+export async function getPayoutStatistics() {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const pending = await db.select({ 
+    count: sql<number>`COUNT(*)`,
+    total: sql<number>`COALESCE(SUM(amount), 0)`,
+  }).from(payoutRequests).where(eq(payoutRequests.status, "pending"));
+  
+  const approved = await db.select({ 
+    count: sql<number>`COUNT(*)`,
+    total: sql<number>`COALESCE(SUM(amount), 0)`,
+  }).from(payoutRequests).where(eq(payoutRequests.status, "approved"));
+  
+  const completed = await db.select({ 
+    count: sql<number>`COUNT(*)`,
+    total: sql<number>`COALESCE(SUM(amount), 0)`,
+  }).from(payoutRequests).where(eq(payoutRequests.status, "completed"));
+  
+  const thisMonth = await db.select({ 
+    count: sql<number>`COUNT(*)`,
+    total: sql<number>`COALESCE(SUM(amount), 0)`,
+  }).from(payoutRequests)
+  .where(and(
+    eq(payoutRequests.status, "completed"),
+    gt(payoutRequests.completedAt, sql`DATE_SUB(NOW(), INTERVAL 30 DAY)`)
+  ));
+  
+  return {
+    pending: { count: pending[0]?.count || 0, total: pending[0]?.total || 0 },
+    approved: { count: approved[0]?.count || 0, total: approved[0]?.total || 0 },
+    completed: { count: completed[0]?.count || 0, total: completed[0]?.total || 0 },
+    thisMonth: { count: thisMonth[0]?.count || 0, total: thisMonth[0]?.total || 0 },
+  };
 }

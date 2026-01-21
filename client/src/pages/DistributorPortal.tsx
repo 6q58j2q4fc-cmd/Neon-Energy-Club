@@ -45,6 +45,8 @@ import {
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import GenealogyTree from "@/components/GenealogyTree";
+import { AutoshipManager } from "@/components/AutoshipManager";
+import { PayoutManager } from "@/components/PayoutManager";
 
 export default function DistributorPortal() {
   const [, setLocation] = useLocation();
@@ -152,6 +154,7 @@ export default function DistributorPortal() {
             { id: "team", icon: Users, label: "My Team" },
             { id: "sales", icon: ShoppingCart, label: "Sales" },
             { id: "commissions", icon: DollarSign, label: "Commissions" },
+            { id: "payouts", icon: CreditCard, label: "Payouts" },
             { id: "marketing", icon: Share2, label: "Marketing" },
             { id: "training", icon: BookOpen, label: "Training" },
             { id: "autoship", icon: Repeat, label: "Auto-Ship" },
@@ -662,45 +665,18 @@ export default function DistributorPortal() {
               animate={{ opacity: 1, y: 0 }}
               className="space-y-6"
             >
-              <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
-                <CardHeader>
-                  <CardTitle>Your Auto-Ship Subscription</CardTitle>
-                  <CardDescription>Manage your monthly product delivery</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="p-6 bg-gradient-to-r from-[#c8ff00]/10 to-transparent rounded-xl border border-[#c8ff00]/30">
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <Badge className="bg-green-500/20 text-green-500 mb-2">Active</Badge>
-                        <h3 className="text-xl font-bold text-white">Pro Pack Monthly</h3>
-                        <p className="text-gray-400">300 PV • Ships monthly</p>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-3xl font-bold text-[#c8ff00]">$424.15</div>
-                        <div className="text-gray-500 text-sm line-through">$499.00</div>
-                        <Badge className="bg-[#c8ff00]/20 text-[#c8ff00]">15% OFF</Badge>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 text-sm text-gray-400 mb-6">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        Next shipment: Jan 20, 2026
-                      </div>
-                    </div>
-                    <div className="flex gap-3">
-                      <Button variant="outline" className="border-[#c8ff00]/30 text-[#c8ff00]">
-                        Skip Next Month
-                      </Button>
-                      <Button variant="outline" className="border-gray-700 text-gray-400">
-                        Pause Subscription
-                      </Button>
-                      <Button variant="outline" className="border-gray-700 text-gray-400">
-                        Change Products
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <AutoshipManager />
+            </motion.div>
+          )}
+
+          {/* Payouts Tab */}
+          {activeTab === "payouts" && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-6"
+            >
+              <PayoutManager />
             </motion.div>
           )}
 

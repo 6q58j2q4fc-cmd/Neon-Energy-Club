@@ -784,3 +784,223 @@ export const investorInquiries = mysqlTable("investor_inquiries", {
 export type InvestorInquiry = typeof investorInquiries.$inferSelect;
 export type InsertInvestorInquiry = typeof investorInquiries.$inferInsert;
 
+
+/**
+ * Distributor Autoship table for recurring monthly orders.
+ * Allows distributors to maintain their PV requirements automatically.
+ */
+export const distributorAutoships = mysqlTable("distributor_autoships", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Distributor ID */
+  distributorId: int("distributorId").notNull(),
+  /** User ID for shipping info */
+  userId: int("userId").notNull(),
+  /** Autoship name/description */
+  name: varchar("name", { length: 255 }).default("Monthly Autoship"),
+  /** Status of the autoship */
+  status: mysqlEnum("status", ["active", "paused", "cancelled"]).default("active").notNull(),
+  /** Day of month to process (1-28) */
+  processDay: int("processDay").default(1).notNull(),
+  /** Total PV for this autoship */
+  totalPV: int("totalPV").default(0).notNull(),
+  /** Total price in cents */
+  totalPrice: int("totalPrice").default(0).notNull(),
+  /** Payment method ID (Stripe) */
+  paymentMethodId: varchar("paymentMethodId", { length: 255 }),
+  /** Stripe customer ID */
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  /** Shipping address line 1 */
+  shippingAddress1: text("shippingAddress1"),
+  /** Shipping address line 2 */
+  shippingAddress2: text("shippingAddress2"),
+  /** Shipping city */
+  shippingCity: varchar("shippingCity", { length: 100 }),
+  /** Shipping state */
+  shippingState: varchar("shippingState", { length: 100 }),
+  /** Shipping postal code */
+  shippingPostalCode: varchar("shippingPostalCode", { length: 20 }),
+  /** Shipping country */
+  shippingCountry: varchar("shippingCountry", { length: 100 }).default("USA"),
+  /** Next processing date */
+  nextProcessDate: timestamp("nextProcessDate"),
+  /** Last processed date */
+  lastProcessedDate: timestamp("lastProcessedDate"),
+  /** Number of successful orders */
+  successfulOrders: int("successfulOrders").default(0),
+  /** Number of failed attempts */
+  failedAttempts: int("failedAttempts").default(0),
+  /** Last failure reason */
+  lastFailureReason: text("lastFailureReason"),
+  /** Email reminder sent for upcoming autoship */
+  reminderSent: int("reminderSent").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DistributorAutoship = typeof distributorAutoships.$inferSelect;
+export type InsertDistributorAutoship = typeof distributorAutoships.$inferInsert;
+
+/**
+ * Autoship items table for products in each autoship.
+ */
+export const autoshipItems = mysqlTable("autoship_items", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Autoship ID */
+  autoshipId: int("autoshipId").notNull(),
+  /** Product SKU */
+  productSku: varchar("productSku", { length: 100 }).notNull(),
+  /** Product name */
+  productName: varchar("productName", { length: 255 }).notNull(),
+  /** Quantity */
+  quantity: int("quantity").default(1).notNull(),
+  /** PV per unit */
+  pvPerUnit: int("pvPerUnit").default(0).notNull(),
+  /** Price per unit in cents */
+  pricePerUnit: int("pricePerUnit").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AutoshipItem = typeof autoshipItems.$inferSelect;
+export type InsertAutoshipItem = typeof autoshipItems.$inferInsert;
+
+/**
+ * Autoship order history table.
+ */
+export const autoshipOrders = mysqlTable("autoship_orders", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Autoship ID */
+  autoshipId: int("autoshipId").notNull(),
+  /** Distributor ID */
+  distributorId: int("distributorId").notNull(),
+  /** Order status */
+  status: mysqlEnum("status", ["pending", "processing", "completed", "failed", "refunded"]).default("pending").notNull(),
+  /** Total PV credited */
+  totalPV: int("totalPV").default(0).notNull(),
+  /** Total amount in cents */
+  totalAmount: int("totalAmount").default(0).notNull(),
+  /** Stripe payment intent ID */
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
+  /** Tracking number */
+  trackingNumber: varchar("trackingNumber", { length: 100 }),
+  /** Carrier */
+  carrier: varchar("carrier", { length: 50 }),
+  /** Failure reason if failed */
+  failureReason: text("failureReason"),
+  /** Processing date */
+  processedAt: timestamp("processedAt"),
+  /** Shipped date */
+  shippedAt: timestamp("shippedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AutoshipOrder = typeof autoshipOrders.$inferSelect;
+export type InsertAutoshipOrder = typeof autoshipOrders.$inferInsert;
+
+/**
+ * Payout settings table for distributor payout preferences.
+ */
+export const payoutSettings = mysqlTable("payout_settings", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Distributor ID */
+  distributorId: int("distributorId").notNull().unique(),
+  /** Preferred payout method */
+  payoutMethod: mysqlEnum("payoutMethod", ["stripe_connect", "paypal", "bank_transfer", "check"]).default("stripe_connect").notNull(),
+  /** Stripe Connect account ID */
+  stripeConnectAccountId: varchar("stripeConnectAccountId", { length: 255 }),
+  /** Stripe Connect onboarding status */
+  stripeConnectStatus: mysqlEnum("stripeConnectStatus", ["pending", "onboarding", "active", "restricted", "disabled"]).default("pending"),
+  /** PayPal email */
+  paypalEmail: varchar("paypalEmail", { length: 320 }),
+  /** Bank account holder name */
+  bankAccountName: varchar("bankAccountName", { length: 255 }),
+  /** Bank routing number (encrypted) */
+  bankRoutingNumber: varchar("bankRoutingNumber", { length: 255 }),
+  /** Bank account number (last 4 only) */
+  bankAccountLast4: varchar("bankAccountLast4", { length: 4 }),
+  /** Bank account type */
+  bankAccountType: mysqlEnum("bankAccountType", ["checking", "savings"]).default("checking"),
+  /** Mailing address for checks */
+  checkMailingAddress: text("checkMailingAddress"),
+  /** Minimum payout threshold in cents (default $50) */
+  minimumPayout: int("minimumPayout").default(5000).notNull(),
+  /** Payout frequency */
+  payoutFrequency: mysqlEnum("payoutFrequency", ["weekly", "biweekly", "monthly"]).default("weekly").notNull(),
+  /** Tax form submitted (W-9 for US) */
+  taxFormSubmitted: int("taxFormSubmitted").default(0),
+  /** Tax ID (SSN last 4 or EIN) */
+  taxIdLast4: varchar("taxIdLast4", { length: 4 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PayoutSetting = typeof payoutSettings.$inferSelect;
+export type InsertPayoutSetting = typeof payoutSettings.$inferInsert;
+
+/**
+ * Payout requests table for tracking commission payouts.
+ */
+export const payoutRequests = mysqlTable("payout_requests", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Distributor ID */
+  distributorId: int("distributorId").notNull(),
+  /** Request amount in cents */
+  amount: int("amount").notNull(),
+  /** Processing fee in cents */
+  processingFee: int("processingFee").default(0),
+  /** Net amount after fees */
+  netAmount: int("netAmount").notNull(),
+  /** Payout method used */
+  payoutMethod: mysqlEnum("payoutMethod", ["stripe_connect", "paypal", "bank_transfer", "check"]).notNull(),
+  /** Request status */
+  status: mysqlEnum("status", ["pending", "approved", "processing", "completed", "failed", "cancelled"]).default("pending").notNull(),
+  /** Stripe transfer ID */
+  stripeTransferId: varchar("stripeTransferId", { length: 255 }),
+  /** PayPal payout batch ID */
+  paypalPayoutId: varchar("paypalPayoutId", { length: 255 }),
+  /** Check number if paid by check */
+  checkNumber: varchar("checkNumber", { length: 50 }),
+  /** Admin who approved */
+  approvedBy: int("approvedBy"),
+  /** Approval date */
+  approvedAt: timestamp("approvedAt"),
+  /** Processing date */
+  processedAt: timestamp("processedAt"),
+  /** Completion date */
+  completedAt: timestamp("completedAt"),
+  /** Failure reason */
+  failureReason: text("failureReason"),
+  /** Notes */
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PayoutRequest = typeof payoutRequests.$inferSelect;
+export type InsertPayoutRequest = typeof payoutRequests.$inferInsert;
+
+/**
+ * Payout history table for completed payouts.
+ */
+export const payoutHistory = mysqlTable("payout_history", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Payout request ID */
+  payoutRequestId: int("payoutRequestId").notNull(),
+  /** Distributor ID */
+  distributorId: int("distributorId").notNull(),
+  /** Amount paid in cents */
+  amount: int("amount").notNull(),
+  /** Payout method */
+  payoutMethod: varchar("payoutMethod", { length: 50 }).notNull(),
+  /** Transaction reference */
+  transactionRef: varchar("transactionRef", { length: 255 }),
+  /** Period start date */
+  periodStart: timestamp("periodStart"),
+  /** Period end date */
+  periodEnd: timestamp("periodEnd"),
+  /** Commissions included (JSON array of commission IDs) */
+  commissionsIncluded: text("commissionsIncluded"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PayoutHistoryRecord = typeof payoutHistory.$inferSelect;
+export type InsertPayoutHistoryRecord = typeof payoutHistory.$inferInsert;

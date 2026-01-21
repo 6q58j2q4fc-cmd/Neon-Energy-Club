@@ -1611,3 +1611,34 @@
 - [x] Create distributor portal with all MLM features (DistributorPortal.tsx)
 - [x] Add training resources and marketing materials (existing)
 - [x] Write vitest tests for all new features (distributor-mlm.test.ts - 12 tests)
+
+
+## Autoship & Commission Payout System (Jan 21)
+
+### Autoship Management System
+- [x] Create autoship database table (products, schedule, status, next_run)
+- [x] Add autoship_items table for products in each autoship
+- [x] Create autoship router with CRUD operations
+- [x] Implement autoship processing job for scheduled orders
+- [x] Add PV calculation for autoship orders
+- [x] Create autoship UI in distributor portal (AutoshipManager.tsx)
+- [x] Add product selection with quantity controls
+- [x] Implement shipping date selection (1st-28th of month)
+- [x] Add payment method management for autoship
+- [x] Show autoship history and upcoming orders
+- [x] Add pause/resume/cancel autoship functionality
+- [x] Send reminder emails before autoship processing
+
+### Commission Payout System
+- [x] Create payout_requests table (amount, status, method, processed_at)
+- [x] Create payout_settings table for distributor payout preferences
+- [x] Add minimum payout threshold configuration ($10-$250 options)
+- [x] Create payout request endpoint for distributors
+- [x] Implement admin payout approval workflow
+- [x] Add Stripe Connect integration structure
+- [x] Add PayPal Payouts integration structure
+- [x] Create payout history UI for distributors (PayoutManager.tsx)
+- [x] Build admin payout management dashboard (AdminDashboard Payouts tab)
+- [x] Add weekly/monthly automatic payout scheduling
+- [x] Implement payout notifications (pending, approved, paid)
+- [x] Write vitest tests for autoship and payout features (25 tests)

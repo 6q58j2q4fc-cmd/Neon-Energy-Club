@@ -77,6 +77,10 @@ export default function AdminDashboard() {
     enabled: !!user && user.role === "admin",
   });
 
+  const { data: allPayoutRequests, isLoading: payoutsLoading } = trpc.distributor.adminGetPayoutRequests.useQuery(undefined, {
+    enabled: !!user && user.role === "admin",
+  });
+
   // Mutations
   const updateOrderStatus = trpc.preorder.updateStatus.useMutation({
     onSuccess: () => {
@@ -106,6 +110,14 @@ export default function AdminDashboard() {
     onSuccess: () => {
       toast.success("Blog post deleted");
       utils.blog.list.invalidate();
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
+  const processPayoutMutation = trpc.distributor.adminProcessPayout.useMutation({
+    onSuccess: () => {
+      toast.success("Payout processed successfully");
+      utils.distributor.adminGetPayoutRequests.invalidate();
     },
     onError: (error) => toast.error(error.message),
   });
@@ -218,6 +230,7 @@ export default function AdminDashboard() {
             { id: "blog", icon: FileText, label: "Blog Posts" },
             { id: "nfts", icon: Gem, label: "NFTs" },
             { id: "investors", icon: Building2, label: "Investors" },
+            { id: "payouts", icon: DollarSign, label: "Payouts" },
             { id: "crm", icon: Link2, label: "CRM Integration" },
             { id: "settings", icon: Settings, label: "Settings" },
           ].map((item) => (
@@ -822,6 +835,166 @@ export default function AdminDashboard() {
                                 <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
                                   <Eye className="w-4 h-4" />
                                 </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Payouts Tab */}
+          {activeTab === "payouts" && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                  <Input
+                    placeholder="Search payouts..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 bg-black border-[#c8ff00]/30 w-64"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-40 bg-black border-[#c8ff00]/30">
+                      <SelectValue placeholder="Filter status" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-black border-[#c8ff00]/30">
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="approved">Approved</SelectItem>
+                      <SelectItem value="processing">Processing</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="failed">Failed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={() => exportToCSV(allPayoutRequests || [], "payout_requests")} className="bg-[#c8ff00] text-black hover:bg-[#a8d600]">
+                    <Download className="w-4 h-4 mr-2" />
+                    Export CSV
+                  </Button>
+                </div>
+              </div>
+
+              {/* Payout Stats */}
+              <div className="grid md:grid-cols-4 gap-4">
+                <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
+                  <CardContent className="p-4 text-center">
+                    <div className="text-3xl font-bold text-yellow-500">
+                      {allPayoutRequests?.filter(p => p.status === "pending").length || 0}
+                    </div>
+                    <div className="text-gray-500">Pending</div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
+                  <CardContent className="p-4 text-center">
+                    <div className="text-3xl font-bold text-blue-500">
+                      {allPayoutRequests?.filter(p => p.status === "approved" || p.status === "processing").length || 0}
+                    </div>
+                    <div className="text-gray-500">Processing</div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
+                  <CardContent className="p-4 text-center">
+                    <div className="text-3xl font-bold text-[#c8ff00]">
+                      ${((allPayoutRequests?.filter(p => p.status === "pending" || p.status === "approved").reduce((sum, p) => sum + p.amount, 0) || 0) / 100).toLocaleString()}
+                    </div>
+                    <div className="text-gray-500">Pending Amount</div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
+                  <CardContent className="p-4 text-center">
+                    <div className="text-3xl font-bold text-green-500">
+                      ${((allPayoutRequests?.filter(p => p.status === "completed").reduce((sum, p) => sum + p.amount, 0) || 0) / 100).toLocaleString()}
+                    </div>
+                    <div className="text-gray-500">Total Paid</div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
+                <CardContent className="p-0">
+                  {payoutsLoading ? (
+                    <div className="flex justify-center py-12">
+                      <Loader2 className="w-8 h-8 animate-spin text-[#c8ff00]" />
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-[#c8ff00]/20">
+                          <TableHead className="text-[#c8ff00]">ID</TableHead>
+                          <TableHead className="text-[#c8ff00]">Distributor</TableHead>
+                          <TableHead className="text-[#c8ff00]">Amount</TableHead>
+                          <TableHead className="text-[#c8ff00]">Net Amount</TableHead>
+                          <TableHead className="text-[#c8ff00]">Method</TableHead>
+                          <TableHead className="text-[#c8ff00]">Status</TableHead>
+                          <TableHead className="text-[#c8ff00]">Requested</TableHead>
+                          <TableHead className="text-[#c8ff00]">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {allPayoutRequests
+                          ?.filter(p => statusFilter === "all" || p.status === statusFilter)
+                          ?.filter(p => searchQuery === "" || p.distributorId?.toString().includes(searchQuery))
+                          .map((payout) => (
+                            <TableRow key={payout.id} className="border-[#c8ff00]/10">
+                              <TableCell className="text-white">#{payout.id}</TableCell>
+                              <TableCell className="text-white">Distributor #{payout.distributorId}</TableCell>
+                              <TableCell className="text-white font-medium">${(payout.amount / 100).toFixed(2)}</TableCell>
+                              <TableCell className="text-[#c8ff00]">${(payout.netAmount / 100).toFixed(2)}</TableCell>
+                              <TableCell>
+                                <Badge className="bg-gray-500/20 text-gray-300">
+                                  {payout.payoutMethod?.replace("_", " ") || "N/A"}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <Badge className={
+                                  payout.status === "completed" ? "bg-green-500/20 text-green-500" :
+                                  payout.status === "pending" ? "bg-yellow-500/20 text-yellow-500" :
+                                  payout.status === "approved" ? "bg-blue-500/20 text-blue-500" :
+                                  payout.status === "processing" ? "bg-purple-500/20 text-purple-500" :
+                                  "bg-red-500/20 text-red-500"
+                                }>
+                                  {payout.status}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-gray-400">
+                                {new Date(payout.createdAt).toLocaleDateString()}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex gap-1">
+                                  {payout.status === "pending" && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="text-green-500 hover:text-green-400"
+                                      onClick={() => {
+                                        trpc.distributor.adminApprovePayout.useMutation().mutate({ requestId: payout.id });
+                                        toast.success("Payout approved");
+                                        utils.distributor.adminGetPayoutRequests.invalidate();
+                                      }}
+                                    >
+                                      <Check className="w-4 h-4" />
+                                    </Button>
+                                  )}
+                                  {payout.status === "approved" && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="text-blue-500 hover:text-blue-400"
+                                      onClick={() => processPayoutMutation.mutate({ requestId: payout.id })}
+                                    >
+                                      <RefreshCw className="w-4 h-4" />
+                                    </Button>
+                                  )}
+                                  <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                                    <Eye className="w-4 h-4" />
+                                  </Button>
+                                </div>
                               </TableCell>
                             </TableRow>
                           ))}

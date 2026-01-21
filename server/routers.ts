@@ -594,6 +594,342 @@ export const appRouter = router({
         const { updateDistributorStatus } = await import("./db");
         return await updateDistributorStatus(input.distributorId, input.status);
       }),
+
+    // ============================================
+    // AUTOSHIP ENDPOINTS
+    // ============================================
+
+    // Get distributor's autoships
+    getAutoships: protectedProcedure.query(async ({ ctx }) => {
+      const { getDistributorByUserId, getDistributorAutoships } = await import("./db");
+      const distributor = await getDistributorByUserId(ctx.user.id);
+      if (!distributor) throw new TRPCError({ code: "NOT_FOUND", message: "Distributor not found" });
+      return await getDistributorAutoships(distributor.id);
+    }),
+
+    // Create new autoship
+    createAutoship: protectedProcedure
+      .input(z.object({
+        name: z.string().optional(),
+        processDay: z.number().int().min(1).max(28),
+        shippingAddress1: z.string().min(1),
+        shippingAddress2: z.string().optional(),
+        shippingCity: z.string().min(1),
+        shippingState: z.string().min(1),
+        shippingPostalCode: z.string().min(1),
+        shippingCountry: z.string().default("USA"),
+        paymentMethodId: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { getDistributorByUserId, createAutoship } = await import("./db");
+        const distributor = await getDistributorByUserId(ctx.user.id);
+        if (!distributor) throw new TRPCError({ code: "NOT_FOUND", message: "Distributor not found" });
+
+        // Calculate next process date
+        const now = new Date();
+        let nextProcessDate = new Date(now.getFullYear(), now.getMonth(), input.processDay);
+        if (nextProcessDate <= now) {
+          nextProcessDate = new Date(now.getFullYear(), now.getMonth() + 1, input.processDay);
+        }
+
+        return await createAutoship({
+          distributorId: distributor.id,
+          userId: ctx.user.id,
+          name: input.name || "Monthly Autoship",
+          processDay: input.processDay,
+          shippingAddress1: input.shippingAddress1,
+          shippingAddress2: input.shippingAddress2 || null,
+          shippingCity: input.shippingCity,
+          shippingState: input.shippingState,
+          shippingPostalCode: input.shippingPostalCode,
+          shippingCountry: input.shippingCountry,
+          paymentMethodId: input.paymentMethodId || null,
+          nextProcessDate,
+        });
+      }),
+
+    // Update autoship
+    updateAutoship: protectedProcedure
+      .input(z.object({
+        autoshipId: z.number(),
+        name: z.string().optional(),
+        processDay: z.number().int().min(1).max(28).optional(),
+        status: z.enum(["active", "paused", "cancelled"]).optional(),
+        shippingAddress1: z.string().optional(),
+        shippingAddress2: z.string().optional(),
+        shippingCity: z.string().optional(),
+        shippingState: z.string().optional(),
+        shippingPostalCode: z.string().optional(),
+        shippingCountry: z.string().optional(),
+        paymentMethodId: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { getDistributorByUserId, getAutoshipById, updateAutoship } = await import("./db");
+        const distributor = await getDistributorByUserId(ctx.user.id);
+        if (!distributor) throw new TRPCError({ code: "NOT_FOUND", message: "Distributor not found" });
+
+        const autoship = await getAutoshipById(input.autoshipId);
+        if (!autoship || autoship.distributorId !== distributor.id) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Autoship not found" });
+        }
+
+        const { autoshipId, ...updateData } = input;
+        return await updateAutoship(autoshipId, updateData);
+      }),
+
+    // Add item to autoship
+    addAutoshipItem: protectedProcedure
+      .input(z.object({
+        autoshipId: z.number(),
+        productSku: z.string(),
+        productName: z.string(),
+        quantity: z.number().int().min(1),
+        pvPerUnit: z.number().int(),
+        pricePerUnit: z.number().int(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { getDistributorByUserId, getAutoshipById, addAutoshipItem } = await import("./db");
+        const distributor = await getDistributorByUserId(ctx.user.id);
+        if (!distributor) throw new TRPCError({ code: "NOT_FOUND", message: "Distributor not found" });
+
+        const autoship = await getAutoshipById(input.autoshipId);
+        if (!autoship || autoship.distributorId !== distributor.id) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Autoship not found" });
+        }
+
+        return await addAutoshipItem(input);
+      }),
+
+    // Remove item from autoship
+    removeAutoshipItem: protectedProcedure
+      .input(z.object({ itemId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { removeAutoshipItem } = await import("./db");
+        return await removeAutoshipItem(input.itemId);
+      }),
+
+    // Update autoship item quantity
+    updateAutoshipItemQuantity: protectedProcedure
+      .input(z.object({
+        itemId: z.number(),
+        quantity: z.number().int().min(1),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { updateAutoshipItemQuantity } = await import("./db");
+        return await updateAutoshipItemQuantity(input.itemId, input.quantity);
+      }),
+
+    // Get autoship order history
+    getAutoshipOrders: protectedProcedure
+      .input(z.object({ autoshipId: z.number(), limit: z.number().default(12) }))
+      .query(async ({ ctx, input }) => {
+        const { getDistributorByUserId, getAutoshipById, getAutoshipOrderHistory } = await import("./db");
+        const distributor = await getDistributorByUserId(ctx.user.id);
+        if (!distributor) throw new TRPCError({ code: "NOT_FOUND", message: "Distributor not found" });
+
+        const autoship = await getAutoshipById(input.autoshipId);
+        if (!autoship || autoship.distributorId !== distributor.id) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Autoship not found" });
+        }
+
+        return await getAutoshipOrderHistory(input.autoshipId, input.limit);
+      }),
+
+    // ============================================
+    // PAYOUT ENDPOINTS
+    // ============================================
+
+    // Get payout settings
+    getPayoutSettings: protectedProcedure.query(async ({ ctx }) => {
+      const { getDistributorByUserId, getPayoutSettings } = await import("./db");
+      const distributor = await getDistributorByUserId(ctx.user.id);
+      if (!distributor) throw new TRPCError({ code: "NOT_FOUND", message: "Distributor not found" });
+      return await getPayoutSettings(distributor.id);
+    }),
+
+    // Update payout settings
+    updatePayoutSettings: protectedProcedure
+      .input(z.object({
+        payoutMethod: z.enum(["stripe_connect", "paypal", "bank_transfer", "check"]).optional(),
+        paypalEmail: z.string().email().optional(),
+        minimumPayout: z.number().int().min(1000).optional(), // Min $10
+        payoutFrequency: z.enum(["weekly", "biweekly", "monthly"]).optional(),
+        checkMailingAddress: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { getDistributorByUserId, updatePayoutSettings } = await import("./db");
+        const distributor = await getDistributorByUserId(ctx.user.id);
+        if (!distributor) throw new TRPCError({ code: "NOT_FOUND", message: "Distributor not found" });
+        return await updatePayoutSettings(distributor.id, input);
+      }),
+
+    // Request payout
+    requestPayout: protectedProcedure
+      .input(z.object({
+        amount: z.number().int().min(1000), // Min $10
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { getDistributorByUserId, getPayoutSettings, createPayoutRequest } = await import("./db");
+        const distributor = await getDistributorByUserId(ctx.user.id);
+        if (!distributor) throw new TRPCError({ code: "NOT_FOUND", message: "Distributor not found" });
+
+        // Check available balance
+        if (distributor.availableBalance < input.amount) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Insufficient balance" });
+        }
+
+        // Get payout settings
+        const settings = await getPayoutSettings(distributor.id);
+        if (!settings) throw new TRPCError({ code: "NOT_FOUND", message: "Payout settings not found" });
+
+        // Check minimum payout
+        if (input.amount < settings.minimumPayout) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: `Minimum payout is $${(settings.minimumPayout / 100).toFixed(2)}` });
+        }
+
+        // Calculate processing fee (2.5% for Stripe/PayPal, 0 for check)
+        const feeRate = settings.payoutMethod === "check" ? 0 : 0.025;
+        const processingFee = Math.round(input.amount * feeRate);
+        const netAmount = input.amount - processingFee;
+
+        return await createPayoutRequest({
+          distributorId: distributor.id,
+          amount: input.amount,
+          processingFee,
+          netAmount,
+          payoutMethod: settings.payoutMethod,
+        });
+      }),
+
+    // Get payout requests
+    getPayoutRequests: protectedProcedure
+      .input(z.object({ limit: z.number().default(50) }).optional())
+      .query(async ({ ctx, input }) => {
+        const { getDistributorByUserId, getDistributorPayoutRequests } = await import("./db");
+        const distributor = await getDistributorByUserId(ctx.user.id);
+        if (!distributor) throw new TRPCError({ code: "NOT_FOUND", message: "Distributor not found" });
+        return await getDistributorPayoutRequests(distributor.id, input?.limit || 50);
+      }),
+
+    // Get payout history
+    getPayoutHistory: protectedProcedure
+      .input(z.object({ limit: z.number().default(50) }).optional())
+      .query(async ({ ctx, input }) => {
+        const { getDistributorByUserId, getDistributorPayoutHistory } = await import("./db");
+        const distributor = await getDistributorByUserId(ctx.user.id);
+        if (!distributor) throw new TRPCError({ code: "NOT_FOUND", message: "Distributor not found" });
+        return await getDistributorPayoutHistory(distributor.id, input?.limit || 50);
+      }),
+
+    // Admin: Get all payout requests
+    adminGetPayoutRequests: protectedProcedure
+      .input(z.object({
+        status: z.string().optional(),
+        limit: z.number().default(100),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { getAllPayoutRequests } = await import("./db");
+        return await getAllPayoutRequests(input);
+      }),
+
+    // Admin: Get payout statistics
+    adminGetPayoutStats: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+      const { getPayoutStatistics } = await import("./db");
+      return await getPayoutStatistics();
+    }),
+
+    // Admin: Approve payout request
+    adminApprovePayout: protectedProcedure
+      .input(z.object({
+        requestId: z.number(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { updatePayoutRequestStatus } = await import("./db");
+        return await updatePayoutRequestStatus(input.requestId, "approved", {
+          approvedBy: ctx.user.id,
+          notes: input.notes || null,
+        });
+      }),
+
+    // Admin: Process payout (mark as processing)
+    adminProcessPayout: protectedProcedure
+      .input(z.object({
+        requestId: z.number(),
+        stripeTransferId: z.string().optional(),
+        paypalPayoutId: z.string().optional(),
+        checkNumber: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { updatePayoutRequestStatus, getPayoutRequestById, deductDistributorBalance } = await import("./db");
+        
+        const request = await getPayoutRequestById(input.requestId);
+        if (!request) throw new TRPCError({ code: "NOT_FOUND", message: "Payout request not found" });
+        
+        // Deduct from distributor balance
+        await deductDistributorBalance(request.distributorId, request.amount);
+        
+        return await updatePayoutRequestStatus(input.requestId, "processing", {
+          stripeTransferId: input.stripeTransferId || null,
+          paypalPayoutId: input.paypalPayoutId || null,
+          checkNumber: input.checkNumber || null,
+        });
+      }),
+
+    // Admin: Complete payout
+    adminCompletePayout: protectedProcedure
+      .input(z.object({
+        requestId: z.number(),
+        transactionRef: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { updatePayoutRequestStatus, getPayoutRequestById, createPayoutHistoryRecord } = await import("./db");
+        
+        const request = await getPayoutRequestById(input.requestId);
+        if (!request) throw new TRPCError({ code: "NOT_FOUND", message: "Payout request not found" });
+        
+        // Create history record
+        await createPayoutHistoryRecord({
+          payoutRequestId: request.id,
+          distributorId: request.distributorId,
+          amount: request.netAmount,
+          payoutMethod: request.payoutMethod,
+          transactionRef: input.transactionRef || null,
+        });
+        
+        return await updatePayoutRequestStatus(input.requestId, "completed");
+      }),
+
+    // Admin: Reject/Cancel payout
+    adminRejectPayout: protectedProcedure
+      .input(z.object({
+        requestId: z.number(),
+        reason: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { updatePayoutRequestStatus } = await import("./db");
+        return await updatePayoutRequestStatus(input.requestId, "cancelled", {
+          failureReason: input.reason,
+        });
+      }),
   }),
 
   blog: router({
