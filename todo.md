@@ -1536,3 +1536,31 @@
 - [x] Link to territory tracking dashboard (/admin/territories)
 - [x] Style link subtly for admin access
 - [x] Test admin link navigation
+
+
+## Admin & Notification Enhancements (Jan 21)
+
+### Role-Based Access Control
+- [x] Add adminProcedure to routers for admin-only operations (already existed)
+- [x] Protect territory management endpoints with admin role check (already existed)
+- [x] Add admin role check to AdminTerritories page frontend (already existed)
+- [x] Show access denied message for non-admin users (already existed)
+
+### Territory Email Notifications
+- [x] Create email template for territory approval notification (already existed)
+- [x] Create email template for territory rejection notification (already existed)
+- [x] Integrate email sending into territory status update flow (added to updateApplicationStatus)
+- [x] Test email notifications for territory status changes
+
+### CSV Export Functionality
+- [x] Add export endpoint for territory applications (frontend-only CSV generation)
+- [x] Create CSV generation logic with all relevant fields (18 columns)
+- [x] Add Export button to AdminTerritories page
+- [x] Test CSV download functionality
+
+### Email Notification Fixes
+- [x] Disable test/fake email notifications (removed newsletter/referral notifications)
+- [x] Only send emails for real subscriber signups (disabled automatic notifications)
+- [x] Only send emails for real order confirmations (production mode only)
+- [x] Keep social proof popups working with simulated data (SocialProofNotifications unchanged)
+- [x] Separate popup display logic from email notification logic (already separate)

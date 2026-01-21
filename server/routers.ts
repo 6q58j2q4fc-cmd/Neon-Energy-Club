@@ -372,11 +372,9 @@ export const appRouter = router({
         const { subscribeNewsletter } = await import("./db");
         const subscription = await subscribeNewsletter(input);
         
-        // Notify admin of new newsletter subscription
-        await notifyOwner({
-          title: "New Newsletter Subscription",
-          content: `New subscriber: ${input.name} (${input.email}) has joined the NEON newsletter. Total subscribers growing!`,
-        });
+        // Note: Newsletter subscription notifications disabled to reduce noise
+        // Admin can view subscriber counts in the dashboard instead
+        // Only real orders and applications trigger email notifications
         
         return subscription;
       }),
@@ -393,16 +391,9 @@ export const appRouter = router({
         const { addNewsletterReferrals, getNewsletterSubscription } = await import("./db");
         await addNewsletterReferrals(input.subscriptionId, input.friendEmails);
         
-        // Get subscriber info for notification
-        const subscription = await getNewsletterSubscription(input.subscriptionId);
-        const subscriberName = subscription?.name || "A subscriber";
-        const subscriberEmail = subscription?.email || "unknown";
-        
-        // Notify admin of referrals
-        await notifyOwner({
-          title: "New Referrals Submitted",
-          content: `${subscriberName} (${subscriberEmail}) has referred ${input.friendEmails.length} friend(s) to NEON: ${input.friendEmails.join(", ")}. Viral growth in action!`,
-        });
+        // Note: Referral notifications disabled to reduce noise
+        // Admin can view referral counts in the dashboard instead
+        // Only real orders and applications trigger email notifications
         
         return { success: true };
       }),
@@ -989,9 +980,11 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
           adminNotes: input.adminNotes,
         });
         
+        // Get application details for email notification
+        const application = await getTerritoryApplication(input.applicationId);
+        
         // If approved, create claimed territory
         if (input.status === "approved") {
-          const application = await getTerritoryApplication(input.applicationId);
           if (application && application.centerLat && application.centerLng && application.radiusMiles) {
             await createClaimedTerritory({
               territoryLicenseId: input.applicationId,
@@ -1004,6 +997,28 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
               zipCode: application.zipCode,
               status: "active",
             });
+          }
+        }
+        
+        // Send email notification for approval/rejection
+        if (application?.email && application?.firstName && (input.status === "approved" || input.status === "rejected")) {
+          try {
+            const { sendTerritoryApprovalNotification } = await import("./emailNotifications");
+            const squareMiles = application.radiusMiles ? Math.PI * Math.pow(application.radiusMiles, 2) : 0;
+            const monthlyFee = application.totalCost ? Math.round(application.totalCost / (application.termMonths || 12)) : undefined;
+            
+            await sendTerritoryApprovalNotification({
+              applicantName: `${application.firstName} ${application.lastName || ""}`.trim(),
+              applicantEmail: application.email,
+              applicationId: input.applicationId,
+              territoryName: application.territoryName || "Your Territory",
+              squareMiles,
+              status: input.status as "approved" | "rejected",
+              rejectionReason: input.status === "rejected" ? input.adminNotes : undefined,
+              monthlyFee,
+            });
+          } catch (emailError) {
+            console.warn("[Territory] Failed to send status notification email:", emailError);
           }
         }
         

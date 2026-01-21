@@ -25,7 +25,8 @@ import {
   Target,
   Calendar,
   MessageSquare,
-  Send
+  Send,
+  Download
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -253,14 +254,70 @@ export default function AdminTerritories() {
                     Rejected
                   </Button>
                 </div>
-                <Button
-                  variant="outline"
-                  onClick={() => refetch()}
-                  className="border-[#c8ff00]/30 text-[#c8ff00]"
-                >
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Refresh
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      // Generate CSV content
+                      const headers = [
+                        "ID", "Territory Name", "First Name", "Last Name", "Email", "Phone",
+                        "Street Address", "City", "State", "Zip Code",
+                        "Business Name", "Business Type", "Total Cost", "Term (Months)",
+                        "Radius (Miles)", "Status", "Created At", "Admin Notes"
+                      ];
+                      const csvRows = [headers.join(",")];
+                      
+                      filteredApplications.forEach((app: any) => {
+                        const row = [
+                          app.id,
+                          `"${(app.territoryName || "").replace(/"/g, '""')}"`,
+                          `"${(app.firstName || "").replace(/"/g, '""')}"`,
+                          `"${(app.lastName || "").replace(/"/g, '""')}"`,
+                          `"${(app.email || "").replace(/"/g, '""')}"`,
+                          `"${(app.phone || "").replace(/"/g, '""')}"`,
+                          `"${(app.streetAddress || "").replace(/"/g, '""')}"`,
+                          `"${(app.city || "").replace(/"/g, '""')}"`,
+                          `"${(app.state || "").replace(/"/g, '""')}"`,
+                          `"${(app.zipCode || "").replace(/"/g, '""')}"`,
+                          `"${(app.businessName || "").replace(/"/g, '""')}"`,
+                          `"${(app.businessType || "").replace(/"/g, '""')}"`,
+                          app.totalCost || 0,
+                          app.termMonths || 0,
+                          app.radiusMiles || 0,
+                          `"${(app.status || "").replace(/"/g, '""')}"`,
+                          app.createdAt ? new Date(app.createdAt).toISOString() : "",
+                          `"${(app.adminNotes || "").replace(/"/g, '""')}"`
+                        ];
+                        csvRows.push(row.join(","));
+                      });
+                      
+                      const csvContent = csvRows.join("\n");
+                      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                      const url = URL.createObjectURL(blob);
+                      const link = document.createElement("a");
+                      link.href = url;
+                      link.download = `territory-applications-${new Date().toISOString().split("T")[0]}.csv`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      URL.revokeObjectURL(url);
+                      toast.success(`Exported ${filteredApplications.length} applications to CSV`);
+                    }}
+                    className="border-[#c8ff00]/30 text-[#c8ff00]"
+                    disabled={filteredApplications.length === 0}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Export CSV
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => refetch()}
+                    className="border-[#c8ff00]/30 text-[#c8ff00]"
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Refresh
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
