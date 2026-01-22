@@ -23,8 +23,12 @@ import {
   Zap,
   Target,
   Crown,
-  Sparkles
+  Sparkles,
+  Globe,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
+import ProfileEditor from "@/components/ProfileEditor";
 
 export default function CustomerPortal() {
   const { user, isAuthenticated } = useAuth();
@@ -437,6 +441,35 @@ export default function CustomerPortal() {
               </CardContent>
             </Card>
           </div>
+
+          {/* My Website Section */}
+          {referralData?.referralCode && (
+            <Card className="mt-8 bg-[#0d2818]/50 border-[#c8ff00]/20">
+              <CardHeader>
+                <div 
+                  className="flex items-center justify-between cursor-pointer"
+                  onClick={() => {
+                    const section = document.getElementById('profile-editor-section');
+                    if (section) {
+                      section.classList.toggle('hidden');
+                    }
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-[#c8ff00]" />
+                    <CardTitle className="text-white">Customize Your Referral Page</CardTitle>
+                  </div>
+                  <ChevronDown className="w-5 h-5 text-white/60" />
+                </div>
+                <CardDescription className="text-white/60">
+                  Personalize how your landing page looks when friends visit your referral link
+                </CardDescription>
+              </CardHeader>
+              <CardContent id="profile-editor-section" className="hidden">
+                <ProfileEditor userType="customer" />
+              </CardContent>
+            </Card>
+          )}
 
           {/* Become a Distributor CTA */}
           <Card className="mt-12 bg-gradient-to-r from-[#0d2818] via-[#1a3a2a] to-[#0d2818] border-[#00ffff]/30 overflow-hidden">

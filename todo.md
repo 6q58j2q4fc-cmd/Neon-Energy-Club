@@ -2021,3 +2021,90 @@
 - [x] Audit all buttons for proper functionality
 - [x] Fix duplicate useState import in VendingMachines.tsx
 - [x] Ensure all CTAs navigate correctly
+
+## Personalized Website Clones & Referral Link Customization (Jan 22)
+
+### Database Schema Updates
+- [ ] Add custom_referral_slug field to distributors table
+- [ ] Add custom_referral_slug field to customers table
+- [ ] Add profile_photo_url field for profile pictures
+- [ ] Add display_name field for custom display names
+- [ ] Add location field for user location
+- [ ] Create unique index on referral slugs to prevent duplicates
+
+### Referral Link Editing with Uniqueness Validation
+- [ ] Create API endpoint to check if referral slug is available
+- [ ] Create API endpoint to update custom referral slug
+- [ ] Validate slug format (alphanumeric, hyphens only)
+- [ ] Ensure no duplicate slugs across distributors AND customers
+- [ ] Return
+ helpful error messages for taken slugs
+
+### Profile Customization UI
+- [ ] Create profile photo upload component with S3 storage
+- [ ] Add display name editing field
+- [ ] Add location editing field
+- [ ] Create referral link customization section
+- [ ] Show real-time preview of personalized link
+- [ ] Add save/update functionality with validation feedback
+
+### Personalized Landing Page Clone System
+- [ ] Create dynamic route for personalized pages (neonenergyclub.com/[slug])
+- [ ] Display distributor/customer photo on their clone page
+- [ ] Show custom display name and location
+- [ ] Maintain all original site functionality on clone pages
+- [ ] Track referrals through personalized links
+
+### Automatic Publishing on Account Creation
+- [ ] Generate default referral slug on new distributor signup
+- [ ] Generate default referral slug on new customer signup
+- [ ] Auto-publish personalized page immediately
+- [ ] Send welcome email with personalized link details
+
+
+## Personalized Website Clone System (Jan 22)
+
+### Database & Backend
+- [x] Add userProfiles table for storing custom profile data
+- [x] Create generateUniqueSlug function for auto-generating slugs
+- [x] Implement checkSlugAvailability function with reserved slug protection
+- [x] Add createDistributorProfile and createCustomerProfile functions
+- [x] Implement updatePersonalizedProfile for editing display name, bio, location
+- [x] Add updateProfileSlug for custom URL changes
+- [x] Create getProfileBySlug for public profile retrieval
+- [x] Add page view and signup tracking functions
+- [x] Implement reserved slugs list (admin, api, shop, join, etc.)
+- [x] Write vitest tests for profile system
+
+### Profile Editor Component
+- [x] Create ProfileEditor component with photo upload
+- [x] Add display name and bio editing fields
+- [x] Implement location input field
+- [x] Add custom referral URL editor with real-time availability check
+- [x] Show preview of personalized landing page
+- [x] Add profile statistics display (page views, signups)
+- [x] Integrate with tRPC for saving profile updates
+
+### Distributor Portal Integration
+- [x] Add "My Website" tab to DistributorPortal sidebar
+- [x] Integrate ProfileEditor in My Website tab
+- [x] Show distributor-specific customization options
+
+### Customer Portal Integration
+- [x] Add collapsible "Customize Your Referral Page" section
+- [x] Integrate ProfileEditor for customers
+- [x] Show customer-specific customization options
+
+### Personalized Landing Page
+- [x] Create PersonalizedLanding page component
+- [x] Display distributor/customer photo and name
+- [x] Show custom bio and location
+- [x] Render full NEON landing page with personalized header
+- [x] Track page views when landing page is visited
+- [x] Add route for /:slug format URLs
+
+### Auto-Profile Creation
+- [x] Auto-create profile when new distributor signs up
+- [x] Auto-create profile when customer generates referral code
+- [x] Generate unique slug based on user name
+

@@ -1305,4 +1305,37 @@ export const pushSubscriptions = mysqlTable("push_subscriptions", {
 export type PushSubscription = typeof pushSubscriptions.$inferSelect;
 export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert;
 
+/**
+ * User profiles for personalized landing pages.
+ * Stores custom referral slugs, profile photos, display names, and locations.
+ * Used by both distributors and customers for their personalized website clones.
+ */
+export const userProfiles = mysqlTable("user_profiles", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User ID (foreign key to users table) */
+  userId: int("userId").notNull().unique(),
+  /** Custom referral slug for personalized URL (e.g., neonenergyclub.com/john-smith) */
+  customSlug: varchar("customSlug", { length: 100 }).unique(),
+  /** Profile photo URL (stored in S3) */
+  profilePhotoUrl: text("profilePhotoUrl"),
+  /** Custom display name for landing page */
+  displayName: varchar("displayName", { length: 255 }),
+  /** Location (city, state) for landing page */
+  location: varchar("location", { length: 255 }),
+  /** Bio/tagline for landing page */
+  bio: text("bio"),
+  /** User type: distributor or customer */
+  userType: mysqlEnum("userType", ["distributor", "customer"]).notNull(),
+  /** Whether the personalized page is published */
+  isPublished: boolean("isPublished").default(true).notNull(),
+  /** Total visits to personalized page */
+  pageViews: int("pageViews").default(0).notNull(),
+  /** Total signups through personalized page */
+  signupsGenerated: int("signupsGenerated").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type UserProfile = typeof userProfiles.$inferSelect;
+export type InsertUserProfile = typeof userProfiles.$inferInsert;
+
 

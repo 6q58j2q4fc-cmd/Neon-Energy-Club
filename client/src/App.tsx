@@ -38,6 +38,7 @@ import Investors from "./pages/Investors";
 import CustomerPortal from "./pages/CustomerPortal";
 import MLMAdminPanel from "./pages/MLMAdminPanel";
 import FranchiseDashboard from "./pages/FranchiseDashboard";
+import PersonalizedLanding from "./pages/PersonalizedLanding";
 import AmbientSoundToggle from "./components/AmbientSoundToggle";
 import FloatingChatBot from "./components/FloatingChatBot";
 import CartDrawer from "./components/CartDrawer";
@@ -73,6 +74,7 @@ function Router() {
         <Route path={"/join"} component={JoinNow} />
         <Route path={"/distributor/dashboard"} component={DistributorDashboard} />
         <Route path={"/d/:code"} component={DistributorSite} />
+        <Route path={"/r/:slug"} component={PersonalizedLanding} />
         <Route path={"/shop"} component={Shop} />
         <Route path={"/checkout"} component={Checkout} />
         <Route path={"/compensation"} component={Compensation} />
@@ -100,6 +102,8 @@ function Router() {
         <Route path="/franchise/dashboard" component={FranchiseDashboard} />
         <Route path="/distributor" component={DistributorPortal} />
         <Route path="/404" component={NotFound} />
+        {/* Catch-all route for personalized landing pages (neonenergyclub.com/uniquereferralid) */}
+        <Route path="/:slug" component={PersonalizedLanding} />
         <Route component={NotFound} />
       </Switch>
     </>

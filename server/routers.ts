@@ -480,11 +480,17 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input, ctx }) => {
-        const { enrollDistributor } = await import("./db");
+        const { enrollDistributor, createDistributorProfile } = await import("./db");
         const distributor = await enrollDistributor({
           userId: ctx.user.id,
           sponsorCode: input.sponsorCode,
         });
+        
+        // Automatically create personalized profile for new distributor
+        if (distributor) {
+          await createDistributorProfile(ctx.user.id, ctx.user.name || "NEON Distributor");
+        }
+        
         return distributor;
       }),
 
@@ -2390,8 +2396,15 @@ Always be helpful, enthusiastic, and guide users toward making a purchase or inv
     // Generate referral code
     generateReferralCode: protectedProcedure
       .mutation(async ({ ctx }) => {
-        const { generateCustomerReferralCode } = await import("./db");
+        const { generateCustomerReferralCode, createCustomerProfile, getPersonalizedProfile } = await import("./db");
         const code = await generateCustomerReferralCode(ctx.user.id);
+        
+        // Automatically create personalized profile for customer if not exists
+        const existingProfile = await getPersonalizedProfile(ctx.user.id);
+        if (!existingProfile) {
+          await createCustomerProfile(ctx.user.id, ctx.user.name || "NEON Customer");
+        }
+        
         return { code };
       }),
 
@@ -2726,6 +2739,200 @@ Always be helpful, enthusiastic, and guide users toward making a purchase or inv
 
       return { success: successCount > 0, sentCount: successCount };
     }),
+  }),
+
+  // Profile router for personalized landing pages
+  profile: router({
+    // Check if a custom slug is available
+    checkSlugAvailability: protectedProcedure
+      .input(z.object({
+        slug: z.string().min(3, "Slug must be at least 3 characters").max(50, "Slug must be at most 50 characters")
+          .regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens"),
+      }))
+      .query(async ({ input, ctx }) => {
+        const { isSlugAvailable } = await import("./db");
+        const available = await isSlugAvailable(input.slug, ctx.user?.id);
+        return { available, slug: input.slug.toLowerCase() };
+      }),
+
+    // Get current user's personalized profile
+    getMyProfile: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getPersonalizedProfile, getUserProfile } = await import("./db");
+        
+        // Get personalized profile data
+        const personalizedProfile = await getPersonalizedProfile(ctx.user.id);
+        
+        // Get base user profile
+        const userProfile = await getUserProfile(ctx.user.id);
+        
+        return {
+          personalizedProfile,
+          userProfile,
+          user: ctx.user,
+        };
+      }),
+
+    // Get profile by slug (public)
+    getBySlug: publicProcedure
+      .input(z.object({
+        slug: z.string().min(1),
+      }))
+      .query(async ({ input }) => {
+        const { getUserProfileBySlug, incrementProfilePageViews } = await import("./db");
+        
+        const profile = await getUserProfileBySlug(input.slug);
+        
+        if (profile) {
+          // Increment page views
+          await incrementProfilePageViews(input.slug);
+        }
+        
+        return profile;
+      }),
+
+    // Update custom slug
+    updateSlug: protectedProcedure
+      .input(z.object({
+        slug: z.string().min(3, "Slug must be at least 3 characters").max(50, "Slug must be at most 50 characters")
+          .regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens"),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { isSlugAvailable, updateUserSlug, getPersonalizedProfile, upsertUserProfile, getDistributorByUserId } = await import("./db");
+        
+        // Check availability
+        const available = await isSlugAvailable(input.slug, ctx.user.id);
+        if (!available) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "This referral link is already taken. Please choose a different one.",
+          });
+        }
+        
+        // Check if profile exists, create if not
+        const existingProfile = await getPersonalizedProfile(ctx.user.id);
+        if (!existingProfile) {
+          // Determine user type
+          const distributor = await getDistributorByUserId(ctx.user.id);
+          const userType = distributor ? "distributor" : "customer";
+          
+          await upsertUserProfile({
+            userId: ctx.user.id,
+            customSlug: input.slug,
+            displayName: ctx.user.name || undefined,
+            userType,
+          });
+          return { success: true, slug: input.slug.toLowerCase() };
+        }
+        
+        // Update existing profile
+        const success = await updateUserSlug(ctx.user.id, input.slug);
+        if (!success) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to update referral link. Please try again.",
+          });
+        }
+        
+        return { success: true, slug: input.slug.toLowerCase() };
+      }),
+
+    // Update profile details (photo, name, location, bio)
+    updateProfile: protectedProcedure
+      .input(z.object({
+        displayName: z.string().max(255).optional(),
+        location: z.string().max(255).optional(),
+        bio: z.string().max(1000).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { getPersonalizedProfile, upsertUserProfile, getDistributorByUserId, generateUniqueSlug } = await import("./db");
+        
+        // Check if profile exists
+        const existingProfile = await getPersonalizedProfile(ctx.user.id);
+        
+        if (!existingProfile) {
+          // Create new profile
+          const distributor = await getDistributorByUserId(ctx.user.id);
+          const userType = distributor ? "distributor" : "customer";
+          const slug = await generateUniqueSlug(input.displayName || ctx.user.name || "neon-member");
+          
+          await upsertUserProfile({
+            userId: ctx.user.id,
+            customSlug: slug,
+            displayName: input.displayName,
+            location: input.location,
+            bio: input.bio,
+            userType,
+          });
+        } else {
+          // Update existing profile
+          await upsertUserProfile({
+            userId: ctx.user.id,
+            displayName: input.displayName,
+            location: input.location,
+            bio: input.bio,
+            userType: existingProfile.userType,
+          });
+        }
+        
+        return { success: true };
+      }),
+
+    // Upload profile photo
+    uploadPhoto: protectedProcedure
+      .input(z.object({
+        photoBase64: z.string(),
+        mimeType: z.string().regex(/^image\/(jpeg|png|gif|webp)$/),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { updateProfilePhoto, getPersonalizedProfile, upsertUserProfile, getDistributorByUserId, generateUniqueSlug } = await import("./db");
+        const { storagePut } = await import("./storage");
+        
+        // Decode base64 and upload to S3
+        const buffer = Buffer.from(input.photoBase64, "base64");
+        const extension = input.mimeType.split("/")[1];
+        const fileName = `profile-photos/${ctx.user.id}-${Date.now()}.${extension}`;
+        
+        const { url } = await storagePut(fileName, buffer, input.mimeType);
+        
+        // Check if profile exists
+        const existingProfile = await getPersonalizedProfile(ctx.user.id);
+        
+        if (!existingProfile) {
+          // Create new profile with photo
+          const distributor = await getDistributorByUserId(ctx.user.id);
+          const userType = distributor ? "distributor" : "customer";
+          const slug = await generateUniqueSlug(ctx.user.name || "neon-member");
+          
+          await upsertUserProfile({
+            userId: ctx.user.id,
+            customSlug: slug,
+            profilePhotoUrl: url,
+            displayName: ctx.user.name || undefined,
+            userType,
+          });
+        } else {
+          // Update photo
+          await updateProfilePhoto(ctx.user.id, url);
+        }
+        
+        return { success: true, photoUrl: url };
+      }),
+
+    // Get profile stats
+    getStats: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getPersonalizedProfile } = await import("./db");
+        
+        const profile = await getPersonalizedProfile(ctx.user.id);
+        
+        return {
+          pageViews: profile?.pageViews || 0,
+          signupsGenerated: profile?.signupsGenerated || 0,
+          customSlug: profile?.customSlug || null,
+          isPublished: profile?.isPublished || false,
+        };
+      }),
   }),
 
 });

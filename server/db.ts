@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption, vendingApplications, franchiseApplications, pushSubscriptions, InsertVendingApplication, InsertFranchiseApplication, InsertPushSubscription } from "../drizzle/schema";
+import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption, vendingApplications, franchiseApplications, pushSubscriptions, InsertVendingApplication, InsertFranchiseApplication, InsertPushSubscription, userProfiles, InsertUserProfile } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -3925,4 +3925,461 @@ export async function removePushSubscription(subscriptionId: number): Promise<vo
 
   await db.delete(pushSubscriptions)
     .where(eq(pushSubscriptions.id, subscriptionId));
+}
+
+
+// ============================================================================
+// USER PROFILE FUNCTIONS (Personalized Landing Pages)
+// ============================================================================
+
+/**
+ * Check if a custom slug is available (not taken by any user)
+ */
+export async function isSlugAvailable(slug: string, excludeUserId?: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  const normalizedSlug = slug.toLowerCase().trim();
+  
+  // Check in userProfiles table
+  const existing = await db.select({ id: userProfiles.id })
+    .from(userProfiles)
+    .where(eq(userProfiles.customSlug, normalizedSlug))
+    .limit(1);
+
+  if (existing[0]) {
+    // If we're excluding a user (for updates), check if it's their own slug
+    if (excludeUserId) {
+      const ownProfile = await db.select({ userId: userProfiles.userId })
+        .from(userProfiles)
+        .where(eq(userProfiles.id, existing[0].id))
+        .limit(1);
+      if (ownProfile[0]?.userId === excludeUserId) {
+        return true; // User's own slug is "available" for them
+      }
+    }
+    return false;
+  }
+
+  // Also check distributor codes and subdomains to prevent conflicts
+  const distributorConflict = await db.select({ id: distributors.id })
+    .from(distributors)
+    .where(sql`LOWER(${distributors.distributorCode}) = ${normalizedSlug} OR LOWER(${distributors.subdomain}) = ${normalizedSlug}`)
+    .limit(1);
+
+  if (distributorConflict[0]) {
+    return false;
+  }
+
+  // Check customer referral codes
+  const customerCodeConflict = await db.select({ id: customerReferralCodes.id })
+    .from(customerReferralCodes)
+    .where(sql`LOWER(${customerReferralCodes.code}) = ${normalizedSlug}`)
+    .limit(1);
+
+  return !customerCodeConflict[0];
+}
+
+/**
+ * Get personalized profile by user ID (for landing page customization)
+ */
+export async function getPersonalizedProfile(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.select()
+    .from(userProfiles)
+    .where(eq(userProfiles.userId, userId))
+    .limit(1);
+
+  return result[0] || null;
+}
+
+/**
+ * Get user profile by custom slug
+ */
+export async function getUserProfileBySlug(slug: string) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const normalizedSlug = slug.toLowerCase().trim();
+  
+  const result = await db.select()
+    .from(userProfiles)
+    .where(eq(userProfiles.customSlug, normalizedSlug))
+    .limit(1);
+
+  if (result[0]) {
+    // Get associated user data
+    const userData = await db.select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+    })
+      .from(users)
+      .where(eq(users.id, result[0].userId))
+      .limit(1);
+
+    // Get distributor data if applicable
+    let distributorData = null;
+    if (result[0].userType === 'distributor') {
+      const distResult = await db.select({
+        id: distributors.id,
+        rank: distributors.rank,
+        distributorCode: distributors.distributorCode,
+      })
+        .from(distributors)
+        .where(eq(distributors.userId, result[0].userId))
+        .limit(1);
+      distributorData = distResult[0] || null;
+    }
+
+    return {
+      ...result[0],
+      user: userData[0] || null,
+      distributor: distributorData,
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Create or update user profile
+ */
+export async function upsertUserProfile(data: {
+  userId: number;
+  customSlug?: string;
+  profilePhotoUrl?: string;
+  displayName?: string;
+  location?: string;
+  bio?: string;
+  userType: "distributor" | "customer";
+}): Promise<number | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  // Check if profile exists
+  const existing = await db.select({ id: userProfiles.id })
+    .from(userProfiles)
+    .where(eq(userProfiles.userId, data.userId))
+    .limit(1);
+
+  if (existing[0]) {
+    // Update existing profile
+    await db.update(userProfiles)
+      .set({
+        customSlug: data.customSlug?.toLowerCase().trim() || null,
+        profilePhotoUrl: data.profilePhotoUrl || null,
+        displayName: data.displayName || null,
+        location: data.location || null,
+        bio: data.bio || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(userProfiles.id, existing[0].id));
+    return existing[0].id;
+  }
+
+  // Create new profile
+  const result = await db.insert(userProfiles).values({
+    userId: data.userId,
+    customSlug: data.customSlug?.toLowerCase().trim() || null,
+    profilePhotoUrl: data.profilePhotoUrl || null,
+    displayName: data.displayName || null,
+    location: data.location || null,
+    bio: data.bio || null,
+    userType: data.userType,
+    isPublished: true,
+  });
+
+  return result[0]?.insertId || null;
+}
+
+/**
+ * Update custom slug only
+ */
+export async function updateUserSlug(userId: number, newSlug: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  const normalizedSlug = newSlug.toLowerCase().trim();
+
+  // Verify slug is available
+  const available = await isSlugAvailable(normalizedSlug, userId);
+  if (!available) {
+    return false;
+  }
+
+  // Check if profile exists
+  const existing = await db.select({ id: userProfiles.id })
+    .from(userProfiles)
+    .where(eq(userProfiles.userId, userId))
+    .limit(1);
+
+  if (existing[0]) {
+    await db.update(userProfiles)
+      .set({ customSlug: normalizedSlug, updatedAt: new Date() })
+      .where(eq(userProfiles.id, existing[0].id));
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Update profile photo
+ */
+export async function updateProfilePhoto(userId: number, photoUrl: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  const existing = await db.select({ id: userProfiles.id })
+    .from(userProfiles)
+    .where(eq(userProfiles.userId, userId))
+    .limit(1);
+
+  if (existing[0]) {
+    await db.update(userProfiles)
+      .set({ profilePhotoUrl: photoUrl, updatedAt: new Date() })
+      .where(eq(userProfiles.id, existing[0].id));
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Increment page views for a profile
+ */
+export async function incrementProfilePageViews(slug: string): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  const normalizedSlug = slug.toLowerCase().trim();
+
+  await db.update(userProfiles)
+    .set({ pageViews: sql`${userProfiles.pageViews} + 1` })
+    .where(eq(userProfiles.customSlug, normalizedSlug));
+}
+
+/**
+ * Increment signups generated for a profile
+ */
+export async function incrementProfileSignups(slug: string): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  const normalizedSlug = slug.toLowerCase().trim();
+
+  await db.update(userProfiles)
+    .set({ signupsGenerated: sql`${userProfiles.signupsGenerated} + 1` })
+    .where(eq(userProfiles.customSlug, normalizedSlug));
+}
+
+/**
+ * Generate a unique default slug for a new user
+ */
+export async function generateUniqueSlug(baseName: string): Promise<string> {
+  const db = await getDb();
+  if (!db) return `user-${Date.now()}`;
+
+  // Clean the base name
+  let baseSlug = baseName
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim();
+
+  if (!baseSlug) {
+    baseSlug = 'neon-member';
+  }
+
+  // Check if base slug is available
+  if (await isSlugAvailable(baseSlug)) {
+    return baseSlug;
+  }
+
+  // Try adding numbers until we find an available slug
+  let counter = 1;
+  let candidateSlug = `${baseSlug}-${counter}`;
+  
+  while (!(await isSlugAvailable(candidateSlug)) && counter < 1000) {
+    counter++;
+    candidateSlug = `${baseSlug}-${counter}`;
+  }
+
+  return candidateSlug;
+}
+
+/**
+ * Create default profile for new distributor
+ */
+export async function createDistributorProfile(userId: number, name: string): Promise<number | null> {
+  const slug = await generateUniqueSlug(name);
+  
+  return upsertUserProfile({
+    userId,
+    customSlug: slug,
+    displayName: name,
+    userType: 'distributor',
+  });
+}
+
+/**
+ * Create default profile for new customer
+ */
+export async function createCustomerProfile(userId: number, name: string): Promise<number | null> {
+  const slug = await generateUniqueSlug(name);
+  
+  return upsertUserProfile({
+    userId,
+    customSlug: slug,
+    displayName: name,
+    userType: 'customer',
+  });
+}
+
+/**
+ * Get all profiles with pagination
+ */
+export async function getAllProfiles(limit = 50, offset = 0) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select()
+    .from(userProfiles)
+    .where(eq(userProfiles.isPublished, true))
+    .orderBy(desc(userProfiles.createdAt))
+    .limit(limit)
+    .offset(offset);
+}
+
+
+// Reserved slugs that cannot be used by users
+const RESERVED_SLUGS = [
+  'admin', 'api', 'shop', 'join', 'about', 'products', 'faq', 'privacy', 'terms',
+  'policies', 'profile', 'orders', 'leaderboard', 'investors', 'invest', 'portal',
+  'blog', 'vending', 'nft-gallery', 'nfts', 'franchise', 'celebrities', 'crowdfund',
+  'success', 'checkout', 'compensation', 'distributor', 'customer-portal', 'my-rewards',
+  '404', 'home', 'index', 'login', 'logout', 'signup', 'register', 'settings',
+  'dashboard', 'help', 'support', 'contact', 'careers', 'press', 'media', 'legal',
+  'tos', 'eula', 'dmca', 'copyright', 'trademark', 'brand', 'assets', 'static',
+  'public', 'private', 'internal', 'external', 'test', 'demo', 'staging', 'production',
+  'dev', 'development', 'beta', 'alpha', 'release', 'version', 'v1', 'v2', 'v3',
+  'neon', 'energy', 'drink', 'neon-energy', 'neonenergyclub', 'neonenergydrink',
+  'r', 'd', 'ref', 'referral', 'invite', 'share', 'promo', 'discount', 'coupon',
+];
+
+/**
+ * Check if a slug is available for a user (public API)
+ */
+export async function checkSlugAvailability(slug: string, userId: number): Promise<{ available: boolean; slug: string }> {
+  const normalizedSlug = slug.toLowerCase().trim();
+  
+  // Check reserved slugs first
+  if (RESERVED_SLUGS.includes(normalizedSlug)) {
+    return { available: false, slug: normalizedSlug };
+  }
+  
+  // Check minimum length
+  if (normalizedSlug.length < 3) {
+    return { available: false, slug: normalizedSlug };
+  }
+  
+  // Check format (alphanumeric and hyphens only)
+  if (!/^[a-z0-9-]+$/.test(normalizedSlug)) {
+    return { available: false, slug: normalizedSlug };
+  }
+  
+  const available = await isSlugAvailable(normalizedSlug, userId);
+  return { available, slug: normalizedSlug };
+}
+
+/**
+ * Get profile by slug (alias for getUserProfileBySlug)
+ */
+export async function getProfileBySlug(slug: string) {
+  return getUserProfileBySlug(slug);
+}
+
+/**
+ * Update profile slug with validation
+ */
+export async function updateProfileSlug(userId: number, newSlug: string) {
+  const { available } = await checkSlugAvailability(newSlug, userId);
+  
+  if (!available) {
+    throw new Error('This slug is not available');
+  }
+  
+  const success = await updateUserSlug(userId, newSlug);
+  
+  if (!success) {
+    throw new Error('Failed to update slug');
+  }
+  
+  return getPersonalizedProfile(userId);
+}
+
+/**
+ * Update personalized profile details
+ */
+export async function updatePersonalizedProfile(userId: number, data: {
+  displayName?: string;
+  bio?: string;
+  location?: string;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const existing = await db.select({ id: userProfiles.id })
+    .from(userProfiles)
+    .where(eq(userProfiles.userId, userId))
+    .limit(1);
+  
+  if (!existing[0]) {
+    return null;
+  }
+  
+  await db.update(userProfiles)
+    .set({
+      displayName: data.displayName || undefined,
+      bio: data.bio || undefined,
+      location: data.location || undefined,
+      updatedAt: new Date(),
+    })
+    .where(eq(userProfiles.id, existing[0].id));
+  
+  return getPersonalizedProfile(userId);
+}
+
+/**
+ * Increment page view for a user profile by userId
+ */
+export async function incrementProfilePageView(userId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.update(userProfiles)
+    .set({ pageViews: sql`${userProfiles.pageViews} + 1` })
+    .where(eq(userProfiles.userId, userId));
+}
+
+/**
+ * Get profile stats for a user
+ */
+export async function getProfileStats(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select({
+    pageViews: userProfiles.pageViews,
+    signupsGenerated: userProfiles.signupsGenerated,
+  })
+    .from(userProfiles)
+    .where(eq(userProfiles.userId, userId))
+    .limit(1);
+  
+  return result[0] || { pageViews: 0, signupsGenerated: 0 };
 }

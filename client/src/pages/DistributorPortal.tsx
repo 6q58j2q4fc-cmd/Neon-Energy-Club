@@ -51,6 +51,7 @@ import { AutoshipManager } from "@/components/AutoshipManager";
 import { PayoutManager } from "@/components/PayoutManager";
 import { RankHistory } from "@/components/RankHistory";
 import DistributorRewards from "@/components/DistributorRewards";
+import ProfileEditor from "@/components/ProfileEditor";
 
 export default function DistributorPortal() {
   const [, setLocation] = useLocation();
@@ -228,6 +229,7 @@ export default function DistributorPortal() {
         <nav className="px-4 space-y-2">
           {[
             { id: "dashboard", icon: BarChart3, label: "Dashboard" },
+            { id: "my-website", icon: Globe, label: "My Website" },
             { id: "team", icon: Users, label: "My Team" },
             { id: "sales", icon: ShoppingCart, label: "Sales" },
             { id: "commissions", icon: DollarSign, label: "Commissions" },
@@ -283,6 +285,7 @@ export default function DistributorPortal() {
             <div>
               <h2 className="text-2xl font-bold">
                 {activeTab === "dashboard" && "Dashboard"}
+                {activeTab === "my-website" && "My Website"}
                 {activeTab === "team" && "My Team"}
                 {activeTab === "sales" && "Sales"}
                 {activeTab === "commissions" && "Commissions"}
@@ -846,6 +849,29 @@ export default function DistributorPortal() {
               {distributorProfile && (
                 <DistributorRewards distributorId={distributorProfile.id} />
               )}
+            </motion.div>
+          )}
+
+          {/* My Website Tab */}
+          {activeTab === "my-website" && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-6"
+            >
+              <Card className="bg-gradient-to-br from-[#c8ff00]/10 to-purple-500/10 border-[#c8ff00]/30">
+                <CardContent className="pt-6">
+                  <div className="text-center mb-6">
+                    <Globe className="w-12 h-12 text-[#c8ff00] mx-auto mb-3" />
+                    <h3 className="text-2xl font-bold text-white mb-2">Your Personal NEON Website</h3>
+                    <p className="text-gray-400">
+                      Customize your landing page to attract customers and build your team
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <ProfileEditor userType="distributor" />
             </motion.div>
           )}
 
