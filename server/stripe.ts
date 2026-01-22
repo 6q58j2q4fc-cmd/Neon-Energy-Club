@@ -134,6 +134,65 @@ export async function createFranchiseCheckout(params: {
 }
 
 /**
+ * Create a Stripe Checkout Session for pre-orders from shopping cart
+ */
+export async function createPreorderCheckout(params: {
+  items: Array<{
+    name: string;
+    price: number;
+    quantity: number;
+    type: string;
+    flavor?: string;
+  }>;
+  customerEmail: string;
+  customerName: string;
+  userId?: number;
+  origin: string;
+}): Promise<{ url: string }> {
+  const stripe = await getStripe();
+
+  const lineItems = params.items.map(item => ({
+    price_data: {
+      currency: "usd",
+      product_data: {
+        name: item.name,
+        description: item.flavor ? `Flavor: ${item.flavor}` : (item.type === 'package' ? 'Distributor Package' : 'NEON Energy Drink'),
+        images: [`${params.origin}/neon-can.png`],
+      },
+      unit_amount: Math.round(item.price * 100), // Convert to cents
+    },
+    quantity: item.quantity,
+  }));
+
+  const totalAmount = params.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: lineItems,
+    mode: "payment",
+    success_url: `${params.origin}/success?session_id={CHECKOUT_SESSION_ID}&type=preorder`,
+    cancel_url: `${params.origin}/shop`,
+    customer_email: params.customerEmail,
+    client_reference_id: params.userId?.toString(),
+    metadata: {
+      type: "preorder",
+      customer_name: params.customerName,
+      customer_email: params.customerEmail,
+      user_id: params.userId?.toString() || "",
+      total_amount: totalAmount.toString(),
+      items_count: params.items.length.toString(),
+      items_json: JSON.stringify(params.items.map(i => ({ name: i.name, qty: i.quantity, price: i.price }))),
+    },
+    allow_promotion_codes: true,
+    shipping_address_collection: {
+      allowed_countries: ["US", "CA", "GB", "AU", "DE", "FR", "ES", "IT", "NL", "BE"],
+    },
+  });
+
+  return { url: session.url! };
+}
+
+/**
  * Retrieve a Checkout Session
  */
 export async function getCheckoutSession(sessionId: string) {

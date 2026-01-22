@@ -1223,3 +1223,86 @@ export const rewardRedemptions = mysqlTable("reward_redemptions", {
 });
 export type RewardRedemption = typeof rewardRedemptions.$inferSelect;
 export type InsertRewardRedemption = typeof rewardRedemptions.$inferInsert;
+
+/**
+ * Vending machine applications table.
+ * Tracks applications from people interested in owning NEON vending machines.
+ */
+export const vendingApplications = mysqlTable("vending_applications", {
+  id: int("id").autoincrement().primaryKey(),
+  firstName: varchar("firstName", { length: 100 }).notNull(),
+  lastName: varchar("lastName", { length: 100 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 50 }).notNull(),
+  businessName: varchar("businessName", { length: 255 }),
+  businessType: varchar("businessType", { length: 100 }).notNull(),
+  yearsInBusiness: varchar("yearsInBusiness", { length: 50 }),
+  city: varchar("city", { length: 100 }).notNull(),
+  state: varchar("state", { length: 100 }).notNull(),
+  zipCode: varchar("zipCode", { length: 20 }).notNull(),
+  proposedLocations: text("proposedLocations"),
+  numberOfMachines: varchar("numberOfMachines", { length: 50 }).notNull(),
+  investmentBudget: varchar("investmentBudget", { length: 50 }),
+  timeline: varchar("timeline", { length: 50 }),
+  experience: text("experience"),
+  questions: text("questions"),
+  status: mysqlEnum("status", ["pending", "under_review", "approved", "rejected"]).default("pending").notNull(),
+  adminNotes: text("adminNotes"),
+  submittedAt: timestamp("submittedAt").defaultNow().notNull(),
+  reviewedAt: timestamp("reviewedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type VendingApplication = typeof vendingApplications.$inferSelect;
+export type InsertVendingApplication = typeof vendingApplications.$inferInsert;
+
+/**
+ * Franchise applications table.
+ * Tracks applications from people interested in franchise territory ownership.
+ */
+export const franchiseApplications = mysqlTable("franchise_applications", {
+  id: int("id").autoincrement().primaryKey(),
+  firstName: varchar("firstName", { length: 100 }).notNull(),
+  lastName: varchar("lastName", { length: 100 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 50 }).notNull(),
+  territoryCity: varchar("territoryCity", { length: 100 }).notNull(),
+  territoryState: varchar("territoryState", { length: 100 }).notNull(),
+  territorySize: varchar("territorySize", { length: 50 }).notNull(),
+  exclusivityType: varchar("exclusivityType", { length: 50 }).notNull(),
+  investmentCapital: varchar("investmentCapital", { length: 50 }).notNull(),
+  financingNeeded: varchar("financingNeeded", { length: 50 }),
+  netWorth: varchar("netWorth", { length: 50 }),
+  businessExperience: varchar("businessExperience", { length: 100 }).notNull(),
+  distributionExperience: text("distributionExperience"),
+  teamSize: varchar("teamSize", { length: 50 }),
+  motivation: text("motivation").notNull(),
+  timeline: varchar("timeline", { length: 50 }).notNull(),
+  questions: text("questions"),
+  status: mysqlEnum("status", ["pending", "under_review", "approved", "rejected"]).default("pending").notNull(),
+  adminNotes: text("adminNotes"),
+  submittedAt: timestamp("submittedAt").defaultNow().notNull(),
+  reviewedAt: timestamp("reviewedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type FranchiseApplication = typeof franchiseApplications.$inferSelect;
+export type InsertFranchiseApplication = typeof franchiseApplications.$inferInsert;
+
+/**
+ * Push notification subscriptions table.
+ * Stores browser push notification subscriptions for distributors.
+ */
+export const pushSubscriptions = mysqlTable("push_subscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  endpoint: text("endpoint").notNull(),
+  p256dh: text("p256dh").notNull(),
+  auth: text("auth").notNull(),
+  userAgent: text("userAgent"),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type PushSubscription = typeof pushSubscriptions.$inferSelect;
+export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert;
+
+

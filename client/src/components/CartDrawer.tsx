@@ -10,7 +10,7 @@ export default function CartDrawer() {
 
   const handleCheckout = () => {
     setIsOpen(false);
-    setLocation("/shop");
+    setLocation("/checkout");
   };
 
   return (

@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption } from "../drizzle/schema";
+import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption, vendingApplications, franchiseApplications, pushSubscriptions, InsertVendingApplication, InsertFranchiseApplication, InsertPushSubscription } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -3637,4 +3637,288 @@ export async function getTopDistributorsByTeamSize(limit: number = 10) {
     .limit(limit);
 
   return results;
+}
+
+// ============================================================================
+// VENDING & FRANCHISE APPLICATION FUNCTIONS
+// ============================================================================
+
+/**
+ * Create a vending machine application
+ */
+export async function createVendingApplication(data: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  businessName?: string;
+  businessType: string;
+  yearsInBusiness?: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  proposedLocations?: string;
+  numberOfMachines: string;
+  investmentBudget?: string;
+  timeline?: string;
+  experience?: string;
+  questions?: string;
+  status: "pending" | "under_review" | "approved" | "rejected";
+  submittedAt: Date;
+}): Promise<{ id: number }> {
+  const db = await getDb();
+  if (!db) return { id: 0 };
+
+  const result = await db.insert(vendingApplications).values({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone,
+    businessName: data.businessName || null,
+    businessType: data.businessType,
+    yearsInBusiness: data.yearsInBusiness || null,
+    city: data.city,
+    state: data.state,
+    zipCode: data.zipCode,
+    proposedLocations: data.proposedLocations || null,
+    numberOfMachines: data.numberOfMachines,
+    investmentBudget: data.investmentBudget || null,
+    timeline: data.timeline || null,
+    experience: data.experience || null,
+    questions: data.questions || null,
+    status: data.status,
+    submittedAt: data.submittedAt,
+  });
+
+  return { id: result[0]?.insertId || 0 };
+}
+
+/**
+ * Create a franchise application
+ */
+export async function createFranchiseApplication(data: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  territoryCity: string;
+  territoryState: string;
+  territorySize: string;
+  exclusivityType: string;
+  investmentCapital: string;
+  financingNeeded?: string;
+  netWorth?: string;
+  businessExperience: string;
+  distributionExperience?: string;
+  teamSize?: string;
+  motivation: string;
+  timeline: string;
+  questions?: string;
+  status: "pending" | "under_review" | "approved" | "rejected";
+  submittedAt: Date;
+}): Promise<{ id: number }> {
+  const db = await getDb();
+  if (!db) return { id: 0 };
+
+  const result = await db.insert(franchiseApplications).values({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone,
+    territoryCity: data.territoryCity,
+    territoryState: data.territoryState,
+    territorySize: data.territorySize,
+    exclusivityType: data.exclusivityType,
+    investmentCapital: data.investmentCapital,
+    financingNeeded: data.financingNeeded || null,
+    netWorth: data.netWorth || null,
+    businessExperience: data.businessExperience,
+    distributionExperience: data.distributionExperience || null,
+    teamSize: data.teamSize || null,
+    motivation: data.motivation,
+    timeline: data.timeline,
+    questions: data.questions || null,
+    status: data.status,
+    submittedAt: data.submittedAt,
+  });
+
+  return { id: result[0]?.insertId || 0 };
+}
+
+/**
+ * Get all vending applications (admin)
+ */
+export async function getAllVendingApplications() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select()
+    .from(vendingApplications)
+    .orderBy(desc(vendingApplications.submittedAt));
+}
+
+/**
+ * Get all franchise applications (admin)
+ */
+export async function getAllFranchiseApplications() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select()
+    .from(franchiseApplications)
+    .orderBy(desc(franchiseApplications.submittedAt));
+}
+
+/**
+ * Update vending application status (admin)
+ */
+export async function updateVendingApplicationStatus(
+  applicationId: number,
+  status: "pending" | "under_review" | "approved" | "rejected",
+  adminNotes?: string
+): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(vendingApplications)
+    .set({
+      status,
+      adminNotes: adminNotes || null,
+      reviewedAt: new Date(),
+    })
+    .where(eq(vendingApplications.id, applicationId));
+}
+
+/**
+ * Update franchise application status (admin)
+ */
+export async function updateFranchiseApplicationStatus(
+  applicationId: number,
+  status: "pending" | "under_review" | "approved" | "rejected",
+  adminNotes?: string
+): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(franchiseApplications)
+    .set({
+      status,
+      adminNotes: adminNotes || null,
+      reviewedAt: new Date(),
+    })
+    .where(eq(franchiseApplications.id, applicationId));
+}
+
+
+// ============================================================================
+// PUSH NOTIFICATION FUNCTIONS
+// ============================================================================
+
+/**
+ * Save a push notification subscription
+ */
+export async function savePushSubscription(data: {
+  userId: number;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  userAgent?: string;
+}): Promise<number | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  // Check if subscription already exists for this endpoint
+  const existing = await db.select()
+    .from(pushSubscriptions)
+    .where(eq(pushSubscriptions.endpoint, data.endpoint))
+    .limit(1);
+
+  if (existing[0]) {
+    // Update existing subscription
+    await db.update(pushSubscriptions)
+      .set({
+        userId: data.userId,
+        p256dh: data.p256dh,
+        auth: data.auth,
+        userAgent: data.userAgent || null,
+        isActive: true,
+        updatedAt: new Date(),
+      })
+      .where(eq(pushSubscriptions.id, existing[0].id));
+    return existing[0].id;
+  }
+
+  // Create new subscription
+  const result = await db.insert(pushSubscriptions).values({
+    userId: data.userId,
+    endpoint: data.endpoint,
+    p256dh: data.p256dh,
+    auth: data.auth,
+    userAgent: data.userAgent || null,
+    isActive: true,
+  });
+
+  return result[0]?.insertId || null;
+}
+
+/**
+ * Get push subscriptions for a user
+ */
+export async function getUserPushSubscriptions(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select()
+    .from(pushSubscriptions)
+    .where(and(
+      eq(pushSubscriptions.userId, userId),
+      eq(pushSubscriptions.isActive, true)
+    ));
+}
+
+/**
+ * Get all active push subscriptions for distributors
+ */
+export async function getDistributorPushSubscriptions() {
+  const db = await getDb();
+  if (!db) return [];
+
+  // Get all users who are distributors with active push subscriptions
+  const results = await db.select({
+    subscriptionId: pushSubscriptions.id,
+    userId: pushSubscriptions.userId,
+    endpoint: pushSubscriptions.endpoint,
+    p256dh: pushSubscriptions.p256dh,
+    auth: pushSubscriptions.auth,
+    distributorId: distributors.id,
+    distributorCode: distributors.distributorCode,
+  })
+    .from(pushSubscriptions)
+    .innerJoin(distributors, eq(pushSubscriptions.userId, distributors.userId))
+    .where(eq(pushSubscriptions.isActive, true));
+
+  return results;
+}
+
+/**
+ * Deactivate a push subscription
+ */
+export async function deactivatePushSubscription(endpoint: string): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(pushSubscriptions)
+    .set({ isActive: false })
+    .where(eq(pushSubscriptions.endpoint, endpoint));
+}
+
+/**
+ * Remove a push subscription
+ */
+export async function removePushSubscription(subscriptionId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(pushSubscriptions)
+    .where(eq(pushSubscriptions.id, subscriptionId));
 }

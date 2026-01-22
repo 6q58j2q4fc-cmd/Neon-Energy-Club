@@ -286,6 +286,39 @@ export const appRouter = router({
 
         return result;
       }),
+
+    // Create Stripe checkout for pre-orders from shopping cart
+    createPreorderCheckout: publicProcedure
+      .input(
+        z.object({
+          items: z.array(z.object({
+            name: z.string(),
+            price: z.number(),
+            quantity: z.number().int().min(1),
+            type: z.string(),
+            flavor: z.string().optional(),
+          })).min(1, "Cart cannot be empty"),
+          name: z.string().min(1),
+          email: z.string().email(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (!isStripeConfigured()) {
+          throw new Error("Stripe is not configured. Please contact support.");
+        }
+
+        const { createPreorderCheckout } = await import("./stripe");
+        const origin = `${ctx.req.protocol}://${ctx.req.headers.host}`;
+        const result = await createPreorderCheckout({
+          items: input.items,
+          customerEmail: input.email,
+          customerName: input.name,
+          userId: ctx.user?.id,
+          origin,
+        });
+
+        return result;
+      }),
   }),
 
   crowdfunding: router({
@@ -1678,6 +1711,89 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
         
         return { success: true };
       }),
+
+    // Submit vending machine application
+    submitVendingApplication: publicProcedure
+      .input(
+        z.object({
+          firstName: z.string().min(1),
+          lastName: z.string().min(1),
+          email: z.string().email(),
+          phone: z.string().min(10),
+          businessName: z.string().optional(),
+          businessType: z.string(),
+          yearsInBusiness: z.string().optional(),
+          city: z.string().min(1),
+          state: z.string().min(1),
+          zipCode: z.string().min(5),
+          proposedLocations: z.string().optional(),
+          numberOfMachines: z.string(),
+          investmentBudget: z.string().optional(),
+          timeline: z.string().optional(),
+          experience: z.string().optional(),
+          questions: z.string().optional(),
+          applicationType: z.literal("vending"),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { createVendingApplication } = await import("./db");
+        
+        const application = await createVendingApplication({
+          ...input,
+          status: "pending",
+          submittedAt: new Date(),
+        });
+        
+        // Notify admin of new vending application
+        await notifyOwner({
+          title: "New Vending Machine Application",
+          content: `New vending application from ${input.firstName} ${input.lastName} (${input.email}, ${input.phone}).\n\nLocation: ${input.city}, ${input.state} ${input.zipCode}\nBusiness: ${input.businessName || "Individual"}\nMachines: ${input.numberOfMachines}\nBudget: ${input.investmentBudget || "Not specified"}\nTimeline: ${input.timeline || "Not specified"}\n\nProposed Locations: ${input.proposedLocations || "Not specified"}\n\nExperience: ${input.experience || "None provided"}\n\nQuestions: ${input.questions || "None"}`,
+        });
+        
+        return { success: true, applicationId: application.id };
+      }),
+
+    // Submit franchise territory application
+    submitFranchiseApplication: publicProcedure
+      .input(
+        z.object({
+          firstName: z.string().min(1),
+          lastName: z.string().min(1),
+          email: z.string().email(),
+          phone: z.string().min(10),
+          territoryCity: z.string().min(1),
+          territoryState: z.string().min(1),
+          territorySize: z.string(),
+          exclusivityType: z.string(),
+          investmentCapital: z.string(),
+          financingNeeded: z.string().optional(),
+          netWorth: z.string().optional(),
+          businessExperience: z.string(),
+          distributionExperience: z.string().optional(),
+          teamSize: z.string().optional(),
+          motivation: z.string().min(10),
+          timeline: z.string(),
+          questions: z.string().optional(),
+          applicationType: z.literal("franchise"),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { createFranchiseApplication } = await import("./db");
+        
+        const application = await createFranchiseApplication({
+          ...input,
+          status: "pending",
+          submittedAt: new Date(),
+        });
+        
+        // Notify admin of new franchise application
+        await notifyOwner({
+          title: "New Franchise Territory Application",
+          content: `New franchise application from ${input.firstName} ${input.lastName} (${input.email}, ${input.phone}).\n\nDesired Territory: ${input.territoryCity}, ${input.territoryState}\nTerritory Size: ${input.territorySize}\nExclusivity: ${input.exclusivityType}\n\nInvestment Capital: ${input.investmentCapital}\nFinancing Needed: ${input.financingNeeded || "Not specified"}\nNet Worth: ${input.netWorth || "Not disclosed"}\n\nBusiness Experience: ${input.businessExperience}\nDistribution Experience: ${input.distributionExperience || "None provided"}\nTeam Size: ${input.teamSize || "Not specified"}\n\nMotivation: ${input.motivation}\nTimeline: ${input.timeline}\n\nQuestions: ${input.questions || "None"}`,
+        });
+        
+        return { success: true, applicationId: application.id };
+      }),
   }),
 
   // NFT Gallery and Management
@@ -2528,6 +2644,88 @@ Always be helpful, enthusiastic, and guide users toward making a purchase or inv
         
         return { salesLeaders, teamLeaders, period };
       }),
+  }),
+
+  // Push notifications for distributors
+  pushNotifications: router({
+    // Get VAPID public key for client-side subscription
+    getVapidPublicKey: publicProcedure.query(async () => {
+      const { getVapidPublicKey } = await import('./pushNotifications');
+      return { publicKey: getVapidPublicKey() };
+    }),
+
+    // Subscribe to push notifications
+    subscribe: protectedProcedure
+      .input(z.object({
+        endpoint: z.string(),
+        p256dh: z.string(),
+        auth: z.string(),
+        userAgent: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { savePushSubscription } = await import('./db');
+        const subscriptionId = await savePushSubscription({
+          userId: ctx.user.id,
+          endpoint: input.endpoint,
+          p256dh: input.p256dh,
+          auth: input.auth,
+          userAgent: input.userAgent,
+        });
+        return { success: true, subscriptionId };
+      }),
+
+    // Unsubscribe from push notifications
+    unsubscribe: protectedProcedure
+      .input(z.object({
+        endpoint: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { deactivatePushSubscription } = await import('./db');
+        await deactivatePushSubscription(input.endpoint);
+        return { success: true };
+      }),
+
+    // Get user's push subscriptions
+    getMySubscriptions: protectedProcedure.query(async ({ ctx }) => {
+      const { getUserPushSubscriptions } = await import('./db');
+      const subscriptions = await getUserPushSubscriptions(ctx.user.id);
+      return subscriptions.map(sub => ({
+        id: sub.id,
+        endpoint: sub.endpoint.substring(0, 50) + '...', // Truncate for privacy
+        isActive: sub.isActive,
+        createdAt: sub.createdAt,
+      }));
+    }),
+
+    // Test push notification (for debugging)
+    testNotification: protectedProcedure.mutation(async ({ ctx }) => {
+      const { getUserPushSubscriptions } = await import('./db');
+      const { sendPushNotification } = await import('./pushNotifications');
+      
+      const subscriptions = await getUserPushSubscriptions(ctx.user.id);
+      if (subscriptions.length === 0) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'No push subscriptions found. Please enable notifications first.',
+        });
+      }
+
+      let successCount = 0;
+      for (const sub of subscriptions) {
+        const success = await sendPushNotification(
+          { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
+          {
+            title: '🎉 Test Notification',
+            body: 'Push notifications are working! You\'ll receive alerts for team signups, commissions, and rank advancements.',
+            icon: '/neon-icon-192.png',
+            tag: 'test-notification',
+          }
+        );
+        if (success) successCount++;
+      }
+
+      return { success: successCount > 0, sentCount: successCount };
+    }),
   }),
 
 });

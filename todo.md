@@ -1926,3 +1926,67 @@
 - [x] Restrict leaderboard to franchise owners only
 - [x] Restrict leaderboard to vending machine owners only
 - [x] Block public/customer access to leaderboard (shows access denied message)
+
+## Pre-Order, Application Forms & Push Notifications (Jan 21)
+
+### Pre-Order & Shopping Cart Integration
+- [ ] Fix pre-order buttons to integrate with shopping cart
+- [ ] Ensure shopping cart is fully functional
+- [ ] Prepare Stripe checkout integration
+- [ ] Add checkout flow that creates real orders
+- [ ] Send order confirmation notifications
+
+### Vending & Franchise Application Forms
+- [ ] Create real application form for vending machines
+- [ ] Create real application form for franchise territories
+- [ ] Send notifications when applications are submitted
+- [ ] Replace Apply Now buttons with links to application forms
+- [ ] Replace Book a Call with online application form
+
+### Post-Application Sales Prompts
+- [ ] Add prompt to pre-order NEON after application
+- [ ] Add prompt to enroll as distributor after application
+- [ ] Create success page with sales CTAs
+- [ ] Track conversion from application to purchase
+
+### Browser Push Notifications for Distributors
+- [ ] Implement push notification service
+- [ ] Add notification for new team signups
+- [ ] Add notification for commission payouts
+- [ ] Add notification for rank advancements
+- [ ] Create notification preferences UI
+
+
+## Pre-Order, Application Forms & Push Notifications (Jan 21)
+
+### Pre-Order Buttons & Shopping Cart
+- [x] Fix pre-order buttons to integrate with shopping cart
+- [x] Create checkout page with Stripe integration ready
+- [x] Add cart summary and order review
+- [x] Implement Stripe checkout session creation (createPreorderCheckout)
+- [x] Handle successful payment redirects
+
+### Vending & Franchise Application Forms
+- [x] Create VendingApplicationForm component
+- [x] Create FranchiseApplicationForm component
+- [x] Add form validation and multi-step flow
+- [x] Send notification on form submission
+- [x] Update Apply Now buttons to open application forms (dialog)
+- [x] Update Book a Call buttons to open application forms
+- [x] Add vending_application and franchise_application tables to database
+
+### Post-Application Sales Prompts
+- [x] Add pre-order CTA after application submission
+- [x] Add distributor enrollment CTA after application submission
+- [x] Create success screen with next steps
+
+### Browser Push Notifications
+- [x] Create push notification service (pushNotifications.ts)
+- [x] Add push subscription API endpoints (pushNotifications router)
+- [x] Create service worker for notifications (sw.js)
+- [x] Create PushNotificationSettings component
+- [x] Implement notifications for team signups (notifyNewTeamSignup)
+- [x] Implement notifications for commission payouts (notifyCommissionPayout)
+- [x] Implement notifications for rank advancements (notifyRankAdvancement)
+- [x] Add pushSubscriptions table to database
+- [x] All 217 tests passing

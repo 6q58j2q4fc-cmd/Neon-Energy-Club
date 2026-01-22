@@ -18,6 +18,7 @@ import JoinNow from "./pages/JoinNow";
 import DistributorDashboard from "./pages/DistributorDashboard";
 import DistributorSite from "./pages/DistributorSite";
 import Shop from "./pages/Shop";
+import Checkout from "./pages/Checkout";
 import Compensation from "./pages/Compensation";
 import DistributorPortal from "./pages/DistributorPortal";
 import Blog from "./pages/Blog";
@@ -73,6 +74,7 @@ function Router() {
         <Route path={"/distributor/dashboard"} component={DistributorDashboard} />
         <Route path={"/d/:code"} component={DistributorSite} />
         <Route path={"/shop"} component={Shop} />
+        <Route path={"/checkout"} component={Checkout} />
         <Route path={"/compensation"} component={Compensation} />
         <Route path={"/portal"} component={DistributorPortal} />
         <Route path={"/blog"} component={Blog} />

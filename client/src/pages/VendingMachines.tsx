@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { 
   Zap, 
   DollarSign, 
@@ -25,6 +26,7 @@ import {
 import { SEO } from "@/components/SEO";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
+import VendingApplicationForm from "@/components/VendingApplicationForm";
 
 export default function VendingMachines() {
   const [dailySales, setDailySales] = useState(20);
@@ -97,16 +99,26 @@ export default function VendingMachines() {
                 </p>
                 
                 <div className="flex flex-wrap gap-4">
-                  <Link href="/franchise">
-                    <Button size="lg" className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold text-lg px-8">
-                      Apply Now <ArrowRight className="w-5 h-5 ml-2" />
-                    </Button>
-                  </Link>
-                  <a href="https://calendly.com/neonenergy/vending-consultation" target="_blank" rel="noopener noreferrer">
-                    <Button size="lg" variant="outline" className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10 font-bold text-lg px-8">
-                      <Phone className="w-5 h-5 mr-2" /> Schedule Call
-                    </Button>
-                  </a>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button size="lg" className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold text-lg px-8">
+                        Apply Now <ArrowRight className="w-5 h-5 ml-2" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#0a1a1a] border-[#c8ff00]/30">
+                      <VendingApplicationForm />
+                    </DialogContent>
+                  </Dialog>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button size="lg" variant="outline" className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10 font-bold text-lg px-8">
+                        <Phone className="w-5 h-5 mr-2" /> Book a Call
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#0a1a1a] border-[#c8ff00]/30">
+                      <VendingApplicationForm isBookCall />
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </motion.div>
               
