@@ -1990,3 +1990,34 @@
 - [x] Implement notifications for rank advancements (notifyRankAdvancement)
 - [x] Add pushSubscriptions table to database
 - [x] All 217 tests passing
+
+## Distributor Panel, Video Player & Button Fixes (Jan 22)
+
+### Distributor Login Panel
+- [x] Fix and restore distributor login panel functionality
+- [x] Ensure login redirects to proper distributor portal
+- [x] Verify all distributor portal features work correctly
+- [x] Fixed rankProgress.nextRank object rendering (extract .name or .key)
+- [x] Fixed getDistributorRankProgress to return serializable properties only
+
+### Video Player Fixes
+- [x] Add expand/fullscreen functionality to video player (already present)
+- [x] Add volume controls to video player (already present)
+- [x] Center video properly on page (object-contain applied)
+- [x] Zoom out video to show full content without overflow
+- [x] Ensure video is responsive on all screen sizes
+
+### Pre-Order & Shopping Cart
+- [x] Verify pre-order buttons integrate with shopping cart
+- [x] Ensure checkout flow works with Stripe ready
+- [x] Test add to cart functionality
+
+### Application Forms
+- [x] Verify vending application form works and sends notifications
+- [x] Verify franchise application form works and sends notifications
+- [x] Ensure post-application prompts display correctly
+
+### Site-Wide Button Audit
+- [x] Audit all buttons for proper functionality
+- [x] Fix duplicate useState import in VendingMachines.tsx
+- [x] Ensure all CTAs navigate correctly

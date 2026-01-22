@@ -172,7 +172,7 @@ export default function DistributorPortal() {
     teamSize: statsData?.teamSize || teamData?.length || 0,
     personallyEnrolled: distributorInfo?.personallyEnrolled || 0,
     rank: distributorProfile?.rank || "Brand Partner",
-    nextRank: rankProgressData?.nextRank || "Senior Partner",
+    nextRank: rankProgressData?.nextRank?.name || rankProgressData?.nextRank?.key || "Senior Partner",
     rankProgress: overallProgress,
     weeklyEarnings: (commissions?.totals as any)?.thisWeek || 0,
     monthlyEarnings: (commissions?.totals as any)?.thisMonth || 0,

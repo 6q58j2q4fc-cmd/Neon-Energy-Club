@@ -33,6 +33,8 @@ export default function VendingMachines() {
   const [pricePerCan, setPricePerCan] = useState(3.5);
   const [costPerCan, setCostPerCan] = useState(1.5);
   const [machineInvestment, setMachineInvestment] = useState(4500);
+  const [applyDialogOpen, setApplyDialogOpen] = useState(false);
+  const [bookCallDialogOpen, setBookCallDialogOpen] = useState(false);
   
   // Calculate ROI
   const dailyProfit = dailySales * (pricePerCan - costPerCan);
@@ -99,24 +101,24 @@ export default function VendingMachines() {
                 </p>
                 
                 <div className="flex flex-wrap gap-4">
-                  <Dialog>
+                  <Dialog open={applyDialogOpen} onOpenChange={setApplyDialogOpen}>
                     <DialogTrigger asChild>
                       <Button size="lg" className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold text-lg px-8">
                         Apply Now <ArrowRight className="w-5 h-5 ml-2" />
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#0a1a1a] border-[#c8ff00]/30">
-                      <VendingApplicationForm />
+                      <VendingApplicationForm onClose={() => setApplyDialogOpen(false)} />
                     </DialogContent>
                   </Dialog>
-                  <Dialog>
+                  <Dialog open={bookCallDialogOpen} onOpenChange={setBookCallDialogOpen}>
                     <DialogTrigger asChild>
                       <Button size="lg" variant="outline" className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10 font-bold text-lg px-8">
                         <Phone className="w-5 h-5 mr-2" /> Book a Call
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#0a1a1a] border-[#c8ff00]/30">
-                      <VendingApplicationForm isBookCall />
+                      <VendingApplicationForm isBookCall onClose={() => setBookCallDialogOpen(false)} />
                     </DialogContent>
                   </Dialog>
                 </div>

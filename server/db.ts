@@ -2069,11 +2069,15 @@ export async function getDistributorRankProgress(userId: number) {
   return {
     currentRank: {
       key: distributor.rank,
-      ...currentRank,
+      name: currentRank?.name || "Starter",
+      level: currentRank?.level || 0,
+      color: currentRank?.color || "#9CA3AF",
     },
     nextRank: progress.nextRank ? {
       key: progress.nextRank,
-      ...RANKS[progress.nextRank],
+      name: RANKS[progress.nextRank]?.name || "Unknown",
+      level: RANKS[progress.nextRank]?.level || 0,
+      color: RANKS[progress.nextRank]?.color || "#9CA3AF",
     } : null,
     progress: {
       personalPV: {

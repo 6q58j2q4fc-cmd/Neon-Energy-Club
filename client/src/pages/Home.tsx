@@ -306,12 +306,14 @@ export default function Home() {
             </div>
             
             {/* Enhanced Widescreen Video Player with Volume Control and Video Cycling */}
-            <VideoPlayer
-              videos={neonVideos}
-              className="aspect-[21/9] w-full"
-              autoPlay={true}
-              initialMuted={true}
-            />
+            <div className="relative w-full max-w-5xl mx-auto">
+              <VideoPlayer
+                videos={neonVideos}
+                className="aspect-video w-full rounded-2xl shadow-2xl shadow-[#c8ff00]/20"
+                autoPlay={true}
+                initialMuted={true}
+              />
+            </div>
           </div>
         </div>
       </section>

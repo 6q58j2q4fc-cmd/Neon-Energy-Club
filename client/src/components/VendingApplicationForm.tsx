@@ -13,10 +13,11 @@ import { useAuth } from "@/_core/hooks/useAuth";
 
 interface VendingApplicationFormProps {
   onSuccess?: () => void;
+  onClose?: () => void;
   isBookCall?: boolean;
 }
 
-export default function VendingApplicationForm({ onSuccess, isBookCall = false }: VendingApplicationFormProps) {
+export default function VendingApplicationForm({ onSuccess, onClose, isBookCall = false }: VendingApplicationFormProps) {
   const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
