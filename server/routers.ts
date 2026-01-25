@@ -589,6 +589,108 @@ export const appRouter = router({
         return await getDistributorActivityStatus(ctx.user.id);
       }),
 
+    // Get LLM-powered analytics insights
+    analyticsInsights: protectedProcedure.query(async ({ ctx }) => {
+        const { getDistributorByUserId, getDistributorStats, getDistributorTeam } = await import("./db");
+        const { generateDistributorInsights } = await import("./analyticsLLM");
+        
+        const distributor = await getDistributorByUserId(ctx.user.id);
+        if (!distributor) throw new TRPCError({ code: "NOT_FOUND", message: "Distributor not found" });
+        
+        const stats = await getDistributorStats(ctx.user.id);
+        const team = await getDistributorTeam(distributor.id);
+        const { getDistributorCommissions } = await import("./db");
+        const commissionsData = await getDistributorCommissions(ctx.user.id);
+        const totalCommissions = commissionsData.totals.total;
+        const activeDownline = team.filter((m: any) => m.isActive).length;
+        
+        const analytics = {
+          distributorId: distributor.id,
+          distributorCode: distributor.distributorCode,
+          rank: distributor.rank,
+          personalSales: distributor.personalSales,
+          teamSales: distributor.teamSales,
+          leftLegVolume: distributor.leftLegVolume,
+          rightLegVolume: distributor.rightLegVolume,
+          monthlyPV: distributor.monthlyPV,
+          totalDownline: stats.teamSize,
+          activeDownline: activeDownline,
+          commissionTotal: totalCommissions,
+          joinDate: distributor.createdAt,
+        };
+        
+        const teamMembers = team.map((member: any) => ({
+          id: member.id,
+          name: member.username || member.distributorCode,
+          rank: member.rank,
+          personalSales: member.personalSales,
+          teamSales: member.teamSales,
+          monthlyPV: member.monthlyPV,
+          isActive: member.isActive,
+          joinDate: member.createdAt,
+        }));
+        
+        return await generateDistributorInsights(analytics, teamMembers);
+      }),
+
+    // Get team performance analysis
+    teamAnalysis: protectedProcedure
+      .input(z.object({ timeframe: z.enum(["week", "month", "quarter"]).default("month") }).optional())
+      .query(async ({ ctx, input }) => {
+        const { getDistributorByUserId, getDistributorTeam } = await import("./db");
+        const { analyzeTeamTrends } = await import("./analyticsLLM");
+        
+        const distributor = await getDistributorByUserId(ctx.user.id);
+        if (!distributor) throw new TRPCError({ code: "NOT_FOUND", message: "Distributor not found" });
+        
+        const team = await getDistributorTeam(distributor.id);
+        const teamMembers = team.map((member: any) => ({
+          id: member.id,
+          name: member.username || member.distributorCode,
+          rank: member.rank,
+          personalSales: member.personalSales,
+          teamSales: member.teamSales,
+          monthlyPV: member.monthlyPV,
+          isActive: member.isActive,
+          joinDate: member.createdAt,
+        }));
+        
+        return await analyzeTeamTrends(teamMembers, input?.timeframe || "month");
+      }),
+
+    // Get commission optimization recommendations
+    commissionOptimization: protectedProcedure.query(async ({ ctx }) => {
+        const { getDistributorByUserId, getDistributorStats } = await import("./db");
+        const { generateCommissionOptimization } = await import("./analyticsLLM");
+        
+        const distributor = await getDistributorByUserId(ctx.user.id);
+        if (!distributor) throw new TRPCError({ code: "NOT_FOUND", message: "Distributor not found" });
+        
+        const stats = await getDistributorStats(ctx.user.id);
+        const { getDistributorTeam, getDistributorCommissions } = await import("./db");
+        const team = await getDistributorTeam(distributor.id);
+        const commissionsData = await getDistributorCommissions(ctx.user.id);
+        const totalCommissions = commissionsData.totals.total;
+        const activeDownline = team.filter((m: any) => m.isActive).length;
+        
+        const analytics = {
+          distributorId: distributor.id,
+          distributorCode: distributor.distributorCode,
+          rank: distributor.rank,
+          personalSales: distributor.personalSales,
+          teamSales: distributor.teamSales,
+          leftLegVolume: distributor.leftLegVolume,
+          rightLegVolume: distributor.rightLegVolume,
+          monthlyPV: distributor.monthlyPV,
+          totalDownline: stats.teamSize,
+          activeDownline: activeDownline,
+          commissionTotal: totalCommissions,
+          joinDate: distributor.createdAt,
+        };
+        
+        return await generateCommissionOptimization(analytics);
+      }),
+
     // Get commission history
     commissions: protectedProcedure
       .input(z.object({ limit: z.number().int().min(1).max(100).default(50) }).optional())

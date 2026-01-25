@@ -101,6 +101,7 @@ function Router() {
         <Route path="/my-rewards" component={CustomerPortal} />
         <Route path="/franchise/dashboard" component={FranchiseDashboard} />
         <Route path="/distributor" component={DistributorPortal} />
+        <Route path="/distributor-portal" component={DistributorPortal} />
         <Route path="/404" component={NotFound} />
         {/* Catch-all route for personalized landing pages (neonenergyclub.com/uniquereferralid) */}
         <Route path="/:slug" component={PersonalizedLanding} />

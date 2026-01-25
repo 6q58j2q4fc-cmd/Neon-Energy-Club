@@ -52,6 +52,7 @@ import { PayoutManager } from "@/components/PayoutManager";
 import { RankHistory } from "@/components/RankHistory";
 import DistributorRewards from "@/components/DistributorRewards";
 import ProfileEditor from "@/components/ProfileEditor";
+import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 
 export default function DistributorPortal() {
   const [, setLocation] = useLocation();
@@ -318,6 +319,11 @@ export default function DistributorPortal() {
         <div className="p-6">
           {/* Dashboard Tab */}
           {activeTab === "dashboard" && (
+            <>
+              {/* AI Analytics Section */}
+              <AnalyticsDashboard />
+              
+              {/* Original Dashboard Content */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -567,6 +573,7 @@ export default function DistributorPortal() {
                 </CardContent>
               </Card>
             </motion.div>
+            </>
           )}
 
           {/* Team Tab */}
