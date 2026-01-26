@@ -205,13 +205,18 @@ export default function Home() {
 
               {/* Social Proof */}
               <div className="flex items-center gap-6 pt-4">
-                <div className="flex -space-x-3">
+                <div className="flex items-center gap-2 -space-x-3">
                   {[1, 2, 3, 4, 5].map((i) => (
                     <div
                       key={i}
-                      className="w-10 h-10 rounded-full bg-gradient-to-br from-[#c8ff00]/30 to-[#c8ff00]/10 border-2 border-black flex items-center justify-center text-xs font-bold text-[#c8ff00]"
+                      className="w-10 h-10 rounded-full bg-gradient-to-br from-[#c8ff00]/30 to-[#c8ff00]/10 border-2 border-black flex items-center justify-center text-xs font-bold text-[#c8ff00] overflow-hidden"
+                      title={`Member ${i}`}
                     >
-                      {String.fromCharCode(64 + i)}
+                      <img
+                        src={`https://api.dicebear.com/7.x/avataaars/svg?seed=member${i}`}
+                        alt={`Member ${i}`}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   ))}
                 </div>

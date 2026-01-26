@@ -45,6 +45,12 @@ export default function ProfileEditor({ userType, onSave }: ProfileEditorProps) 
   const [isEditingSlug, setIsEditingSlug] = useState(false);
   const [slugInput, setSlugInput] = useState("");
   
+  // Social media links
+  const [instagram, setInstagram] = useState("");
+  const [tiktok, setTiktok] = useState("");
+  const [facebook, setFacebook] = useState("");
+  const [twitter, setTwitter] = useState("");
+  
   // Photo upload
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);

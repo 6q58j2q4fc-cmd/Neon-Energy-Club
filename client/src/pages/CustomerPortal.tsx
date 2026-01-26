@@ -10,6 +10,8 @@ import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import RewardRedemption from "@/components/RewardRedemption";
+import NavigationHeader from "@/components/NavigationHeader";
+import { useLocation } from "wouter";
 import { 
   Gift, 
   Users, 

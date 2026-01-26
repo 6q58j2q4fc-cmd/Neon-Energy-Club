@@ -45,7 +45,7 @@ export async function createCrowdfundingCheckout(params: {
   const stripe = await getStripe();
 
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
+    payment_method_types: ["card", "paypal"],
     line_items: [
       {
         price_data: {
@@ -95,8 +95,14 @@ export async function createFranchiseCheckout(params: {
 }): Promise<{ url: string }> {
   const stripe = await getStripe();
 
+  // Support Affirm for franchise deposits (typically $5,000+) and PayPal for all
+  const paymentMethods = ["card", "paypal"];
+  if (params.depositAmount >= 5000) {
+    paymentMethods.push("affirm");
+  }
+
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
+    payment_method_types: paymentMethods,
     line_items: [
       {
         price_data: {
@@ -166,8 +172,14 @@ export async function createPreorderCheckout(params: {
 
   const totalAmount = params.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
+  // Support Affirm for orders over $50 and PayPal for all orders
+  const paymentMethods = ["card", "paypal"];
+  if (totalAmount >= 50) {
+    paymentMethods.push("affirm");
+  }
+
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
+    payment_method_types: paymentMethods,
     line_items: lineItems,
     mode: "payment",
     success_url: `${params.origin}/success?session_id={CHECKOUT_SESSION_ID}&type=preorder`,

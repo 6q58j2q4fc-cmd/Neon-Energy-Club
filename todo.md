@@ -2152,3 +2152,57 @@
 ### Audit & Planning
 - [x] Audit all distributor portal pages (Dashboard, My Website, My Team, Sales, Commissions, Payouts, Rank History, Marketing, Training, Auto-Ship, 3-for-Free, Settings)
 - [x] Add missing Sales tab content section (already exists and working)
+
+
+## New Features (Jan 25)
+
+### Payment Options
+- [x] Add Affirm payment integration for expensive items (orders $50+)
+- [x] Add PayPal Credit payment option (all orders)
+- [ ] Test payment flow for vending machines
+- [ ] Ensure payment options appear on checkout
+
+### Vending Machine Application
+- [ ] Audit vending machine application form
+- [ ] Fix any broken functionality
+- [ ] Test complete application workflow
+- [ ] Verify all data is captured correctly
+
+### Navigation Improvements
+- [x] Add Home button to all portal pages
+- [x] Add Back button to all portal pages
+- [x] Add navigation to Distributor Portal pages
+- [x] Add navigation to Customer Portal pages
+- [ ] Add navigation to Franchise Portal pages
+- [ ] Add navigation to Vending Portal pages
+- [ ] Test navigation on all pages
+
+### Homepage Profile Bubbles
+- [x] Display real user profile pictures in customer bubbles
+- [x] Show "People who joined the movement" with actual profile images
+- [x] Ensure images are properly sized and styled
+- [x] Add fallback for users without profile pictures
+
+### Distributor Profile Social Media
+- [ ] Add social media link fields to profile editor
+- [ ] Support Instagram, TikTok, Facebook, Twitter
+- [ ] Display social media links on personalized landing pages
+- [ ] Add social media icons with links
+
+### Leaderboard System
+- [ ] Create leaderboard database schema
+- [ ] Build leaderboard calculation engine
+- [ ] Add monthly sales leaderboard
+- [ ] Add recruits leaderboard
+- [ ] Add commissions leaderboard
+- [ ] Create leaderboard UI component
+- [ ] Restrict access to distributors only
+- [ ] Test leaderboard calculations
+
+### Push Notifications
+- [ ] Set up push notification service
+- [ ] Implement commission earned notifications
+- [ ] Implement new team member notifications
+- [ ] Implement rank advancement notifications
+- [ ] Add user notification preferences
+- [ ] Test push notifications

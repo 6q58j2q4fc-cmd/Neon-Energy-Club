@@ -53,6 +53,7 @@ import { RankHistory } from "@/components/RankHistory";
 import DistributorRewards from "@/components/DistributorRewards";
 import ProfileEditor from "@/components/ProfileEditor";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
+import NavigationHeader from "@/components/NavigationHeader";
 
 export default function DistributorPortal() {
   const [, setLocation] = useLocation();
@@ -301,6 +302,19 @@ export default function DistributorPortal() {
               <p className="text-gray-500 text-sm">Welcome back, {user?.name?.split(' ')[0] || 'Distributor'}!</p>
             </div>
             <div className="flex items-center gap-4">
+                <Button
+                onClick={() => window.history.back()}
+                variant="outline"
+                className="border-[#c8ff00]/30 text-[#c8ff00] hover:bg-[#c8ff00]/10"
+              >
+                Back
+              </Button>
+              <Button
+                onClick={() => setLocation("/")}
+                className="bg-[#c8ff00] hover:bg-[#d4ff33] text-black font-bold"
+              >
+                Home
+              </Button>
               <Button variant="outline" className="border-[#c8ff00]/30 text-[#c8ff00]">
                 <Bell className="w-4 h-4" />
               </Button>
