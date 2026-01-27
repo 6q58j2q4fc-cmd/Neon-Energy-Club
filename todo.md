@@ -2206,3 +2206,22 @@
 - [ ] Implement rank advancement notifications
 - [ ] Add user notification preferences
 - [ ] Test push notifications
+
+
+## Crowdfunding & Pre-Order System (Jan 26)
+
+### Crowdfunding Goal Updates
+- [ ] Update crowdfunding goal when simulated orders appear in notifications
+- [ ] Update crowdfunding goal when real orders are placed
+- [ ] Ensure crowdfunding progress bar always reflects current total
+- [ ] Track both simulated and real order amounts separately
+
+### Pre-Order System
+- [x] Create pre-order checkout page with multiple NEON packages
+- [x] Implement package selection (single, 4-pack, 12-pack, etc.)
+- [x] Add auto-ship option (checked by default)
+- [x] Show auto-ship discount (e.g., 15% off)
+- [x] Display warning when unchecking auto-ship
+- [x] Remove discount when auto-ship is unchecked
+- [x] Process real pre-orders through Stripe
+- [ ] Track pre-order inventory and fulfillment

@@ -31,7 +31,7 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Policies from "./pages/Policies";
 import Profile from "./pages/Profile";
-import Orders from "./pages/Orders";
+import PreOrder from "@/pages/PreOrder";
 import Leaderboard from "./pages/Leaderboard";
 import DistributorLeaderboard from "./pages/DistributorLeaderboard";
 import Investors from "./pages/Investors";
@@ -92,7 +92,7 @@ function Router() {
         <Route path="/terms" component={Terms} />
         <Route path="/policies" component={Policies} />
         <Route path="/profile" component={Profile} />
-        <Route path="/orders" component={Orders} />
+        <Route path="/pre-order" component={PreOrder} />
         <Route path="/leaderboard" component={Leaderboard} />
         <Route path="/distributor-leaderboard" component={DistributorLeaderboard} />
         <Route path="/investors" component={Investors} />

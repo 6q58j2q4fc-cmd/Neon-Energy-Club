@@ -33,7 +33,9 @@ export default function Home() {
     seconds: 0,
   });
 
-  const crowdfundingStats = trpc.crowdfunding.stats.useQuery();
+  const crowdfundingStats = trpc.crowdfunding.stats.useQuery(undefined, {
+    refetchInterval: 5000,
+  });
 
   useEffect(() => {
     setIsVisible(true);
