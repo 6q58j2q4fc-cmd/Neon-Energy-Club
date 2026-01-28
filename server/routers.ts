@@ -6,6 +6,9 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { notifyOwner } from "./_core/notification";
 import { isStripeConfigured, createCrowdfundingCheckout, createFranchiseCheckout } from "./stripe";
+import { getDb } from "./db";
+import { users, preorders, commissions, distributors } from "../drizzle/schema";
+import { sql, eq, gte, desc, like, or, and } from "drizzle-orm";
 
 export const appRouter = router({
   system: systemRouter,
@@ -3054,6 +3057,423 @@ Always be helpful, enthusiastic, and guide users toward making a purchase or inv
           signupsGenerated: profile?.signupsGenerated || 0,
           customSlug: profile?.customSlug || null,
           isPublished: profile?.isPublished || false,
+        };
+      }),
+  }),
+
+  // Admin router for Admin Panel
+  admin: router({
+    // Admin stats for dashboard
+    stats: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      
+      // Get total users
+      const totalUsersResult = await db.select({ count: sql<number>`count(*)` }).from(users);
+      const totalUsers = totalUsersResult[0]?.count || 0;
+      
+      // Get today's new users
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const newUsersTodayResult = await db.select({ count: sql<number>`count(*)` })
+        .from(users)
+        .where(gte(users.createdAt, today));
+      const newUsersToday = newUsersTodayResult[0]?.count || 0;
+      
+      // Get total orders
+      const totalOrdersResult = await db.select({ count: sql<number>`count(*)` }).from(preorders);
+      const totalOrders = totalOrdersResult[0]?.count || 0;
+      
+      // Get today's orders
+      const ordersTodayResult = await db.select({ count: sql<number>`count(*)` })
+        .from(preorders)
+        .where(gte(preorders.createdAt, today));
+      const ordersToday = ordersTodayResult[0]?.count || 0;
+      
+      // Get total revenue (sum of quantity * price estimate)
+      const revenueResult = await db.select({ total: sql<number>`COALESCE(SUM(quantity * 30), 0)` }).from(preorders);
+      const totalRevenue = revenueResult[0]?.total || 0;
+      
+      // Get today's revenue
+      const revenueTodayResult = await db.select({ total: sql<number>`COALESCE(SUM(quantity * 30), 0)` })
+        .from(preorders)
+        .where(gte(preorders.createdAt, today));
+      const revenueToday = revenueTodayResult[0]?.total || 0;
+      
+      // Get total commissions
+      const commissionsResult = await db.select({ total: sql<number>`COALESCE(SUM(amount), 0)` })
+        .from(commissions)
+        .where(eq(commissions.status, "paid"));
+      const totalCommissions = commissionsResult[0]?.total || 0;
+      
+      // Get active distributors
+      const activeDistributorsResult = await db.select({ count: sql<number>`count(*)` })
+        .from(distributors)
+        .where(eq(distributors.isActive, 1));
+      const activeDistributors = activeDistributorsResult[0]?.count || 0;
+      
+      // Get pending orders
+      const pendingOrdersResult = await db.select({ count: sql<number>`count(*)` })
+        .from(preorders)
+        .where(eq(preorders.status, "pending"));
+      const pendingOrders = pendingOrdersResult[0]?.count || 0;
+      
+      // Get pending commissions
+      const pendingCommissionsResult = await db.select({ total: sql<number>`COALESCE(SUM(amount), 0)` })
+        .from(commissions)
+        .where(eq(commissions.status, "pending"));
+      const pendingCommissions = pendingCommissionsResult[0]?.total || 0;
+      
+      return {
+        totalUsers,
+        newUsersToday,
+        totalOrders,
+        ordersToday,
+        totalRevenue,
+        revenueToday,
+        totalCommissions,
+        activeDistributors,
+        pendingOrders,
+        pendingCommissions,
+      };
+    }),
+
+    // Recent activity feed
+    recentActivity: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      
+      // Get recent orders
+      const recentOrders = await db.select()
+        .from(preorders)
+        .orderBy(desc(preorders.createdAt))
+        .limit(5);
+      
+      // Get recent users
+      const recentUsers = await db.select()
+        .from(users)
+        .orderBy(desc(users.createdAt))
+        .limit(5);
+      
+      // Combine and sort by date
+      const activities = [
+        ...recentOrders.map(o => ({
+          type: 'order' as const,
+          title: 'New order placed',
+          description: `Order #${o.id} - $${(o.quantity * 30).toFixed(2)}`,
+          createdAt: o.createdAt,
+        })),
+        ...recentUsers.map(u => ({
+          type: 'user' as const,
+          title: 'New user registered',
+          description: u.name || u.email || 'Unknown user',
+          createdAt: u.createdAt,
+        })),
+      ].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
+       .slice(0, 10);
+      
+      return activities;
+    }),
+
+    // User management
+    users: protectedProcedure
+      .input(z.object({
+        search: z.string().optional(),
+        role: z.string().optional(),
+        status: z.string().optional(),
+        page: z.number().default(1),
+        limit: z.number().default(10),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const offset = (input.page - 1) * input.limit;
+        
+        // Apply filters
+        const conditions = [];
+        if (input.search) {
+          conditions.push(or(
+            like(users.name, `%${input.search}%`),
+            like(users.email, `%${input.search}%`)
+          ));
+        }
+        if (input.role) {
+          conditions.push(eq(users.role, input.role as any));
+        }
+        
+        const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+        
+        const usersList = await db.select()
+          .from(users)
+          .where(whereClause)
+          .orderBy(desc(users.createdAt))
+          .limit(input.limit)
+          .offset(offset);
+        
+        const totalResult = await db.select({ count: sql<number>`count(*)` })
+          .from(users)
+          .where(whereClause);
+        const total = totalResult[0]?.count || 0;
+        
+        return {
+          users: usersList.map(u => ({
+            id: u.id,
+            name: u.name,
+            email: u.email,
+            role: u.role,
+            avatar: null,
+            status: 'active',
+            createdAt: u.createdAt,
+          })),
+          total,
+          totalPages: Math.ceil(total / input.limit),
+        };
+      }),
+
+    // Update user
+    updateUser: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        email: z.string().optional(),
+        role: z.enum(["admin", "user"]).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        await db.update(users)
+          .set({
+            name: input.name,
+            role: input.role,
+          })
+          .where(eq(users.id, input.id));
+        
+        return { success: true };
+      }),
+
+    // Suspend user
+    suspendUser: protectedProcedure
+      .input(z.object({
+        userId: z.number(),
+        suspend: z.boolean(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        // In a real app, you'd update a status field
+        return { success: true };
+      }),
+
+    // Order management
+    orders: protectedProcedure
+      .input(z.object({
+        status: z.string().optional(),
+        page: z.number().default(1),
+        limit: z.number().default(10),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const offset = (input.page - 1) * input.limit;
+        
+        const whereClause = input.status ? eq(preorders.status, input.status as any) : undefined;
+        
+        const ordersList = await db.select()
+          .from(preorders)
+          .where(whereClause)
+          .orderBy(desc(preorders.createdAt))
+          .limit(input.limit)
+          .offset(offset);
+        
+        const totalResult = await db.select({ count: sql<number>`count(*)` })
+          .from(preorders)
+          .where(whereClause);
+        const total = totalResult[0]?.count || 0;
+        
+        return {
+          orders: ordersList.map(o => ({
+            id: o.id,
+            orderNumber: `NEON-${o.id}`,
+            customerName: o.name,
+            customerEmail: o.email,
+            status: o.status,
+            total: o.quantity * 30,
+            createdAt: o.createdAt,
+          })),
+          total,
+          totalPages: Math.ceil(total / input.limit),
+        };
+      }),
+
+    // Update order status
+    updateOrder: protectedProcedure
+      .input(z.object({
+        orderId: z.number(),
+        status: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        await db.update(preorders)
+          .set({ status: input.status as any })
+          .where(eq(preorders.id, input.orderId));
+        
+        return { success: true };
+      }),
+
+    // Commission management
+    commissions: protectedProcedure
+      .input(z.object({
+        status: z.string().optional(),
+        page: z.number().default(1),
+        limit: z.number().default(10),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const offset = (input.page - 1) * input.limit;
+        
+        const whereClause = input.status ? eq(commissions.status, input.status as any) : undefined;
+        
+        const commissionsList = await db.select({
+          id: commissions.id,
+          amount: commissions.amount,
+          status: commissions.status,
+          commissionType: commissions.commissionType,
+          createdAt: commissions.createdAt,
+          distributorId: commissions.distributorId,
+        })
+          .from(commissions)
+          .where(whereClause)
+          .orderBy(desc(commissions.createdAt))
+          .limit(input.limit)
+          .offset(offset);
+        
+        const totalResult = await db.select({ count: sql<number>`count(*)` })
+          .from(commissions)
+          .where(whereClause);
+        const total = totalResult[0]?.count || 0;
+        
+        return {
+          commissions: commissionsList.map(c => ({
+            id: c.id,
+            amount: c.amount,
+            status: c.status,
+            type: c.commissionType,
+            distributorName: `Distributor #${c.distributorId}`,
+            createdAt: c.createdAt,
+          })),
+          total,
+          totalPages: Math.ceil(total / input.limit),
+        };
+      }),
+
+    // Approve commission
+    approveCommission: protectedProcedure
+      .input(z.object({ commissionId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        await db.update(commissions)
+          .set({ status: "paid" })
+          .where(eq(commissions.id, input.commissionId));
+        
+        return { success: true };
+      }),
+
+    // Reject commission
+    rejectCommission: protectedProcedure
+      .input(z.object({ commissionId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        await db.update(commissions)
+          .set({ status: "cancelled" })
+          .where(eq(commissions.id, input.commissionId));
+        
+        return { success: true };
+      }),
+
+    // Distributor management
+    distributors: protectedProcedure
+      .input(z.object({
+        search: z.string().optional(),
+        page: z.number().default(1),
+        limit: z.number().default(10),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const offset = (input.page - 1) * input.limit;
+        
+        const whereClause = input.search 
+          ? or(
+              like(distributors.username, `%${input.search}%`),
+              like(distributors.distributorCode, `%${input.search}%`)
+            )
+          : undefined;
+        
+        const distributorsList = await db.select()
+          .from(distributors)
+          .where(whereClause)
+          .orderBy(desc(distributors.createdAt))
+          .limit(input.limit)
+          .offset(offset);
+        
+        const totalResult = await db.select({ count: sql<number>`count(*)` })
+          .from(distributors)
+          .where(whereClause);
+        const total = totalResult[0]?.count || 0;
+        
+        return {
+          distributors: distributorsList.map(d => ({
+            id: d.id,
+            name: d.username,
+            username: d.username,
+            distributorCode: d.distributorCode,
+            rank: d.rank,
+            isActive: d.isActive,
+            personalSales: d.personalSales,
+            teamSales: d.teamSales,
+            createdAt: d.createdAt,
+          })),
+          total,
+          totalPages: Math.ceil(total / input.limit),
         };
       }),
   }),

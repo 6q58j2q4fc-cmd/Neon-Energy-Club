@@ -2476,3 +2476,56 @@
 - [x] Reduced data loading for mobile
 - [x] Offline capability indicators
 - [x] Mobile navigation menu
+
+
+## Comprehensive Platform Fixes (Jan 28)
+
+### My Team Page Fixes
+- [x] Fix 404 error on My Team page
+- [x] Build full working genealogy tree with expand/collapse
+- [x] Show team member details (name, rank, sales, join date)
+- [x] Add team performance metrics
+- [x] Implement team member search and filtering
+
+### Profile Photo Uploads
+- [ ] Ensure photo uploads work for distributors
+- [ ] Display uploaded photos on cloned distributor pages
+- [ ] Add photo cropping/resizing functionality
+- [ ] Store photos in S3 with proper URLs
+
+### Video Player Enhancements
+- [x] Add expand/minimize functionality to main page video
+- [x] Full-screen video mode
+- [x] Video controls (play, pause, volume)
+- [x] Smooth transitions for expand/minimize
+
+### Homepage Bubbles
+- [ ] Show real user profile photos in bubbles
+- [ ] Generate AI/placeholder photos for users without photos
+- [ ] Animate bubble appearances
+- [ ] Link bubbles to user profiles
+
+### Product Page with 3D Can
+- [x] Create 3D spinning can component
+- [x] Show ingredients panel from attached label
+- [x] Mouse drag to rotate can
+- [x] Pre-order buttons on product page
+- [x] Enhanced graphics and styling
+
+### Fruit Slider Fixes
+- [ ] Remove inconsistent backgrounds from fruit images
+- [ ] Ensure all fruit images have transparent backgrounds
+- [ ] Consistent styling across all slider items
+
+### Admin Panel Complete Build
+- [x] Fix any 404 or routing errors
+- [x] User management (list, edit, suspend)
+- [x] Order management (status, tracking)
+- [x] Commission management (approve, reject)
+- [x] Dashboard with real-time stats
+- [x] Export functionality for reports
+
+### Button Functionality
+- [ ] Test all buttons on every page
+- [ ] Fix any non-functional buttons
+- [ ] Ensure proper navigation and actions

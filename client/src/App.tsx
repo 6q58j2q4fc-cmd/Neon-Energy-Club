@@ -12,6 +12,7 @@ import Success from "./pages/Success";
 import Admin from "./pages/Admin";
 import About from "./pages/About";
 import Products from "./pages/Products";
+import Product from "./pages/Product";
 import Crowdfund from "./pages/Crowdfund";
 import FAQ from "./pages/FAQ";
 import JoinNow from "./pages/JoinNow";
@@ -68,6 +69,7 @@ function Router() {
         <Route path={"/about"} component={About} />
         <Route path={"/story"} component={About} />
         <Route path={"/products"} component={Products} />
+        <Route path={"/product"} component={Product} />
         <Route path={"/success"} component={Success} />
         <Route path={"/admin"} component={Admin} />
         <Route path={"/franchise"} component={Franchise} />
