@@ -20,7 +20,8 @@ import {
   Video
 } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { format, addDays, startOfWeek, isSameDay, isAfter, setHours, setMinutes } from "date-fns";
+import { format, addDays, startOfWeek, isSameDay, isAfter, setHours, setMinutes, addHours } from "date-fns";
+import { CalendarPlus, Download, ExternalLink } from "lucide-react";
 
 interface MeetingSchedulerProps {
   meetingType: "franchise" | "vending" | "general";
@@ -164,7 +165,83 @@ export default function MeetingScheduler({ meetingType, onSuccess, onClose }: Me
     setCurrentWeekStart(prev => addDays(prev, 7));
   };
 
-  const meetingTypeLabels = {
+  // Calendar integration helper functions
+  const getScheduledDateTime = () => {
+    if (!selectedDate || !selectedTime) return null;
+    const [hours, minutes] = selectedTime.split(":").map(Number);
+    return setMinutes(setHours(selectedDate, hours), minutes);
+  };
+
+  const downloadICSFile = () => {
+    const startDate = getScheduledDateTime();
+    if (!startDate) return;
+    
+    const endDate = addHours(startDate, 1);
+    const title = `NEON Energy - ${meetingTypeLabels[meetingType]}`;
+    const description = `Your ${meetingTypeLabels[meetingType]} with NEON Energy team.\n\nContact: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\n\nNotes: ${formData.notes || "None"}`;
+    
+    const formatICSDate = (date: Date) => {
+      return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    };
+    
+    const icsContent = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//NEON Energy//Meeting Scheduler//EN",
+      "BEGIN:VEVENT",
+      `DTSTART:${formatICSDate(startDate)}`,
+      `DTEND:${formatICSDate(endDate)}`,
+      `SUMMARY:${title}`,
+      `DESCRIPTION:${description.replace(/\n/g, "\\n")}`,
+      "LOCATION:Video Call (link will be sent via email)",
+      `UID:${Date.now()}@neonenergy.com`,
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n");
+    
+    const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `neon-meeting-${format(startDate, "yyyy-MM-dd")}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success("Calendar file downloaded!");
+  };
+
+  const openGoogleCalendar = () => {
+    const startDate = getScheduledDateTime();
+    if (!startDate) return;
+    
+    const endDate = addHours(startDate, 1);
+    const title = encodeURIComponent(`NEON Energy - ${meetingTypeLabels[meetingType]}`);
+    const details = encodeURIComponent(`Your ${meetingTypeLabels[meetingType]} with NEON Energy team.\n\nContact: ${formData.name}\nEmail: ${formData.email}`);
+    const location = encodeURIComponent("Video Call (link will be sent via email)");
+    
+    const formatGoogleDate = (date: Date) => {
+      return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    };
+    
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}&details=${details}&location=${location}`;
+    window.open(url, "_blank");
+  };
+
+  const openOutlookCalendar = () => {
+    const startDate = getScheduledDateTime();
+    if (!startDate) return;
+    
+    const endDate = addHours(startDate, 1);
+    const title = encodeURIComponent(`NEON Energy - ${meetingTypeLabels[meetingType]}`);
+    const body = encodeURIComponent(`Your ${meetingTypeLabels[meetingType]} with NEON Energy team.\n\nContact: ${formData.name}\nEmail: ${formData.email}`);
+    const location = encodeURIComponent("Video Call (link will be sent via email)");
+    
+    const url = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${startDate.toISOString()}&enddt=${endDate.toISOString()}&body=${body}&location=${location}`;
+    window.open(url, "_blank");
+  };
+
+  const meetingTypeLabels: Record<string, string> = {
     franchise: "Franchise Consultation",
     vending: "Vending Machine Consultation",
     general: "General Consultation",
@@ -194,6 +271,44 @@ export default function MeetingScheduler({ meetingType, onSuccess, onClose }: Me
           <p className="text-gray-400 text-sm mb-6">
             A confirmation email with meeting details has been sent to {formData.email}
           </p>
+          
+          {/* Calendar Integration Buttons */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-6">
+            <p className="text-white text-sm font-medium mb-3 flex items-center gap-2">
+              <CalendarPlus className="w-4 h-4 text-[#c8ff00]" />
+              Add to your calendar:
+            </p>
+            <div className="flex flex-wrap gap-2 justify-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => downloadICSFile()}
+                className="border-white/20 text-white hover:bg-white/10"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download .ics
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => openGoogleCalendar()}
+                className="border-white/20 text-white hover:bg-white/10"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Google Calendar
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => openOutlookCalendar()}
+                className="border-white/20 text-white hover:bg-white/10"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Outlook
+              </Button>
+            </div>
+          </div>
+          
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               onClick={onClose}

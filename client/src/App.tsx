@@ -43,8 +43,7 @@ import MLMAdminPanel from "./pages/MLMAdminPanel";
 import FranchiseDashboard from "./pages/FranchiseDashboard";
 import PersonalizedLanding from "./pages/PersonalizedLanding";
 import AmbientSoundToggle from "./components/AmbientSoundToggle";
-import FloatingChatBot from "./components/FloatingChatBot";
-import LiveChatWidget from "./components/LiveChatWidget";
+import UnifiedChatBot from "./components/UnifiedChatBot";
 import CartDrawer from "./components/CartDrawer";
 import VoiceMuteButton from "./components/VoiceMuteButton";
 import { LanguageProvider } from "./contexts/LanguageContext";
@@ -129,8 +128,7 @@ function App() {
             <CartDrawer />
             <VoiceMuteButton />
             <AmbientSoundToggle />
-            <FloatingChatBot />
-            <LiveChatWidget />
+            <UnifiedChatBot />
           </TooltipProvider>
         </ThemeProvider>
       </LanguageProvider>

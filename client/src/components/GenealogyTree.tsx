@@ -49,7 +49,158 @@ interface GenealogyTreeProps {
   rootDistributor?: any;
   team?: any[];
   useApi?: boolean;
+  showTutorial?: boolean;
 }
+
+// Sample data for tutorial mode
+const SAMPLE_TREE_DATA: GenealogyData = {
+  distributor: {
+    id: 1,
+    distributorCode: "NEON-001",
+    username: "you",
+    subdomain: "yoursite",
+    rank: "gold",
+    personalSales: 250000,
+    teamSales: 1500000,
+    leftLegVolume: 750000,
+    rightLegVolume: 650000,
+    monthlyPV: 500,
+    isActive: 1,
+  },
+  tree: [
+    {
+      id: 2,
+      distributorCode: "NEON-002",
+      username: "sarah_j",
+      name: "Sarah Johnson",
+      email: "sarah@example.com",
+      rank: "silver",
+      personalSales: 150000,
+      teamSales: 450000,
+      leftLegVolume: 200000,
+      rightLegVolume: 180000,
+      monthlyPV: 300,
+      isActive: 1,
+      placementPosition: "left",
+      depth: 1,
+      childCount: 2,
+      children: [
+        {
+          id: 4,
+          distributorCode: "NEON-004",
+          username: "mike_t",
+          name: "Mike Thompson",
+          email: "mike@example.com",
+          rank: "bronze",
+          personalSales: 75000,
+          teamSales: 120000,
+          leftLegVolume: 50000,
+          rightLegVolume: 45000,
+          monthlyPV: 150,
+          isActive: 1,
+          placementPosition: "left",
+          depth: 2,
+          childCount: 1,
+          children: [
+            {
+              id: 6,
+              distributorCode: "NEON-006",
+              username: "lisa_m",
+              name: "Lisa Martinez",
+              email: "lisa@example.com",
+              rank: "starter",
+              personalSales: 25000,
+              teamSales: 25000,
+              leftLegVolume: 0,
+              rightLegVolume: 0,
+              monthlyPV: 50,
+              isActive: 1,
+              placementPosition: "left",
+              depth: 3,
+              childCount: 0,
+              children: [],
+            },
+          ],
+        },
+        {
+          id: 5,
+          distributorCode: "NEON-005",
+          username: "emma_w",
+          name: "Emma Wilson",
+          email: "emma@example.com",
+          rank: "bronze",
+          personalSales: 80000,
+          teamSales: 80000,
+          leftLegVolume: 0,
+          rightLegVolume: 0,
+          monthlyPV: 160,
+          isActive: 1,
+          placementPosition: "right",
+          depth: 2,
+          childCount: 0,
+          children: [],
+        },
+      ],
+    },
+    {
+      id: 3,
+      distributorCode: "NEON-003",
+      username: "john_d",
+      name: "John Davis",
+      email: "john@example.com",
+      rank: "gold",
+      personalSales: 200000,
+      teamSales: 600000,
+      leftLegVolume: 300000,
+      rightLegVolume: 250000,
+      monthlyPV: 400,
+      isActive: 1,
+      placementPosition: "right",
+      depth: 1,
+      childCount: 2,
+      children: [
+        {
+          id: 7,
+          distributorCode: "NEON-007",
+          username: "alex_b",
+          name: "Alex Brown",
+          email: "alex@example.com",
+          rank: "silver",
+          personalSales: 120000,
+          teamSales: 200000,
+          leftLegVolume: 80000,
+          rightLegVolume: 70000,
+          monthlyPV: 240,
+          isActive: 1,
+          placementPosition: "left",
+          depth: 2,
+          childCount: 0,
+          children: [],
+        },
+        {
+          id: 8,
+          distributorCode: "NEON-008",
+          username: "chris_l",
+          name: "Chris Lee",
+          email: "chris@example.com",
+          rank: "bronze",
+          personalSales: 60000,
+          teamSales: 60000,
+          leftLegVolume: 0,
+          rightLegVolume: 0,
+          monthlyPV: 120,
+          isActive: 0,
+          placementPosition: "right",
+          depth: 2,
+          childCount: 0,
+          children: [],
+        },
+      ],
+    },
+  ],
+  totalDownline: 7,
+  depth: 3,
+};
 
 // Rank colors for visualization
 const RANK_COLORS: Record<string, { bg: string; border: string; text: string }> = {
@@ -208,15 +359,16 @@ function TreeLevel({
   );
 }
 
-export default function GenealogyTree({ rootDistributor, team, useApi = true }: GenealogyTreeProps) {
+export default function GenealogyTree({ rootDistributor, team, useApi = true, showTutorial = false }: GenealogyTreeProps) {
   const [selectedNode, setSelectedNode] = useState<TreeNode | null>(null);
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
   const [viewMode, setViewMode] = useState<'tree' | 'list'>('tree');
+  const [isTutorialMode, setIsTutorialMode] = useState(showTutorial);
   
   // Fetch genealogy data from API
   const { data: genealogyData, isLoading } = trpc.distributor.genealogy.useQuery(
     { depth: 5 },
-    { enabled: useApi }
+    { enabled: useApi && !isTutorialMode }
   );
   
   // Fetch rank progress
@@ -260,8 +412,8 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true }: 
     setExpandedNodes(new Set());
   }, []);
   
-  // Build tree from props if not using API
-  const treeData = useApi ? genealogyData : (() => {
+  // Build tree from props if not using API, or use sample data in tutorial mode
+  const treeData = isTutorialMode ? SAMPLE_TREE_DATA : (useApi ? genealogyData : (() => {
     if (!rootDistributor) return null;
     const buildTree = (distributor: any, teamMembers: any[]): TreeNode => {
       const children = teamMembers
@@ -292,7 +444,7 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true }: 
       totalDownline: team?.length || 0,
       depth: 5,
     };
-  })();
+  })());
 
   if (isLoading) {
     return (
@@ -478,6 +630,14 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true }: 
               )}
             </CardTitle>
             <div className="flex gap-2">
+              <Button 
+                size="sm" 
+                variant={isTutorialMode ? "default" : "outline"} 
+                onClick={() => setIsTutorialMode(!isTutorialMode)} 
+                className={isTutorialMode ? "bg-blue-500 hover:bg-blue-600 text-white" : "border-blue-500/50 text-blue-400 hover:bg-blue-500/10"}
+              >
+                {isTutorialMode ? "Exit Tutorial" : "View Tutorial"}
+              </Button>
               <Button size="sm" variant="outline" onClick={expandAll} className="border-[#c8ff00]/50 text-[#c8ff00] hover:bg-[#c8ff00]/10">
                 <Maximize2 className="w-4 h-4 mr-1" /> Expand All
               </Button>
@@ -488,6 +648,30 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true }: 
           </div>
         </CardHeader>
         <CardContent>
+          {/* Tutorial Mode Banner */}
+          {isTutorialMode && (
+            <div className="mb-4 p-4 bg-blue-500/20 border border-blue-500/50 rounded-lg">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-blue-500/30 flex items-center justify-center flex-shrink-0">
+                  <span className="text-lg">📚</span>
+                </div>
+                <div>
+                  <h4 className="font-bold text-blue-400 mb-1">Tutorial Mode - Sample Network</h4>
+                  <p className="text-sm text-gray-300 mb-2">
+                    This is a sample genealogy tree showing how your network could look. In this example:
+                  </p>
+                  <ul className="text-sm text-gray-400 space-y-1 list-disc list-inside">
+                    <li><strong className="text-white">You</strong> are at Gold rank with $15,000 in team sales</li>
+                    <li><strong className="text-white">Sarah (Left Leg)</strong> - Silver rank with 2 team members</li>
+                    <li><strong className="text-white">John (Right Leg)</strong> - Gold rank with 2 team members</li>
+                    <li>Click on any node to see detailed stats and commission potential</li>
+                    <li>Binary commissions are calculated from the weaker leg volume</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+          
           {/* Tree Visualization */}
           <div className="relative min-h-[400px] overflow-auto p-4 bg-black/50 rounded-lg border border-[#c8ff00]/20">
             {treeData?.tree && treeData.tree.length > 0 ? (

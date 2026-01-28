@@ -57,10 +57,19 @@ import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import NavigationHeader from "@/components/NavigationHeader";
 
 export default function DistributorPortal() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { user, loading, logout } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
+
+  // Handle URL query parameter for tab selection
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    if (tab) {
+      setActiveTab(tab);
+    }
+  }, [location]);
 
   // Fetch real distributor data from API
   const { data: distributorProfile, isLoading: profileLoading } = trpc.distributor.me.useQuery(undefined, {
@@ -86,6 +95,13 @@ export default function DistributorPortal() {
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  // Update URL when tab changes
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    const newUrl = tabId === 'dashboard' ? '/portal' : `/portal?tab=${tabId}`;
+    window.history.replaceState({}, '', newUrl);
+  };
 
   // Redirect to login if not authenticated
   if (!loading && !user) {
@@ -246,7 +262,7 @@ export default function DistributorPortal() {
           ].map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => handleTabChange(item.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                 activeTab === item.id 
                   ? 'bg-[#c8ff00]/20 text-[#c8ff00]' 
@@ -956,7 +972,7 @@ export default function DistributorPortal() {
           ].map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => handleTabChange(item.id)}
               className={`flex flex-col items-center py-2 px-3 rounded-lg ${
                 activeTab === item.id ? 'text-[#c8ff00]' : 'text-gray-500'
               }`}

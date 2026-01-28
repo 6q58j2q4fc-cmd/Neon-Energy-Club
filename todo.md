@@ -2821,3 +2821,39 @@
 - [x] Fix any broken links or navigation
 - [x] Verify all form submissions work correctly
 - [x] Test complete user journey from application to payment (Stripe pending)
+
+
+## Portal Fixes & Enhancements (Jan 28) - COMPLETED
+
+### Fix My Team 404 Error
+- [x] Fix My Team page route - now uses query params to navigate to portal tabs
+- [x] Audit all distributor portal dropdown links
+- [x] Ensure all portal navigation works correctly
+
+### Calendar Integration
+- [x] Generate .ics files for scheduled meetings
+- [x] Add Google Calendar link generation
+- [x] Add "Add to Calendar" button in meeting confirmation
+- [x] Include meeting details in calendar events
+
+### Genealogy Tree Enhancement
+- [x] Show real customers and distributors in genealogy tree
+- [x] Show vending machines in network if applicable
+- [x] Create sample/tutorial tree for new users
+- [x] Add interactive tutorial explaining how tree works
+
+### Chatbot Consolidation
+- [x] Merge duplicate chatbot buttons into single UnifiedChatBot
+- [x] Add Sales Training mode to chatbot
+- [x] Add Customer Service mode to chatbot
+- [x] Add Website Tutorial mode to chatbot
+- [x] Add Distributor Training mode to chatbot
+- [x] Improve chatbot training and instructions
+
+### FAQ Expansion
+- [x] Add comprehensive product FAQs (7 questions)
+- [x] Add distributor/MLM FAQs (8 questions)
+- [x] Add franchise/territory FAQs (4 questions)
+- [x] Add vending machine FAQs (4 questions)
+- [x] Add account & technical FAQs (4 questions)
+- [x] Add legal & compliance FAQs (3 questions)

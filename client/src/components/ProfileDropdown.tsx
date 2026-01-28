@@ -344,13 +344,13 @@ export default function ProfileDropdown({ accentColor = "#c8ff00" }: ProfileDrop
                       <button onClick={() => handleNavClick("/portal")} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-white/70 hover:text-white hover:bg-[#00ffff]/10 transition-all text-sm">
                         <BarChart3 className="w-4 h-4" /> Dashboard
                       </button>
-                      <button onClick={() => handleNavClick("/distributor/team")} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-white/70 hover:text-white hover:bg-[#00ffff]/10 transition-all text-sm">
+                      <button onClick={() => handleNavClick("/portal?tab=team")} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-white/70 hover:text-white hover:bg-[#00ffff]/10 transition-all text-sm">
                         <Users className="w-4 h-4" /> My Team
                       </button>
-                      <button onClick={() => handleNavClick("/distributor/commissions")} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-white/70 hover:text-white hover:bg-[#00ffff]/10 transition-all text-sm">
+                      <button onClick={() => handleNavClick("/portal?tab=commissions")} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-white/70 hover:text-white hover:bg-[#00ffff]/10 transition-all text-sm">
                         <CreditCard className="w-4 h-4" /> Commissions
                       </button>
-                      <button onClick={() => handleNavClick("/distributor/autoship")} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-white/70 hover:text-white hover:bg-[#00ffff]/10 transition-all text-sm">
+                      <button onClick={() => handleNavClick("/portal?tab=autoship")} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-white/70 hover:text-white hover:bg-[#00ffff]/10 transition-all text-sm">
                         <Truck className="w-4 h-4" /> Autoship
                       </button>
                       <button onClick={() => handleNavClick("/compensation")} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-white/70 hover:text-white hover:bg-[#00ffff]/10 transition-all text-sm">

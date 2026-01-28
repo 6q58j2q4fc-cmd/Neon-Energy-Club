@@ -31,6 +31,55 @@ const faqCategories = [
         q: "How much caffeine is in each can?",
         a: "Each 8.4 fl oz (250ml) can contains 160mg of natural caffeine, equivalent to about 1.5 cups of coffee. We recommend not exceeding 2 cans per day."
       },
+      {
+        q: "Are there any allergens in NEON?",
+        a: "NEON is free from the top 8 allergens: milk, eggs, fish, shellfish, tree nuts, peanuts, wheat, and soybeans. However, our products are manufactured in facilities that may process these allergens. Always check the label if you have severe allergies."
+      },
+      {
+        q: "Is NEON safe for pregnant or nursing women?",
+        a: "Due to the caffeine content (160mg per can), we recommend consulting with your healthcare provider before consuming NEON if you are pregnant, nursing, or have any medical conditions. The FDA recommends pregnant women limit caffeine to 200mg per day."
+      },
+      {
+        q: "What flavors are available?",
+        a: "NEON is available in 6 delicious flavors: Original Citrus Burst, Tropical Fusion, Berry Blast, Mango Tango, Watermelon Wave, and our new limited edition Midnight Grape. All flavors are zero sugar and contain the same energy-boosting formula."
+      },
+    ],
+  },
+  {
+    category: "Distributor Program & MLM",
+    questions: [
+      {
+        q: "How do I become a NEON distributor?",
+        a: "Becoming a distributor is easy! Click 'Become a Distributor' on our website, fill out the application form, and pay the one-time starter kit fee ($99). You'll receive your distributor kit within 5-7 business days, including product samples, marketing materials, and access to your personalized distributor portal."
+      },
+      {
+        q: "How does the compensation plan work?",
+        a: "NEON uses a binary compensation plan with 5 ways to earn: 1) Direct Sales Commission (25% on personal sales), 2) Binary Team Commission (10% on weaker leg volume), 3) Fast-Start Bonus ($50 per new distributor enrolled), 4) Matching Bonus (up to 5 levels deep), and 5) Rank Advancement Bonuses ($500-$50,000). Full details are in the Compensation Plan page."
+      },
+      {
+        q: "What are the rank requirements?",
+        a: "NEON has 10 ranks: Starter (join), Bronze (500 PV + 2 active legs), Silver (1,000 PV + 3 active legs), Gold (2,500 PV + 4 active legs), Platinum (5,000 PV + 5 active legs), Diamond (10,000 PV + 6 active legs), Executive (25,000 PV), Presidential (50,000 PV), Ambassador (100,000 PV), and Crown Ambassador (250,000 PV)."
+      },
+      {
+        q: "How do I track my commissions and team?",
+        a: "Log into your Distributor Portal to access real-time dashboards showing your personal sales, team volume, commission earnings, rank progress, and genealogy tree. You can also view pending payouts, download reports, and manage your team from the portal."
+      },
+      {
+        q: "When and how do I get paid?",
+        a: "Commissions are calculated weekly and paid out every Friday via direct deposit or PayPal. The minimum payout threshold is $50. You can request early payouts for a small processing fee. View your payout history and pending earnings in the Distributor Portal."
+      },
+      {
+        q: "What is the autoship requirement?",
+        a: "To remain 'active' and qualify for team commissions, distributors must maintain a minimum of 100 PV per month through personal purchases or customer orders. Autoship is optional but recommended - you can set up recurring orders at a 15% discount."
+      },
+      {
+        q: "Can I sell NEON online or only in person?",
+        a: "Both! Every distributor gets a personalized website (yourname.neonenergy.com) where customers can order directly. You earn commissions on all orders through your link. You can also sell in person at events, gyms, offices, etc. We provide marketing materials for both approaches."
+      },
+      {
+        q: "What happens if I want to cancel my distributorship?",
+        a: "You can cancel anytime by contacting support. There are no ongoing fees or penalties. If you cancel within 90 days, you can return unopened products for a 90% refund. After 90 days, the standard return policy applies. Your downline will be reassigned to your sponsor."
+      },
     ],
   },
   {
@@ -106,6 +155,69 @@ const faqCategories = [
       {
         q: "Do you offer wholesale pricing?",
         a: "Yes! We offer wholesale pricing for retailers, gyms, and businesses ordering 50+ cases. Contact our B2B team at wholesale@neonenergy.com for pricing and terms."
+      },
+      {
+        q: "What if my order arrives damaged?",
+        a: "If your order arrives damaged, take photos of the packaging and products, then contact us within 48 hours. We'll send a replacement at no charge."
+      },
+    ],
+  },
+  {
+    category: "Vending Machine Business",
+    questions: [
+      {
+        q: "How does the vending machine program work?",
+        a: "Our vending program lets you own and operate NEON-branded smart vending machines. You purchase or lease machines ($3,500-$8,000), place them in approved locations, and keep 100% of sales revenue minus product costs."
+      },
+      {
+        q: "What locations are best for NEON vending machines?",
+        a: "High-traffic locations perform best: gyms/fitness centers, college campuses, office buildings, hospitals, airports, shopping malls, and sports venues. Average machines generate $500-$1,500/month."
+      },
+      {
+        q: "Do I need a franchise territory to operate vending machines?",
+        a: "No! You can operate vending machines independently or as part of a franchise territory. Independent operators can place machines anywhere not already claimed."
+      },
+      {
+        q: "What's included with each vending machine?",
+        a: "Each machine includes: AI-powered smart vending technology, touchscreen display, cashless payment, remote inventory monitoring, temperature control, LED lighting, initial product inventory (200 cans), and 1-year warranty."
+      },
+    ],
+  },
+  {
+    category: "Account & Technical",
+    questions: [
+      {
+        q: "How do I create an account?",
+        a: "Click 'Sign Up' in the top navigation, enter your email and create a password, then verify your email. Accounts let you track orders, save addresses, and earn rewards points."
+      },
+      {
+        q: "I forgot my password. How do I reset it?",
+        a: "Click 'Login' then 'Forgot Password'. Enter your email address and we'll send a reset link within 5 minutes. Check your spam folder if you don't see it."
+      },
+      {
+        q: "Is my payment information secure?",
+        a: "Absolutely. We use Stripe for payment processing, which is PCI-DSS Level 1 certified. All transactions are encrypted with 256-bit SSL. We also support Apple Pay and Google Pay."
+      },
+      {
+        q: "How do I use a promo code?",
+        a: "Enter your promo code in the 'Promo Code' field during checkout, then click 'Apply'. Valid codes show the discount immediately. Only one code can be used per order."
+      },
+    ],
+  },
+  {
+    category: "Legal & Compliance",
+    questions: [
+      {
+        q: "Is NEON's MLM program legal?",
+        a: "Yes, NEON operates a fully legal network marketing business. Unlike illegal pyramid schemes, our compensation is based on actual product sales to real customers, not recruitment. We comply with FTC guidelines."
+      },
+      {
+        q: "What is the income disclosure?",
+        a: "Our Income Disclosure Statement shows that distributor earnings vary widely. Results depend on effort, skills, and market conditions. Full disclosure available on our Compensation page."
+      },
+      {
+        q: "Where can I find your privacy policy and terms?",
+        a: "Our Privacy Policy, Terms of Service, and other legal documents are linked in the footer of every page. We comply with GDPR and CCPA regulations."
       },
     ],
   },
