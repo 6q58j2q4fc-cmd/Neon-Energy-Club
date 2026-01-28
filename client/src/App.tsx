@@ -43,6 +43,7 @@ import FranchiseDashboard from "./pages/FranchiseDashboard";
 import PersonalizedLanding from "./pages/PersonalizedLanding";
 import AmbientSoundToggle from "./components/AmbientSoundToggle";
 import FloatingChatBot from "./components/FloatingChatBot";
+import LiveChatWidget from "./components/LiveChatWidget";
 import CartDrawer from "./components/CartDrawer";
 import VoiceMuteButton from "./components/VoiceMuteButton";
 import { LanguageProvider } from "./contexts/LanguageContext";
@@ -127,6 +128,7 @@ function App() {
             <VoiceMuteButton />
             <AmbientSoundToggle />
             <FloatingChatBot />
+            <LiveChatWidget />
           </TooltipProvider>
         </ThemeProvider>
       </LanguageProvider>
