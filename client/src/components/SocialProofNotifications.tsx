@@ -223,6 +223,9 @@ export default function SocialProofNotifications() {
   const [usedSimulatedIds, setUsedSimulatedIds] = useState<Set<string>>(new Set());
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cycleRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Mutation to record simulated contributions
+  const recordSimulated = trpc.crowdfunding.recordSimulated.useMutation();
 
   // Fetch real data from the database
   const recentContributions = trpc.crowdfunding.recentContributions.useQuery(undefined, {
@@ -324,6 +327,18 @@ export default function SocialProofNotifications() {
         ...notification,
         timestamp: new Date(Date.now() - Math.random() * 5 * 60 * 1000), // Within last 5 minutes
       };
+      
+      // Record simulated contribution to crowdfunding goal
+      const amount = notification.type === "crowdfunding" && notification.amount 
+        ? notification.amount 
+        : notification.type === "preorder" 
+        ? Math.floor(Math.random() * 70) + 10 // $10-$80 for preorders
+        : Math.floor(Math.random() * 50) + 25; // $25-$75 for distributor signups
+      
+      recordSimulated.mutate({
+        amount,
+        type: notification.type as "preorder" | "crowdfunding" | "distributor",
+      });
     }
     
     setCurrentNotification(notification);

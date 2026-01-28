@@ -2225,3 +2225,36 @@
 - [x] Remove discount when auto-ship is unchecked
 - [x] Process real pre-orders through Stripe
 - [ ] Track pre-order inventory and fulfillment
+
+
+## Crowdfunding Momentum & Customer Features
+
+### Simulated Order to Crowdfunding Integration
+- [x] Connect SocialProofNotifications to crowdfunding goal updates
+- [x] Increment crowdfunding total when simulated orders appear
+- [x] Add realistic order amounts to crowdfunding ($10-$80 range)
+- [x] Ensure crowdfunding progress bar updates in real-time
+- [x] Display "Just now" timestamps for simulated contributions
+- [x] Track total simulated vs real contributions separately
+
+### Order Tracking Dashboard
+- [x] Create /orders page for authenticated customers
+- [x] Display all customer pre-orders with status
+- [x] Show order details: date, package, quantity, total, auto-ship status
+- [x] Add status badges: pending, processing, shipped, delivered
+- [x] Implement order timeline with status updates
+- [x] Add tracking number and shipping info when available
+- [x] Show estimated delivery date
+- [x] Allow customers to cancel pending orders
+- [x] Display order history with filters (all, pending, completed)
+
+### Referral Bonus System
+- [x] Create referral link generation for each customer
+- [x] Track referral clicks and conversions
+- [x] Award discount codes to referrer when friend pre-orders
+- [x] Display referral bonus amount in customer portal
+- [x] Create referral leaderboard (top referrers)
+- [x] Send referral reward notifications
+- [x] Add referral tracking to order metadata
+- [x] Implement referral bonus redemption
+- [x] Show referral stats: clicks, conversions, earnings

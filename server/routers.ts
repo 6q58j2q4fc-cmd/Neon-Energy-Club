@@ -366,6 +366,27 @@ export const appRouter = router({
       return await getRecentCrowdfundingContributions(10); // Last 10 contributions
     }),
 
+    // Record simulated contribution for momentum tracking
+    recordSimulated: publicProcedure
+      .input(
+        z.object({
+          amount: z.number().int().min(1),
+          type: z.enum(["preorder", "crowdfunding", "distributor"]),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { createCrowdfundingContribution } = await import("./db");
+        // Record simulated contribution with special marker
+        await createCrowdfundingContribution({
+          name: "Simulated Activity",
+          email: "simulated@neonenergy.com",
+          amount: input.amount,
+          rewardTier: `Simulated ${input.type}`,
+          message: `Auto-generated ${input.type} activity for momentum tracking`,
+        });
+        return { success: true };
+      }),
+
     // Admin: List all contributions
     list: protectedProcedure.query(async ({ ctx }) => {
       if (ctx.user.role !== "admin") {
