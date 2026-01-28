@@ -1031,3 +1031,24 @@ html {
   background: linear-gradient(to top, rgba(10, 26, 26, 0.8) 0%, transparent 50%);
   pointer-events: none;
 }
+
+
+/* Slide-up animation for sticky CTA bar */
+@keyframes slide-up {
+  0% { transform: translateY(100%); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out forwards;
+}
+
+/* Pulse animation for urgency indicators */
+@keyframes urgency-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-urgency-pulse {
+  animation: urgency-pulse 2s ease-in-out infinite;
+}

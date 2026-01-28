@@ -8,6 +8,8 @@ import SocialProofNotifications from "@/components/SocialProofNotifications";
 import ViralNewsletterPopup, { shouldShowPopup, markPopupShown } from "@/components/ViralNewsletterPopup";
 import Header from "@/components/Header";
 import SocialProofBubbles from "@/components/SocialProofBubbles";
+import StickyCTABar from "@/components/StickyCTABar";
+import ExitIntentPopup from "@/components/ExitIntentPopup";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -96,6 +98,8 @@ export default function Home() {
       
       <SocialProofNotifications />
       <ViralNewsletterPopup open={showNewsletter} onClose={() => setShowNewsletter(false)} />
+      <StickyCTABar />
+      <ExitIntentPopup />
 
       <Header />
 
@@ -153,17 +157,26 @@ export default function Home() {
                 <span className="text-sm font-medium text-[#c8ff00]">THE RELAUNCH IS COMING</span>
               </div>
 
-              {/* Headline */}
+              {/* Headline - AIDA: Attention */}
               <h1 className="text-5xl md:text-7xl font-black leading-[0.9] tracking-tight">
-                <span className="text-white">FUEL YOUR</span>
+                <span className="text-white">TIRED OF</span>
                 <br />
-                <span className="gradient-text font-vice">POTENTIAL</span>
+                <span className="gradient-text font-vice">CRASHING?</span>
               </h1>
 
-              <p className="text-xl text-white/60 max-w-lg leading-relaxed">
-                Clean energy. Natural ingredients. Zero compromise. 
-                Join the movement and be part of the NEON revolution.
+              {/* Subheadline - AIDA: Interest + Desire */}
+              <p className="text-xl text-white/80 max-w-lg leading-relaxed">
+                <span className="text-[#c8ff00] font-bold">Finally</span> — an energy drink that delivers <span className="text-[#c8ff00] font-semibold">sustained power</span> without the jitters, crash, or guilt. 
+                <span className="block mt-2 text-white/60">100% natural. Zero sugar. All-day energy.</span>
               </p>
+
+              {/* Urgency Badge */}
+              <div className="flex items-center gap-3 text-sm">
+                <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/20 border border-red-500/30 text-red-400">
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  Only {2847 - Math.floor(Math.random() * 100)} spots left for Early Bird pricing
+                </span>
+              </div>
 
               {/* Countdown Timer */}
               <div className="glass-card-neon rounded-2xl p-6 max-w-md">
@@ -187,14 +200,14 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* CTA Buttons */}
+              {/* CTA Buttons - AIDA: Action with benefit-driven copy */}
               <div className="flex flex-wrap gap-4">
                 <Button
                   onClick={() => { playSound('back'); setLocation("/crowdfund"); }}
-                  className="bg-[#c8ff00] hover:bg-[#d4ff33] text-black font-bold px-8 h-14 text-lg rounded-xl shadow-[0_0_20px_rgba(200,255,0,0.4)] hover:shadow-[0_0_30px_rgba(200,255,0,0.6)] transition-all"
+                  className="bg-[#c8ff00] hover:bg-[#d4ff33] text-black font-bold px-8 h-14 text-lg rounded-xl shadow-[0_0_20px_rgba(200,255,0,0.4)] hover:shadow-[0_0_30px_rgba(200,255,0,0.6)] transition-all group"
                 >
-                  <Gift className="w-5 h-5 mr-2" />
-                  BACK THE RELAUNCH
+                  <Gift className="w-5 h-5 mr-2 group-hover:animate-bounce" />
+                  YES! GET MY NEON NOW
                 </Button>
                 <Button
                   onClick={() => { playSound('preorder'); setLocation("/products"); }}
@@ -202,8 +215,20 @@ export default function Home() {
                   className="border-2 border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10 font-bold px-8 h-14 text-lg rounded-xl"
                 >
                   <Play className="w-5 h-5 mr-2" />
-                  PRE-ORDER NOW
+                  SEE ALL PRODUCTS
                 </Button>
+              </div>
+
+              {/* Trust Signals */}
+              <div className="flex flex-wrap items-center gap-4 text-xs text-white/50">
+                <span className="flex items-center gap-1">
+                  <Shield className="w-4 h-4 text-[#c8ff00]" />
+                  30-Day Money Back Guarantee
+                </span>
+                <span className="flex items-center gap-1">
+                  <Leaf className="w-4 h-4 text-[#c8ff00]" />
+                  100% Natural Ingredients
+                </span>
               </div>
 
               {/* Social Proof - Real User Bubbles */}
@@ -418,12 +443,13 @@ export default function Home() {
         
         <div className="container mx-auto px-6 relative z-10">
           <div className="text-center mb-16">
-            <span className="badge-neon mb-4 inline-block">WHY NEON</span>
+            <span className="badge-neon mb-4 inline-block">THE PROBLEM WITH ENERGY DRINKS</span>
             <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
-              ENERGY <span className="text-[#c8ff00]">REIMAGINED</span>
+              STOP THE <span className="text-[#c8ff00]">CRASH CYCLE</span>
             </h2>
-            <p className="text-white/60 max-w-2xl mx-auto">
-              We're not just another energy drink. We're a movement towards cleaner, smarter energy.
+            <p className="text-white/60 max-w-2xl mx-auto text-lg">
+              <span className="text-white/80">You know the feeling:</span> that 3pm crash, the jitters, the guilt from drinking chemicals. 
+              <span className="text-[#c8ff00] font-semibold">NEON is different.</span> We engineered clean energy that actually works.
             </p>
           </div>
 
@@ -431,20 +457,20 @@ export default function Home() {
             {[
               {
                 icon: Leaf,
-                title: "100% Natural",
-                description: "No artificial colors, flavors, or preservatives. Just pure, clean energy from nature.",
+                title: "Zero Artificial Junk",
+                description: "While others pump you full of chemicals, we use only plant-based ingredients you can actually pronounce. Your body deserves better.",
                 color: "from-green-500/20 to-green-500/5"
               },
               {
                 icon: Shield,
-                title: "Science-Backed",
-                description: "Formulated with optimal doses of caffeine, taurine, and B-vitamins for sustained energy.",
+                title: "Clinically Dosed",
+                description: "150mg natural caffeine + adaptogens + B-vitamins in the exact ratios proven by science. No pixie-dusting, no shortcuts.",
                 color: "from-blue-500/20 to-blue-500/5"
               },
               {
                 icon: Heart,
-                title: "No Crash",
-                description: "Smooth, sustained energy without the jitters or afternoon crash. Feel good all day.",
+                title: "Goodbye, 3PM Crash",
+                description: "Our slow-release formula keeps you powered for 6+ hours. No spike. No crash. Just smooth, sustained focus.",
                 color: "from-pink-500/20 to-pink-500/5"
               },
             ].map((feature, i) => (
@@ -591,13 +617,16 @@ export default function Home() {
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <span className="badge-neon mb-4 inline-block">BUSINESS OPPORTUNITY</span>
+              <span className="badge-neon mb-4 inline-block">LIMITED TERRITORIES AVAILABLE</span>
               <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
-                OWN YOUR <span className="text-[#c8ff00]">TERRITORY</span>
+                BUILD YOUR <span className="text-[#c8ff00]">EMPIRE</span>
               </h2>
-              <p className="text-white/60 text-lg mb-8 leading-relaxed">
-                Become a NEON micro-franchise partner. Get exclusive vending machine rights 
-                in your area with our revolutionary AI-powered dispensing technology.
+              <p className="text-white/80 text-lg mb-4 leading-relaxed">
+                <span className="text-[#c8ff00] font-bold">Imagine this:</span> Passive income from AI-powered vending machines 
+                that sell themselves. No employees. No inventory headaches. Just <span className="text-[#c8ff00]">recurring revenue</span> while you sleep.
+              </p>
+              <p className="text-white/60 text-base mb-8">
+                Our top partners earn $5,000-$15,000/month per territory. And territories are going fast.
               </p>
 
               <div className="grid grid-cols-2 gap-4 mb-8">
@@ -699,26 +728,36 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-r from-[#c8ff00]/5 via-transparent to-[#c8ff00]/5" />
             <div className="relative z-10">
               <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
-                READY TO <span className="text-[#c8ff00]">JOIN?</span>
+                DON'T MISS <span className="text-[#c8ff00]">THIS</span>
               </h2>
-              <p className="text-white/60 text-lg mb-8 max-w-2xl mx-auto">
-                Whether you want to pre-order, back our crowdfunding, or become a franchise partner, 
-                there's a place for you in the NEON family.
+              <p className="text-white/80 text-lg mb-4 max-w-2xl mx-auto">
+                <span className="text-[#c8ff00] font-bold">Early backers get exclusive pricing</span> that won't be available after launch. 
+                Plus founder perks, VIP access, and the satisfaction of being part of something big.
+              </p>
+              <p className="text-white/50 text-sm mb-8">
+                Join 2,847+ people who've already secured their spot. Will you be next?
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Button
                   onClick={() => { playSound('preorder'); setLocation("/shop"); }}
-                  className="btn-primary-shiny text-black font-bold px-8 h-14 text-lg rounded-xl"
+                  className="btn-primary-shiny text-black font-bold px-8 h-14 text-lg rounded-xl group"
                 >
-                  PRE-ORDER NOW
+                  <Zap className="w-5 h-5 mr-2 group-hover:animate-pulse" />
+                  CLAIM MY EARLY BIRD PRICING
                 </Button>
                 <Button
                   onClick={() => { playSound('join'); setLocation("/join"); }}
                   variant="outline"
                   className="btn-shiny text-[#c8ff00] font-bold px-8 h-14 text-lg rounded-xl"
                 >
-                  BECOME A PARTNER
+                  EXPLORE BUSINESS OPPORTUNITY
                 </Button>
+              </div>
+              {/* Final Trust Signal */}
+              <div className="mt-8 flex flex-wrap justify-center gap-6 text-xs text-white/40">
+                <span className="flex items-center gap-1"><Shield className="w-4 h-4" /> 30-Day Money Back</span>
+                <span className="flex items-center gap-1"><Leaf className="w-4 h-4" /> 100% Natural</span>
+                <span className="flex items-center gap-1"><Star className="w-4 h-4" /> 4.9/5 Rating</span>
               </div>
             </div>
           </div>

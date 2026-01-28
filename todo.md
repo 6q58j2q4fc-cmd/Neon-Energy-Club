@@ -2732,3 +2732,57 @@
 
 ### Audit Report
 - Full audit report saved to AUDIT_REPORT.md
+
+
+## API Rate Limiting & Marketing Enhancement (Jan 28)
+
+### API Rate Limiting
+- [ ] Install rate limiting package (express-rate-limit)
+- [ ] Create rate limiting middleware for API endpoints
+- [ ] Configure different limits for public vs authenticated routes
+- [ ] Add rate limit headers to responses
+- [ ] Implement progressive penalties for repeated violations
+- [ ] Add rate limiting to sensitive endpoints (login, signup, checkout)
+- [ ] Write tests for rate limiting functionality
+
+### Proven Marketing & Sales Flow Enhancement
+- [ ] Research and implement AIDA framework (Attention, Interest, Desire, Action)
+- [ ] Apply PAS copywriting formula (Problem, Agitate, Solution)
+- [ ] Implement social proof elements (testimonials, user counts, trust badges)
+- [ ] Add urgency and scarcity triggers (countdown timers, limited availability)
+- [ ] Optimize CTAs with action-oriented, benefit-driven copy
+- [ ] Implement exit-intent popups with compelling offers
+- [ ] Add trust signals (money-back guarantee, secure checkout badges)
+- [ ] Optimize above-the-fold content for immediate value proposition
+- [ ] Implement progressive disclosure in sales funnel
+- [ ] Add micro-commitments throughout user journey
+- [ ] Optimize form fields for conversion (reduce friction)
+- [ ] Test and verify complete user flow from landing to conversion
+
+
+## API Rate Limiting & Marketing Enhancement (Jan 28)
+
+### API Rate Limiting - COMPLETED
+- [x] Implement rate limiting middleware for all API endpoints
+- [x] Add specific limits for sensitive endpoints (auth, checkout, payouts)
+- [x] Configure appropriate limits per endpoint type
+- [x] Add general limiter (100 req/min)
+- [x] Add auth limiter (5 req/15min)
+- [x] Add checkout limiter (5 req/min)
+- [x] Add payout limiter (3 req/hour)
+- [x] Add LLM limiter (10 req/min)
+
+### Marketing & Sales Flow Enhancement - COMPLETED
+- [x] Research proven marketing frameworks (AIDA, PAS, social proof)
+- [x] Document marketing frameworks in docs/MARKETING_FRAMEWORKS.md
+- [x] Enhance homepage hero with AIDA copywriting
+- [x] Update headline to address pain point ("Tired of Crashing?")
+- [x] Add urgency badge with scarcity messaging
+- [x] Optimize CTAs with benefit-driven copy ("YES! GET MY NEON NOW")
+- [x] Add trust signals (30-day guarantee, 100% natural)
+- [x] Enhance features section with PAS framework
+- [x] Update franchise section with stronger benefit copy
+- [x] Enhance final CTA section with urgency and social proof
+- [x] Add sticky CTA bar for mobile conversion
+- [x] Add exit-intent popup for lead capture
+- [x] Add slide-up animation for sticky bar

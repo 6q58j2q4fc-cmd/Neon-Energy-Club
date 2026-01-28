@@ -7,6 +7,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { generalLimiter, authLimiter, checkoutLimiter, llmLimiter } from "./rateLimit";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -30,11 +31,27 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+  
+  // Trust proxy for accurate IP detection behind reverse proxies
+  app.set("trust proxy", 1);
+  
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  
+  // Apply general rate limiting to all API routes
+  app.use("/api", generalLimiter);
+  
+  // Apply stricter rate limiting to sensitive endpoints
+  app.use("/api/oauth", authLimiter);
+  app.use("/api/trpc/payment", checkoutLimiter);
+  app.use("/api/trpc/distributor.analytics", llmLimiter);
+  app.use("/api/trpc/distributor.getInsights", llmLimiter);
+  app.use("/api/trpc/distributor.getRecommendations", llmLimiter);
+  
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+  
   // tRPC API
   app.use(
     "/api/trpc",
@@ -43,6 +60,7 @@ async function startServer() {
       createContext,
     })
   );
+  
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
@@ -59,6 +77,7 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    console.log(`Rate limiting enabled: 100 req/min general, 5 req/15min auth, 5 req/min checkout`);
   });
 }
 
