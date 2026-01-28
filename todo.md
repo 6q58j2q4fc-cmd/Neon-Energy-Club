@@ -2258,3 +2258,35 @@
 - [x] Add referral tracking to order metadata
 - [x] Implement referral bonus redemption
 - [x] Show referral stats: clicks, conversions, earnings
+
+
+## Email Notification System
+
+### Email Infrastructure
+- [x] Create email service module with SMTP/API integration
+- [x] Design responsive email templates with NEON branding
+- [x] Set up email queue system for reliable delivery
+- [x] Implement email logging and tracking
+- [ ] Add unsubscribe functionality
+
+### Order Status Emails
+- [x] Send confirmation email when order is placed
+- [x] Send processing email when order is confirmed
+- [x] Send shipping email with tracking number
+- [x] Send delivery confirmation email
+- [x] Send auto-ship reminder emails before renewal
+
+### Referral Reward Emails
+- [x] Send welcome email when referral code is generated
+- [x] Send notification when someone uses referral link
+- [x] Send reward earned email when referred friend purchases
+- [x] Send monthly referral performance summary
+- [x] Send milestone emails (10 referrals, 25 referrals, etc.)
+
+### Crowdfunding Milestone Emails
+- [x] Send email at 25% funding milestone
+- [x] Send email at 50% funding milestone
+- [x] Send email at 75% funding milestone
+- [x] Send email at 100% funding milestone
+- [x] Send email for stretch goals reached
+- [x] Send weekly progress updates to backers
