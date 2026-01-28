@@ -1,0 +1,25 @@
+Fruit Slider Image Analysis
+============================
+
+Images with transparent backgrounds (PNG with alpha):
+- /cranberry.png - transparent background (checkered pattern visible)
+- /strawberry.png - transparent background (checkered pattern visible)
+- /raspberry.png - white/light background (NOT transparent)
+- /images/blueberries.png - needs checking
+
+Images with solid backgrounds (JPG - no transparency):
+- /cherry.jpg - light gray/white background
+- /gotu-kola.jpg - full green leaf photo (no transparency)
+- /images/passion-fruit.jpg - needs checking
+- /images/prickly-pear.jpg - needs checking
+- /images/green-tea-leaves.jpg - needs checking
+
+Issues identified:
+1. raspberry.png appears to have a white background, not transparent
+2. JPG files cannot have transparency - cherry.jpg, gotu-kola.jpg have solid backgrounds
+3. Inconsistent mix of transparent PNGs and solid background JPGs
+
+Solution approach:
+- Since images are displayed in circular containers with overflow:hidden, the background inconsistency is visible
+- Best fix: Add a dark background color to the image container to normalize appearance
+- Alternative: Replace JPG images with transparent PNG versions

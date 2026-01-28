@@ -2529,3 +2529,23 @@
 - [ ] Test all buttons on every page
 - [ ] Fix any non-functional buttons
 - [ ] Ensure proper navigation and actions
+
+
+## UI Improvements (Jan 28)
+
+### Homepage Profile Bubbles
+- [x] Update "People who joined" section with real user photos from database
+- [x] Fetch actual user profile photos instead of placeholder avatars
+- [x] Add animated bubble appearances with staggered animations
+- [x] Show real user names and join dates
+
+### Fruit Slider Background Fix
+- [x] Remove inconsistent backgrounds from fruit images in slider
+- [x] Ensure all fruit images have transparent backgrounds
+- [x] Maintain visual consistency across all slider images
+
+### Profile Photo Cropping
+- [x] Implement image cropping functionality for profile photo uploads
+- [x] Add crop preview with adjustable crop area
+- [x] Ensure consistent sizing (square aspect ratio) for all profile photos
+- [x] Integrate cropping into ProfileEditor component

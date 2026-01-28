@@ -4383,3 +4383,46 @@ export async function getProfileStats(userId: number) {
   
   return result[0] || { pageViews: 0, signupsGenerated: 0 };
 }
+
+
+/**
+ * Get recent users who joined with their profile photos
+ * Used for homepage "People who joined" section
+ */
+export async function getRecentJoinedUsers(limit = 10) {
+  const db = await getDb();
+  if (!db) return [];
+
+  // Join users with their profiles to get photos
+  const result = await db.select({
+    id: users.id,
+    name: users.name,
+    createdAt: users.createdAt,
+    profilePhotoUrl: userProfiles.profilePhotoUrl,
+    displayName: userProfiles.displayName,
+    location: userProfiles.location,
+  })
+    .from(users)
+    .leftJoin(userProfiles, eq(users.id, userProfiles.userId))
+    .orderBy(desc(users.createdAt))
+    .limit(limit);
+
+  return result.map(user => ({
+    id: user.id,
+    name: user.displayName || user.name || 'NEON Member',
+    createdAt: user.createdAt,
+    profilePhotoUrl: user.profilePhotoUrl,
+    location: user.location,
+  }));
+}
+
+/**
+ * Get total count of users/backers
+ */
+export async function getTotalUserCount(): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const result = await db.select({ count: sql<number>`count(*)` }).from(users);
+  return result[0]?.count || 0;
+}

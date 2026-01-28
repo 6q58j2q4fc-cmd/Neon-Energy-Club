@@ -7,6 +7,7 @@ import { VideoPlayer } from "@/components/VideoPlayer";
 import SocialProofNotifications from "@/components/SocialProofNotifications";
 import ViralNewsletterPopup, { shouldShowPopup, markPopupShown } from "@/components/ViralNewsletterPopup";
 import Header from "@/components/Header";
+import SocialProofBubbles from "@/components/SocialProofBubbles";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -205,28 +206,8 @@ export default function Home() {
                 </Button>
               </div>
 
-              {/* Social Proof */}
-              <div className="flex items-center gap-6 pt-4">
-                <div className="flex items-center gap-2 -space-x-3">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div
-                      key={i}
-                      className="w-10 h-10 rounded-full bg-gradient-to-br from-[#c8ff00]/30 to-[#c8ff00]/10 border-2 border-black flex items-center justify-center text-xs font-bold text-[#c8ff00] overflow-hidden"
-                      title={`Member ${i}`}
-                    >
-                      <img
-                        src={`https://api.dicebear.com/7.x/avataaars/svg?seed=member${i}`}
-                        alt={`Member ${i}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
-                <div>
-                  <p className="text-white font-semibold">2,847+ Backers</p>
-                  <p className="text-white/50 text-sm">Already joined the movement</p>
-                </div>
-              </div>
+              {/* Social Proof - Real User Bubbles */}
+              <SocialProofBubbles />
             </div>
 
             {/* Right - Product Showcase with Vice City Blending */}
@@ -536,7 +517,7 @@ export default function Home() {
                       benefit: "Vitamin C & antioxidants for immune support",
                     },
                     {
-                      image: "/cherry.jpg",
+                      image: "/cherry-transparent.png",
                       name: "Cherry",
                       benefit: "Rich in antioxidants & natural anti-inflammatory compounds",
                     },
@@ -546,7 +527,7 @@ export default function Home() {
                       benefit: "Urinary tract health & immune-boosting vitamin C",
                     },
                     {
-                      image: "/raspberry.png",
+                      image: "/raspberry-transparent.png",
                       name: "Raspberry",
                       benefit: "High fiber content & metabolism-boosting ketones",
                     },
@@ -556,7 +537,7 @@ export default function Home() {
                       benefit: "Heart-healthy folate & skin-nourishing vitamin C",
                     },
                     {
-                      image: "/gotu-kola.jpg",
+                      image: "/gotu-kola-transparent.png",
                       name: "Gotu Kola",
                       benefit: "Brain function support & natural stress relief",
                     },
@@ -570,11 +551,11 @@ export default function Home() {
                         <div className="absolute inset-0 bg-[#c8ff00]/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         
                         {/* Image Container */}
-                        <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-[#c8ff00]/30 group-hover:border-[#c8ff00] transition-all duration-300 shadow-lg">
+                        <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-[#c8ff00]/30 group-hover:border-[#c8ff00] transition-all duration-300 shadow-lg bg-gradient-to-br from-[#0a1a0a] to-[#1a2a1a]">
                           <img
                             src={ingredient.image}
                             alt={ingredient.name}
-                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                            className="w-full h-full object-contain p-2 transform group-hover:scale-110 transition-transform duration-500"
                           />
                         </div>
                       </div>

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import ImageCropper from "./ImageCropper";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,6 +56,8 @@ export default function ProfileEditor({ userType, onSave }: ProfileEditorProps) 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [showCropper, setShowCropper] = useState(false);
+  const [rawImageData, setRawImageData] = useState<string | null>(null);
   
   // Slug availability check
   const [isCheckingSlug, setIsCheckingSlug] = useState(false);
@@ -184,12 +187,34 @@ export default function ProfileEditor({ userType, onSave }: ProfileEditorProps) 
       return;
     }
     
-    // Create preview
+    // Create preview and show cropper
     const reader = new FileReader();
     reader.onload = (e) => {
-      setPhotoPreview(e.target?.result as string);
+      setRawImageData(e.target?.result as string);
+      setShowCropper(true);
     };
     reader.readAsDataURL(file);
+  };
+  
+  // Handle crop complete
+  const handleCropComplete = (croppedImage: string) => {
+    setPhotoPreview(croppedImage);
+    setShowCropper(false);
+    setRawImageData(null);
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+  
+  // Handle crop cancel
+  const handleCropCancel = () => {
+    setShowCropper(false);
+    setRawImageData(null);
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
   
   // Upload photo
@@ -576,6 +601,17 @@ export default function ProfileEditor({ userType, onSave }: ProfileEditorProps) 
           </p>
         </CardContent>
       </Card>
+      
+      {/* Image Cropper Modal */}
+      {showCropper && rawImageData && (
+        <ImageCropper
+          imageSrc={rawImageData}
+          onCropComplete={handleCropComplete}
+          onCancel={handleCropCancel}
+          aspectRatio={1}
+          outputSize={400}
+        />
+      )}
     </div>
   );
 }

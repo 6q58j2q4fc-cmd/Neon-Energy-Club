@@ -3061,6 +3061,20 @@ Always be helpful, enthusiastic, and guide users toward making a purchase or inv
       }),
   }),
 
+  // Public endpoints for homepage data
+  homepage: router({
+    // Get recent users who joined with their profile photos
+    recentJoinedUsers: publicProcedure
+      .input(z.object({ limit: z.number().int().min(1).max(20).default(10) }).optional())
+      .query(async ({ input }) => {
+        const { getRecentJoinedUsers, getTotalUserCount } = await import("./db");
+        const limit = input?.limit || 10;
+        const users = await getRecentJoinedUsers(limit);
+        const totalCount = await getTotalUserCount();
+        return { users, totalCount };
+      }),
+  }),
+
   // Admin router for Admin Panel
   admin: router({
     // Admin stats for dashboard
