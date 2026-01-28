@@ -47,6 +47,7 @@ import {
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import GenealogyTree from "@/components/GenealogyTree";
+import MyTeam from "@/components/MyTeam";
 import { AutoshipManager } from "@/components/AutoshipManager";
 import { PayoutManager } from "@/components/PayoutManager";
 import { RankHistory } from "@/components/RankHistory";
@@ -596,7 +597,7 @@ export default function DistributorPortal() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <GenealogyTree />
+              <MyTeam />
             </motion.div>
           )}
 

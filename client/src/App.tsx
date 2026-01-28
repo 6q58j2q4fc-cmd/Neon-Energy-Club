@@ -31,7 +31,9 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Policies from "./pages/Policies";
 import Profile from "./pages/Profile";
-import PreOrder from "@/pages/PreOrder";
+import PreOrder from "./pages/PreOrder";
+import AdminPanel from "./pages/AdminPanel";
+import EmailPreferences from "./pages/EmailPreferences";
 import Leaderboard from "./pages/Leaderboard";
 import DistributorLeaderboard from "./pages/DistributorLeaderboard";
 import Investors from "./pages/Investors";
@@ -92,7 +94,9 @@ function Router() {
         <Route path="/terms" component={Terms} />
         <Route path="/policies" component={Policies} />
         <Route path="/profile" component={Profile} />
-        <Route path="/pre-order" component={PreOrder} />
+          <Route path="/pre-order" component={PreOrder} />
+          <Route path="/admin" component={AdminPanel} />
+          <Route path="/preferences" component={EmailPreferences} />
         <Route path="/leaderboard" component={Leaderboard} />
         <Route path="/distributor-leaderboard" component={DistributorLeaderboard} />
         <Route path="/investors" component={Investors} />
