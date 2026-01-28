@@ -10,6 +10,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Loader2, CheckCircle, Building2, MapPin, Phone, Mail, User, Briefcase } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
+import MeetingScheduler from "@/components/MeetingScheduler";
 
 interface VendingApplicationFormProps {
   onSuccess?: () => void;
@@ -104,6 +105,17 @@ export default function VendingApplicationForm({ onSuccess, onClose, isBookCall 
   const updateField = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
+  // If this is a Book Call dialog, show the MeetingScheduler instead
+  if (isBookCall) {
+    return (
+      <MeetingScheduler 
+        meetingType="vending" 
+        onSuccess={onSuccess} 
+        onClose={onClose} 
+      />
+    );
+  }
 
   if (isSubmitted) {
     return (

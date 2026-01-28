@@ -1,0 +1,46 @@
+{
+  "query": "SELECT * FROM scheduled_meetings ORDER BY id DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT * FROM scheduled_meetings ORDER BY id DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "2",
+      "userId": "1",
+      "name": "Dakota Rea",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "phone": "(555) 987-6543",
+      "meetingType": "vending",
+      "scheduledAt": "2026-01-29 09:30:00",
+      "durationMinutes": "30",
+      "timezone": "America/New_York",
+      "status": "scheduled",
+      "notes": "NULL",
+      "adminNotes": "NULL",
+      "meetingLink": "NULL",
+      "reminderSent": "0",
+      "createdAt": "2026-01-28 22:56:39",
+      "updatedAt": "2026-01-28 22:56:39"
+    },
+    {
+      "id": "1",
+      "userId": "1",
+      "name": "Dakota Rea",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "phone": "(555) 987-6543",
+      "meetingType": "vending",
+      "scheduledAt": "2026-01-29 10:00:00",
+      "durationMinutes": "30",
+      "timezone": "America/New_York",
+      "status": "scheduled",
+      "notes": "NULL",
+      "adminNotes": "NULL",
+      "meetingLink": "NULL",
+      "reminderSent": "0",
+      "createdAt": "2026-01-28 22:36:31",
+      "updatedAt": "2026-01-28 22:36:31"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tname\temail\tphone\tmeetingType\tscheduledAt\tdurationMinutes\ttimezone\tstatus\tnotes\tadminNotes\tmeetingLink\treminderSent\tcreatedAt\tupdatedAt\n2\t1\tDakota Rea\tb4429bc6tn@privaterelay.appleid.com\t(555) 987-6543\tvending\t2026-01-29 09:30:00\t30\tAmerica/New_York\tscheduled\tNULL\tNULL\tNULL\t0\t2026-01-28 22:56:39\t2026-01-28 22:56:39\n1\t1\tDakota Rea\tb4429bc6tn@privaterelay.appleid.com\t(555) 987-6543\tvending\t2026-01-29 10:00:00\t30\tAmerica/New_York\tscheduled\tNULL\tNULL\tNULL\t0\t2026-01-28 22:36:31\t2026-01-28 22:36:31\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

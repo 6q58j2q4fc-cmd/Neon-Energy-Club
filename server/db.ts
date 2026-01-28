@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption, vendingApplications, franchiseApplications, pushSubscriptions, InsertVendingApplication, InsertFranchiseApplication, InsertPushSubscription, userProfiles, InsertUserProfile } from "../drizzle/schema";
+import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption, vendingApplications, franchiseApplications, pushSubscriptions, InsertVendingApplication, InsertFranchiseApplication, InsertPushSubscription, userProfiles, InsertUserProfile, scheduledMeetings, InsertScheduledMeeting } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -4425,4 +4425,169 @@ export async function getTotalUserCount(): Promise<number> {
 
   const result = await db.select({ count: sql<number>`count(*)` }).from(users);
   return result[0]?.count || 0;
+}
+
+
+// ============================================
+// SCHEDULED MEETINGS FUNCTIONS
+// ============================================
+
+/**
+ * Get booked meeting slots for a date range
+ */
+export async function getBookedMeetingSlots(startDate: Date, endDate: Date) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.select({
+    id: scheduledMeetings.id,
+    scheduledAt: scheduledMeetings.scheduledAt,
+    durationMinutes: scheduledMeetings.durationMinutes,
+  })
+    .from(scheduledMeetings)
+    .where(and(
+      gt(scheduledMeetings.scheduledAt, startDate),
+      sql`${scheduledMeetings.scheduledAt} < ${endDate}`,
+      sql`${scheduledMeetings.status} NOT IN ('cancelled')`
+    ));
+  
+  return result;
+}
+
+/**
+ * Create a new scheduled meeting
+ */
+export async function createScheduledMeeting(data: {
+  userId: number | null;
+  name: string;
+  email: string;
+  phone: string;
+  meetingType: "franchise" | "vending" | "general";
+  scheduledAt: Date;
+  timezone: string;
+  notes: string | null;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.insert(scheduledMeetings).values({
+    userId: data.userId,
+    name: data.name,
+    email: data.email,
+    phone: data.phone,
+    meetingType: data.meetingType,
+    scheduledAt: data.scheduledAt,
+    timezone: data.timezone,
+    notes: data.notes,
+    status: "scheduled",
+    durationMinutes: 30,
+  });
+  
+  return { id: Number(result[0].insertId) };
+}
+
+/**
+ * Get meetings for a specific user
+ */
+export async function getUserMeetings(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select()
+    .from(scheduledMeetings)
+    .where(eq(scheduledMeetings.userId, userId))
+    .orderBy(desc(scheduledMeetings.scheduledAt));
+}
+
+/**
+ * Get a meeting by ID
+ */
+export async function getMeetingById(meetingId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select()
+    .from(scheduledMeetings)
+    .where(eq(scheduledMeetings.id, meetingId))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Cancel a meeting
+ */
+export async function cancelMeeting(meetingId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  await db.update(scheduledMeetings)
+    .set({ status: "cancelled" })
+    .where(eq(scheduledMeetings.id, meetingId));
+  
+  return { success: true };
+}
+
+/**
+ * Get all meetings (admin)
+ */
+export async function getAllMeetings(options: {
+  status?: string;
+  meetingType?: string;
+  limit: number;
+  offset: number;
+}) {
+  const db = await getDb();
+  if (!db) return { meetings: [], total: 0 };
+  
+  let query = db.select().from(scheduledMeetings);
+  
+  const conditions = [];
+  if (options.status && options.status !== "all") {
+    conditions.push(eq(scheduledMeetings.status, options.status as any));
+  }
+  if (options.meetingType && options.meetingType !== "all") {
+    conditions.push(eq(scheduledMeetings.meetingType, options.meetingType as any));
+  }
+  
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+  
+  const meetings = await query
+    .orderBy(desc(scheduledMeetings.scheduledAt))
+    .limit(options.limit)
+    .offset(options.offset);
+  
+  // Get total count
+  let countQuery = db.select({ count: sql<number>`count(*)` }).from(scheduledMeetings);
+  if (conditions.length > 0) {
+    countQuery = countQuery.where(and(...conditions)) as any;
+  }
+  const countResult = await countQuery;
+  const total = countResult[0]?.count || 0;
+  
+  return { meetings, total };
+}
+
+/**
+ * Update meeting status (admin)
+ */
+export async function updateMeetingStatus(meetingId: number, data: {
+  status: string;
+  adminNotes?: string;
+  meetingLink?: string;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const updateData: any = { status: data.status };
+  if (data.adminNotes !== undefined) updateData.adminNotes = data.adminNotes;
+  if (data.meetingLink !== undefined) updateData.meetingLink = data.meetingLink;
+  
+  await db.update(scheduledMeetings)
+    .set(updateData)
+    .where(eq(scheduledMeetings.id, meetingId));
+  
+  return { success: true };
 }

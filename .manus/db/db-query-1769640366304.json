@@ -1,0 +1,29 @@
+{
+  "query": "SELECT * FROM territory_licenses ORDER BY createdAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT * FROM territory_licenses ORDER BY createdAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "userId": "NULL",
+      "name": "John Smith",
+      "email": "john.smith@example.com",
+      "phone": "555-123-4567",
+      "territory": "Brickell Ave, Miami, FL 33131, USA",
+      "coordinates": "NULL",
+      "squareMiles": "79",
+      "termMonths": "12",
+      "pricePerSqMile": "202",
+      "totalCost": "190848",
+      "depositAmount": "47712",
+      "financing": "full",
+      "status": "pending",
+      "notes": "NULL",
+      "createdAt": "2026-01-28 22:45:28",
+      "updatedAt": "2026-01-28 22:45:28"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tname\temail\tphone\tterritory\tcoordinates\tsquareMiles\ttermMonths\tpricePerSqMile\ttotalCost\tdepositAmount\tfinancing\tstatus\tnotes\tcreatedAt\tupdatedAt\n1\tNULL\tJohn Smith\tjohn.smith@example.com\t555-123-4567\tBrickell Ave, Miami, FL 33131, USA\tNULL\t79\t12\t202\t190848\t47712\tfull\tpending\tNULL\t2026-01-28 22:45:28\t2026-01-28 22:45:28\n",
+  "stderr": "",
+  "execution_time_ms": 126
+}

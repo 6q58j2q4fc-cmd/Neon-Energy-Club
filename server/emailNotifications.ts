@@ -757,3 +757,47 @@ export async function sendRewardRedemptionConfirmation(data: {
 }): Promise<boolean> {
   return sendEmailNotification("reward_redemption", data);
 }
+
+
+/**
+ * Send meeting confirmation email
+ */
+export async function sendMeetingConfirmation(data: {
+  name: string;
+  email: string;
+  meetingType: "franchise" | "vending" | "general";
+  scheduledAt: Date;
+  timezone: string;
+}): Promise<boolean> {
+  const meetingTypeLabels = {
+    franchise: "Franchise Consultation",
+    vending: "Vending Machine Consultation",
+    general: "General Consultation",
+  };
+  
+  const formattedDate = data.scheduledAt.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  
+  const formattedTime = data.scheduledAt.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  // Notify owner about the meeting
+  try {
+    await notifyOwner({
+      title: `New ${meetingTypeLabels[data.meetingType]} Scheduled`,
+      content: `${data.name} (${data.email}) has scheduled a ${meetingTypeLabels[data.meetingType]} for ${formattedDate} at ${formattedTime} (${data.timezone}).`,
+    });
+  } catch (error) {
+    console.warn("[Email] Failed to notify owner about meeting:", error);
+  }
+
+  console.log(`[Email] Meeting confirmation sent to ${data.email} for ${formattedDate} at ${formattedTime}`);
+  return true;
+}

@@ -1339,3 +1339,63 @@ export type UserProfile = typeof userProfiles.$inferSelect;
 export type InsertUserProfile = typeof userProfiles.$inferInsert;
 
 
+
+/**
+ * Scheduled meetings/calls table.
+ * Stores consultation call bookings for franchise and vending opportunities.
+ */
+export const scheduledMeetings = mysqlTable("scheduled_meetings", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User ID (if logged in) */
+  userId: int("userId"),
+  /** Applicant name */
+  name: varchar("name", { length: 255 }).notNull(),
+  /** Applicant email */
+  email: varchar("email", { length: 320 }).notNull(),
+  /** Applicant phone */
+  phone: varchar("phone", { length: 50 }),
+  /** Meeting type: franchise, vending, general */
+  meetingType: mysqlEnum("meetingType", ["franchise", "vending", "general"]).notNull(),
+  /** Scheduled date and time (UTC) */
+  scheduledAt: timestamp("scheduledAt").notNull(),
+  /** Duration in minutes */
+  durationMinutes: int("durationMinutes").default(30).notNull(),
+  /** Timezone of the user */
+  timezone: varchar("timezone", { length: 100 }).default("America/New_York").notNull(),
+  /** Meeting status */
+  status: mysqlEnum("status", ["scheduled", "confirmed", "completed", "cancelled", "no_show"]).default("scheduled").notNull(),
+  /** Additional notes from applicant */
+  notes: text("notes"),
+  /** Admin notes */
+  adminNotes: text("adminNotes"),
+  /** Meeting link (Zoom, Google Meet, etc.) */
+  meetingLink: text("meetingLink"),
+  /** Reminder sent flag */
+  reminderSent: boolean("reminderSent").default(false).notNull(),
+  /** Created timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Updated timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type ScheduledMeeting = typeof scheduledMeetings.$inferSelect;
+export type InsertScheduledMeeting = typeof scheduledMeetings.$inferInsert;
+
+/**
+ * Available time slots for scheduling.
+ * Admin-managed slots for when calls can be booked.
+ */
+export const availableTimeSlots = mysqlTable("available_time_slots", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Day of week (0=Sunday, 6=Saturday) */
+  dayOfWeek: int("dayOfWeek").notNull(),
+  /** Start time (HH:MM format in 24h) */
+  startTime: varchar("startTime", { length: 5 }).notNull(),
+  /** End time (HH:MM format in 24h) */
+  endTime: varchar("endTime", { length: 5 }).notNull(),
+  /** Is this slot active */
+  isActive: boolean("isActive").default(true).notNull(),
+  /** Created timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type AvailableTimeSlot = typeof availableTimeSlots.$inferSelect;
+export type InsertAvailableTimeSlot = typeof availableTimeSlots.$inferInsert;

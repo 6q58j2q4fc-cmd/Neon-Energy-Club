@@ -3492,6 +3492,134 @@ Always be helpful, enthusiastic, and guide users toward making a purchase or inv
       }),
   }),
 
+  // Scheduling router for meeting bookings
+  scheduling: router({
+    // Get booked slots for a date range
+    getBookedSlots: publicProcedure
+      .input(z.object({
+        startDate: z.string(),
+        endDate: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const { getBookedMeetingSlots } = await import("./db");
+        return await getBookedMeetingSlots(new Date(input.startDate), new Date(input.endDate));
+      }),
+
+    // Schedule a new meeting
+    scheduleMeeting: publicProcedure
+      .input(z.object({
+        name: z.string().min(1, "Name is required"),
+        email: z.string().email("Valid email is required"),
+        phone: z.string().min(1, "Phone is required"),
+        meetingType: z.enum(["franchise", "vending", "general"]),
+        scheduledAt: z.string(),
+        timezone: z.string(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { createScheduledMeeting } = await import("./db");
+        
+        const result = await createScheduledMeeting({
+          userId: ctx.user?.id || null,
+          name: input.name,
+          email: input.email,
+          phone: input.phone,
+          meetingType: input.meetingType,
+          scheduledAt: new Date(input.scheduledAt),
+          timezone: input.timezone,
+          notes: input.notes || null,
+        });
+
+        // Send confirmation email
+        try {
+          const { sendMeetingConfirmation } = await import("./emailNotifications");
+          await sendMeetingConfirmation({
+            name: input.name,
+            email: input.email,
+            meetingType: input.meetingType,
+            scheduledAt: new Date(input.scheduledAt),
+            timezone: input.timezone,
+          });
+        } catch (emailError) {
+          console.warn("[Scheduling] Failed to send confirmation email:", emailError);
+        }
+
+        // Notify owner about new meeting
+        try {
+          await notifyOwner({
+            title: `New ${input.meetingType} consultation scheduled`,
+            content: `${input.name} (${input.email}) scheduled a ${input.meetingType} consultation for ${new Date(input.scheduledAt).toLocaleString()} ${input.timezone}. Phone: ${input.phone}. Notes: ${input.notes || "None"}`,
+          });
+        } catch (notifyError) {
+          console.warn("[Scheduling] Failed to notify owner:", notifyError);
+        }
+
+        return { success: true, meetingId: result?.id };
+      }),
+
+    // Get user's scheduled meetings
+    getMyMeetings: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getUserMeetings } = await import("./db");
+        return await getUserMeetings(ctx.user.id);
+      }),
+
+    // Cancel a meeting
+    cancelMeeting: protectedProcedure
+      .input(z.object({ meetingId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const { cancelMeeting, getMeetingById } = await import("./db");
+        const meeting = await getMeetingById(input.meetingId);
+        
+        if (!meeting) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Meeting not found" });
+        }
+        
+        // Only allow cancellation by the user who booked or admin
+        if (meeting.userId !== ctx.user.id && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Not authorized to cancel this meeting" });
+        }
+        
+        return await cancelMeeting(input.meetingId);
+      }),
+
+    // Admin: Get all meetings
+    adminGetAllMeetings: protectedProcedure
+      .input(z.object({
+        status: z.enum(["scheduled", "confirmed", "completed", "cancelled", "no_show", "all"]).optional(),
+        meetingType: z.enum(["franchise", "vending", "general", "all"]).optional(),
+        limit: z.number().default(50),
+        offset: z.number().default(0),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { getAllMeetings } = await import("./db");
+        return await getAllMeetings(input);
+      }),
+
+    // Admin: Update meeting status
+    adminUpdateMeetingStatus: protectedProcedure
+      .input(z.object({
+        meetingId: z.number(),
+        status: z.enum(["scheduled", "confirmed", "completed", "cancelled", "no_show"]),
+        adminNotes: z.string().optional(),
+        meetingLink: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { updateMeetingStatus } = await import("./db");
+        return await updateMeetingStatus(input.meetingId, {
+          status: input.status,
+          adminNotes: input.adminNotes,
+          meetingLink: input.meetingLink,
+        });
+      }),
+  }),
+
 });
 
 // Helper function to anonymize names for privacy on public leaderboard

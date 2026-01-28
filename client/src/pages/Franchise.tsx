@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { trpc } from "@/lib/trpc";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,13 +8,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { MapPin, DollarSign, Calendar, TrendingUp, Check } from "lucide-react";
+import { MapPin, DollarSign, Calendar, TrendingUp, Check, Phone, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import TerritoryMapSelector from "@/components/TerritoryMapSelector";
 import type { TerritoryData } from "@/components/TerritoryMapSelector";
 import { useAuth } from "@/_core/hooks/useAuth";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import { SEO } from "@/components/SEO";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import MeetingScheduler from "@/components/MeetingScheduler";
 
 // Territory pricing data (price per square mile per month)
 const territoryPricing = {
@@ -44,6 +47,7 @@ export default function Franchise() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
+  const [scheduleCallOpen, setScheduleCallOpen] = useState(false);
   
   // Territory selection state
   const [territory, setTerritory] = useState<TerritoryData | null>(null);
@@ -68,6 +72,20 @@ export default function Franchise() {
   const depositAmount = totalCost * 0.25; // 25% deposit
   const monthlyPayment = totalCost / termMonths;
 
+  // Mutation to submit franchise application
+  const submitApplication = trpc.franchise.submit.useMutation({
+    onSuccess: () => {
+      toast.success("Franchise application submitted! We'll contact you within 24 hours.");
+      // Reset form
+      setFormData({ name: "", email: "", phone: "", notes: "" });
+      setTerritory(null);
+      setTermMonths(12);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to submit application. Please try again.");
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -76,12 +94,25 @@ export default function Franchise() {
       return;
     }
 
-    toast.success("Franchise application submitted! We'll contact you within 24 hours.");
-    
-    // Reset form
-    setFormData({ name: "", email: "", phone: "", notes: "" });
-    setTerritory(null);
-    setTermMonths(12);
+    if (!formData.name || !formData.email || !formData.phone) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    // Submit to database via tRPC
+    submitApplication.mutate({
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      territory: territory.address,
+      squareMiles: Math.round(territory.squareMiles),
+      termMonths: termMonths,
+      pricePerSqMile: Math.round(territory.totalPrice / territory.squareMiles),
+      totalCost: Math.round(totalCost),
+      depositAmount: Math.round(depositAmount),
+      financing: financing as "full" | "deposit" | "monthly",
+      notes: formData.notes || undefined,
+    });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -373,13 +404,33 @@ export default function Franchise() {
                   </div>
                 )}
 
-                <Button
-                  type="submit"
-                  disabled={!territory}
-                  className="w-full bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold text-lg py-6 neon-pulse transition-smooth"
-                >
-                  Submit Application
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button
+                    type="submit"
+                    disabled={!territory || submitApplication.isPending}
+                    className="flex-1 bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold text-lg py-6 neon-pulse transition-smooth"
+                  >
+                    {submitApplication.isPending ? "Submitting..." : "Submit Application"} <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                  <Dialog open={scheduleCallOpen} onOpenChange={setScheduleCallOpen}>
+                    <DialogTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex-1 border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10 font-bold text-lg py-6"
+                      >
+                        <Phone className="w-5 h-5 mr-2" /> Schedule a Call
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-[#0a1a1a] border-[#c8ff00]/30">
+                      <MeetingScheduler 
+                        meetingType="franchise" 
+                        onSuccess={() => setScheduleCallOpen(false)} 
+                        onClose={() => setScheduleCallOpen(false)} 
+                      />
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </form>
             </CardContent>
           </Card>

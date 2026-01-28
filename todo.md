@@ -2786,3 +2786,38 @@
 - [x] Add sticky CTA bar for mobile conversion
 - [x] Add exit-intent popup for lead capture
 - [x] Add slide-up animation for sticky bar
+
+
+## Franchise & Vending Application Flow Fix (Jan 28) - COMPLETED
+
+### Apply Now Button Fixes
+- [x] Fix Apply Now button on Franchise page
+- [x] Fix Apply Now button on Vending page
+- [x] Ensure buttons navigate to correct application forms
+
+### Custom Scheduler Implementation
+- [x] Create MeetingScheduler component with proposed time slots
+- [x] Add database table for scheduled meetings
+- [x] Implement time slot selection with availability checking
+- [x] Add meeting confirmation emails
+- [x] Create admin view for managing scheduled meetings
+
+### Schedule Call Button
+- [x] Fix Schedule Call button on Franchise page
+- [x] Fix Schedule Call button on Vending page
+- [x] Integrate scheduler component with both pages
+
+### Complete Application Flow
+- [x] Franchise application form with all required fields
+- [x] Vending application form with all required fields
+- [x] Application submission to database
+- [x] Application review workflow in admin panel
+- [x] Application-to-checkout integration (ready for Stripe keys)
+- [ ] Payment processing for approved applications (requires Stripe keys)
+
+### Full-Stack Audit
+- [x] Audit all buttons on Franchise page
+- [x] Audit all buttons on Vending page
+- [x] Fix any broken links or navigation
+- [x] Verify all form submissions work correctly
+- [x] Test complete user journey from application to payment (Stripe pending)
