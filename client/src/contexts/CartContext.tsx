@@ -5,9 +5,10 @@ export interface CartItem {
   name: string;
   price: number;
   quantity: number;
-  type: "product" | "package";
+  type?: "product" | "package";
   flavor?: "original" | "organic" | "mixed";
   image?: string;
+  distributorCode?: string;
 }
 
 interface CartContextType {
@@ -20,6 +21,7 @@ interface CartContextType {
   totalPrice: number;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  openCart: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -82,6 +84,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
+  const openCart = () => setIsOpen(true);
+
   return (
     <CartContext.Provider
       value={{
@@ -94,6 +98,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         totalPrice,
         isOpen,
         setIsOpen,
+        openCart,
       }}
     >
       {children}

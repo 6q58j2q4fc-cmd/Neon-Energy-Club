@@ -4685,3 +4685,63 @@ export async function getVendingPaymentHistory(orderId: number) {
     .where(eq(vendingPaymentHistory.orderId, orderId))
     .orderBy(desc(vendingPaymentHistory.createdAt));
 }
+
+
+/**
+ * Get public distributor profile by distributor code (for cloned pages)
+ */
+export async function getDistributorPublicProfile(code: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  // Try to find by distributor code first
+  let [distributor] = await db.select()
+    .from(distributors)
+    .where(eq(distributors.distributorCode, code));
+  
+  // If not found, try by username
+  if (!distributor) {
+    [distributor] = await db.select()
+      .from(distributors)
+      .where(eq(distributors.username, code));
+  }
+  
+  // If not found, try by subdomain
+  if (!distributor) {
+    [distributor] = await db.select()
+      .from(distributors)
+      .where(eq(distributors.subdomain, code));
+  }
+  
+  if (!distributor || distributor.isActive !== 1) {
+    return null;
+  }
+  
+  // Get user profile for additional info
+  const [profile] = await db.select()
+    .from(userProfiles)
+    .where(eq(userProfiles.userId, distributor.userId));
+  
+  // Count total customers (orders attributed to this distributor)
+  const customerCountResult = await db.select({
+    count: sql<number>`COUNT(DISTINCT customer_id)`
+  })
+    .from(sales)
+    .where(eq(sales.distributorId, distributor.id));
+  
+  const totalCustomers = customerCountResult[0]?.count || 0;
+  
+  return {
+    id: distributor.id,
+    distributorCode: distributor.distributorCode,
+    username: distributor.username || distributor.distributorCode,
+    displayName: profile?.displayName || distributor.username || `NEON Distributor ${distributor.distributorCode}`,
+    profilePhoto: profile?.profilePhotoUrl || null,
+    location: profile?.location || null,
+    bio: profile?.bio || null,
+    rank: distributor.rank || 'starter',
+    joinDate: distributor.createdAt?.toISOString() || new Date().toISOString(),
+    totalCustomers: totalCustomers,
+    isActive: distributor.isActive === 1,
+  };
+}

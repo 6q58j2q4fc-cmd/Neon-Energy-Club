@@ -1,16 +1,51 @@
 import { useEffect, useState } from "react";
-import { useRoute } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Zap, Share2, ShoppingCart, Users, TrendingUp, Sparkles } from "lucide-react";
+import { Zap, Share2, ShoppingCart, Users, TrendingUp, Sparkles, MapPin, Star, CheckCircle, Copy, ExternalLink } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
+
+interface DistributorProfile {
+  id: number;
+  distributorCode: string;
+  username: string;
+  displayName: string;
+  profilePhoto: string | null;
+  location: string | null;
+  bio: string | null;
+  rank: string;
+  joinDate: string;
+  totalCustomers: number;
+  isActive: boolean;
+}
 
 export default function DistributorSite() {
   const [, params] = useRoute("/d/:code");
   const distributorCode = params?.code;
+  const [, setLocation] = useLocation();
   const [timeLeft, setTimeLeft] = useState({ days: 90, hours: 0, minutes: 0, seconds: 0 });
+  const [copied, setCopied] = useState(false);
+  const { addItem, openCart } = useCart();
 
-  // In a real implementation, this would fetch distributor info by code
-  // For now, we'll show a branded landing page
+  // Fetch real distributor profile data
+  const { data: profile, isLoading, error } = trpc.distributor.getPublicProfile.useQuery(
+    { code: distributorCode || "" },
+    { enabled: !!distributorCode }
+  );
+
+  // Track referral click when page loads
+  const trackClick = trpc.distributor.trackReferralClick.useMutation();
+
+  useEffect(() => {
+    if (distributorCode) {
+      // Store distributor code in session for order attribution
+      sessionStorage.setItem('referringDistributor', distributorCode);
+      
+      // Track the click
+      trackClick.mutate({ distributorCode });
+    }
+  }, [distributorCode]);
 
   useEffect(() => {
     const calculateTimeLeft = () => {
@@ -33,6 +68,68 @@ export default function DistributorSite() {
     return () => clearInterval(timer);
   }, []);
 
+  const handleOrderNow = () => {
+    // Add default product to cart with distributor attribution
+    addItem({
+      id: "neon-original-case",
+      name: "NEON Original Case (24 Cans)",
+      price: 59.99,
+      quantity: 1,
+      image: "/neon-can.png",
+      distributorCode: distributorCode,
+    });
+    openCart();
+    toast.success("Added to cart! Your order will be credited to your distributor.");
+  };
+
+  const handleBecomeDistributor = () => {
+    // Navigate to join page with sponsor code pre-filled
+    setLocation(`/join?sponsor=${distributorCode}`);
+  };
+
+  const copyLink = () => {
+    const link = `${window.location.origin}/d/${distributorCode}`;
+    navigator.clipboard.writeText(link);
+    setCopied(true);
+    toast.success("Link copied to clipboard!");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#c8ff00] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading distributor page...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state for invalid distributor code
+  if (error || !profile) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-6">
+          <div className="w-20 h-20 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-6">
+            <Zap className="w-10 h-10 text-red-500" />
+          </div>
+          <h1 className="text-3xl font-black mb-4">Distributor Not Found</h1>
+          <p className="text-gray-400 mb-8">
+            The distributor code "{distributorCode}" doesn't exist or is no longer active.
+          </p>
+          <Button
+            onClick={() => setLocation("/")}
+            className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold"
+          >
+            Go to Main Site
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header with Distributor Branding */}
@@ -45,20 +142,97 @@ export default function DistributorSite() {
               </div>
               <div>
                 <div className="text-xl font-black neon-text">NEON®</div>
-                {distributorCode && (
-                  <div className="text-xs text-gray-500">Distributor: {distributorCode}</div>
-                )}
+                <div className="text-xs text-gray-500">Independent Distributor</div>
               </div>
             </div>
-            <Button className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold">
-              Order Now
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={copyLink}
+                className="border-[#c8ff00]/30 text-[#c8ff00] hover:bg-[#c8ff00]/10"
+              >
+                {copied ? <CheckCircle className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
+                {copied ? "Copied!" : "Share"}
+              </Button>
+              <Button 
+                onClick={handleOrderNow}
+                className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold"
+              >
+                <ShoppingCart className="w-4 h-4 mr-2" />
+                Order Now
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
+      {/* Distributor Profile Section */}
+      <section className="py-8 border-b border-[#c8ff00]/20 bg-gradient-to-b from-[#0a0a0a] to-black">
+        <div className="container px-6">
+          <div className="flex flex-col md:flex-row items-center gap-6 max-w-4xl mx-auto">
+            {/* Profile Photo */}
+            <div className="relative">
+              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[#c8ff00] neon-glow">
+                {profile.profilePhoto ? (
+                  <img 
+                    src={profile.profilePhoto} 
+                    alt={profile.displayName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-[#c8ff00]/20 flex items-center justify-center">
+                    <Users className="w-12 h-12 text-[#c8ff00]" />
+                  </div>
+                )}
+              </div>
+              {/* Rank Badge */}
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#c8ff00] text-black text-xs font-bold rounded-full uppercase">
+                {profile.rank}
+              </div>
+            </div>
+
+            {/* Profile Info */}
+            <div className="text-center md:text-left flex-1">
+              <h2 className="text-3xl font-black mb-2">{profile.displayName}</h2>
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-gray-400 mb-3">
+                {profile.location && (
+                  <span className="flex items-center gap-1">
+                    <MapPin className="w-4 h-4 text-[#c8ff00]" />
+                    {profile.location}
+                  </span>
+                )}
+                <span className="flex items-center gap-1">
+                  <Star className="w-4 h-4 text-[#c8ff00]" />
+                  {profile.totalCustomers} Happy Customers
+                </span>
+                <span className="flex items-center gap-1">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Verified Distributor
+                </span>
+              </div>
+              {profile.bio && (
+                <p className="text-gray-300 max-w-xl">{profile.bio}</p>
+              )}
+            </div>
+
+            {/* Quick Stats */}
+            <div className="flex gap-4">
+              <div className="text-center px-4 py-2 bg-[#0a0a0a] border border-[#c8ff00]/30 rounded-lg">
+                <div className="text-2xl font-black text-[#c8ff00]">{profile.totalCustomers}</div>
+                <div className="text-xs text-gray-500">Customers</div>
+              </div>
+              <div className="text-center px-4 py-2 bg-[#0a0a0a] border border-[#c8ff00]/30 rounded-lg">
+                <div className="text-2xl font-black text-[#c8ff00]">4.9</div>
+                <div className="text-xs text-gray-500">Rating</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Hero Section */}
-      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-black via-[#0a0a0a] to-black"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(200,255,0,0.15),transparent_50%)]"></div>
@@ -76,12 +250,12 @@ export default function DistributorSite() {
               <span className="text-[#c8ff00] font-bold text-sm">EXCLUSIVE DISTRIBUTOR OFFER</span>
             </div>
 
-            <h1 className="text-6xl lg:text-7xl font-black leading-none">
+            <h1 className="text-5xl lg:text-7xl font-black leading-none">
               FUEL YOUR <span className="text-[#c8ff00] neon-text">FUTURE</span>
             </h1>
 
             <p className="text-xl text-gray-300 leading-relaxed max-w-2xl mx-auto">
-              Join the NEON revolution. Get exclusive pricing, early access, and special rewards when you order through your distributor.
+              {profile.displayName} invites you to join the NEON revolution. Get exclusive pricing, early access, and special rewards when you order through your personal distributor.
             </p>
 
             {/* Countdown Timer */}
@@ -108,6 +282,7 @@ export default function DistributorSite() {
             <div className="flex flex-wrap gap-4 justify-center">
               <Button
                 size="lg"
+                onClick={handleOrderNow}
                 className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-black text-lg px-10 h-16 neon-pulse"
               >
                 <ShoppingCart className="w-6 h-6 mr-2" />
@@ -116,27 +291,29 @@ export default function DistributorSite() {
               <Button
                 size="lg"
                 variant="outline"
+                onClick={handleBecomeDistributor}
                 className="border-2 border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10 font-black text-lg px-10 h-16"
               >
                 <Users className="w-6 h-6 mr-2" />
-                BECOME A DISTRIBUTOR
+                JOIN THE TEAM
               </Button>
             </div>
 
-            {/* Distributor Info */}
-            {distributorCode && (
-              <div className="pt-8">
-                <div className="inline-flex items-center gap-3 px-6 py-3 bg-[#0a0a0a] border border-[#c8ff00]/30 rounded-full">
-                  <div className="w-10 h-10 rounded-full bg-[#c8ff00]/20 flex items-center justify-center">
-                    <Users className="w-5 h-5 text-[#c8ff00]" />
-                  </div>
-                  <div className="text-left">
-                    <div className="text-xs text-gray-500">Your Distributor</div>
-                    <div className="font-bold text-[#c8ff00]">{distributorCode}</div>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Trust Badges */}
+            <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-sm text-gray-400">
+              <span className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                30-Day Money Back
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                100% Natural
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                Free Shipping $50+
+              </span>
+            </div>
           </div>
         </div>
       </section>
@@ -146,7 +323,7 @@ export default function DistributorSite() {
         <div className="container px-6">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-black mb-4">
-              WHY ORDER THROUGH A <span className="text-[#c8ff00] neon-text">DISTRIBUTOR</span>?
+              WHY ORDER FROM <span className="text-[#c8ff00] neon-text">{profile.displayName.split(' ')[0].toUpperCase()}</span>?
             </h2>
           </div>
 
@@ -160,7 +337,7 @@ export default function DistributorSite() {
               {
                 icon: Sparkles,
                 title: "PERSONAL SERVICE",
-                description: "Direct support and guidance from your dedicated distributor",
+                description: `Direct support and guidance from ${profile.displayName}`,
               },
               {
                 icon: Share2,
@@ -168,12 +345,40 @@ export default function DistributorSite() {
                 description: "Be first to receive new products and limited editions",
               },
             ].map((benefit, index) => (
-              <div key={index} className="text-center p-8 bg-[#0a0a0a] border border-[#c8ff00]/30 rounded-2xl">
+              <div key={index} className="text-center p-8 bg-[#0a0a0a] border border-[#c8ff00]/30 rounded-2xl hover:border-[#c8ff00]/60 transition-colors">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#c8ff00]/10 mb-6 neon-glow-soft">
                   <benefit.icon className="w-8 h-8 text-[#c8ff00]" />
                 </div>
                 <h3 className="text-xl font-black mb-3">{benefit.title}</h3>
                 <p className="text-gray-400">{benefit.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Products Preview */}
+      <section className="py-20 border-t border-[#c8ff00]/20 bg-gradient-to-b from-black to-[#0a0a0a]">
+        <div className="container px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-black mb-4">
+              FEATURED <span className="text-[#c8ff00] neon-text">PRODUCTS</span>
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {[
+              { name: "NEON Original", price: "$2.99", desc: "Classic energy formula" },
+              { name: "NEON Organic", price: "$3.49", desc: "100% organic ingredients" },
+              { name: "NEON Case (24)", price: "$59.99", desc: "Best value pack" },
+            ].map((product, index) => (
+              <div key={index} className="bg-[#0a0a0a] border border-[#c8ff00]/30 rounded-xl p-6 text-center hover:border-[#c8ff00] transition-colors cursor-pointer" onClick={handleOrderNow}>
+                <div className="w-24 h-32 bg-gradient-to-b from-[#c8ff00]/20 to-transparent rounded-lg mx-auto mb-4 flex items-center justify-center">
+                  <Zap className="w-12 h-12 text-[#c8ff00]" />
+                </div>
+                <h3 className="font-bold text-lg mb-1">{product.name}</h3>
+                <p className="text-sm text-gray-400 mb-2">{product.desc}</p>
+                <p className="text-2xl font-black text-[#c8ff00]">{product.price}</p>
               </div>
             ))}
           </div>
@@ -188,10 +393,11 @@ export default function DistributorSite() {
               READY TO <span className="text-[#c8ff00] neon-text">ENERGIZE</span>?
             </h2>
             <p className="text-xl text-gray-300">
-              Order now and get exclusive distributor pricing plus free shipping on your first order
+              Order now through {profile.displayName} and get exclusive distributor pricing plus free shipping on your first order over $50
             </p>
             <Button
               size="lg"
+              onClick={handleOrderNow}
               className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-black text-xl px-12 h-16 neon-pulse"
             >
               <ShoppingCart className="w-6 h-6 mr-2" />
@@ -206,9 +412,22 @@ export default function DistributorSite() {
         <div className="container px-6">
           <div className="text-center text-sm text-gray-500">
             <p>© 2026 NEON Energy Drink. All rights reserved.</p>
-            {distributorCode && (
-              <p className="mt-2">Independent Distributor: {distributorCode}</p>
-            )}
+            <p className="mt-2">
+              Independent Distributor: <span className="text-[#c8ff00]">{profile.displayName}</span> ({profile.distributorCode})
+            </p>
+            <div className="mt-4 flex items-center justify-center gap-4">
+              <button onClick={() => setLocation("/")} className="text-gray-400 hover:text-[#c8ff00] transition-colors">
+                Main Site
+              </button>
+              <span className="text-gray-600">•</span>
+              <button onClick={() => setLocation("/join")} className="text-gray-400 hover:text-[#c8ff00] transition-colors">
+                Become a Distributor
+              </button>
+              <span className="text-gray-600">•</span>
+              <button onClick={() => setLocation("/products")} className="text-gray-400 hover:text-[#c8ff00] transition-colors">
+                All Products
+              </button>
+            </div>
           </div>
         </div>
       </footer>

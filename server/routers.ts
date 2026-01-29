@@ -593,6 +593,22 @@ export const appRouter = router({
         return await checkSubdomainAvailable(input.subdomain);
       }),
 
+    // Get public distributor profile by code (for cloned pages)
+    getPublicProfile: publicProcedure
+      .input(z.object({ code: z.string() }))
+      .query(async ({ input }) => {
+        const { getDistributorPublicProfile } = await import("./db");
+        return await getDistributorPublicProfile(input.code);
+      }),
+
+    // Track referral click (for attribution)
+    trackReferralClick: publicProcedure
+      .input(z.object({ distributorCode: z.string() }))
+      .mutation(async ({ input }) => {
+        const { trackReferralClick } = await import("./mlmDataMonitor");
+        return await trackReferralClick(input.distributorCode, {});
+      }),
+
     // Get genealogy tree
     genealogy: protectedProcedure
       .input(z.object({ depth: z.number().int().min(1).max(10).default(5) }).optional())

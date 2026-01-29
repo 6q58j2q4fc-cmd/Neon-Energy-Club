@@ -60,7 +60,7 @@ export default function Checkout() {
         name: item.name,
         price: item.price,
         quantity: item.quantity,
-        type: item.type,
+        type: item.type || "product",
         flavor: item.flavor,
       })),
       name: name.trim(),
