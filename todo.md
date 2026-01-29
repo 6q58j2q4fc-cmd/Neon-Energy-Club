@@ -3226,3 +3226,16 @@
 - [x] Add breadcrumbs to Blog pages
 - [x] Add breadcrumbs to Shop page
 - [x] Style breadcrumbs to match Vice City theme
+
+
+## Audio Feature Cleanup (Jan 29, 2026)
+
+### Remove Audio Playback Feature
+- [x] Remove audio speed controls from VoiceMuteButton
+- [x] Simplify the sound toggle to just on/off
+- [x] Remove playback rate functionality from useSoundEffects hook
+
+### Make Jungle Sounds Icon Collapsible
+- [x] Reposition sound icon to bottom-right (less intrusive)
+- [x] Make icon collapsible/minimizable with chevron toggle
+- [x] Ensure it doesn't interfere with page navigation
