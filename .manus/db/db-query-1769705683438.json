@@ -1,0 +1,24 @@
+{
+  "query": "SELECT u.id, u.name, u.email, d.distributorCode, d.sponsorId FROM users u LEFT JOIN distributors d ON u.id = d.userId WHERE u.name LIKE '%Dakota%' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT u.id, u.name, u.email, d.distributorCode, d.sponsorId FROM users u LEFT JOIN distributors d ON u.id = d.userId WHERE u.name LIKE '%Dakota%' LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Dakota Rea",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "distributorCode": "NEON1VDTXNY",
+      "sponsorId": "NULL"
+    },
+    {
+      "id": "510004",
+      "name": "Dakota Rea",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "distributorCode": "NEON5100041SAH51",
+      "sponsorId": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tdistributorCode\tsponsorId\n1\tDakota Rea\tb4429bc6tn@privaterelay.appleid.com\tNEON1VDTXNY\tNULL\n510004\tDakota Rea\tb4429bc6tn@privaterelay.appleid.com\tNEON5100041SAH51\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

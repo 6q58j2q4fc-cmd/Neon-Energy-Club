@@ -1,0 +1,26 @@
+{
+  "query": "SELECT d.id, d.userId, d.distributorCode, d.sponsorId, d.`rank`, u.name FROM distributors d JOIN users u ON d.userId = u.id WHERE u.name LIKE '%Dakota%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT d.id, d.userId, d.distributorCode, d.sponsorId, d.`rank`, u.name FROM distributors d JOIN users u ON d.userId = u.id WHERE u.name LIKE '%Dakota%';",
+  "rows": [
+    {
+      "id": "30001",
+      "userId": "1",
+      "distributorCode": "NEON1VDTXNY",
+      "sponsorId": "NULL",
+      "rank": "ambassador",
+      "name": "Dakota Rea"
+    },
+    {
+      "id": "180001",
+      "userId": "510004",
+      "distributorCode": "NEON5100041SAH51",
+      "sponsorId": "NULL",
+      "rank": "starter",
+      "name": "Dakota Rea"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tdistributorCode\tsponsorId\trank\tname\n30001\t1\tNEON1VDTXNY\tNULL\tambassador\tDakota Rea\n180001\t510004\tNEON5100041SAH51\tNULL\tstarter\tDakota Rea\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

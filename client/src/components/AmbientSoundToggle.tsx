@@ -103,7 +103,7 @@ export function AmbientSoundToggle() {
 
   return (
     <div 
-      className="fixed bottom-4 left-4 z-50 flex items-center gap-2"
+      className="fixed top-20 right-4 z-40 flex items-center gap-2"
       onMouseEnter={() => setShowVolumeSlider(true)}
       onMouseLeave={() => setShowVolumeSlider(false)}
     >
@@ -112,7 +112,7 @@ export function AmbientSoundToggle() {
         size="icon"
         variant="outline"
         className={`
-          w-12 h-12 rounded-full border-2 transition-all duration-300
+          w-10 h-10 rounded-full border-2 transition-all duration-300
           ${isPlaying 
             ? "bg-[#c8ff00]/20 border-[#c8ff00] text-[#c8ff00] shadow-[0_0_20px_rgba(200,255,0,0.3)]" 
             : "bg-black/50 border-white/30 text-white/60 hover:border-[#c8ff00]/50 hover:text-[#c8ff00]"

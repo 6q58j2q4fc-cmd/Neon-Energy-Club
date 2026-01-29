@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, userId, distributorCode, sponsorId, `rank`, status FROM distributors LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT id, userId, distributorCode, sponsorId, `rank`, status FROM distributors LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "userId": "100",
+      "distributorCode": "NEON100RS8ZGQ",
+      "sponsorId": "NULL",
+      "rank": "starter",
+      "status": "active"
+    },
+    {
+      "id": "2",
+      "userId": "101",
+      "distributorCode": "NEON101WLT40Q",
+      "sponsorId": "NULL",
+      "rank": "starter",
+      "status": "active"
+    },
+    {
+      "id": "3",
+      "userId": "102",
+      "distributorCode": "NEON102BP5CGC",
+      "sponsorId": "2",
+      "rank": "starter",
+      "status": "active"
+    },
+    {
+      "id": "4",
+      "userId": "103",
+      "distributorCode": "NEON103XUBLLC",
+      "sponsorId": "NULL",
+      "rank": "starter",
+      "status": "active"
+    },
+    {
+      "id": "5",
+      "userId": "104",
+      "distributorCode": "NEON1043HSOCY",
+      "sponsorId": "NULL",
+      "rank": "starter",
+      "status": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tdistributorCode\tsponsorId\trank\tstatus\n1\t100\tNEON100RS8ZGQ\tNULL\tstarter\tactive\n2\t101\tNEON101WLT40Q\tNULL\tstarter\tactive\n3\t102\tNEON102BP5CGC\t2\tstarter\tactive\n4\t103\tNEON103XUBLLC\tNULL\tstarter\tactive\n5\t104\tNEON1043HSOCY\tNULL\tstarter\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

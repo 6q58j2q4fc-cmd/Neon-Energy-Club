@@ -7,7 +7,7 @@ export default function VoiceMuteButton() {
   return (
     <button
       onClick={toggleMute}
-      className="fixed bottom-4 left-4 z-50 w-12 h-12 rounded-full bg-black/80 backdrop-blur-sm border border-[#c8ff00]/30 flex items-center justify-center hover:bg-black/90 hover:border-[#c8ff00]/50 transition-all duration-200 group"
+      className="fixed top-32 right-4 z-40 w-10 h-10 rounded-full bg-black/80 backdrop-blur-sm border border-[#c8ff00]/30 flex items-center justify-center hover:bg-black/90 hover:border-[#c8ff00]/50 transition-all duration-200 group"
       title={isMuted ? "Unmute voice" : "Mute voice"}
     >
       {isMuted ? (
