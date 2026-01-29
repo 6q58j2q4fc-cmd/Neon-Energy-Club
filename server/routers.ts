@@ -3627,6 +3627,136 @@ Provide step-by-step instructions with specific button names and locations. Keep
       }),
   }),
 
+  // Vending machine orders router
+  vending: router({
+    // Create a new vending machine order
+    createOrder: publicProcedure
+      .input(z.object({
+        machineModel: z.string(),
+        quantity: z.number().int().min(1),
+        totalPriceCents: z.number().int(),
+        depositAmountCents: z.number().int(),
+        paymentType: z.enum(["full", "deposit", "payment_plan"]),
+        paymentPlanMonths: z.number().int().optional(),
+        monthlyPaymentCents: z.number().int().optional(),
+        name: z.string().min(1),
+        email: z.string().email(),
+        phone: z.string().min(1),
+        deliveryAddress: z.string().optional(),
+        deliveryCity: z.string().optional(),
+        deliveryState: z.string().optional(),
+        deliveryZip: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { createVendingOrder } = await import("./db");
+        
+        const order = await createVendingOrder({
+          userId: ctx.user?.id,
+          name: input.name,
+          email: input.email,
+          phone: input.phone,
+          machineModel: input.machineModel,
+          quantity: input.quantity,
+          totalPriceCents: input.totalPriceCents,
+          depositAmountCents: input.depositAmountCents,
+          paymentType: input.paymentType,
+          paymentPlanMonths: input.paymentPlanMonths,
+          monthlyPaymentCents: input.monthlyPaymentCents,
+          amountPaidCents: 0,
+          remainingBalanceCents: input.totalPriceCents,
+          deliveryAddress: input.deliveryAddress,
+          deliveryCity: input.deliveryCity,
+          deliveryState: input.deliveryState,
+          deliveryZip: input.deliveryZip,
+        });
+        
+        // If Stripe is configured, create checkout session
+        if (isStripeConfigured()) {
+          const { createVendingCheckout } = await import("./stripe");
+          const origin = ctx.req.headers.origin || "https://neonenergydrink.manus.space";
+          const checkoutResult = await createVendingCheckout({
+            orderId: order.id,
+            amount: input.paymentType === "full" ? input.totalPriceCents : input.depositAmountCents,
+            machineModel: input.machineModel,
+            quantity: input.quantity,
+            paymentType: input.paymentType,
+            customerEmail: input.email,
+            customerName: input.name,
+            origin,
+          });
+          return { ...order, checkoutUrl: checkoutResult.url };
+        }
+        
+        // Notify owner of new order
+        await notifyOwner({
+          title: "New Vending Machine Order",
+          content: `${input.name} ordered ${input.quantity}x ${input.machineModel} machine(s). Payment type: ${input.paymentType}. Total: $${(input.totalPriceCents / 100).toLocaleString()}`
+        });
+        
+        return order;
+      }),
+
+    // Get user's vending orders
+    getMyOrders: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getUserVendingOrders } = await import("./db");
+        return await getUserVendingOrders(ctx.user.id);
+      }),
+
+    // Get order by ID
+    getOrder: protectedProcedure
+      .input(z.object({ orderId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const { getVendingOrderById } = await import("./db");
+        const order = await getVendingOrderById(input.orderId);
+        if (!order) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Order not found" });
+        }
+        // Only allow owner or admin to view
+        if (order.userId !== ctx.user.id && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Not authorized" });
+        }
+        return order;
+      }),
+
+    // Admin: Get all vending orders
+    adminGetAllOrders: protectedProcedure
+      .input(z.object({
+        status: z.string().optional(),
+        limit: z.number().default(50),
+        offset: z.number().default(0),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { getAllVendingOrders } = await import("./db");
+        return await getAllVendingOrders(input);
+      }),
+
+    // Admin: Update order status
+    adminUpdateOrderStatus: protectedProcedure
+      .input(z.object({
+        orderId: z.number(),
+        status: z.enum(["pending", "deposit_paid", "in_production", "ready_for_delivery", "delivered", "cancelled", "refunded"]),
+        adminNotes: z.string().optional(),
+        estimatedDelivery: z.string().optional(),
+        installationDate: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { updateVendingOrderStatus } = await import("./db");
+        return await updateVendingOrderStatus(input.orderId, {
+          status: input.status,
+          adminNotes: input.adminNotes,
+          estimatedDelivery: input.estimatedDelivery ? new Date(input.estimatedDelivery) : undefined,
+          installationDate: input.installationDate ? new Date(input.installationDate) : undefined,
+        });
+      }),
+  }),
+
 });
 
 // Helper function to anonymize names for privacy on public leaderboard

@@ -211,3 +211,67 @@ export async function getCheckoutSession(sessionId: string) {
   const stripe = await getStripe();
   return await stripe.checkout.sessions.retrieve(sessionId);
 }
+
+
+/**
+ * Create a Stripe Checkout Session for vending machine orders
+ */
+export async function createVendingCheckout(params: {
+  orderId: number;
+  amount: number;
+  machineModel: string;
+  quantity: number;
+  paymentType: "full" | "deposit" | "payment_plan";
+  customerEmail: string;
+  customerName: string;
+  origin: string;
+}): Promise<{ url: string }> {
+  const stripe = await getStripe();
+
+  const modelNames: Record<string, string> = {
+    standard: "Standard Model",
+    premium: "Premium Model",
+    deluxe: "Deluxe Model",
+  };
+
+  const productName = `NEON Vending Machine - ${modelNames[params.machineModel] || params.machineModel}`;
+  const description = params.paymentType === "full" 
+    ? `Full payment for ${params.quantity} machine(s)`
+    : params.paymentType === "deposit"
+    ? `20% deposit for ${params.quantity} machine(s)`
+    : `Deposit + first payment for ${params.quantity} machine(s)`;
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: [
+      {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: productName,
+            description: description,
+            images: [`${params.origin}/vending-machine-1.webp`],
+          },
+          unit_amount: params.amount,
+        },
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    success_url: `${params.origin}/success?session_id={CHECKOUT_SESSION_ID}&type=vending&order_id=${params.orderId}`,
+    cancel_url: `${params.origin}/vending`,
+    customer_email: params.customerEmail,
+    metadata: {
+      type: "vending_machine",
+      order_id: params.orderId.toString(),
+      machine_model: params.machineModel,
+      quantity: params.quantity.toString(),
+      payment_type: params.paymentType,
+      customer_name: params.customerName,
+      customer_email: params.customerEmail,
+    },
+    allow_promotion_codes: true,
+  });
+
+  return { url: session.url! };
+}

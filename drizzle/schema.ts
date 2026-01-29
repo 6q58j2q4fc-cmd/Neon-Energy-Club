@@ -1399,3 +1399,100 @@ export const availableTimeSlots = mysqlTable("available_time_slots", {
 });
 export type AvailableTimeSlot = typeof availableTimeSlots.$inferSelect;
 export type InsertAvailableTimeSlot = typeof availableTimeSlots.$inferInsert;
+
+
+/**
+ * Vending machine orders table.
+ * Tracks purchases and payment plans for vending machines.
+ */
+export const vendingMachineOrders = mysqlTable("vending_machine_orders", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User ID (foreign key to users table) */
+  userId: int("userId"),
+  /** Customer name */
+  name: varchar("name", { length: 255 }).notNull(),
+  /** Customer email */
+  email: varchar("email", { length: 320 }).notNull(),
+  /** Customer phone */
+  phone: varchar("phone", { length: 50 }),
+  /** Machine model/type */
+  machineModel: varchar("machineModel", { length: 100 }).notNull(),
+  /** Quantity of machines */
+  quantity: int("quantity").default(1).notNull(),
+  /** Total price in cents */
+  totalPriceCents: int("totalPriceCents").notNull(),
+  /** Deposit amount in cents */
+  depositAmountCents: int("depositAmountCents").notNull(),
+  /** Payment type: full, deposit, payment_plan */
+  paymentType: mysqlEnum("paymentType", ["full", "deposit", "payment_plan"]).notNull(),
+  /** Payment plan months (3, 6, 12, 24) */
+  paymentPlanMonths: int("paymentPlanMonths"),
+  /** Monthly payment amount in cents (for payment plans) */
+  monthlyPaymentCents: int("monthlyPaymentCents"),
+  /** Amount paid so far in cents */
+  amountPaidCents: int("amountPaidCents").default(0).notNull(),
+  /** Remaining balance in cents */
+  remainingBalanceCents: int("remainingBalanceCents").notNull(),
+  /** Number of payments made */
+  paymentsMade: int("paymentsMade").default(0).notNull(),
+  /** Next payment due date */
+  nextPaymentDue: timestamp("nextPaymentDue"),
+  /** Stripe customer ID */
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  /** Stripe subscription ID (for payment plans) */
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }),
+  /** Stripe payment intent ID (for one-time payments) */
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
+  /** Order status */
+  status: mysqlEnum("status", ["pending", "deposit_paid", "in_production", "ready_for_delivery", "delivered", "cancelled", "refunded"]).default("pending").notNull(),
+  /** Delivery address */
+  deliveryAddress: text("deliveryAddress"),
+  /** City */
+  deliveryCity: varchar("deliveryCity", { length: 100 }),
+  /** State */
+  deliveryState: varchar("deliveryState", { length: 100 }),
+  /** Zip code */
+  deliveryZip: varchar("deliveryZip", { length: 20 }),
+  /** Estimated delivery date */
+  estimatedDelivery: timestamp("estimatedDelivery"),
+  /** Installation date */
+  installationDate: timestamp("installationDate"),
+  /** Notes */
+  notes: text("notes"),
+  /** Admin notes */
+  adminNotes: text("adminNotes"),
+  /** Created timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Updated timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type VendingMachineOrder = typeof vendingMachineOrders.$inferSelect;
+export type InsertVendingMachineOrder = typeof vendingMachineOrders.$inferInsert;
+
+/**
+ * Vending machine payment history table.
+ * Tracks individual payments for vending machine orders.
+ */
+export const vendingPaymentHistory = mysqlTable("vending_payment_history", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Order ID (foreign key to vending_machine_orders) */
+  orderId: int("orderId").notNull(),
+  /** Amount in cents */
+  amountCents: int("amountCents").notNull(),
+  /** Payment type: deposit, monthly, final */
+  paymentType: mysqlEnum("paymentType", ["deposit", "monthly", "final", "full"]).notNull(),
+  /** Payment number (1, 2, 3, etc. for payment plans) */
+  paymentNumber: int("paymentNumber"),
+  /** Stripe payment intent ID */
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
+  /** Payment status */
+  status: mysqlEnum("status", ["pending", "succeeded", "failed", "refunded"]).default("pending").notNull(),
+  /** Payment date */
+  paidAt: timestamp("paidAt"),
+  /** Created timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type VendingPaymentHistory = typeof vendingPaymentHistory.$inferSelect;
+export type InsertVendingPaymentHistory = typeof vendingPaymentHistory.$inferInsert;

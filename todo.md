@@ -2857,3 +2857,27 @@
 - [x] Add vending machine FAQs (4 questions)
 - [x] Add account & technical FAQs (4 questions)
 - [x] Add legal & compliance FAQs (3 questions)
+
+
+## Theme Consistency & Payment Plan (Jan 28)
+
+### Theme Consistency Audit
+- [ ] Audit all pages for design consistency
+- [ ] Apply unified glowing jungle/neon theme across all pages
+- [ ] Ensure consistent color palette, fonts, and styling
+- [ ] Add glowing avatar/movie-like jungle scene elements
+
+### Fruit Slider Fix
+- [x] Fix fruit slider images to have consistent white backgrounds (container has bg-white)
+- [x] Ensure all images display uniformly in the slider
+
+### Vending Machine Payment Plan
+- [x] Create deposit button for vending machines
+- [x] Build checkout feature with payment plans
+- [x] Integrate Stripe for payment plan calculations (ready for API keys)
+- [x] Add flexible payment options (3/6/12/24 month plans)
+
+### UX Flow Improvements
+- [ ] Identify and fix UX friction points
+- [ ] Improve navigation flow
+- [ ] Ensure all CTAs are highly visible

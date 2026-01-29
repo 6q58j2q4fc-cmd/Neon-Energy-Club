@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption, vendingApplications, franchiseApplications, pushSubscriptions, InsertVendingApplication, InsertFranchiseApplication, InsertPushSubscription, userProfiles, InsertUserProfile, scheduledMeetings, InsertScheduledMeeting } from "../drizzle/schema";
+import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption, vendingApplications, franchiseApplications, pushSubscriptions, InsertVendingApplication, InsertFranchiseApplication, InsertPushSubscription, userProfiles, InsertUserProfile, scheduledMeetings, InsertScheduledMeeting, vendingMachineOrders, vendingPaymentHistory, InsertVendingMachineOrder, InsertVendingPaymentHistory } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -4590,4 +4590,98 @@ export async function updateMeetingStatus(meetingId: number, data: {
     .where(eq(scheduledMeetings.id, meetingId));
   
   return { success: true };
+}
+
+
+// ==================== VENDING MACHINE ORDERS ====================
+
+export async function createVendingOrder(data: Omit<InsertVendingMachineOrder, "id" | "createdAt" | "updatedAt">): Promise<{ id: number }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(vendingMachineOrders).values(data);
+  return { id: Number(result[0].insertId) };
+}
+
+export async function getVendingOrderById(orderId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const results = await db.select().from(vendingMachineOrders).where(eq(vendingMachineOrders.id, orderId)).limit(1);
+  return results[0] || null;
+}
+
+export async function getUserVendingOrders(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(vendingMachineOrders)
+    .where(eq(vendingMachineOrders.userId, userId))
+    .orderBy(desc(vendingMachineOrders.createdAt));
+}
+
+export async function getAllVendingOrders(options: { status?: string; limit?: number; offset?: number }) {
+  const db = await getDb();
+  if (!db) return { orders: [] as any[], total: 0 };
+  
+  const { status, limit = 50, offset = 0 } = options;
+  
+  let orders;
+  if (status && status !== "all") {
+    orders = await db.select().from(vendingMachineOrders)
+      .where(eq(vendingMachineOrders.status, status as any))
+      .orderBy(desc(vendingMachineOrders.createdAt))
+      .limit(limit)
+      .offset(offset);
+  } else {
+    orders = await db.select().from(vendingMachineOrders)
+      .orderBy(desc(vendingMachineOrders.createdAt))
+      .limit(limit)
+      .offset(offset);
+  }
+  
+  const countResult = await db.select({ count: sql<number>`count(*)` }).from(vendingMachineOrders);
+  const total = countResult[0]?.count || 0;
+  
+  return { orders, total };
+}
+
+export async function updateVendingOrderStatus(orderId: number, data: {
+  status?: string;
+  adminNotes?: string;
+  estimatedDelivery?: Date;
+  installationDate?: Date;
+  amountPaidCents?: number;
+  remainingBalanceCents?: number;
+  paymentsMade?: number;
+  nextPaymentDue?: Date;
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  stripePaymentIntentId?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(vendingMachineOrders)
+    .set(data as any)
+    .where(eq(vendingMachineOrders.id, orderId));
+  
+  return { success: true };
+}
+
+export async function recordVendingPayment(data: Omit<InsertVendingPaymentHistory, "id" | "createdAt">) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(vendingPaymentHistory).values(data);
+  return { id: Number(result[0].insertId) };
+}
+
+export async function getVendingPaymentHistory(orderId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(vendingPaymentHistory)
+    .where(eq(vendingPaymentHistory.orderId, orderId))
+    .orderBy(desc(vendingPaymentHistory.createdAt));
 }

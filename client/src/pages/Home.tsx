@@ -523,17 +523,17 @@ export default function Home() {
                 <div key={setIndex} className="flex gap-8">
                   {[
                     {
-                      image: "/images/passion-fruit.jpg",
+                      image: "/images/passion-fruit-transparent.png",
                       name: "Passion Fruit",
                       benefit: "Heart health support with vitamins A, B6, B12 & C",
                     },
                     {
-                      image: "/images/prickly-pear.jpg",
+                      image: "/images/prickly-pear-transparent.png",
                       name: "Prickly Pear",
                       benefit: "Blood glucose regulation with natural pectin & fiber",
                     },
                     {
-                      image: "/images/green-tea-leaves.jpg",
+                      image: "/images/green-tea-transparent.png",
                       name: "Green Tea Extract",
                       benefit: "150mg natural caffeine with powerful antioxidants",
                     },
@@ -576,12 +576,12 @@ export default function Home() {
                         {/* Glow Effect */}
                         <div className="absolute inset-0 bg-[#c8ff00]/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         
-                        {/* Image Container */}
-                        <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-[#c8ff00]/30 group-hover:border-[#c8ff00] transition-all duration-300 shadow-lg bg-gradient-to-br from-[#0a1a0a] to-[#1a2a1a]">
+                        {/* Image Container - White background for consistency */}
+                        <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-[#c8ff00]/30 group-hover:border-[#c8ff00] transition-all duration-300 shadow-lg shadow-[#c8ff00]/20 bg-white">
                           <img
                             src={ingredient.image}
                             alt={ingredient.name}
-                            className="w-full h-full object-contain p-2 transform group-hover:scale-110 transition-transform duration-500"
+                            className="w-full h-full object-contain p-3 transform group-hover:scale-110 transition-transform duration-500"
                           />
                         </div>
                       </div>
