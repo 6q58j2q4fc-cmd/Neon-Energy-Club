@@ -91,6 +91,7 @@ function Router() {
         <Route path="/admin/mlm" component={MLMAdminPanel} />
         <Route path="/admin/territories" component={AdminTerritories} />
         <Route path="/nft-gallery" component={NFTGallery} />
+        <Route path="/nft" component={NFTGallery} />
         <Route path="/nft/:tokenId" component={NFTDetail} />
         <Route path={"/nfts"} component={NFTGallery} />
         <Route path="/privacy" component={Privacy} />

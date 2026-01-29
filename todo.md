@@ -2969,3 +2969,28 @@
 - [x] eywa-pulse animation for connection effect
 - [x] border-glow-sweep animation for glowing borders
 - [x] pollen-drift animation for floating pollen
+
+
+## Full UX Debugging Scan (Jan 29, 2026)
+
+### Start Referring Button Fix
+- [x] Fix Start Referring button on referral leaderboard - now navigates to /join
+- [x] Fix React hooks ordering error in Leaderboard.tsx - hooks called unconditionally
+
+### Route Fixes
+- [x] Add /nft route alias for NFT Gallery page
+
+### All Buttons & Navigation Verified Working
+- [x] Homepage - All buttons functional
+- [x] Products page - Pre-Order buttons work
+- [x] Shop page - Distributor/Customer tabs work
+- [x] Crowdfund page - Tier selection and form work
+- [x] Franchise page - All CTAs work
+- [x] Vending Machines - Deposit/Order checkout works
+- [x] Join Now - Customer and Distributor paths work
+- [x] Customer Portal - Referral system works
+- [x] Leaderboard - Start Referring fixed
+- [x] NFT Gallery - All routes work (/nft, /nft-gallery, /nfts)
+- [x] Investors page - Form and submission works
+- [x] Admin Dashboard - All tabs functional
+- [x] MLM Admin Panel - All tabs functional

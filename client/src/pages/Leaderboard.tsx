@@ -6,20 +6,33 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trophy, Users, Target, TrendingUp, Crown, Medal, Star, Share2, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
+import { useLocation } from "wouter";
 
 export default function Leaderboard() {
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
   const [timeframe, setTimeframe] = useState<"all" | "monthly" | "weekly">("all");
   const [copied, setCopied] = useState(false);
   
-  // Check if user has access (distributor, franchise owner, vending owner, or admin)
+  // All hooks must be called unconditionally at the top level
   const { data: distributorProfile, isLoading: loadingDistributor } = trpc.distributor.me.useQuery(undefined, {
     enabled: !!user,
   });
   const { data: territoryApps, isLoading: loadingTerritory } = trpc.territory.listApplications.useQuery(undefined, {
+    enabled: !!user,
+  });
+  
+  // Leaderboard data - always call these hooks
+  const { data: leaderboard, isLoading } = trpc.sms.leaderboard.useQuery({ 
+    limit: 50, 
+    timeframe 
+  });
+  
+  const { data: stats } = trpc.sms.leaderboardStats.useQuery();
+  const { data: myPosition } = trpc.sms.myPosition.useQuery(undefined, {
     enabled: !!user,
   });
   
@@ -30,44 +43,6 @@ export default function Leaderboard() {
     !!distributorProfile || 
     (territoryApps && territoryApps.length > 0)
   );
-  
-  // Show access denied message if not authorized
-  if (!isCheckingAccess && !hasAccess) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a]">
-        <HamburgerHeader />
-        <div className="container mx-auto px-4 py-32 text-center">
-          <Trophy className="w-20 h-20 text-[#c8ff00]/30 mx-auto mb-6" />
-          <h1 className="text-4xl font-black text-white mb-4">Referral Leaderboard</h1>
-          <p className="text-xl text-gray-400 mb-8 max-w-md mx-auto">
-            This leaderboard is exclusively available to NEON distributors, franchise owners, and vending machine operators.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <a href="/join" className="px-6 py-3 bg-[#c8ff00] text-black font-bold rounded-lg hover:bg-[#a8d600] transition-colors">
-              Become a Distributor
-            </a>
-            <a href="/franchise" className="px-6 py-3 border border-[#c8ff00] text-[#c8ff00] font-bold rounded-lg hover:bg-[#c8ff00]/10 transition-colors">
-              Franchise Opportunities
-            </a>
-            <a href="/vending" className="px-6 py-3 border border-[#c8ff00] text-[#c8ff00] font-bold rounded-lg hover:bg-[#c8ff00]/10 transition-colors">
-              Vending Machines
-            </a>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-  
-  const { data: leaderboard, isLoading } = trpc.sms.leaderboard.useQuery({ 
-    limit: 50, 
-    timeframe 
-  });
-  
-  const { data: stats } = trpc.sms.leaderboardStats.useQuery();
-  const { data: myPosition } = trpc.sms.myPosition.useQuery(undefined, {
-    enabled: !!user,
-  });
 
   const copyReferralLink = () => {
     if (myPosition?.referralCode) {
@@ -88,6 +63,45 @@ export default function Leaderboard() {
     if (rank === 3) return <Medal className="w-6 h-6 text-amber-600" />;
     return <span className="text-lg font-bold text-gray-400">#{rank}</span>;
   };
+  
+  // Show access denied message if not authorized (after all hooks are called)
+  if (!isCheckingAccess && !hasAccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a]">
+        <HamburgerHeader />
+        <div className="container mx-auto px-4 py-32 text-center">
+          <Trophy className="w-20 h-20 text-[#c8ff00]/30 mx-auto mb-6" />
+          <h1 className="text-4xl font-black text-white mb-4">Referral Leaderboard</h1>
+          <p className="text-xl text-gray-400 mb-8 max-w-md mx-auto">
+            This leaderboard is exclusively available to NEON distributors, franchise owners, and vending machine operators.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Button 
+              onClick={() => setLocation("/join")}
+              className="px-6 py-3 bg-[#c8ff00] text-black font-bold rounded-lg hover:bg-[#a8d600] transition-colors"
+            >
+              Start Referring
+            </Button>
+            <Button 
+              onClick={() => setLocation("/franchise")}
+              variant="outline"
+              className="px-6 py-3 border border-[#c8ff00] text-[#c8ff00] font-bold rounded-lg hover:bg-[#c8ff00]/10 transition-colors"
+            >
+              Franchise Opportunities
+            </Button>
+            <Button 
+              onClick={() => setLocation("/vending")}
+              variant="outline"
+              className="px-6 py-3 border border-[#c8ff00] text-[#c8ff00] font-bold rounded-lg hover:bg-[#c8ff00]/10 transition-colors"
+            >
+              Vending Machines
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a]">
@@ -315,7 +329,10 @@ export default function Leaderboard() {
                   <p className="text-gray-400 mb-6">
                     No referrers yet. Start sharing and claim the #1 spot!
                   </p>
-                  <Button className="bg-[#c8ff00] text-black hover:bg-[#a8df00] font-bold">
+                  <Button 
+                    onClick={() => setLocation('/join')}
+                    className="bg-[#c8ff00] text-black hover:bg-[#a8df00] font-bold"
+                  >
                     <Share2 className="w-4 h-4 mr-2" />
                     Start Referring
                   </Button>
