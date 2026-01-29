@@ -538,7 +538,7 @@ export default function Home() {
                       benefit: "150mg natural caffeine with powerful antioxidants",
                     },
                     {
-                      image: "/images/blueberries.png",
+                      image: "/images/blueberries-transparent.png",
                       name: "Blueberry",
                       benefit: "Vitamin C & antioxidants for immune support",
                     },

@@ -2994,3 +2994,49 @@
 - [x] Investors page - Form and submission works
 - [x] Admin Dashboard - All tabs functional
 - [x] MLM Admin Panel - All tabs functional
+
+
+## Pre-Order Checkout & UX Improvements (Jan 29, 2026)
+
+### Pre-Order Now Button Fix
+- [ ] Fix Pre-Order Now button to add items to shopping cart
+- [ ] Navigate customers to checkout page with live transactions
+- [ ] Ensure cart persists and checkout flow works end-to-end
+
+### Products Page Fruit Graphics
+- [ ] Add fruit graphics/imagery to products page
+- [ ] Create visually appealing fruit decorations
+
+### Fruit Slider Transparent Backgrounds
+- [ ] Fix all fruit slider icons to have transparent backgrounds
+- [ ] Remove white backgrounds from fruit images
+- [ ] Ensure consistent appearance across all fruit icons
+
+### UX Declutter & Flow Tightening
+- [ ] Declutter unnecessary UI elements
+- [ ] Tighten navigation flow between pages
+- [ ] Improve overall user experience
+
+
+## Pre-Order Checkout & UX Improvements (Jan 29, 2026)
+
+### Pre-Order Now Button Fix
+- [x] Fixed Pre-Order Now button on Products page to add items to cart
+- [x] Button now adds NEON Original Case (24 Cans) at $59.99 to cart
+- [x] Automatically navigates to checkout page after adding to cart
+- [x] Cart drawer shows item with quantity controls and Checkout button
+- [x] Full checkout flow ready (pending Stripe API keys)
+
+### Fruit Slider Transparent Backgrounds
+- [x] Replaced blueberries.png (had white background) with blueberries-transparent.png
+- [x] All fruit images now have transparent backgrounds
+- [x] Container has bg-white class for consistent white circular backgrounds
+
+### Products Page Enhancements
+- [x] Added fruit graphics (floating fruit icons in background)
+- [x] Cleaner UX with streamlined product cards
+- [x] Add to Cart buttons for individual products
+- [x] Mixed Case option available
+
+### Testing
+- [x] All 293 vitest tests passing
