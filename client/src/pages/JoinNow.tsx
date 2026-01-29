@@ -193,6 +193,11 @@ export default function JoinNow() {
         <DistributorSignupForm user={user} />
       )}
 
+      {/* Customer Welcome (shown after choosing customer and logging in) */}
+      {step === "signup" && user && accountType === "customer" && (
+        <CustomerWelcome user={user} />
+      )}
+
       <Footer />
     </div>
   );
@@ -303,6 +308,77 @@ function DistributorSignupForm({ user }: { user: any }) {
               </form>
             </CardContent>
           </Card>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+function CustomerWelcome({ user }: { user: any }) {
+  const [, setLocation] = useLocation();
+
+  return (
+    <section className="py-20">
+      <div className="container px-6">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="w-24 h-24 mx-auto mb-8 rounded-full bg-[#c8ff00]/20 flex items-center justify-center neon-glow">
+            <Gift className="w-12 h-12 text-[#c8ff00]" />
+          </div>
+          
+          <h2 className="text-5xl font-black mb-4">
+            WELCOME TO <span className="text-[#c8ff00] neon-text">NEON!</span>
+          </h2>
+          <p className="text-xl text-gray-400 mb-8">
+            Hey {user.name?.split(' ')[0] || 'there'}! You're now part of the NEON family.
+          </p>
+
+          <Card className="bg-gradient-to-br from-[#0a0a0a] to-black border-[#c8ff00]/30 mb-8">
+            <CardContent className="p-8">
+              <h3 className="text-2xl font-black text-[#c8ff00] mb-6">YOUR MEMBER BENEFITS</h3>
+              <div className="grid md:grid-cols-2 gap-4 text-left">
+                {[
+                  { icon: DollarSign, text: "Exclusive member discounts" },
+                  { icon: Zap, text: "Early access to new flavors" },
+                  { icon: Gift, text: "3-for-Free referral rewards" },
+                  { icon: ShoppingCart, text: "Free shipping on $50+ orders" },
+                  { icon: Users, text: "VIP community access" },
+                  { icon: Sparkles, text: "Birthday rewards" },
+                ].map((benefit, index) => (
+                  <div key={index} className="flex items-center gap-3 p-3 bg-[#c8ff00]/5 rounded-lg">
+                    <benefit.icon className="w-5 h-5 text-[#c8ff00] flex-shrink-0" />
+                    <span className="text-white">{benefit.text}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="bg-[#c8ff00]/10 border border-[#c8ff00]/30 rounded-xl p-6 mb-8">
+            <h4 className="font-black text-[#c8ff00] text-lg mb-2">🎁 3-FOR-FREE PROGRAM</h4>
+            <p className="text-gray-300">
+              Refer 3 friends who make a purchase and get a FREE case of NEON! 
+              Track your referrals in your Customer Portal.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              onClick={() => setLocation("/customer-portal")}
+              className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-black h-14 px-8 text-lg neon-pulse"
+            >
+              Go to My Rewards Dashboard
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+            <Button
+              onClick={() => setLocation("/products")}
+              variant="outline"
+              className="border-[#c8ff00]/50 text-[#c8ff00] hover:bg-[#c8ff00]/10 font-bold h-14 px-8"
+            >
+              <ShoppingCart className="w-5 h-5 mr-2" />
+              Shop Now
+            </Button>
+          </div>
         </div>
       </div>
     </section>

@@ -3152,3 +3152,16 @@
 - [x] Implement profile photo upload to S3 (multer + storagePut)
 - [x] Display uploaded photo on distributor dashboard (Profile Photo card)
 - [x] Show photo on cloned distributor website (fetched via getPublicProfile)
+
+
+## Join as Customer Fix & Mobile UX (Jan 29, 2026)
+
+### Join as Customer Button Fixes
+- [x] Audit all Join as Customer buttons across site
+- [x] Fix navigation to proper customer options page (JoinNow.tsx has CustomerWelcome component)
+- [x] Ensure consistent behavior on all pages - buttons redirect to /join with OAuth flow
+
+### Mobile UX Improvements
+- [x] Add swipe-to-close gesture for hamburger menu
+- [x] Add audio speed controls to voice effects (0.5x, 0.75x, 1x, 1.25x, 1.5x, 2x)
+- [x] Create mobile-friendly TOC drawer for smaller screens (Policies page)

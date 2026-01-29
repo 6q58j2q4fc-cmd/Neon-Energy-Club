@@ -12,6 +12,7 @@ const SOUND_FILES: Record<SoundType, string> = {
 };
 
 const MUTE_STORAGE_KEY = "neon-voice-muted";
+const SPEED_STORAGE_KEY = "neon-voice-speed";
 
 export function useSoundEffects() {
   const audioRefs = useRef<Map<SoundType, HTMLAudioElement>>(new Map());
@@ -21,12 +22,20 @@ export function useSoundEffects() {
     }
     return false;
   });
+  const [playbackRate, setPlaybackRateState] = useState(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem(SPEED_STORAGE_KEY);
+      return stored ? parseFloat(stored) : 1;
+    }
+    return 1;
+  });
 
   useEffect(() => {
     Object.entries(SOUND_FILES).forEach(([type, src]) => {
       const audio = new Audio(src);
       audio.preload = "auto";
       audio.volume = 0.7;
+      audio.playbackRate = playbackRate;
       audioRefs.current.set(type as SoundType, audio);
     });
 
@@ -39,6 +48,14 @@ export function useSoundEffects() {
     };
   }, []);
 
+  // Update playback rate on all audio elements when it changes
+  useEffect(() => {
+    audioRefs.current.forEach((audio) => {
+      audio.playbackRate = playbackRate;
+    });
+    localStorage.setItem(SPEED_STORAGE_KEY, String(playbackRate));
+  }, [playbackRate]);
+
   useEffect(() => {
     localStorage.setItem(MUTE_STORAGE_KEY, String(isMuted));
   }, [isMuted]);
@@ -49,15 +66,20 @@ export function useSoundEffects() {
       const audio = audioRefs.current.get(type);
       if (audio) {
         audio.currentTime = 0;
+        audio.playbackRate = playbackRate;
         audio.play().catch(() => {});
       }
     },
-    [isMuted]
+    [isMuted, playbackRate]
   );
 
   const toggleMute = useCallback(() => {
     setIsMuted((prev) => !prev);
   }, []);
 
-  return { playSound, isMuted, toggleMute };
+  const setPlaybackRate = useCallback((rate: number) => {
+    setPlaybackRateState(rate);
+  }, []);
+
+  return { playSound, isMuted, toggleMute, playbackRate, setPlaybackRate };
 }

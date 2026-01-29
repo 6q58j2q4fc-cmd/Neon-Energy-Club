@@ -102,6 +102,11 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
   const [scrolled, setScrolled] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const menuPanelRef = useRef<HTMLDivElement>(null);
+  
+  // Touch gesture state for swipe-to-close
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
+  const [touchDelta, setTouchDelta] = useState(0);
   
   const { user, loading } = useAuth();
   const logoutMutation = trpc.auth.logout.useMutation();
@@ -168,6 +173,35 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
       document.body.style.overflow = '';
     };
   }, [menuOpen, searchOpen]);
+
+  // Swipe-to-close gesture handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    setTouchStart({ x: touch.clientX, y: touch.clientY });
+    setTouchDelta(0);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStart) return;
+    const touch = e.touches[0];
+    const deltaY = touch.clientY - touchStart.y;
+    const deltaX = Math.abs(touch.clientX - touchStart.x);
+    
+    // Only track vertical swipes (not horizontal scrolling)
+    if (deltaX < Math.abs(deltaY) && deltaY < 0) {
+      // Swiping up - apply visual feedback
+      setTouchDelta(Math.max(deltaY, -150));
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (touchDelta < -80) {
+      // Threshold reached - close menu
+      setMenuOpen(false);
+    }
+    setTouchStart(null);
+    setTouchDelta(0);
+  };
 
   const handleNavClick = (path: string) => {
     setMenuOpen(false);
@@ -461,14 +495,26 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
 
       {/* Dropdown Menu Panel */}
       <div
-        className={`fixed top-[68px] left-0 right-0 z-50 transition-all duration-300 ease-out ${
+        ref={menuPanelRef}
+        className={`fixed top-[68px] left-0 right-0 z-50 transition-all ease-out ${
           menuOpen 
             ? "opacity-100 translate-y-0 pointer-events-auto" 
             : "opacity-0 -translate-y-4 pointer-events-none"
-        }`}
+        } ${touchDelta === 0 ? 'duration-300' : 'duration-0'}`}
+        style={{
+          transform: menuOpen ? `translateY(${touchDelta}px)` : undefined,
+          opacity: menuOpen ? Math.max(0.3, 1 + touchDelta / 150) : 0,
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <div className="container mx-auto px-4">
           <div className="bg-[#0a0318]/98 backdrop-blur-xl rounded-2xl border border-[#c8ff00]/30 shadow-2xl shadow-black/50 overflow-hidden">
+            {/* Swipe indicator */}
+            <div className="flex justify-center py-2">
+              <div className="w-10 h-1 rounded-full bg-white/30" />
+            </div>
             {/* Accent gradient line at top */}
             <div className="h-1 bg-gradient-to-r from-[#ff0080] via-[#c8ff00] to-[#00ffff]" />
             
