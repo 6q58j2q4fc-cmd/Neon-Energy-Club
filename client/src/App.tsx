@@ -47,6 +47,7 @@ import UnifiedChatBot from "./components/UnifiedChatBot";
 import CartDrawer from "./components/CartDrawer";
 import VoiceMuteButton from "./components/VoiceMuteButton";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { AvatarJungleAtmosphere } from "./components/BioluminescentParticles";
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -124,6 +125,7 @@ function App() {
         <ThemeProvider defaultTheme="dark">
           <TooltipProvider>
             <Toaster />
+            <AvatarJungleAtmosphere intensity="medium" />
             <Router />
             <CartDrawer />
             <VoiceMuteButton />

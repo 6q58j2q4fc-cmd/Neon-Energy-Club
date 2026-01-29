@@ -573,21 +573,50 @@ export default function Home() {
                       className="group text-center flex-shrink-0 w-48"
                     >
                       <div className="relative mb-6 mx-auto w-40 h-40">
-                        {/* Glow Effect */}
-                        <div className="absolute inset-0 bg-[#c8ff00]/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        {/* Avatar-style Bioluminescent Glow */}
+                        <div className="absolute inset-[-10px] rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700"
+                          style={{
+                            background: 'radial-gradient(circle, rgba(200, 255, 0, 0.4) 0%, rgba(0, 255, 255, 0.2) 50%, transparent 70%)',
+                            filter: 'blur(15px)',
+                            animation: 'bio-pulse 3s ease-in-out infinite'
+                          }}
+                        />
                         
-                        {/* Image Container - White background for consistency */}
-                        <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-[#c8ff00]/30 group-hover:border-[#c8ff00] transition-all duration-300 shadow-lg shadow-[#c8ff00]/20 bg-white">
+                        {/* Floating particles around fruit */}
+                        <div className="absolute inset-[-20px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                          {[...Array(6)].map((_, idx) => (
+                            <div
+                              key={idx}
+                              className="absolute w-2 h-2 rounded-full"
+                              style={{
+                                background: idx % 2 === 0 ? '#c8ff00' : '#00ffff',
+                                left: `${20 + idx * 12}%`,
+                                top: `${10 + (idx % 3) * 30}%`,
+                                boxShadow: `0 0 10px ${idx % 2 === 0 ? '#c8ff00' : '#00ffff'}`,
+                                animation: `spore-float ${8 + idx}s ease-in-out infinite`,
+                                animationDelay: `${-idx * 1.5}s`
+                              }}
+                            />
+                          ))}
+                        </div>
+                        
+                        {/* Image Container - Consistent white background */}
+                        <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-[#c8ff00]/30 group-hover:border-[#c8ff00] transition-all duration-500 bg-white"
+                          style={{
+                            boxShadow: '0 0 20px rgba(200, 255, 0, 0.3), 0 0 40px rgba(200, 255, 0, 0.1), inset 0 0 20px rgba(200, 255, 0, 0.05)'
+                          }}
+                        >
                           <img
                             src={ingredient.image}
                             alt={ingredient.name}
                             className="w-full h-full object-contain p-3 transform group-hover:scale-110 transition-transform duration-500"
+                            style={{ filter: 'drop-shadow(0 0 8px rgba(200, 255, 0, 0.3))' }}
                           />
                         </div>
                       </div>
                       
-                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#c8ff00] transition-colors">
-                        {ingredient.name}
+                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#c8ff00] transition-colors avatar-text" style={{ textShadow: 'none' }}>
+                        <span className="group-hover:avatar-text transition-all">{ingredient.name}</span>
                       </h3>
                       <p className="text-white/60 text-sm leading-relaxed max-w-[180px] mx-auto">
                         {ingredient.benefit}

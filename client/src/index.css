@@ -1052,3 +1052,509 @@ html {
 .animate-urgency-pulse {
   animation: urgency-pulse 2s ease-in-out infinite;
 }
+
+
+/* ========================================
+   AVATAR-STYLE BIOLUMINESCENT JUNGLE THEME
+   Movie-like glowing elements
+   ======================================== */
+
+/* Bioluminescent Glow Effect */
+.bio-glow {
+  position: relative;
+}
+
+.bio-glow::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  background: radial-gradient(ellipse at center, rgba(200, 255, 0, 0.4) 0%, transparent 70%);
+  filter: blur(15px);
+  z-index: -1;
+  animation: bio-pulse 3s ease-in-out infinite;
+}
+
+@keyframes bio-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Glowing Fruit Elements - Avatar Style */
+.glowing-fruit {
+  position: relative;
+  filter: drop-shadow(0 0 15px rgba(200, 255, 0, 0.6));
+  animation: fruit-glow 4s ease-in-out infinite;
+}
+
+@keyframes fruit-glow {
+  0%, 100% { 
+    filter: drop-shadow(0 0 15px rgba(200, 255, 0, 0.6)) drop-shadow(0 0 30px rgba(200, 255, 0, 0.3));
+  }
+  50% { 
+    filter: drop-shadow(0 0 25px rgba(200, 255, 0, 0.9)) drop-shadow(0 0 50px rgba(200, 255, 0, 0.5));
+  }
+}
+
+/* Bioluminescent Spores - Floating particles */
+.bio-spores {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bio-spore {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, rgba(200, 255, 0, 1) 0%, rgba(200, 255, 0, 0.5) 50%, transparent 100%);
+  border-radius: 50%;
+  animation: spore-float 20s ease-in-out infinite, spore-glow 3s ease-in-out infinite;
+}
+
+.bio-spore:nth-child(1) { left: 5%; animation-delay: 0s; }
+.bio-spore:nth-child(2) { left: 15%; animation-delay: -3s; }
+.bio-spore:nth-child(3) { left: 25%; animation-delay: -6s; }
+.bio-spore:nth-child(4) { left: 35%; animation-delay: -9s; }
+.bio-spore:nth-child(5) { left: 45%; animation-delay: -12s; }
+.bio-spore:nth-child(6) { left: 55%; animation-delay: -15s; }
+.bio-spore:nth-child(7) { left: 65%; animation-delay: -18s; }
+.bio-spore:nth-child(8) { left: 75%; animation-delay: -2s; }
+.bio-spore:nth-child(9) { left: 85%; animation-delay: -5s; }
+.bio-spore:nth-child(10) { left: 95%; animation-delay: -8s; }
+
+.bio-spore.cyan { background: radial-gradient(circle, rgba(0, 255, 255, 1) 0%, rgba(0, 255, 255, 0.5) 50%, transparent 100%); }
+.bio-spore.pink { background: radial-gradient(circle, rgba(255, 0, 128, 1) 0%, rgba(255, 0, 128, 0.5) 50%, transparent 100%); }
+.bio-spore.purple { background: radial-gradient(circle, rgba(157, 78, 221, 1) 0%, rgba(157, 78, 221, 0.5) 50%, transparent 100%); }
+
+@keyframes spore-float {
+  0% { transform: translateY(100vh) translateX(0) scale(0.5); opacity: 0; }
+  10% { opacity: 0.8; }
+  50% { transform: translateY(50vh) translateX(30px) scale(1); }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(-10vh) translateX(-20px) scale(0.3); opacity: 0; }
+}
+
+@keyframes spore-glow {
+  0%, 100% { box-shadow: 0 0 10px currentColor, 0 0 20px currentColor; }
+  50% { box-shadow: 0 0 20px currentColor, 0 0 40px currentColor, 0 0 60px currentColor; }
+}
+
+/* Glowing Vine Tendrils */
+.glowing-vine {
+  position: absolute;
+  width: 3px;
+  background: linear-gradient(180deg, 
+    rgba(200, 255, 0, 0) 0%,
+    rgba(200, 255, 0, 0.8) 30%,
+    rgba(0, 255, 255, 0.6) 70%,
+    rgba(200, 255, 0, 0) 100%
+  );
+  box-shadow: 0 0 15px rgba(200, 255, 0, 0.5), 0 0 30px rgba(200, 255, 0, 0.3);
+  animation: vine-pulse 5s ease-in-out infinite;
+}
+
+@keyframes vine-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Bioluminescent Tree of Souls Effect */
+.tree-of-souls-bg {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 100% 100% at 50% 100%, rgba(200, 255, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 60% at 30% 80%, rgba(0, 255, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(ellipse 70% 50% at 70% 90%, rgba(255, 0, 128, 0.06) 0%, transparent 35%);
+  pointer-events: none;
+  animation: tree-glow 8s ease-in-out infinite;
+}
+
+@keyframes tree-glow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Floating Seed Pods */
+.seed-pod {
+  position: absolute;
+  width: 20px;
+  height: 30px;
+  background: radial-gradient(ellipse at center, rgba(200, 255, 0, 0.9) 0%, rgba(200, 255, 0, 0.3) 50%, transparent 100%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: seed-float 15s ease-in-out infinite;
+  filter: blur(1px);
+}
+
+.seed-pod::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 15px;
+  background: linear-gradient(180deg, transparent, rgba(200, 255, 0, 0.6));
+}
+
+@keyframes seed-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-30px) rotate(5deg); }
+  50% { transform: translateY(-10px) rotate(-3deg); }
+  75% { transform: translateY(-40px) rotate(8deg); }
+}
+
+/* Glowing Mushroom Effect */
+.glowing-mushroom {
+  position: relative;
+}
+
+.glowing-mushroom::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120%;
+  height: 30px;
+  background: radial-gradient(ellipse at center bottom, rgba(200, 255, 0, 0.4) 0%, transparent 70%);
+  filter: blur(10px);
+  animation: mushroom-glow 3s ease-in-out infinite;
+}
+
+@keyframes mushroom-glow {
+  0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+}
+
+/* Neural Network Connection Lines */
+.neural-network {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.neural-line {
+  position: absolute;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200, 255, 0, 0.6), transparent);
+  animation: neural-pulse 4s ease-in-out infinite;
+}
+
+@keyframes neural-pulse {
+  0%, 100% { opacity: 0; transform: scaleX(0); }
+  50% { opacity: 1; transform: scaleX(1); }
+}
+
+/* Glowing Avatar Eyes Effect for Cards */
+.avatar-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(200, 255, 0, 0.1), 
+    rgba(0, 255, 255, 0.1), 
+    transparent
+  );
+  animation: avatar-shimmer 8s ease-in-out infinite;
+}
+
+@keyframes avatar-shimmer {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
+/* Pandora Night Sky Stars */
+.pandora-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pandora-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #fff;
+  border-radius: 50%;
+  animation: star-twinkle 3s ease-in-out infinite;
+}
+
+.pandora-star.large {
+  width: 4px;
+  height: 4px;
+  box-shadow: 0 0 10px rgba(200, 255, 0, 0.5);
+}
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* Bioluminescent Water Ripple */
+.bio-ripple {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(200, 255, 0, 0.5);
+  animation: ripple-expand 4s ease-out infinite;
+}
+
+@keyframes ripple-expand {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+/* Helicoradian (Spiral Plant) Effect */
+.helicoradian {
+  position: absolute;
+  width: 40px;
+  height: 80px;
+  background: linear-gradient(180deg, 
+    rgba(255, 0, 128, 0.8) 0%,
+    rgba(157, 78, 221, 0.6) 50%,
+    rgba(200, 255, 0, 0.4) 100%
+  );
+  border-radius: 50% 50% 0 0;
+  transform-origin: bottom center;
+  animation: helicoradian-sway 6s ease-in-out infinite;
+  filter: blur(2px);
+}
+
+@keyframes helicoradian-sway {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+
+/* Woodsprite (Floating Jellyfish-like) */
+.woodsprite {
+  position: absolute;
+  width: 30px;
+  height: 40px;
+  background: radial-gradient(ellipse at center top, 
+    rgba(255, 255, 255, 0.9) 0%, 
+    rgba(200, 255, 0, 0.5) 30%,
+    transparent 70%
+  );
+  border-radius: 50% 50% 30% 30%;
+  animation: woodsprite-float 12s ease-in-out infinite;
+  filter: blur(1px);
+}
+
+.woodsprite::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 25px;
+  background: linear-gradient(180deg, rgba(200, 255, 0, 0.6), transparent);
+}
+
+@keyframes woodsprite-float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-20px) translateX(10px); }
+  50% { transform: translateY(-5px) translateX(-15px); }
+  75% { transform: translateY(-25px) translateX(5px); }
+}
+
+/* Glowing Text Effect - Avatar Style */
+.avatar-text {
+  color: #c8ff00;
+  text-shadow: 
+    0 0 10px rgba(200, 255, 0, 0.8),
+    0 0 20px rgba(200, 255, 0, 0.6),
+    0 0 30px rgba(200, 255, 0, 0.4),
+    0 0 40px rgba(200, 255, 0, 0.2);
+  animation: avatar-text-glow 3s ease-in-out infinite;
+}
+
+@keyframes avatar-text-glow {
+  0%, 100% { 
+    text-shadow: 
+      0 0 10px rgba(200, 255, 0, 0.8),
+      0 0 20px rgba(200, 255, 0, 0.6),
+      0 0 30px rgba(200, 255, 0, 0.4),
+      0 0 40px rgba(200, 255, 0, 0.2);
+  }
+  50% { 
+    text-shadow: 
+      0 0 20px rgba(200, 255, 0, 1),
+      0 0 40px rgba(200, 255, 0, 0.8),
+      0 0 60px rgba(200, 255, 0, 0.6),
+      0 0 80px rgba(200, 255, 0, 0.4);
+  }
+}
+
+/* Ikran (Flying Creature) Silhouette */
+.ikran-silhouette {
+  position: absolute;
+  width: 60px;
+  height: 20px;
+  background: rgba(10, 26, 26, 0.8);
+  clip-path: polygon(0% 50%, 30% 0%, 50% 30%, 70% 0%, 100% 50%, 70% 100%, 50% 70%, 30% 100%);
+  animation: ikran-fly 30s linear infinite;
+}
+
+@keyframes ikran-fly {
+  0% { transform: translateX(-100px) translateY(0); }
+  25% { transform: translateX(25vw) translateY(-30px); }
+  50% { transform: translateX(50vw) translateY(10px); }
+  75% { transform: translateX(75vw) translateY(-20px); }
+  100% { transform: translateX(calc(100vw + 100px)) translateY(0); }
+}
+
+/* Luminescent Moss Ground Cover */
+.luminescent-moss {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: 
+    radial-gradient(ellipse 30% 100% at 10% 100%, rgba(200, 255, 0, 0.2) 0%, transparent 50%),
+    radial-gradient(ellipse 25% 100% at 30% 100%, rgba(0, 255, 255, 0.15) 0%, transparent 45%),
+    radial-gradient(ellipse 35% 100% at 50% 100%, rgba(200, 255, 0, 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 28% 100% at 70% 100%, rgba(255, 0, 128, 0.12) 0%, transparent 40%),
+    radial-gradient(ellipse 32% 100% at 90% 100%, rgba(200, 255, 0, 0.2) 0%, transparent 50%);
+  pointer-events: none;
+  animation: moss-glow 6s ease-in-out infinite;
+}
+
+@keyframes moss-glow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Eywa Connection Effect */
+.eywa-connection {
+  position: relative;
+}
+
+.eywa-connection::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(200, 255, 0, 0.3) 0%, transparent 20%),
+    radial-gradient(circle at 80% 70%, rgba(0, 255, 255, 0.25) 0%, transparent 18%),
+    radial-gradient(circle at 50% 50%, rgba(255, 0, 128, 0.2) 0%, transparent 25%);
+  animation: eywa-pulse 5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes eywa-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* Glowing Border Animation */
+.glow-border {
+  position: relative;
+  border: 1px solid rgba(200, 255, 0, 0.3);
+}
+
+.glow-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, 
+    rgba(200, 255, 0, 0) 0%,
+    rgba(200, 255, 0, 0.5) 50%,
+    rgba(200, 255, 0, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: border-glow-sweep 3s linear infinite;
+  z-index: -1;
+  filter: blur(4px);
+}
+
+@keyframes border-glow-sweep {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Floating Pollen Effect */
+.floating-pollen {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.pollen-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(200, 255, 0, 0.6);
+  border-radius: 50%;
+  animation: pollen-drift 25s linear infinite;
+}
+
+.pollen-particle:nth-child(odd) {
+  background: rgba(0, 255, 255, 0.5);
+}
+
+.pollen-particle:nth-child(3n) {
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+@keyframes pollen-drift {
+  0% {
+    transform: translateY(100vh) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% {
+    transform: translateY(-10vh) translateX(100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Responsive adjustments for effects */
+@media (max-width: 768px) {
+  .bio-spore { width: 4px; height: 4px; }
+  .seed-pod { width: 15px; height: 22px; }
+  .woodsprite { width: 20px; height: 28px; }
+  .helicoradian { width: 25px; height: 50px; }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .bio-spore,
+  .firefly,
+  .particle,
+  .seed-pod,
+  .woodsprite,
+  .helicoradian,
+  .ikran-silhouette,
+  .pollen-particle {
+    animation: none;
+  }
+  
+  .bio-glow::after,
+  .glowing-fruit,
+  .avatar-text,
+  .glow-border::before {
+    animation: none;
+  }
+}

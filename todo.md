@@ -2862,9 +2862,9 @@
 ## Theme Consistency & Payment Plan (Jan 28)
 
 ### Theme Consistency Audit
-- [ ] Audit all pages for design consistency
-- [ ] Apply unified glowing jungle/neon theme across all pages
-- [ ] Ensure consistent color palette, fonts, and styling
+- [x] Audit all pages for design consistency
+- [x] Apply unified glowing jungle/neon theme across all pages
+- [x] Ensure consistent color palette, fonts, and styling
 - [ ] Add glowing avatar/movie-like jungle scene elements
 
 ### Fruit Slider Fix
@@ -2878,6 +2878,94 @@
 - [x] Add flexible payment options (3/6/12/24 month plans)
 
 ### UX Flow Improvements
-- [ ] Identify and fix UX friction points
-- [ ] Improve navigation flow
-- [ ] Ensure all CTAs are highly visible
+- [x] Identify and fix UX friction points
+- [x] Improve navigation flow
+- [x] Ensure all CTAs are highly visible (Make Deposit button is prominent with animation)
+
+
+## Admin Panel Full Debug (Jan 28)
+
+### Admin Panel Navigation Audit
+- [ ] Audit all admin panel routes and pages
+- [ ] Test admin sidebar navigation links
+- [ ] Test admin dropdown menus
+- [ ] Verify all admin page loads correctly
+
+### Admin Panel Button Audit
+- [ ] Test all action buttons on each admin page
+- [ ] Test edit/delete/approve/reject buttons
+- [ ] Test export and download buttons
+- [ ] Test form submission buttons
+
+### Admin Panel Fixes
+- [ ] Fix any broken navigation links
+- [ ] Fix any non-functional buttons
+- [ ] Fix any UI/UX issues discovered
+- [ ] Verify all fixes with testing
+
+
+## Admin Panel Debug & Jungle Theme Enhancement (Jan 28)
+
+### Admin Panel Full Debug
+- [ ] Test AdminDashboard page and all its buttons
+- [ ] Test AdminPanel page and all its tabs
+- [ ] Test AdminTerritories page and all actions
+- [ ] Test MLMAdminPanel page and all features
+- [ ] Test all admin dropdown menus
+- [ ] Fix any broken navigation or buttons
+- [ ] Verify all admin CRUD operations work
+
+### Glowing Jungle Theme Enhancement
+- [ ] Create animated jungle particle system
+- [ ] Add glowing firefly/orb animations
+- [ ] Implement movie-like Avatar jungle glow effects
+- [ ] Add bioluminescent plant elements
+- [ ] Create glowing fruit/leaf animations
+- [ ] Apply theme consistently across all pages
+- [ ] Add subtle ambient glow animations to backgrounds
+
+
+## January 28, 2026 - Admin Panel Debug & Avatar Jungle Theme
+
+### Admin Panel Full Debug
+- [x] Audit main admin dashboard (/admin/dashboard) - all 14 tabs working
+- [x] Test all admin dropdown menus and filters - working
+- [x] Test all admin buttons (Export CSV, Refresh, View Site) - working
+- [x] Audit MLM admin panel (/admin/mlm) - all 11 tabs working
+- [x] Test MLM dropdowns (status, rank, date range filters) - working
+- [x] Test MLM action buttons (Export, Add, Commission Calc) - working
+- [x] Verify all admin pages render correctly without errors
+
+### Avatar-Style Glowing Jungle Theme
+- [x] Create BioluminescentParticles component with Avatar-inspired effects
+- [x] Add floating bioluminescent spores across all pages
+- [x] Implement woodsprite floating creatures
+- [x] Add Tree of Souls background glow effect
+- [x] Create luminescent moss ground cover effect
+- [x] Add Pandora-style stars in night sky
+- [x] Implement floating seed pods animation
+- [x] Add Ikran (flying creature) silhouettes
+- [x] Create glowing vine tendrils effect
+- [x] Add floating pollen particles
+
+### Fruit Slider Enhancement
+- [x] Add Avatar-style bioluminescent glow to fruit images
+- [x] Create floating particle effects around fruits on hover
+- [x] Enhance fruit container with consistent white backgrounds
+- [x] Add glowing drop shadow effects to fruit images
+- [x] Implement smooth hover transitions with scale effects
+
+### CSS Animations Added
+- [x] bio-pulse animation for bioluminescent glow
+- [x] spore-float animation for floating particles
+- [x] spore-glow animation for particle brightness
+- [x] vine-pulse animation for glowing vines
+- [x] tree-glow animation for Tree of Souls effect
+- [x] seed-float animation for floating seed pods
+- [x] woodsprite-float animation for jellyfish creatures
+- [x] avatar-text-glow animation for glowing text
+- [x] ikran-fly animation for flying creatures
+- [x] moss-glow animation for ground cover
+- [x] eywa-pulse animation for connection effect
+- [x] border-glow-sweep animation for glowing borders
+- [x] pollen-drift animation for floating pollen
