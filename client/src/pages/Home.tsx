@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useLocation, Link } from "wouter";
 import { Zap, MapPin, DollarSign, Clock, TrendingUp, Users, Star, Sparkles, ArrowRight, Gift, Target, Trophy, ChevronDown, Shield, Leaf, Heart, Play } from "lucide-react";
 import { VideoPlayer } from "@/components/VideoPlayer";
+import MobileVideoPlayer from "@/components/MobileVideoPlayer";
 import SocialProofNotifications from "@/components/SocialProofNotifications";
 import ViralNewsletterPopup, { shouldShowPopup, markPopupShown } from "@/components/ViralNewsletterPopup";
 import Header from "@/components/Header";
@@ -28,6 +29,22 @@ export default function Home() {
     { src: "/neon-promo.mp4", title: "NEON Energy - Natural Ingredients", poster: "/neon-can-new.png" },
     { src: "/neon-promo.mp4", title: "NEON Energy - Join The Movement", poster: "/neon-can-new.png" },
   ];
+  
+  // Mobile video playlist with proper format for MobileVideoPlayer
+  const mobileVideos = [
+    { id: "promo-1", title: "NEON Energy - Feel The Power", thumbnail: "/neon-can-new.png", videoUrl: "/neon-promo.mp4", duration: "0:30" },
+    { id: "promo-2", title: "NEON Energy - Natural Ingredients", thumbnail: "/neon-can-new.png", videoUrl: "/neon-promo.mp4", duration: "0:30" },
+    { id: "promo-3", title: "NEON Energy - Join The Movement", thumbnail: "/neon-can-new.png", videoUrl: "/neon-promo.mp4", duration: "0:30" },
+  ];
+  
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
   
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -139,9 +156,9 @@ export default function Home() {
           ))}
         </div>
         
-        {/* Decorative Palm Trees */}
-        <img src="/neon-palm-tree.png" alt="" className="palm-tree-left hidden lg:block" />
-        <img src="/neon-palm-tree.png" alt="" className="palm-tree-right hidden lg:block" />
+        {/* Decorative Palm Trees - Fixed transparency */}
+        <img src="/neon-palm-tree.png" alt="" className="palm-tree-left hidden lg:block decorative-image" />
+        <img src="/neon-palm-tree.png" alt="" className="palm-tree-right hidden lg:block decorative-image" />
         
         {/* Corner Accents */}
         <div className="corner-accent-tl" />
@@ -200,22 +217,24 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* CTA Buttons - AIDA: Action with benefit-driven copy */}
+              {/* CTA Buttons - AIDA: Action with benefit-driven copy - Mobile optimized */}
               <div className="flex flex-wrap gap-4">
                 <Button
                   onClick={() => { playSound('back'); setLocation("/crowdfund"); }}
-                  className="bg-[#c8ff00] hover:bg-[#d4ff33] text-black font-bold px-8 h-14 text-lg rounded-xl shadow-[0_0_20px_rgba(200,255,0,0.4)] hover:shadow-[0_0_30px_rgba(200,255,0,0.6)] transition-all group"
+                  className="bg-[#c8ff00] hover:bg-[#d4ff33] text-black font-bold px-6 md:px-8 h-12 md:h-14 text-base md:text-lg rounded-xl shadow-[0_0_20px_rgba(200,255,0,0.4)] hover:shadow-[0_0_30px_rgba(200,255,0,0.6)] transition-all group touch-friendly-lg"
                 >
                   <Gift className="w-5 h-5 mr-2 group-hover:animate-bounce" />
-                  YES! GET MY NEON NOW
+                  <span className="hidden sm:inline">YES! GET MY NEON NOW</span>
+                  <span className="sm:hidden">GET NEON NOW</span>
                 </Button>
                 <Button
                   onClick={() => { playSound('preorder'); setLocation("/products"); }}
                   variant="outline"
-                  className="border-2 border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10 font-bold px-8 h-14 text-lg rounded-xl"
+                  className="border-2 border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10 font-bold px-6 md:px-8 h-12 md:h-14 text-base md:text-lg rounded-xl touch-friendly-lg"
                 >
                   <Play className="w-5 h-5 mr-2" />
-                  SEE ALL PRODUCTS
+                  <span className="hidden sm:inline">SEE ALL PRODUCTS</span>
+                  <span className="sm:hidden">PRODUCTS</span>
                 </Button>
               </div>
 
@@ -318,14 +337,21 @@ export default function Home() {
               </p>
             </div>
             
-            {/* Enhanced Widescreen Video Player with Volume Control and Video Cycling */}
-            <div className="relative w-full max-w-5xl mx-auto">
-              <VideoPlayer
-                videos={neonVideos}
-                className="aspect-video w-full rounded-2xl shadow-2xl shadow-[#c8ff00]/20"
-                autoPlay={true}
-                initialMuted={true}
-              />
+            {/* Enhanced Video Player - Mobile optimized with share/download */}
+            <div className="relative w-full max-w-5xl mx-auto mobile-video-player">
+              {isMobile ? (
+                <MobileVideoPlayer
+                  videos={mobileVideos}
+                  autoPlay={false}
+                />
+              ) : (
+                <VideoPlayer
+                  videos={neonVideos}
+                  className="aspect-video w-full rounded-2xl shadow-2xl shadow-[#c8ff00]/20"
+                  autoPlay={true}
+                  initialMuted={true}
+                />
+              )}
             </div>
           </div>
         </div>
