@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useState, useRef } from "react";
 import GenealogyTree from "@/components/GenealogyTree";
 import { Camera, Globe, Image as ImageIcon } from "lucide-react";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 export default function DistributorDashboard() {
   const { user, loading } = useAuth();
@@ -135,6 +136,18 @@ export default function DistributorDashboard() {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Breadcrumb */}
+      <div className="bg-black/90 backdrop-blur-sm border-b border-[#c8ff00]/20 px-4 py-2">
+        <Breadcrumb 
+          items={[
+            { label: 'Distributor Portal', href: '/distributor-portal' },
+            { label: 'Dashboard' }
+          ]} 
+          variant="dark" 
+          className="text-xs"
+        />
+      </div>
+      
       {/* Header */}
       <header className="border-b border-[#c8ff00]/20 py-4">
         <div className="container px-6">

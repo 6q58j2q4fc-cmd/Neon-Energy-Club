@@ -55,6 +55,7 @@ import DistributorRewards from "@/components/DistributorRewards";
 import ProfileEditor from "@/components/ProfileEditor";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import NavigationHeader from "@/components/NavigationHeader";
+import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
 
 export default function DistributorPortal() {
   const [location, setLocation] = useLocation();
@@ -233,6 +234,15 @@ export default function DistributorPortal() {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Breadcrumb - Mobile only */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-black/90 backdrop-blur-sm border-b border-[#c8ff00]/20 px-4 py-2">
+        <Breadcrumb 
+          items={breadcrumbConfigs.distributorPortal} 
+          variant="dark" 
+          className="text-xs"
+        />
+      </div>
+      
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 h-full w-64 bg-[#0a0a0a] border-r border-[#c8ff00]/20 z-50 hidden lg:block">
         <div className="p-6">

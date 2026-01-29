@@ -31,6 +31,7 @@ import {
   ChevronUp
 } from "lucide-react";
 import ProfileEditor from "@/components/ProfileEditor";
+import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
 
 export default function CustomerPortal() {
   const { user, isAuthenticated } = useAuth();
@@ -122,7 +123,16 @@ export default function CustomerPortal() {
     <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a]">
       <HamburgerHeader />
       
-      <div className="pt-24 pb-16">
+      {/* Breadcrumb */}
+      <div className="pt-20 px-4">
+        <Breadcrumb 
+          items={breadcrumbConfigs.customerPortal} 
+          variant="vice" 
+          className="mb-4"
+        />
+      </div>
+      
+      <div className="pt-4 pb-16">
         <div className="container mx-auto px-4">
           {/* Header */}
           <div className="text-center mb-12">

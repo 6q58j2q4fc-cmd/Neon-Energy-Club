@@ -3239,3 +3239,16 @@
 - [x] Reposition sound icon to bottom-right (less intrusive)
 - [x] Make icon collapsible/minimizable with chevron toggle
 - [x] Ensure it doesn't interfere with page navigation
+
+
+## Home Page Hash Navigation & Portal Breadcrumbs (Jan 29, 2026)
+
+### Home Page Hash Navigation
+- [x] Add hash IDs to Home page sections (#crowdfunding, #video, #features)
+- [x] Enable useHashNavigation hook on Home page
+- [x] Support direct URL access (e.g., /#crowdfunding)
+
+### Portal Breadcrumbs
+- [x] Add breadcrumbs to Distributor Portal pages (DistributorPortal, DistributorDashboard)
+- [x] Add breadcrumbs to Customer Portal pages
+- [x] Ensure consistent navigation within dashboards

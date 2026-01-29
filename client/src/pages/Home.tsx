@@ -15,11 +15,13 @@ import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
+import { useHashNavigation } from "@/hooks/useHashNavigation";
 
 export default function Home() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { playSound } = useSoundEffects();
+  useHashNavigation({ offset: 100 });
   const [isVisible, setIsVisible] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [showNewsletter, setShowNewsletter] = useState(false);
@@ -313,7 +315,7 @@ export default function Home() {
 
         {/* Scroll Indicator - Clickable with smooth scroll */}
         <button 
-          onClick={() => document.getElementById('crowdfunding-section')?.scrollIntoView({ behavior: 'smooth' })}
+          onClick={() => document.getElementById('crowdfunding')?.scrollIntoView({ behavior: 'smooth' })}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce cursor-pointer hover:scale-110 transition-transform group"
           aria-label="Scroll to next section"
         >
@@ -323,7 +325,7 @@ export default function Home() {
       </section>
 
       {/* Promotional Video Section */}
-      <section className="py-16 relative overflow-hidden">
+      <section id="video" className="py-16 relative overflow-hidden scroll-mt-20">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a1a1a] via-[#0d2818]/50 to-[#0a1a1a]" />
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-4xl mx-auto">
@@ -358,7 +360,7 @@ export default function Home() {
       </section>
 
       {/* Funding Progress Section - Vice City Style */}
-      <section id="crowdfunding-section" className="py-20 relative scroll-mt-20">
+      <section id="crowdfunding" className="py-20 relative scroll-mt-20">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#ff0080]/5 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#00ffff]/3 via-transparent to-[#9d4edd]/3" />
         <div className="container mx-auto px-6 relative z-10">
@@ -457,7 +459,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 relative overflow-hidden">
+      <section id="features" className="py-20 relative overflow-hidden scroll-mt-20">
         {/* Background Graphics */}
         <div className="absolute inset-0 section-bg-gradient-2" />
         <div className="floating-neon-orb purple w-80 h-80 -top-40 -right-40" style={{ animationDelay: '-7s' }} />
