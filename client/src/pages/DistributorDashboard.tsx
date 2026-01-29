@@ -12,8 +12,9 @@ import {
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import GenealogyTree from "@/components/GenealogyTree";
+import { Camera, Globe, Image as ImageIcon } from "lucide-react";
 
 export default function DistributorDashboard() {
   const { user, loading } = useAuth();
@@ -24,6 +25,19 @@ export default function DistributorDashboard() {
   const distributorStats = trpc.distributor.stats.useQuery();
   const team = trpc.distributor.team.useQuery();
   const affiliateLinks = trpc.distributor.affiliateLinks.useQuery();
+
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const updateProfile = trpc.profile.updateProfile.useMutation({
+    onSuccess: () => {
+      toast.success("Profile updated!");
+      distributorInfo.refetch();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to update profile");
+    },
+  });
 
   const createLink = trpc.distributor.createAffiliateLink.useMutation({
     onSuccess: (data) => {
@@ -76,6 +90,47 @@ export default function DistributorDashboard() {
       campaignName: newLinkCampaign || undefined,
       targetPath: "/",
     });
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be less than 5MB');
+      return;
+    }
+
+    setIsUploadingPhoto(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', 'profile');
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Upload failed');
+
+      const { url } = await response.json();
+      updateProfile.mutate({ profilePhotoUrl: url });
+    } catch (error) {
+      toast.error('Failed to upload photo');
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  };
+
+  const getClonedWebsiteUrl = () => {
+    const baseUrl = window.location.origin;
+    return `${baseUrl}/d/${distributor.distributorCode}`;
   };
 
   return (
@@ -200,6 +255,122 @@ export default function DistributorDashboard() {
                   </div>
                   <div className="text-xs text-gray-500 mt-1">$5,000 more in team sales needed</div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Your Cloned Website & Profile Photo */}
+        <div className="grid md:grid-cols-2 gap-6 mb-12">
+          {/* Cloned Website Section */}
+          <Card className="bg-gradient-to-br from-[#ff0080]/20 to-[#0a0a0a] border-[#ff0080]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-[#ff0080]">
+                <Globe className="w-5 h-5" />
+                Your Cloned Website
+              </CardTitle>
+              <CardDescription>Your personalized NEON website for recruiting & sales</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 bg-black/50 rounded-lg border border-[#ff0080]/30">
+                <div className="text-xs text-gray-400 mb-1">Your Unique URL</div>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 text-[#ff0080] font-mono text-sm break-all">
+                    {getClonedWebsiteUrl()}
+                  </code>
+                  <Button
+                    size="sm"
+                    onClick={() => copyToClipboard(getClonedWebsiteUrl())}
+                    className="bg-[#ff0080] text-white hover:bg-[#d6006b] shrink-0"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  className="flex-1 bg-[#ff0080] text-white hover:bg-[#d6006b]"
+                  onClick={() => window.open(getClonedWebsiteUrl(), '_blank')}
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Visit My Site
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1 border-[#ff0080]/30 text-[#ff0080] hover:bg-[#ff0080]/10"
+                  onClick={() => {
+                    const shareUrl = getClonedWebsiteUrl();
+                    if (navigator.share) {
+                      navigator.share({ title: 'NEON Energy - ' + user?.name, url: shareUrl });
+                    } else {
+                      copyToClipboard(shareUrl);
+                    }
+                  }}
+                >
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Share
+                </Button>
+              </div>
+              <div className="p-3 bg-[#ff0080]/10 rounded-lg text-sm text-gray-300">
+                <strong className="text-[#ff0080]">Pro Tip:</strong> Share this link with prospects! When they order or sign up, you earn commissions automatically.
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Profile Photo Section */}
+          <Card className="bg-gradient-to-br from-[#c8ff00]/20 to-[#0a0a0a] border-[#c8ff00]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Camera className="w-5 h-5 text-[#c8ff00]" />
+                Profile Photo
+              </CardTitle>
+              <CardDescription>Upload a photo to personalize your cloned website</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-6">
+                <div className="relative">
+                  <div className="w-24 h-24 rounded-full bg-[#c8ff00]/20 border-2 border-[#c8ff00] flex items-center justify-center overflow-hidden">
+                    {(distributor as any).profilePhotoUrl ? (
+                      <img 
+                        src={(distributor as any).profilePhotoUrl} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <ImageIcon className="w-10 h-10 text-[#c8ff00]/50" />
+                    )}
+                  </div>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploadingPhoto}
+                    className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-[#c8ff00] text-black flex items-center justify-center hover:bg-[#a8d600] transition-colors disabled:opacity-50"
+                  >
+                    <Camera className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-white mb-1">{user?.name}</h4>
+                  <p className="text-sm text-gray-400 mb-3">ID: {distributor.distributorCode}</p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploadingPhoto}
+                    className="border-[#c8ff00]/30 text-[#c8ff00] hover:bg-[#c8ff00]/10"
+                  >
+                    {isUploadingPhoto ? 'Uploading...' : 'Change Photo'}
+                  </Button>
+                </div>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
+              <div className="p-3 bg-[#c8ff00]/10 rounded-lg text-sm text-gray-300">
+                Your photo will appear on your cloned website to build trust with prospects.
               </div>
             </CardContent>
           </Card>

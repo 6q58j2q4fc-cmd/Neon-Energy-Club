@@ -3130,3 +3130,25 @@
 - [x] Create unique distributor ID and URL (NEON1VDTXNY)
 - [x] Configure cloned website for master distributor (/d/NEON1VDTXNY)
 - [x] Set up tracking for customers and new distributors
+
+
+## Admin Dashboard & Distributor Features (Jan 29, 2026)
+
+### Remove Test Data
+- [x] Remove all test pre-orders from database (cleared all 10 test orders)
+- [x] Clear simulated/placeholder data
+
+### Admin Dashboard Fixes
+- [x] Audit admin dashboard features not populating (all tabs working)
+- [x] Fix any broken data queries (all showing real live data)
+- [x] Ensure all stats show real live data (zeros after clearing test data)
+
+### Distributor Cloned Website Section
+- [x] Add section showing unique distributor domain/URL
+- [x] Display shareable referral link prominently (Your Cloned Website card)
+- [x] Add copy-to-clipboard functionality (copy button on URL)
+
+### Profile Photo Upload
+- [x] Implement profile photo upload to S3 (multer + storagePut)
+- [x] Display uploaded photo on distributor dashboard (Profile Photo card)
+- [x] Show photo on cloned distributor website (fetched via getPublicProfile)

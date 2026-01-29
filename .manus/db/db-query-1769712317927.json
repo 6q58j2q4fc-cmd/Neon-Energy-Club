@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(*) as total_preorders FROM preorders;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT COUNT(*) as total_preorders FROM preorders;",
+  "rows": [
+    {
+      "total_preorders": "259"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_preorders\n259\n",
+  "stderr": "",
+  "execution_time_ms": 131
+}

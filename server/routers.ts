@@ -2992,6 +2992,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
         displayName: z.string().max(255).optional(),
         location: z.string().max(255).optional(),
         bio: z.string().max(1000).optional(),
+        profilePhotoUrl: z.string().url().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const { getPersonalizedProfile, upsertUserProfile, getDistributorByUserId, generateUniqueSlug } = await import("./db");
@@ -3011,6 +3012,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
             displayName: input.displayName,
             location: input.location,
             bio: input.bio,
+            profilePhotoUrl: input.profilePhotoUrl,
             userType,
           });
         } else {
@@ -3020,6 +3022,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
             displayName: input.displayName,
             location: input.location,
             bio: input.bio,
+            profilePhotoUrl: input.profilePhotoUrl,
             userType: existingProfile.userType,
           });
         }
