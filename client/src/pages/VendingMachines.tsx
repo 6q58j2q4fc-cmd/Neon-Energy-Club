@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -28,8 +28,13 @@ import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
 import VendingApplicationForm from "@/components/VendingApplicationForm";
 import VendingCheckout from "@/components/VendingCheckout";
+import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
+import { useHashNavigation } from "@/hooks/useHashNavigation";
 
 export default function VendingMachines() {
+  // Initialize hash navigation
+  useHashNavigation({ offset: 120 });
+  
   const [dailySales, setDailySales] = useState(20);
   const [pricePerCan, setPricePerCan] = useState(3.5);
   const [costPerCan, setCostPerCan] = useState(1.5);
@@ -74,8 +79,15 @@ export default function VendingMachines() {
       <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a]">
         <HamburgerHeader variant="default" />
 
+        {/* Breadcrumb */}
+        <div className="pt-24 pb-4 px-4 relative z-20">
+          <div className="container mx-auto max-w-6xl">
+            <Breadcrumb items={breadcrumbConfigs.vending} variant="default" />
+          </div>
+        </div>
+
         {/* Hero Section */}
-        <section className="pt-32 pb-20 relative overflow-hidden">
+        <section id="hero" className="pt-8 pb-20 relative overflow-hidden scroll-focus-target">
           <div className="absolute inset-0 bg-gradient-to-b from-[#c8ff00]/5 via-transparent to-transparent" />
           
           <div className="container mx-auto px-4">

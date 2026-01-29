@@ -25,6 +25,8 @@ import {
 import { toast } from "sonner";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import { useCart } from "@/contexts/CartContext";
+import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
+import { useHashNavigation } from "@/hooks/useHashNavigation";
 
 // Distributor Packages
 const distributorPackages = [
@@ -135,15 +137,18 @@ const customerPackages = [
 ];
 
 // Auto-ship discount
-const AUTO_SHIP_DISCOUNT = 0.15; // 15% off
+const AUTO_SHIP_DISCOUNT = 0.1; // 10% off
 
 export default function Shop() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
+  const { addItem, setIsOpen } = useCart();
   const [isVisible, setIsVisible] = useState(false);
   const [autoShip, setAutoShip] = useState(false);
   const [selectedFlavor, setSelectedFlavor] = useState<"original" | "organic" | "mixed">("mixed");
-  const { addItem } = useCart();
+  
+  // Initialize hash navigation
+  useHashNavigation({ offset: 120 });
 
   useEffect(() => {
     setIsVisible(true);
@@ -192,8 +197,15 @@ export default function Shop() {
       
       <HamburgerHeader variant="default" />
 
+      {/* Breadcrumb */}
+      <div className="pt-24 pb-4 px-4 relative z-20">
+        <div className="container mx-auto max-w-6xl">
+          <Breadcrumb items={breadcrumbConfigs.shop} variant="default" />
+        </div>
+      </div>
+
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4 relative z-10">
+      <section id="hero" className="pt-8 pb-16 px-4 relative z-10 scroll-focus-target">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(200,255,0,0.15),transparent_50%)]"></div>
         <div className="container mx-auto max-w-6xl text-center relative z-10">
           <motion.div

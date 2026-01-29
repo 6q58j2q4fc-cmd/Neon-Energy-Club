@@ -3,10 +3,15 @@ import { useLocation } from "wouter";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
 import { SEO } from "@/components/SEO";
+import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
+import { useHashNavigation } from "@/hooks/useHashNavigation";
 
 export default function About() {
   const [, setLocation] = useLocation();
   const [isVisible, setIsVisible] = useState(false);
+  
+  // Initialize hash navigation
+  useHashNavigation({ offset: 120 });
 
   useEffect(() => {
     setIsVisible(true);
@@ -36,8 +41,15 @@ export default function About() {
       <img src="/neon-palm-tree.png" alt="" className="palm-tree-right hidden lg:block" />
       <HamburgerHeader variant="vice" />
 
+      {/* Breadcrumb */}
+      <div className="pt-24 pb-4 px-4 relative z-20">
+        <div className="container mx-auto max-w-4xl">
+          <Breadcrumb items={breadcrumbConfigs.about} variant="vice" />
+        </div>
+      </div>
+
       {/* Hero Section - Vice City Style */}
-      <section className="pt-32 pb-16 px-4 relative z-10">
+      <section id="hero" className="pt-8 pb-16 px-4 relative z-10 scroll-focus-target">
         <div className={`container mx-auto max-w-4xl text-center relative z-10 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
           <h2 className="text-5xl md:text-7xl font-black mb-6 font-vice">
             OUR <span className="gradient-text-vice drop-shadow-[0_0_20px_rgba(255,0,128,0.5)]">STORY</span>

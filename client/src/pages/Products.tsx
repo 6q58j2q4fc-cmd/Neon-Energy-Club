@@ -6,16 +6,28 @@ import Footer from "@/components/Footer";
 import { SEO } from "@/components/SEO";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
-import { ShoppingCart, Check, Zap, Leaf, Apple, Cherry, Sparkles, Star, Award, Heart, Shield } from "lucide-react";
+import { ShoppingCart, Check, Zap, Leaf, Apple, Cherry, Sparkles, Star, Award, Heart, Shield, Link as LinkIcon } from "lucide-react";
+import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
+import { useHashNavigation } from "@/hooks/useHashNavigation";
 
 export default function Products() {
   const [, setLocation] = useLocation();
   const [isVisible, setIsVisible] = useState(false);
   const { addItem, setIsOpen } = useCart();
 
+  // Initialize hash navigation
+  const { getShareableUrl } = useHashNavigation({ offset: 120 });
+
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  // Copy section link to clipboard
+  const copyLink = (hash: string) => {
+    const url = getShareableUrl(hash);
+    navigator.clipboard.writeText(url);
+    toast.success('Link copied!', { description: url });
+  };
 
   const handlePreOrder = (product: "original" | "organic" | "mixed") => {
     const products = {
@@ -87,8 +99,15 @@ export default function Products() {
       
       <HamburgerHeader variant="vice" />
 
+      {/* Breadcrumb */}
+      <div className="pt-24 pb-4 px-4 relative z-20">
+        <div className="container mx-auto max-w-6xl">
+          <Breadcrumb items={breadcrumbConfigs.products} variant="vice" />
+        </div>
+      </div>
+
       {/* Hero Section - More vibrant */}
-      <section className="pt-32 pb-12 px-4 relative overflow-hidden">
+      <section id="hero" className="pt-8 pb-12 px-4 relative overflow-hidden scroll-focus-target">
         {/* Floating decorative elements - fixed transparency */}
         <div className="absolute top-20 left-10 w-16 h-16 opacity-30 animate-float decorative-image-normal">
           <Apple className="w-full h-full text-[#c8ff00]" />
@@ -124,11 +143,11 @@ export default function Products() {
       </section>
 
       {/* Products Grid - Seamless blending */}
-      <section className="py-12 px-4 relative">
+      <section id="products" className="py-12 px-4 relative scroll-focus-target">
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
             {/* NEON Original - Seamless design */}
-            <div className={`relative rounded-3xl overflow-hidden transition-all duration-500 hover:scale-[1.02] ${isVisible ? 'animate-slide-in-left' : 'opacity-0'}`}>
+            <div id="original" className={`relative rounded-3xl overflow-hidden transition-all duration-500 hover:scale-[1.02] scroll-focus-target ${isVisible ? 'animate-slide-in-left' : 'opacity-0'}`}>
               {/* Gradient background that blends with page */}
               <div className="absolute inset-0 bg-gradient-to-b from-[#c8ff00]/15 via-black/40 to-black/60 backdrop-blur-sm" />
               <div className="absolute inset-0 border border-[#c8ff00]/20 rounded-3xl" />
@@ -187,7 +206,7 @@ export default function Products() {
             </div>
 
             {/* NEON Organic - Seamless design */}
-            <div className={`relative rounded-3xl overflow-hidden transition-all duration-500 hover:scale-[1.02] ${isVisible ? 'animate-slide-in-right' : 'opacity-0'}`}>
+            <div id="organic" className={`relative rounded-3xl overflow-hidden transition-all duration-500 hover:scale-[1.02] scroll-focus-target ${isVisible ? 'animate-slide-in-right' : 'opacity-0'}`}>
               {/* Gradient background that blends with page */}
               <div className="absolute inset-0 bg-gradient-to-b from-orange-500/15 via-black/40 to-black/60 backdrop-blur-sm" />
               <div className="absolute inset-0 border border-orange-500/20 rounded-3xl" />
@@ -254,7 +273,7 @@ export default function Products() {
           </div>
 
           {/* Mixed Case Option - Enhanced */}
-          <div className="mt-12 relative rounded-3xl overflow-hidden">
+          <div id="mixed" className="mt-12 relative rounded-3xl overflow-hidden scroll-focus-target">
             <div className="absolute inset-0 bg-gradient-to-r from-[#c8ff00]/10 via-transparent to-orange-500/10" />
             <div className="absolute inset-0 border border-white/10 rounded-3xl" />
             

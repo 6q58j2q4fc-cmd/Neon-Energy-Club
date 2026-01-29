@@ -10,6 +10,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { toast } from "sonner";
 import { Mail, MessageCircle, Phone, MapPin, ChevronDown, Send } from "lucide-react";
 import HamburgerHeader from "@/components/HamburgerHeader";
+import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
+import { useHashNavigation } from "@/hooks/useHashNavigation";
 
 const faqCategories = [
   {
@@ -227,6 +229,9 @@ export default function FAQ() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
+  
+  // Initialize hash navigation
+  useHashNavigation({ offset: 120 });
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -265,8 +270,15 @@ export default function FAQ() {
       
       <HamburgerHeader variant="default" />
 
+      {/* Breadcrumb */}
+      <div className="pt-24 pb-4 px-4 relative z-20">
+        <div className="container mx-auto max-w-4xl">
+          <Breadcrumb items={breadcrumbConfigs.faq} variant="default" />
+        </div>
+      </div>
+
       {/* Hero Section */}
-      <section className="pt-32 pb-12 px-4 animated-bg">
+      <section id="hero" className="pt-8 pb-12 px-4 animated-bg scroll-focus-target">
         <div className={`container mx-auto max-w-4xl text-center ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
           <MessageCircle className="w-16 h-16 text-[#c8ff00] mx-auto mb-6 neon-glow" />
           <h2 className="text-5xl md:text-6xl font-black mb-6">

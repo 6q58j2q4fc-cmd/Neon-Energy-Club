@@ -3204,3 +3204,25 @@
 - [x] Make backgrounds more bright and vibrant (product-bg-vibrant, vibrant-glow classes)
 - [ ] Research and add more NEON energy drink content
 - [x] Improve product page visual contrast
+
+
+## URL Hash Navigation & Breadcrumbs (Jan 29, 2026)
+
+### URL Hash Navigation
+- [x] Create useHashNavigation hook for scroll-to-section functionality
+- [x] Add hash IDs to key sections on Products page (#original, #organic, #mixed)
+- [ ] Add hash IDs to key sections on Home page (#crowdfunding, #video, #features)
+- [x] Add hash IDs to Franchise page sections
+- [x] Implement smooth scroll on hash change
+- [x] Support direct URL access with hash (e.g., /products#organic)
+
+### Breadcrumb Navigation
+- [x] Create reusable Breadcrumb component
+- [x] Add breadcrumbs to Products page
+- [x] Add breadcrumbs to Franchise page
+- [x] Add breadcrumbs to Vending page
+- [x] Add breadcrumbs to About/Story page
+- [x] Add breadcrumbs to FAQ page
+- [x] Add breadcrumbs to Blog pages
+- [x] Add breadcrumbs to Shop page
+- [x] Style breadcrumbs to match Vice City theme

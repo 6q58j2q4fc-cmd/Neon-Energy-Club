@@ -17,6 +17,8 @@ import HamburgerHeader from "@/components/HamburgerHeader";
 import { SEO } from "@/components/SEO";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import MeetingScheduler from "@/components/MeetingScheduler";
+import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
+import { useHashNavigation } from "@/hooks/useHashNavigation";
 
 // Territory pricing data (price per square mile per month)
 const territoryPricing = {
@@ -47,6 +49,9 @@ export default function Franchise() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
+  
+  // Initialize hash navigation
+  useHashNavigation({ offset: 120 });
   const [scheduleCallOpen, setScheduleCallOpen] = useState(false);
   
   // Territory selection state
@@ -137,8 +142,15 @@ export default function Franchise() {
       
       <HamburgerHeader variant="default" />
 
+      {/* Breadcrumb */}
+      <div className="pt-24 pb-4 px-4 relative z-20">
+        <div className="container mx-auto max-w-6xl">
+          <Breadcrumb items={breadcrumbConfigs.franchise} variant="default" />
+        </div>
+      </div>
+
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4 animated-bg">
+      <section id="hero" className="pt-8 pb-16 px-4 animated-bg scroll-focus-target">
         <div className={`container mx-auto max-w-6xl text-center ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
           <h2 className="text-5xl md:text-7xl font-black mb-6">
             EXCLUSIVE <span className="text-[#c8ff00] neon-text">TERRITORY</span> LICENSING

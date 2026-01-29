@@ -1,13 +1,14 @@
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { Zap, Calendar, Eye, ArrowRight, Clock, Tag, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
-import { useState } from "react";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
+import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
+import { useHashNavigation } from "@/hooks/useHashNavigation";
 
 const categories = [
   { value: "all", label: "All Posts" },
@@ -24,6 +25,9 @@ export default function Blog() {
   const [, setLocation] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Initialize hash navigation
+  useHashNavigation({ offset: 120 });
   
   const blogPosts = trpc.blog.list.useQuery({ 
     category: selectedCategory === "all" ? undefined : selectedCategory,
@@ -48,8 +52,15 @@ export default function Blog() {
 
       <HamburgerHeader variant="default" />
 
+      {/* Breadcrumb */}
+      <div className="pt-24 pb-4 px-4 relative z-20">
+        <div className="container mx-auto max-w-6xl">
+          <Breadcrumb items={breadcrumbConfigs.blog} variant="default" />
+        </div>
+      </div>
+
       {/* Hero Section */}
-      <section className="pt-32 pb-16 relative">
+      <section id="hero" className="pt-8 pb-16 relative scroll-focus-target">
         <div className="absolute inset-0 animated-grid opacity-20" />
         <div className="container mx-auto px-6 relative z-10">
           <div className="text-center max-w-3xl mx-auto">
