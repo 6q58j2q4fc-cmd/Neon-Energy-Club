@@ -4691,13 +4691,18 @@ export async function getVendingPaymentHistory(orderId: number) {
  * Get public distributor profile by distributor code (for cloned pages)
  */
 export async function getDistributorPublicProfile(code: string) {
+  console.log('[getDistributorPublicProfile] Looking for code:', code);
   const db = await getDb();
-  if (!db) return null;
+  if (!db) {
+    console.log('[getDistributorPublicProfile] No database connection');
+    return null;
+  }
   
   // Try to find by distributor code first
   let [distributor] = await db.select()
     .from(distributors)
     .where(eq(distributors.distributorCode, code));
+  console.log('[getDistributorPublicProfile] Found by code:', distributor ? 'yes' : 'no');
   
   // If not found, try by username
   if (!distributor) {
@@ -4713,25 +4718,43 @@ export async function getDistributorPublicProfile(code: string) {
       .where(eq(distributors.subdomain, code));
   }
   
-  if (!distributor || distributor.isActive !== 1) {
+  // Show page for all distributors with active status (not suspended)
+  // isActive field is for monthly qualification, not account status
+  console.log('[getDistributorPublicProfile] Distributor status:', distributor?.status);
+  if (!distributor || distributor.status === 'suspended') {
+    console.log('[getDistributorPublicProfile] Returning null - no distributor or suspended');
     return null;
   }
   
+  console.log('[getDistributorPublicProfile] Getting profile for userId:', distributor.userId);
+  
   // Get user profile for additional info
-  const [profile] = await db.select()
-    .from(userProfiles)
-    .where(eq(userProfiles.userId, distributor.userId));
+  let profile = null;
+  try {
+    const [profileResult] = await db.select()
+      .from(userProfiles)
+      .where(eq(userProfiles.userId, distributor.userId));
+    profile = profileResult;
+    console.log('[getDistributorPublicProfile] Profile found:', profile ? 'yes' : 'no');
+  } catch (err) {
+    console.log('[getDistributorPublicProfile] Profile query error:', err);
+  }
   
   // Count total customers (orders attributed to this distributor)
-  const customerCountResult = await db.select({
-    count: sql<number>`COUNT(DISTINCT customer_id)`
-  })
-    .from(sales)
-    .where(eq(sales.distributorId, distributor.id));
+  let totalCustomers = 0;
+  try {
+    const customerCountResult = await db.select({
+      count: sql<number>`COUNT(DISTINCT customerId)`
+    })
+      .from(sales)
+      .where(eq(sales.distributorId, distributor.id));
+    totalCustomers = customerCountResult[0]?.count || 0;
+    console.log('[getDistributorPublicProfile] Total customers:', totalCustomers);
+  } catch (err) {
+    console.log('[getDistributorPublicProfile] Customer count error:', err);
+  }
   
-  const totalCustomers = customerCountResult[0]?.count || 0;
-  
-  return {
+  const result = {
     id: distributor.id,
     distributorCode: distributor.distributorCode,
     username: distributor.username || distributor.distributorCode,
@@ -4744,4 +4767,6 @@ export async function getDistributorPublicProfile(code: string) {
     totalCustomers: totalCustomers,
     isActive: distributor.isActive === 1,
   };
+  console.log('[getDistributorPublicProfile] Returning:', JSON.stringify(result));
+  return result;
 }

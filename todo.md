@@ -3071,3 +3071,24 @@
 - [x] Update commission calculations automatically (direct + unilevel commissions)
 - [x] Display real-time stats in distributor portal
 - [x] Ensure data accuracy with LLM monitoring (validateDistributorData)
+
+
+## Test Distributor Account & Email Notifications (Jan 29, 2026)
+
+### Test Distributor Account
+- [x] Create test distributor account via website (Dakota Rea - NEON1VDTXNY)
+- [ ] Upload profile photo for test distributor
+- [x] Test distributor cloned page with real profile data (/d/NEON1VDTXNY works!)
+- [x] Test referral link tracking (sessionStorage + trackReferralClick working)
+
+### Email Notification Configuration
+- [x] Review current email notification system (emailNotifications.ts exists)
+- [x] Email notification service already configured with templates for:
+  - Order confirmations
+  - Commission payouts
+  - Rank advancements
+  - Territory applications
+  - NFT minting
+  - Crowdfunding contributions
+- [x] Production mode flag prevents test notifications from being sent
+- [ ] Configure SMTP credentials for customer email delivery (optional - owner notifications work via built-in API)
