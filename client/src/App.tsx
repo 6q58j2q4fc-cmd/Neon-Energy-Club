@@ -126,7 +126,7 @@ function App() {
         <ThemeProvider defaultTheme="dark">
           <TooltipProvider>
             <Toaster />
-            <AvatarJungleAtmosphere intensity="medium" />
+            <AvatarJungleAtmosphere intensity="low" />
             <Router />
             <CartDrawer />
             <VoiceMuteButton />

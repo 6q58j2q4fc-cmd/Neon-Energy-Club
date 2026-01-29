@@ -89,14 +89,15 @@ export function BioluminescentParticles() {
 }
 
 export function FloatingPollen() {
-  const [particles, setParticles] = useState<{ id: number; left: string; delay: number; duration: number }[]>([]);
+  const [particles, setParticles] = useState<{ id: number; left: string; delay: number; duration: number; size: number }[]>([]);
 
   useEffect(() => {
-    const generated = Array.from({ length: 30 }, (_, i) => ({
+    const generated = Array.from({ length: 15 }, (_, i) => ({
       id: i,
       left: `${Math.random() * 100}%`,
       delay: Math.random() * -25,
       duration: 20 + Math.random() * 15,
+      size: 2 + Math.random() * 2, // Small particles only (2-4px)
     }));
     setParticles(generated);
   }, []);
@@ -109,6 +110,8 @@ export function FloatingPollen() {
           className="pollen-particle"
           style={{
             left: p.left,
+            width: `${p.size}px`,
+            height: `${p.size}px`,
             animationDelay: `${p.delay}s`,
             animationDuration: `${p.duration}s`,
           }}
@@ -234,13 +237,14 @@ export function SeedPods() {
 
 // Combined component for full Avatar-style jungle atmosphere
 export function AvatarJungleAtmosphere({ intensity = 'medium' }: { intensity?: 'low' | 'medium' | 'high' }) {
-  const showWoodsprites = intensity === 'medium' || intensity === 'high';
+  const showWoodsprites = intensity === 'high';
   const showIkrans = intensity === 'high';
-  const showSeedPods = intensity === 'medium' || intensity === 'high';
+  const showSeedPods = intensity === 'high';
+  const showPandoraStars = intensity === 'medium' || intensity === 'high';
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-      <PandoraStars />
+      {showPandoraStars && <PandoraStars />}
       <FloatingPollen />
       {showWoodsprites && <BioluminescentParticles />}
       {showSeedPods && <SeedPods />}

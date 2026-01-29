@@ -3040,3 +3040,9 @@
 
 ### Testing
 - [x] All 293 vitest tests passing
+
+
+## Background Cleanup (Jan 29, 2026)
+
+- [x] Remove larger glowing dots from background (disabled PandoraStars, BioluminescentParticles, SeedPods at low intensity)
+- [x] Keep smaller particles that were already present (FloatingPollen with 2-4px size)
