@@ -3502,3 +3502,22 @@
 - [x] Add progress bar/indicator to ProfileEditor
 - [x] Show checklist of incomplete items
 - [x] Encourage completion with visual feedback
+
+
+## Leaderboard Widget & QR Code Generation (Jan 30, 2026)
+
+### Real-Time Leaderboard Widget
+- [x] Create leaderboard API endpoint to fetch top performers (distributor.getLeaderboard)
+- [x] Query distributors by rank, team size, and monthly volume (getPublicLeaderboard in db.ts)
+- [x] Build LeaderboardWidget component for cloned websites
+- [x] Display top 10 distributors with rank badges and stats
+- [x] Add animation and real-time updates (60-second refresh)
+- [x] Integrate widget into DistributorSite page
+
+### QR Code Generation
+- [x] Install QR code generation library (qrcode)
+- [x] Create QR code generation utility function (QRCodeGenerator component)
+- [x] Generate QR code for distributor's personalized URL
+- [x] Add QR code display in distributor portal (My Website tab)
+- [x] Add download button for QR code image
+- [x] Style QR code with NEON branding colors

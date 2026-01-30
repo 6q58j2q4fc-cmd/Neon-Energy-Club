@@ -603,6 +603,14 @@ export const appRouter = router({
         return await getDistributorPublicProfile(input.code);
       }),
 
+    // Get public leaderboard for cloned websites
+    getLeaderboard: publicProcedure
+      .input(z.object({ limit: z.number().int().min(1).max(20).default(10) }).optional())
+      .query(async ({ input }) => {
+        const { getPublicLeaderboard } = await import("./db");
+        return await getPublicLeaderboard(input?.limit || 10);
+      }),
+
     // Track referral click (for attribution)
     trackReferralClick: publicProcedure
       .input(z.object({ distributorCode: z.string() }))

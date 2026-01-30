@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { getLoginUrl } from "@/const";
+import QRCodeGenerator from "@/components/QRCodeGenerator";
 import { 
   Zap, 
   Users, 
@@ -1049,6 +1050,14 @@ export default function DistributorPortal() {
                   </p>
                 </CardContent>
               </Card>
+              
+              {/* QR Code Section */}
+              <QRCodeGenerator
+                url={`https://neonenergyclub.com/d/${distributorProfile?.distributorCode}`}
+                distributorCode={distributorProfile?.distributorCode || ''}
+                displayName={user?.name || undefined}
+                size={200}
+              />
               
               {/* Profile Customization */}
               <Card className="bg-[#0a0a0a] border-[#c8ff00]/30">

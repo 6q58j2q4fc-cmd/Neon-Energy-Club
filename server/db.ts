@@ -4859,6 +4859,82 @@ export async function getDistributorPublicProfile(code: string) {
 }
 
 
+/**
+ * Get public leaderboard of top distributors for cloned websites
+ */
+export async function getPublicLeaderboard(limit: number = 10) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  try {
+    // Get top distributors by rank and performance
+    const topDistributors = await db.select({
+      id: distributors.id,
+      distributorCode: distributors.distributorCode,
+      username: distributors.username,
+      rank: distributors.rank,
+      teamSales: distributors.teamSales,
+      monthlyPV: distributors.monthlyPV,
+      totalEarnings: distributors.totalEarnings,
+      leftLegVolume: distributors.leftLegVolume,
+      rightLegVolume: distributors.rightLegVolume,
+      activeDownlineCount: distributors.activeDownlineCount,
+      userId: distributors.userId,
+    })
+      .from(distributors)
+      .where(eq(distributors.status, 'active'))
+      .orderBy(
+        desc(distributors.totalEarnings),
+        desc(distributors.teamSales),
+        desc(distributors.monthlyPV)
+      )
+      .limit(limit);
+    
+    // Get profile info for each distributor
+    const leaderboard = await Promise.all(
+      topDistributors.map(async (dist, index) => {
+        let profile = null;
+        try {
+          const [profileResult] = await db.select()
+            .from(userProfiles)
+            .where(eq(userProfiles.userId, dist.userId));
+          profile = profileResult;
+        } catch (err) {
+          // Profile not found, use defaults
+        }
+        
+        return {
+          position: index + 1,
+          displayName: profile?.displayName || dist.username || `Distributor ${dist.distributorCode.slice(-4)}`,
+          profilePhoto: profile?.profilePhotoUrl || null,
+          location: profile?.location || null,
+          rank: dist.rank || 'starter',
+          teamSize: dist.activeDownlineCount || 0,
+          monthlyVolume: dist.monthlyPV || 0,
+          // Don't expose exact earnings, show tier instead
+          earningsTier: getEarningsTier(dist.totalEarnings || 0),
+        };
+      })
+    );
+    
+    return leaderboard;
+  } catch (err) {
+    console.error('[getPublicLeaderboard] Error:', err);
+    return [];
+  }
+}
+
+// Helper to convert earnings to a tier (for privacy)
+function getEarningsTier(earnings: number): string {
+  if (earnings >= 100000) return 'Diamond';
+  if (earnings >= 50000) return 'Platinum';
+  if (earnings >= 25000) return 'Gold';
+  if (earnings >= 10000) return 'Silver';
+  if (earnings >= 5000) return 'Bronze';
+  return 'Rising Star';
+}
+
+
 // ==================== VENDING NETWORK FUNCTIONS ====================
 
 /**

@@ -3,6 +3,7 @@ import { useRoute, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Zap, Share2, ShoppingCart, Users, TrendingUp, Sparkles, MapPin, Star, CheckCircle, Copy, ExternalLink, Instagram, Facebook, Twitter, Youtube, Linkedin } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import LeaderboardWidget from "@/components/LeaderboardWidget";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 
@@ -442,6 +443,21 @@ export default function DistributorSite() {
                 <p className="text-gray-400">{benefit.description}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Top Performers Leaderboard */}
+      <section className="py-16 border-t border-[#c8ff00]/20 bg-gradient-to-b from-[#0a0a0a] to-black">
+        <div className="container px-6">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-black mb-2">
+              TOP <span className="text-[#c8ff00] neon-text">PERFORMERS</span>
+            </h2>
+            <p className="text-gray-400">Join our community of successful distributors</p>
+          </div>
+          <div className="max-w-2xl mx-auto">
+            <LeaderboardWidget limit={5} compact />
           </div>
         </div>
       </section>
