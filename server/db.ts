@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption, vendingApplications, franchiseApplications, pushSubscriptions, InsertVendingApplication, InsertFranchiseApplication, InsertPushSubscription, userProfiles, InsertUserProfile, scheduledMeetings, InsertScheduledMeeting, vendingMachineOrders, vendingPaymentHistory, InsertVendingMachineOrder, InsertVendingPaymentHistory, vendingNetwork, vendingCommissions, InsertVendingNetwork, InsertVendingCommission } from "../drizzle/schema";
+import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption, vendingApplications, franchiseApplications, pushSubscriptions, InsertVendingApplication, InsertFranchiseApplication, InsertPushSubscription, userProfiles, InsertUserProfile, scheduledMeetings, InsertScheduledMeeting, vendingMachineOrders, vendingPaymentHistory, InsertVendingMachineOrder, InsertVendingPaymentHistory, vendingNetwork, vendingCommissions, InsertVendingNetwork, InsertVendingCommission, notificationPreferences, emailDigestQueue, InsertNotificationPreference, InsertEmailDigestQueueItem } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -5074,4 +5074,218 @@ export async function getTotalVendingEarnings(userId: number) {
   }
 
   return { total, pending, paid };
+}
+
+
+// ============================================
+// Notification Preferences Functions
+// ============================================
+
+/**
+ * Get notification preferences for a user
+ */
+export async function getNotificationPreferences(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select()
+    .from(notificationPreferences)
+    .where(eq(notificationPreferences.userId, userId))
+    .limit(1);
+
+  if (result[0]) {
+    return result[0];
+  }
+
+  // Return default preferences if none exist
+  return {
+    userId,
+    referrals: true,
+    commissions: true,
+    teamUpdates: true,
+    promotions: true,
+    orders: true,
+    announcements: true,
+    digestFrequency: "none" as const,
+    digestDay: 1,
+    digestHour: 9,
+    lastDigestSent: null,
+  };
+}
+
+/**
+ * Update notification preferences for a user
+ */
+export async function updateNotificationPreferences(
+  userId: number,
+  preferences: {
+    referrals?: boolean;
+    commissions?: boolean;
+    teamUpdates?: boolean;
+    promotions?: boolean;
+    orders?: boolean;
+    announcements?: boolean;
+    digestFrequency?: "none" | "daily" | "weekly";
+    digestDay?: number;
+    digestHour?: number;
+  }
+) {
+  const db = await getDb();
+  if (!db) return null;
+
+  // Check if preferences exist
+  const existing = await db
+    .select({ id: notificationPreferences.id })
+    .from(notificationPreferences)
+    .where(eq(notificationPreferences.userId, userId))
+    .limit(1);
+
+  if (existing[0]) {
+    // Update existing preferences
+    await db
+      .update(notificationPreferences)
+      .set({
+        ...preferences,
+        updatedAt: new Date(),
+      })
+      .where(eq(notificationPreferences.userId, userId));
+  } else {
+    // Create new preferences
+    await db.insert(notificationPreferences).values({
+      userId,
+      referrals: preferences.referrals ?? true,
+      commissions: preferences.commissions ?? true,
+      teamUpdates: preferences.teamUpdates ?? true,
+      promotions: preferences.promotions ?? true,
+      orders: preferences.orders ?? true,
+      announcements: preferences.announcements ?? true,
+      digestFrequency: preferences.digestFrequency ?? "none",
+      digestDay: preferences.digestDay ?? 1,
+      digestHour: preferences.digestHour ?? 9,
+    });
+  }
+
+  return { success: true };
+}
+
+/**
+ * Check if a notification type is enabled for a user
+ */
+export async function isNotificationEnabled(
+  userId: number,
+  notificationType: "referrals" | "commissions" | "teamUpdates" | "promotions" | "orders" | "announcements"
+): Promise<boolean> {
+  const prefs = await getNotificationPreferences(userId);
+  if (!prefs) return true; // Default to enabled
+  return prefs[notificationType] ?? true;
+}
+
+/**
+ * Add item to email digest queue
+ */
+export async function addToDigestQueue(data: {
+  userId: number;
+  notificationType: string;
+  title: string;
+  content: string;
+  relatedId?: number;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.insert(emailDigestQueue).values({
+    userId: data.userId,
+    notificationType: data.notificationType,
+    title: data.title,
+    content: data.content,
+    relatedId: data.relatedId || null,
+    processed: false,
+  });
+
+  return { id: Number(result[0].insertId) };
+}
+
+/**
+ * Get pending digest items for a user
+ */
+export async function getPendingDigestItems(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(emailDigestQueue)
+    .where(
+      and(
+        eq(emailDigestQueue.userId, userId),
+        eq(emailDigestQueue.processed, false)
+      )
+    )
+    .orderBy(emailDigestQueue.createdAt);
+}
+
+/**
+ * Mark digest items as processed
+ */
+export async function markDigestItemsProcessed(itemIds: number[]) {
+  const db = await getDb();
+  if (!db || itemIds.length === 0) return;
+
+  for (const id of itemIds) {
+    await db
+      .update(emailDigestQueue)
+      .set({ processed: true })
+      .where(eq(emailDigestQueue.id, id));
+  }
+}
+
+/**
+ * Update last digest sent timestamp
+ */
+export async function updateLastDigestSent(userId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(notificationPreferences)
+    .set({ lastDigestSent: new Date() })
+    .where(eq(notificationPreferences.userId, userId));
+}
+
+/**
+ * Get users due for digest email
+ */
+export async function getUsersDueForDigest(frequency: "daily" | "weekly") {
+  const db = await getDb();
+  if (!db) return [];
+
+  const now = new Date();
+  const currentHour = now.getHours();
+  const currentDay = now.getDay();
+
+  // Get users with matching digest frequency
+  const users = await db
+    .select()
+    .from(notificationPreferences)
+    .where(eq(notificationPreferences.digestFrequency, frequency));
+
+  // Filter by time preferences
+  return users.filter((user) => {
+    // Check if it's the right hour
+    if (user.digestHour !== currentHour) return false;
+
+    // For weekly, check if it's the right day
+    if (frequency === "weekly" && user.digestDay !== currentDay) return false;
+
+    // Check if we haven't sent a digest recently
+    if (user.lastDigestSent) {
+      const hoursSinceLastDigest =
+        (now.getTime() - new Date(user.lastDigestSent).getTime()) / (1000 * 60 * 60);
+      if (frequency === "daily" && hoursSinceLastDigest < 20) return false;
+      if (frequency === "weekly" && hoursSinceLastDigest < 160) return false;
+    }
+
+    return true;
+  });
 }

@@ -1565,3 +1565,66 @@ export const vendingCommissions = mysqlTable("vending_commissions", {
 
 export type VendingCommission = typeof vendingCommissions.$inferSelect;
 export type InsertVendingCommission = typeof vendingCommissions.$inferInsert;
+
+
+/**
+ * Notification preferences for distributors.
+ * Allows users to customize which notifications they receive.
+ */
+export const notificationPreferences = mysqlTable("notification_preferences", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User ID (references users table) */
+  userId: int("userId").notNull(),
+  /** Receive notifications for new referrals */
+  referrals: boolean("referrals").default(true).notNull(),
+  /** Receive notifications for commission payouts */
+  commissions: boolean("commissions").default(true).notNull(),
+  /** Receive notifications for team updates (new members, rank changes) */
+  teamUpdates: boolean("teamUpdates").default(true).notNull(),
+  /** Receive promotional notifications */
+  promotions: boolean("promotions").default(true).notNull(),
+  /** Receive order notifications */
+  orders: boolean("orders").default(true).notNull(),
+  /** Receive system announcements */
+  announcements: boolean("announcements").default(true).notNull(),
+  /** Email digest frequency: none, daily, weekly */
+  digestFrequency: mysqlEnum("digestFrequency", ["none", "daily", "weekly"]).default("none").notNull(),
+  /** Preferred digest day for weekly (0=Sunday, 6=Saturday) */
+  digestDay: int("digestDay").default(1),
+  /** Preferred digest hour (0-23) */
+  digestHour: int("digestHour").default(9),
+  /** Last digest sent timestamp */
+  lastDigestSent: timestamp("lastDigestSent"),
+  /** Created timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Updated timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type NotificationPreference = typeof notificationPreferences.$inferSelect;
+export type InsertNotificationPreference = typeof notificationPreferences.$inferInsert;
+
+/**
+ * Email digest queue for batched notifications.
+ * Stores notifications to be included in digest emails.
+ */
+export const emailDigestQueue = mysqlTable("email_digest_queue", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User ID to receive the digest */
+  userId: int("userId").notNull(),
+  /** Notification type */
+  notificationType: varchar("notificationType", { length: 50 }).notNull(),
+  /** Notification title */
+  title: varchar("title", { length: 255 }).notNull(),
+  /** Notification content */
+  content: text("content").notNull(),
+  /** Related entity ID (order, commission, etc.) */
+  relatedId: int("relatedId"),
+  /** Whether this has been included in a digest */
+  processed: boolean("processed").default(false).notNull(),
+  /** Created timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type EmailDigestQueueItem = typeof emailDigestQueue.$inferSelect;
+export type InsertEmailDigestQueueItem = typeof emailDigestQueue.$inferInsert;

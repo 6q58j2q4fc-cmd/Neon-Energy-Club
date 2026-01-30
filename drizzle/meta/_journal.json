@@ -162,6 +162,13 @@
       "when": 1769746125693,
       "tag": "0022_mushy_harrier",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1769746778316,
+      "tag": "0023_purple_giant_man",
+      "breakpoints": true
     }
   ]
 }

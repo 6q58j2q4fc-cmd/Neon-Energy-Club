@@ -3813,6 +3813,31 @@ Provide step-by-step instructions with specific button names and locations. Keep
         const count = await getUnreadNotificationCount(ctx.user.id);
         return { count };
       }),
+
+    // Get notification preferences
+    getPreferences: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getNotificationPreferences } = await import("./db");
+        return await getNotificationPreferences(ctx.user.id);
+      }),
+
+    // Update notification preferences
+    updatePreferences: protectedProcedure
+      .input(z.object({
+        referrals: z.boolean().optional(),
+        commissions: z.boolean().optional(),
+        teamUpdates: z.boolean().optional(),
+        promotions: z.boolean().optional(),
+        orders: z.boolean().optional(),
+        announcements: z.boolean().optional(),
+        digestFrequency: z.enum(["none", "daily", "weekly"]).optional(),
+        digestDay: z.number().int().min(0).max(6).optional(),
+        digestHour: z.number().int().min(0).max(23).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { updateNotificationPreferences } = await import("./db");
+        return await updateNotificationPreferences(ctx.user.id, input);
+      }),
   }),
 
 });

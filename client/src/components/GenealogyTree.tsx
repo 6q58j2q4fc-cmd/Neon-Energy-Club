@@ -216,6 +216,51 @@ const RANK_COLORS: Record<string, { bg: string; border: string; text: string }> 
   crown: { bg: "rgba(255, 215, 0, 0.3)", border: "#ffd700", text: "#ffd700" },
 };
 
+// Empty Position Placeholder Component
+function EmptyPositionCard({ 
+  position, 
+  parentCode,
+  onEnroll 
+}: { 
+  position: 'left' | 'right';
+  parentCode: string;
+  onEnroll: () => void;
+}) {
+  return (
+    <div className="flex flex-col items-center">
+      <div 
+        className="relative cursor-pointer transition-all duration-200 hover:scale-105 group"
+        onClick={onEnroll}
+      >
+        <div 
+          className="p-3 rounded-lg border-2 border-dashed min-w-[160px] bg-black/30 border-[#c8ff00]/30 hover:border-[#c8ff00] hover:bg-[#c8ff00]/10 transition-all"
+        >
+          {/* Position indicator */}
+          <div className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-black rounded text-[10px] text-gray-400 border border-gray-700">
+            {position.toUpperCase()}
+          </div>
+          
+          {/* Empty state */}
+          <div className="text-center py-4">
+            <div className="w-12 h-12 mx-auto rounded-full bg-[#c8ff00]/10 border-2 border-dashed border-[#c8ff00]/30 flex items-center justify-center mb-2 group-hover:border-[#c8ff00] group-hover:bg-[#c8ff00]/20 transition-all">
+              <Users className="w-6 h-6 text-[#c8ff00]/50 group-hover:text-[#c8ff00]" />
+            </div>
+            <div className="text-sm font-medium text-gray-400 group-hover:text-[#c8ff00]">
+              Available Position
+            </div>
+            <div className="text-[10px] text-gray-500 mt-1">
+              Under {parentCode}
+            </div>
+            <div className="mt-2 text-xs text-[#c8ff00] opacity-0 group-hover:opacity-100 transition-opacity">
+              Click to Enroll
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Tree Node Component
 function TreeNodeCard({ 
   node, 
@@ -223,7 +268,9 @@ function TreeNodeCard({
   onToggle, 
   onSelect,
   isSelected,
-  level = 0 
+  level = 0,
+  showEmptyPositions = true,
+  onEnrollPosition
 }: { 
   node: TreeNode; 
   expanded: boolean;
@@ -231,9 +278,18 @@ function TreeNodeCard({
   onSelect: () => void;
   isSelected: boolean;
   level?: number;
+  showEmptyPositions?: boolean;
+  onEnrollPosition?: (parentCode: string, position: 'left' | 'right') => void;
 }) {
   const colors = RANK_COLORS[node.rank] || RANK_COLORS.starter;
   const hasChildren = node.children && node.children.length > 0;
+  
+  // Determine which positions are filled
+  const leftChild = node.children?.find(c => c.placementPosition === 'left');
+  const rightChild = node.children?.find(c => c.placementPosition === 'right');
+  const hasEmptyLeft = !leftChild && showEmptyPositions;
+  const hasEmptyRight = !rightChild && showEmptyPositions;
+  const showExpander = hasChildren || (showEmptyPositions && (!leftChild || !rightChild));
   
   return (
     <div className="flex flex-col items-center">
@@ -251,12 +307,17 @@ function TreeNodeCard({
           {/* Active indicator */}
           <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${node.isActive ? 'bg-green-500' : 'bg-red-500'}`} />
           
+          {/* Unique Distributor ID Badge */}
+          <div className="absolute -top-2 left-2 px-2 py-0.5 bg-black/80 rounded text-[9px] font-mono text-[#c8ff00] border border-[#c8ff00]/30">
+            ID: {node.distributorCode}
+          </div>
+          
           {/* Name/Code */}
-          <div className="text-center">
+          <div className="text-center mt-2">
             <div className="font-bold text-white text-sm truncate max-w-[140px]">
-              {node.name || node.username || node.distributorCode.substring(0, 10)}
+              {node.name || node.username || 'Member'}
             </div>
-            <div className="text-xs text-gray-400">{node.distributorCode.substring(0, 8)}</div>
+            <div className="text-xs text-gray-400">@{node.username || node.distributorCode.substring(5, 10)}</div>
           </div>
           
           {/* Rank Badge with Icon */}
@@ -284,7 +345,7 @@ function TreeNodeCard({
         </div>
         
         {/* Expand/Collapse Button */}
-        {hasChildren && (
+        {showExpander && (
           <button
             onClick={(e) => { e.stopPropagation(); onToggle(); }}
             className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#c8ff00] text-black flex items-center justify-center hover:bg-[#a8d600] transition-colors"
@@ -304,7 +365,9 @@ function TreeLevel({
   toggleNode, 
   selectedNode, 
   setSelectedNode,
-  level = 0 
+  level = 0,
+  showEmptyPositions = true,
+  onEnrollPosition
 }: {
   nodes: TreeNode[];
   expandedNodes: Set<number>;
@@ -312,6 +375,8 @@ function TreeLevel({
   selectedNode: TreeNode | null;
   setSelectedNode: (node: TreeNode) => void;
   level?: number;
+  showEmptyPositions?: boolean;
+  onEnrollPosition?: (parentCode: string, position: 'left' | 'right') => void;
 }) {
   if (!nodes || nodes.length === 0) return null;
   
@@ -322,6 +387,13 @@ function TreeLevel({
           const isExpanded = expandedNodes.has(node.id);
           const hasChildren = node.children && node.children.length > 0;
           
+          // Determine which positions are filled
+          const leftChild = node.children?.find(c => c.placementPosition === 'left');
+          const rightChild = node.children?.find(c => c.placementPosition === 'right');
+          const hasEmptyLeft = !leftChild && showEmptyPositions;
+          const hasEmptyRight = !rightChild && showEmptyPositions;
+          const showChildrenArea = isExpanded && (hasChildren || hasEmptyLeft || hasEmptyRight);
+          
           return (
             <div key={node.id} className="flex flex-col items-center">
               <TreeNodeCard
@@ -331,24 +403,72 @@ function TreeLevel({
                 onSelect={() => setSelectedNode(node)}
                 isSelected={selectedNode?.id === node.id}
                 level={level}
+                showEmptyPositions={showEmptyPositions}
+                onEnrollPosition={onEnrollPosition}
               />
               
               {/* Connection Line */}
-              {hasChildren && isExpanded && (
+              {showChildrenArea && (
                 <div className="w-px h-8 bg-[#c8ff00]/30 mt-4" />
               )}
               
-              {/* Children */}
-              {hasChildren && isExpanded && (
-                <div className="mt-2">
-                  <TreeLevel
-                    nodes={node.children}
-                    expandedNodes={expandedNodes}
-                    toggleNode={toggleNode}
-                    selectedNode={selectedNode}
-                    setSelectedNode={setSelectedNode}
-                    level={level + 1}
-                  />
+              {/* Children and Empty Positions */}
+              {showChildrenArea && (
+                <div className="mt-2 flex gap-4">
+                  {/* Left Position */}
+                  {leftChild ? (
+                    <TreeLevel
+                      nodes={[leftChild]}
+                      expandedNodes={expandedNodes}
+                      toggleNode={toggleNode}
+                      selectedNode={selectedNode}
+                      setSelectedNode={setSelectedNode}
+                      level={level + 1}
+                      showEmptyPositions={showEmptyPositions}
+                      onEnrollPosition={onEnrollPosition}
+                    />
+                  ) : hasEmptyLeft ? (
+                    <EmptyPositionCard
+                      position="left"
+                      parentCode={node.distributorCode}
+                      onEnroll={() => onEnrollPosition?.(node.distributorCode, 'left')}
+                    />
+                  ) : null}
+                  
+                  {/* Right Position */}
+                  {rightChild ? (
+                    <TreeLevel
+                      nodes={[rightChild]}
+                      expandedNodes={expandedNodes}
+                      toggleNode={toggleNode}
+                      selectedNode={selectedNode}
+                      setSelectedNode={setSelectedNode}
+                      level={level + 1}
+                      showEmptyPositions={showEmptyPositions}
+                      onEnrollPosition={onEnrollPosition}
+                    />
+                  ) : hasEmptyRight ? (
+                    <EmptyPositionCard
+                      position="right"
+                      parentCode={node.distributorCode}
+                      onEnroll={() => onEnrollPosition?.(node.distributorCode, 'right')}
+                    />
+                  ) : null}
+                  
+                  {/* Non-binary children (if any without position) */}
+                  {node.children?.filter(c => !c.placementPosition && c.id !== leftChild?.id && c.id !== rightChild?.id).map(child => (
+                    <TreeLevel
+                      key={child.id}
+                      nodes={[child]}
+                      expandedNodes={expandedNodes}
+                      toggleNode={toggleNode}
+                      selectedNode={selectedNode}
+                      setSelectedNode={setSelectedNode}
+                      level={level + 1}
+                      showEmptyPositions={showEmptyPositions}
+                      onEnrollPosition={onEnrollPosition}
+                    />
+                  ))}
                 </div>
               )}
             </div>
@@ -364,6 +484,8 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true, sh
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
   const [viewMode, setViewMode] = useState<'tree' | 'list'>('tree');
   const [isTutorialMode, setIsTutorialMode] = useState(showTutorial);
+  const [showEmptyPositions, setShowEmptyPositions] = useState(true);
+  const [enrollmentModal, setEnrollmentModal] = useState<{ parentCode: string; position: 'left' | 'right' } | null>(null);
   
   // Fetch genealogy data from API
   const { data: genealogyData, isLoading } = trpc.distributor.genealogy.useQuery(
@@ -629,7 +751,15 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true, sh
                 </Badge>
               )}
             </CardTitle>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
+              <Button 
+                size="sm" 
+                variant={showEmptyPositions ? "default" : "outline"} 
+                onClick={() => setShowEmptyPositions(!showEmptyPositions)} 
+                className={showEmptyPositions ? "bg-green-500 hover:bg-green-600 text-white" : "border-green-500/50 text-green-400 hover:bg-green-500/10"}
+              >
+                {showEmptyPositions ? "Hide Empty Spots" : "Show Empty Spots"}
+              </Button>
               <Button 
                 size="sm" 
                 variant={isTutorialMode ? "default" : "outline"} 
@@ -681,6 +811,8 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true, sh
                 toggleNode={toggleNode}
                 selectedNode={selectedNode}
                 setSelectedNode={setSelectedNode}
+                showEmptyPositions={showEmptyPositions}
+                onEnrollPosition={(parentCode, position) => setEnrollmentModal({ parentCode, position })}
               />
             ) : (
               <div className="flex flex-col items-center justify-center h-64 text-gray-500">
@@ -787,6 +919,56 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true, sh
             </div>
           </CardContent>
         </Card>
+      )}
+      
+      {/* Enrollment Modal */}
+      {enrollmentModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="bg-[#0a0a0a] border-[#c8ff00] max-w-md w-full">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-[#c8ff00]">
+                <Users className="w-5 h-5" />
+                Enroll New Distributor
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 bg-[#c8ff00]/10 rounded-lg border border-[#c8ff00]/30">
+                <div className="text-sm text-gray-400 mb-1">Placement Position</div>
+                <div className="text-xl font-bold text-white">
+                  {enrollmentModal.position.toUpperCase()} leg under {enrollmentModal.parentCode}
+                </div>
+              </div>
+              
+              <p className="text-gray-300 text-sm">
+                Share your enrollment link with a new prospect to place them in this position:
+              </p>
+              
+              <div className="p-3 bg-black rounded-lg border border-[#c8ff00]/30 font-mono text-xs text-[#c8ff00] break-all">
+                {window.location.origin}/join?sponsor={enrollmentModal.parentCode}&position={enrollmentModal.position}
+              </div>
+              
+              <div className="flex gap-3">
+                <Button
+                  className="flex-1 bg-[#c8ff00] text-black hover:bg-[#a8d600]"
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      `${window.location.origin}/join?sponsor=${enrollmentModal.parentCode}&position=${enrollmentModal.position}`
+                    );
+                  }}
+                >
+                  Copy Link
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-[#c8ff00]/50 text-[#c8ff00] hover:bg-[#c8ff00]/10"
+                  onClick={() => setEnrollmentModal(null)}
+                >
+                  Close
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   );

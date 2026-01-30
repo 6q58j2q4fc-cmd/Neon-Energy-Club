@@ -3309,3 +3309,30 @@
 - [x] Move jungle noise button to bottom-left corner (out of the way)
 - [x] Simplify overall navigation flows
 - [x] Ensure consistent navigation across all pages
+
+
+## Notification Preferences & Genealogy Tree (Jan 29, 2026)
+
+### Notification Preferences System
+- [x] Create notification_preferences table in database schema
+- [x] Add preference toggles for: referrals, commissions, team updates, promotions, orders, announcements
+- [x] Create NotificationPreferences component in distributor portal
+- [x] Add API endpoints for getting/updating preferences
+- [x] Filter notifications based on user preferences
+
+### Email Digest Options
+- [x] Add digest_frequency field to notification preferences (none, daily, weekly)
+- [x] Add digest day and hour selection for weekly digests
+- [x] Create emailDigestSettings table for digest configuration
+- [x] Add digest preference toggle in settings UI
+
+### Genealogy Tree Empty Positions
+- [x] Add empty position placeholders in genealogy tree (EmptyPositionCard)
+- [x] Show available positions under each distributor (left/right legs)
+- [x] Make empty positions clickable for enrollment (enrollment modal)
+- [x] Generate unique position IDs for empty slots (NEON-XXXX format)
+
+### Distributor ID Display
+- [x] Display unique distributor ID on all tree profiles (ID badge)
+- [x] Show distributor code prominently on profile cards
+- [x] Add ID to enrollment modal for tracking
