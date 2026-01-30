@@ -1075,30 +1075,22 @@ export default function DistributorPortal() {
               animate={{ opacity: 1, y: 0 }}
               className="space-y-6"
             >
+              {/* Profile Customization - Vanity URL, Photo, Bio */}
+              <ProfileEditor userType="distributor" />
+              
+              {/* Additional Settings */}
               <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Settings className="w-5 h-5 text-[#c8ff00]" />
-                    Account Settings
+                    Additional Settings
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="p-4 bg-black/50 rounded-lg">
-                      <h4 className="font-medium text-white mb-1">Profile Information</h4>
-                      <p className="text-sm text-gray-500 mb-3">Update your personal details</p>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="border-[#c8ff00]/30 text-[#c8ff00]"
-                        onClick={() => setLocation("/profile")}
-                      >
-                        Edit Profile
-                      </Button>
-                    </div>
-                    <div className="p-4 bg-black/50 rounded-lg">
                       <h4 className="font-medium text-white mb-1">Payout Settings</h4>
-                      <p className="text-sm text-gray-500 mb-3">Manage your payout preferences</p>
+                      <p className="text-sm text-gray-500 mb-3">Manage your payout preferences and withdrawal methods</p>
                       <Button 
                         variant="outline" 
                         size="sm" 
@@ -1106,6 +1098,30 @@ export default function DistributorPortal() {
                         onClick={() => setActiveTab("payouts")}
                       >
                         Manage Payouts
+                      </Button>
+                    </div>
+                    <div className="p-4 bg-black/50 rounded-lg">
+                      <h4 className="font-medium text-white mb-1">Auto-Ship Settings</h4>
+                      <p className="text-sm text-gray-500 mb-3">Configure your monthly auto-ship orders</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="border-[#c8ff00]/30 text-[#c8ff00]"
+                        onClick={() => setActiveTab("autoship")}
+                      >
+                        Manage Auto-Ship
+                      </Button>
+                    </div>
+                    <div className="p-4 bg-black/50 rounded-lg">
+                      <h4 className="font-medium text-white mb-1">Notification Preferences</h4>
+                      <p className="text-sm text-gray-500 mb-3">Control how you receive updates and alerts</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="border-[#c8ff00]/30 text-[#c8ff00]"
+                        onClick={() => toast.info("Notification settings coming soon!")}
+                      >
+                        Manage Notifications
                       </Button>
                     </div>
                   </div>

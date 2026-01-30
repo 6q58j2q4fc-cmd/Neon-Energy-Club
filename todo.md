@@ -3462,3 +3462,22 @@
 - [x] Verify personalized page loads correctly with distributor info (tested with NEON22780232FDAS59)
 - [x] Test referral tracking functionality (localStorage 30-day tracking working)
 - [x] Update My Website tab to show neonenergyclub.com domain URLs
+
+
+## Custom Vanity URLs & Profile Customization (Jan 30, 2026)
+
+### Custom Vanity URLs
+- [x] Add vanity_url field to distributors table (using userProfiles.customSlug)
+- [x] Create procedure to check vanity URL availability (profile.checkSlugAvailability exists)
+- [x] Create procedure to update vanity URL (profile.updateSlug exists)
+- [x] Update route to support both vanity URL and distributor code (getDistributorPublicProfile updated)
+- [x] Add vanity URL settings UI in distributor portal (ProfileEditor in Settings tab)
+- [x] Validate vanity URL format (alphanumeric, lowercase, min 3 chars) - regex validation in checkSlugAvailability
+
+### Profile Customization
+- [x] Add bio field to distributors table (userProfiles.bio exists)
+- [x] Create photo upload procedure using S3 storage (profile.uploadPhoto)
+- [x] Create procedure to update profile (photo, bio, location) (profile.updateProfile)
+- [x] Build profile settings UI with photo upload (ProfileEditor component)
+- [x] Display photo and bio on cloned distributor website (getDistributorPublicProfile returns profile data)
+- [x] Add profile preview in settings (Preview button in ProfileEditor)

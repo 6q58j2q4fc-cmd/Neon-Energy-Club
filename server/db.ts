@@ -4743,7 +4743,10 @@ export async function getDistributorPublicProfile(code: string) {
     return null;
   }
   
-  // Try to find by distributor code first
+  // Normalize the code to lowercase for vanity URL matching
+  const normalizedCode = code.toLowerCase();
+  
+  // Try to find by distributor code first (case-sensitive for system codes)
   let [distributor] = await db.select()
     .from(distributors)
     .where(eq(distributors.distributorCode, code));
@@ -4761,6 +4764,20 @@ export async function getDistributorPublicProfile(code: string) {
     [distributor] = await db.select()
       .from(distributors)
       .where(eq(distributors.subdomain, code));
+  }
+  
+  // If not found, try by custom vanity URL slug in userProfiles
+  if (!distributor) {
+    const [profileWithSlug] = await db.select()
+      .from(userProfiles)
+      .where(eq(userProfiles.customSlug, normalizedCode));
+    
+    if (profileWithSlug && profileWithSlug.userType === 'distributor') {
+      [distributor] = await db.select()
+        .from(distributors)
+        .where(eq(distributors.userId, profileWithSlug.userId));
+      console.log('[getDistributorPublicProfile] Found by vanity slug:', distributor ? 'yes' : 'no');
+    }
   }
   
   // Show page for all distributors with active status (not suspended)
