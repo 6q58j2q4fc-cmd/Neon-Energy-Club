@@ -19,6 +19,23 @@ export default function Checkout() {
   const [email, setEmail] = useState(user?.email || "");
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Get distributor code from localStorage (set by cloned website visit)
+  const getDistributorCode = (): string | undefined => {
+    try {
+      const referralData = localStorage.getItem('neon_referral');
+      if (referralData) {
+        const data = JSON.parse(referralData);
+        // Check if referral is still valid (30 days)
+        if (data.expiry && new Date(data.expiry) > new Date()) {
+          return data.distributorCode;
+        }
+      }
+    } catch (e) {
+      console.error('Error reading referral data:', e);
+    }
+    return undefined;
+  };
+
   const { data: stripeConfig } = trpc.payment.isConfigured.useQuery();
   const checkoutMutation = trpc.payment.createPreorderCheckout.useMutation({
     onSuccess: (data) => {
@@ -55,6 +72,8 @@ export default function Checkout() {
 
     setIsProcessing(true);
     
+    const distributorCode = getDistributorCode();
+    
     checkoutMutation.mutate({
       items: items.map(item => ({
         name: item.name,
@@ -65,6 +84,7 @@ export default function Checkout() {
       })),
       name: name.trim(),
       email: email.trim(),
+      distributorCode, // Pass distributor code for commission attribution
     });
   };
 

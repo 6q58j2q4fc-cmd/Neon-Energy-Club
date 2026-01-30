@@ -303,6 +303,7 @@ export const appRouter = router({
           })).min(1, "Cart cannot be empty"),
           name: z.string().min(1),
           email: z.string().email(),
+          distributorCode: z.string().optional(), // For commission attribution
         })
       )
       .mutation(async ({ input, ctx }) => {
@@ -318,6 +319,7 @@ export const appRouter = router({
           customerName: input.name,
           userId: ctx.user?.id,
           origin,
+          distributorCode: input.distributorCode, // Pass distributor code for commission tracking
         });
 
         return result;

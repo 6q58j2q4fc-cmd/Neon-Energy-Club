@@ -39,6 +39,17 @@ async function startServer() {
   // Trust proxy for accurate IP detection behind reverse proxies
   app.set("trust proxy", 1);
   
+  // Stripe webhook endpoint - MUST be before body parser to get raw body
+  app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+    try {
+      const { handleStripeWebhook } = await import('../stripeWebhook');
+      await handleStripeWebhook(req, res);
+    } catch (error: any) {
+      console.error('[Stripe Webhook] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+  
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));

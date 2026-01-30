@@ -154,6 +154,7 @@ export async function createPreorderCheckout(params: {
   customerName: string;
   userId?: number;
   origin: string;
+  distributorCode?: string; // For commission attribution from cloned websites
 }): Promise<{ url: string }> {
   const stripe = await getStripe();
 
@@ -194,6 +195,7 @@ export async function createPreorderCheckout(params: {
       total_amount: totalAmount.toString(),
       items_count: params.items.length.toString(),
       items_json: JSON.stringify(params.items.map(i => ({ name: i.name, qty: i.quantity, price: i.price }))),
+      distributor_code: params.distributorCode || "", // For commission attribution
     },
     allow_promotion_codes: true,
     shipping_address_collection: {

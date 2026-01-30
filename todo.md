@@ -3436,3 +3436,20 @@
 - [x] Fix any broken or incomplete implementations
 - [x] Verify all buttons and links work correctly
 - [x] Test complete user journeys
+
+
+## MLM Commission Attribution System (Jan 30, 2026)
+
+### Commission Attribution Flow
+- [x] Add distributorCode parameter to checkout flow
+- [x] Store distributor_code in Stripe metadata
+- [x] Create Stripe webhook handler (/api/stripe/webhook)
+- [x] Process commissions automatically on checkout.session.completed
+- [x] 30-day localStorage referral tracking with expiration
+
+### Cloned Website Functionality
+- [x] /d/{code} route works immediately for all distributors
+- [x] Referral tracking stores distributorCode in localStorage
+- [x] Orders attributed to correct distributor via checkout
+- [x] Commission processing triggered on successful payment
+- [x] All 293 tests passing
