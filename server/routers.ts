@@ -506,7 +506,9 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input, ctx }) => {
-        const { enrollDistributor, createDistributorProfile } = await import("./db");
+        const { enrollDistributor, createDistributorProfile, createEmailVerification } = await import("./db");
+        const { sendEmailVerification } = await import("./emailNotifications");
+        
         const distributor = await enrollDistributor({
           userId: ctx.user.id,
           sponsorCode: input.sponsorCode,
@@ -515,9 +517,30 @@ export const appRouter = router({
         // Automatically create personalized profile for new distributor
         if (distributor) {
           await createDistributorProfile(ctx.user.id, ctx.user.name || "NEON Distributor");
+          
+          // Create email verification token and send verification email
+          if (ctx.user.email) {
+            try {
+              const verification = await createEmailVerification(ctx.user.id);
+              if (verification) {
+                const baseUrl = ctx.req.headers.origin || 'https://neonenergyclub.com';
+                const verificationUrl = `${baseUrl}/verify-email?token=${verification.token}`;
+                
+                await sendEmailVerification({
+                  name: ctx.user.name || 'NEON Distributor',
+                  email: ctx.user.email,
+                  verificationUrl,
+                  expiresIn: '24 hours',
+                });
+              }
+            } catch (emailError) {
+              console.warn("[Distributor] Failed to send verification email:", emailError);
+              // Don't fail enrollment if email fails
+            }
+          }
         }
         
-        return distributor;
+        return { ...distributor, emailVerificationSent: !!ctx.user.email };
       }),
 
     // Get current distributor info
@@ -3930,6 +3953,103 @@ Provide step-by-step instructions with specific button names and locations. Keep
       .mutation(async ({ ctx, input }) => {
         const { updateNotificationPreferences } = await import("./db");
         return await updateNotificationPreferences(ctx.user.id, input);
+      }),
+  }),
+
+  // Email verification routes
+  emailVerification: router({
+    // Verify email with token
+    verify: publicProcedure
+      .input(z.object({ token: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        const { verifyEmailToken, getDistributorByUserId, getUserByVerificationToken } = await import("./db");
+        const { sendEmailVerificationSuccess } = await import("./emailNotifications");
+        
+        // Get user info before verification
+        const user = await getUserByVerificationToken(input.token);
+        if (!user) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Invalid verification token",
+          });
+        }
+        
+        const result = await verifyEmailToken(input.token);
+        
+        if (!result.success) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: result.error || "Verification failed",
+          });
+        }
+        
+        // Get distributor info for success email
+        if (result.userId) {
+          try {
+            const distributor = await getDistributorByUserId(result.userId);
+            if (distributor && user.email) {
+              const baseUrl = ctx.req.headers.origin || 'https://neonenergyclub.com';
+              await sendEmailVerificationSuccess({
+                name: user.name || 'NEON Distributor',
+                email: user.email,
+                distributorCode: distributor.distributorCode,
+                portalUrl: `${baseUrl}/portal`,
+              });
+            }
+          } catch (emailError) {
+            console.warn("[EmailVerification] Failed to send success email:", emailError);
+          }
+        }
+        
+        return { success: true, message: "Email verified successfully!" };
+      }),
+
+    // Resend verification email
+    resend: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { resendVerificationEmail, isEmailVerified } = await import("./db");
+        const { sendEmailVerification } = await import("./emailNotifications");
+        
+        // Check if already verified
+        const verified = await isEmailVerified(ctx.user.id);
+        if (verified) {
+          return { success: false, message: "Email is already verified" };
+        }
+        
+        if (!ctx.user.email) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "No email address on file",
+          });
+        }
+        
+        const verification = await resendVerificationEmail(ctx.user.id);
+        if (!verification) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to generate verification token",
+          });
+        }
+        
+        const baseUrl = ctx.req.headers.origin || 'https://neonenergyclub.com';
+        const verificationUrl = `${baseUrl}/verify-email?token=${verification.token}`;
+        
+        await sendEmailVerification({
+          name: ctx.user.name || 'NEON Distributor',
+          email: ctx.user.email,
+          verificationUrl,
+          expiresIn: '24 hours',
+        });
+        
+        return { success: true, message: "Verification email sent!" };
+      }),
+
+    // Check verification status
+    status: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { isEmailVerified } = await import("./db");
+        const verified = await isEmailVerified(ctx.user.id);
+        return { verified, email: ctx.user.email };
       }),
   }),
 

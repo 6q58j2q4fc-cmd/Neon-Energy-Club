@@ -3620,3 +3620,18 @@
 - [x] Verify photo upload functionality
 - [x] Verify cloned website displays correctly
 - [x] Verify referral tracking in URL
+
+
+## Email Verification for Distributor Signups (Jan 30, 2026)
+
+- [x] Add emailVerified and emailVerificationToken fields to user schema
+- [x] Add emailVerificationExpiry field for token expiration
+- [x] Create token generation utility function (crypto.randomBytes)
+- [x] Create email verification tRPC procedures (verify, resend, status)
+- [x] Implement email sending using notification system (sendEmailVerification, sendEmailVerificationSuccess)
+- [x] Update distributor signup to set emailVerified=false and send verification email
+- [x] Create /verify-email page to handle verification links
+- [x] Add resend verification email functionality (EmailVerificationBanner component)
+- [x] Show verification status in distributor portal (EmailVerificationIndicator component)
+- [x] Create email verification banner for unverified users
+- [x] Write vitest tests for email verification flow (12 tests passing)

@@ -42,6 +42,7 @@ import CustomerPortal from "./pages/CustomerPortal";
 import MLMAdminPanel from "./pages/MLMAdminPanel";
 import FranchiseDashboard from "./pages/FranchiseDashboard";
 import PersonalizedLanding from "./pages/PersonalizedLanding";
+import VerifyEmail from "./pages/VerifyEmail";
 import AmbientSoundToggle from "./components/AmbientSoundToggle";
 import UnifiedChatBot from "./components/UnifiedChatBot";
 import CartDrawer from "./components/CartDrawer";
@@ -115,6 +116,7 @@ function Router() {
         <Route path="/distributor-leaderboard" component={DistributorLeaderboard} />
         <Route path="/investors" component={Investors} />
         <Route path="/invest" component={Investors} />
+        <Route path="/verify-email" component={VerifyEmail} />
         <Route path="/customer-portal" component={CustomerPortal} />
         <Route path="/my-rewards" component={CustomerPortal} />
         <Route path="/franchise/dashboard" component={FranchiseDashboard} />

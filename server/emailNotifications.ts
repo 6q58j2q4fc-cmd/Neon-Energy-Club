@@ -801,3 +801,138 @@ export async function sendMeetingConfirmation(data: {
   console.log(`[Email] Meeting confirmation sent to ${data.email} for ${formattedDate} at ${formattedTime}`);
   return true;
 }
+
+
+/**
+ * Send email verification email
+ */
+export async function sendEmailVerification(data: {
+  name: string;
+  email: string;
+  verificationUrl: string;
+  expiresIn: string;
+}): Promise<boolean> {
+  const template = {
+    title: `✉️ Verify Your Email - NEON Energy`,
+    content: `
+**Email Verification Required**
+
+Hello ${data.name}!
+
+Thank you for signing up as a NEON Distributor! To complete your registration and activate your account, please verify your email address.
+
+**Click the link below to verify your email:**
+${data.verificationUrl}
+
+**Important:**
+- This link will expire in ${data.expiresIn}
+- If you didn't create a NEON account, please ignore this email
+- For security, do not share this link with anyone
+
+**What happens after verification:**
+1. Your distributor account will be fully activated
+2. You'll get access to your personalized distributor website
+3. You can start building your team and earning commissions
+4. Access to training materials and marketing resources
+
+If the link doesn't work, copy and paste it into your browser.
+
+Need help? Contact our support team.
+
+Best regards,
+The NEON Energy Team
+    `.trim(),
+  };
+
+  // Skip notifications in development/test mode
+  if (!NOTIFICATIONS_ENABLED) {
+    console.log(`[Email] Skipping email verification (dev mode) for: ${data.email}`);
+    console.log(`[Email] Verification URL: ${data.verificationUrl}`);
+    return true;
+  }
+
+  try {
+    const success = await notifyOwner({
+      title: template.title,
+      content: template.content,
+    });
+
+    if (success) {
+      console.log(`[Email] Verification email sent to: ${data.email}`);
+    } else {
+      console.warn(`[Email] Failed to send verification email to: ${data.email}`);
+    }
+
+    return success;
+  } catch (error) {
+    console.error(`[Email] Error sending verification email:`, error);
+    return false;
+  }
+}
+
+/**
+ * Send email verification success notification
+ */
+export async function sendEmailVerificationSuccess(data: {
+  name: string;
+  email: string;
+  distributorCode: string;
+  portalUrl: string;
+}): Promise<boolean> {
+  const template = {
+    title: `✅ Email Verified - Welcome to NEON!`,
+    content: `
+**Email Successfully Verified!**
+
+Hello ${data.name}!
+
+🎉 Congratulations! Your email has been verified and your NEON Distributor account is now fully activated!
+
+**Your Distributor Details:**
+- Distributor Code: ${data.distributorCode}
+- Email: ${data.email}
+
+**What's Next:**
+1. **Access Your Portal:** Visit your distributor dashboard to get started
+   ${data.portalUrl}
+
+2. **Customize Your Website:** Upload your photo and personalize your distributor page
+
+3. **Share Your Link:** Start sharing your unique referral link to build your team
+
+4. **Complete Training:** Access our training resources to maximize your success
+
+**Your Personalized Website:**
+Your unique distributor website is ready! Share it with friends and family to start earning commissions.
+
+Welcome to the NEON family! We're excited to have you on board.
+
+Best regards,
+The NEON Energy Team
+    `.trim(),
+  };
+
+  // Skip notifications in development/test mode
+  if (!NOTIFICATIONS_ENABLED) {
+    console.log(`[Email] Skipping verification success email (dev mode) for: ${data.email}`);
+    return true;
+  }
+
+  try {
+    const success = await notifyOwner({
+      title: template.title,
+      content: template.content,
+    });
+
+    if (success) {
+      console.log(`[Email] Verification success email sent to: ${data.email}`);
+    } else {
+      console.warn(`[Email] Failed to send verification success email to: ${data.email}`);
+    }
+
+    return success;
+  } catch (error) {
+    console.error(`[Email] Error sending verification success email:`, error);
+    return false;
+  }
+}

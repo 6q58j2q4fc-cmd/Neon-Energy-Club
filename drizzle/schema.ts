@@ -31,6 +31,12 @@ export const users = mysqlTable("users", {
   country: varchar("country", { length: 100 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  /** Whether the user's email has been verified */
+  emailVerified: boolean("emailVerified").default(false).notNull(),
+  /** Token for email verification */
+  emailVerificationToken: varchar("emailVerificationToken", { length: 64 }),
+  /** Expiration time for email verification token */
+  emailVerificationExpiry: timestamp("emailVerificationExpiry"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

@@ -90,6 +90,142 @@ export async function getUserByOpenId(openId: string) {
 }
 
 /**
+ * Email Verification Functions
+ */
+
+import crypto from 'crypto';
+
+/**
+ * Generate a secure email verification token
+ */
+export function generateVerificationToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+/**
+ * Create email verification record for a user
+ */
+export async function createEmailVerification(userId: number): Promise<{ token: string; expiresAt: Date } | null> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const token = generateVerificationToken();
+  // Token expires in 24 hours
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+  await db.update(users)
+    .set({
+      emailVerificationToken: token,
+      emailVerificationExpiry: expiresAt,
+      emailVerified: false,
+    })
+    .where(eq(users.id, userId));
+
+  return { token, expiresAt };
+}
+
+/**
+ * Verify email with token
+ */
+export async function verifyEmailToken(token: string): Promise<{ success: boolean; userId?: number; error?: string }> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  // Find user with this token
+  const result = await db.select()
+    .from(users)
+    .where(eq(users.emailVerificationToken, token))
+    .limit(1);
+
+  if (result.length === 0) {
+    return { success: false, error: "Invalid verification token" };
+  }
+
+  const user = result[0];
+
+  // Check if token has expired
+  if (user.emailVerificationExpiry && new Date() > user.emailVerificationExpiry) {
+    return { success: false, error: "Verification token has expired" };
+  }
+
+  // Mark email as verified and clear token
+  await db.update(users)
+    .set({
+      emailVerified: true,
+      emailVerificationToken: null,
+      emailVerificationExpiry: null,
+    })
+    .where(eq(users.id, user.id));
+
+  return { success: true, userId: user.id };
+}
+
+/**
+ * Get user by email verification token
+ */
+export async function getUserByVerificationToken(token: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.select()
+    .from(users)
+    .where(eq(users.emailVerificationToken, token))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}
+
+/**
+ * Check if user's email is verified
+ */
+export async function isEmailVerified(userId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.select({ emailVerified: users.emailVerified })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  return result.length > 0 ? result[0].emailVerified : false;
+}
+
+/**
+ * Resend verification email (regenerate token)
+ */
+export async function resendVerificationEmail(userId: number): Promise<{ token: string; expiresAt: Date } | null> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  // Check if already verified
+  const user = await db.select()
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  if (user.length === 0) {
+    return null;
+  }
+
+  if (user[0].emailVerified) {
+    return null; // Already verified
+  }
+
+  // Generate new token
+  return createEmailVerification(userId);
+}
+
+/**
  * Pre-order management queries
  */
 
