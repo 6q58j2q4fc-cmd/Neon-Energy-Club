@@ -1,0 +1,80 @@
+{
+  "query": "SELECT id, distributorCode, username, subdomain, status FROM distributors LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT id, distributorCode, username, subdomain, status FROM distributors LIMIT 10;",
+  "rows": [
+    {
+      "id": "780033",
+      "distributorCode": "NEON22780232FDAS59",
+      "username": "NULL",
+      "subdomain": "NULL",
+      "status": "active"
+    },
+    {
+      "id": "780034",
+      "distributorCode": "NEON887276288F5JZMS",
+      "username": "NULL",
+      "subdomain": "NULL",
+      "status": "active"
+    },
+    {
+      "id": "780035",
+      "distributorCode": "NEON4021093842L4L81",
+      "username": "NULL",
+      "subdomain": "NULL",
+      "status": "active"
+    },
+    {
+      "id": "780036",
+      "distributorCode": "NEON63239453698870K",
+      "username": "NULL",
+      "subdomain": "NULL",
+      "status": "active"
+    },
+    {
+      "id": "780037",
+      "distributorCode": "NEON179298698V16TO8",
+      "username": "NULL",
+      "subdomain": "NULL",
+      "status": "active"
+    },
+    {
+      "id": "780038",
+      "distributorCode": "NEON168814157C6WHZ5",
+      "username": "NULL",
+      "subdomain": "NULL",
+      "status": "active"
+    },
+    {
+      "id": "780039",
+      "distributorCode": "NEON5650942053ZXHOV",
+      "username": "NULL",
+      "subdomain": "NULL",
+      "status": "active"
+    },
+    {
+      "id": "780040",
+      "distributorCode": "NEON481745017186W37",
+      "username": "NULL",
+      "subdomain": "NULL",
+      "status": "active"
+    },
+    {
+      "id": "810001",
+      "distributorCode": "NEON974050923CO7S8D",
+      "username": "NULL",
+      "subdomain": "NULL",
+      "status": "active"
+    },
+    {
+      "id": "810002",
+      "distributorCode": "NEON78245198RVPM9D",
+      "username": "NULL",
+      "subdomain": "NULL",
+      "status": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tdistributorCode\tusername\tsubdomain\tstatus\n780033\tNEON22780232FDAS59\tNULL\tNULL\tactive\n780034\tNEON887276288F5JZMS\tNULL\tNULL\tactive\n780035\tNEON4021093842L4L81\tNULL\tNULL\tactive\n780036\tNEON63239453698870K\tNULL\tNULL\tactive\n780037\tNEON179298698V16TO8\tNULL\tNULL\tactive\n780038\tNEON168814157C6WHZ5\tNULL\tNULL\tactive\n780039\tNEON5650942053ZXHOV\tNULL\tNULL\tactive\n780040\tNEON481745017186W37\tNULL\tNULL\tactive\n810001\tNEON974050923CO7S8D\tNULL\tNULL\tactive\n810002\tNEON78245198RVPM9D\tNULL\tNULL\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

@@ -3453,3 +3453,12 @@
 - [x] Orders attributed to correct distributor via checkout
 - [x] Commission processing triggered on successful payment
 - [x] All 293 tests passing
+
+
+## Bug Fix - Personalized Page Not Working (Jan 30, 2026)
+
+- [x] Diagnose why /d/{code} personalized page isn't working (codes are auto-generated, not "NEON-001")
+- [x] Fix the DistributorSite component or route (working correctly with real codes)
+- [x] Verify personalized page loads correctly with distributor info (tested with NEON22780232FDAS59)
+- [x] Test referral tracking functionality (localStorage 30-day tracking working)
+- [x] Update My Website tab to show neonenergyclub.com domain URLs
