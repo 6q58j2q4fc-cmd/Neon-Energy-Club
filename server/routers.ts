@@ -3776,6 +3776,45 @@ Provide step-by-step instructions with specific button names and locations. Keep
       }),
   }),
 
+  // In-app notifications router for distributors
+  notification: router({
+    // Get user's notifications
+    getNotifications: protectedProcedure
+      .input(z.object({
+        limit: z.number().int().min(1).max(100).default(20),
+        unreadOnly: z.boolean().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        const { getUserNotifications } = await import("./db");
+        return await getUserNotifications(ctx.user.id, input?.limit || 20);
+      }),
+
+    // Mark notification as read
+    markAsRead: protectedProcedure
+      .input(z.object({ notificationId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { markNotificationRead } = await import("./db");
+        await markNotificationRead(input.notificationId);
+        return { success: true };
+      }),
+
+    // Mark all notifications as read
+    markAllAsRead: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { markAllNotificationsRead } = await import("./db");
+        await markAllNotificationsRead(ctx.user.id);
+        return { success: true };
+      }),
+
+    // Get unread count
+    getUnreadCount: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getUnreadNotificationCount } = await import("./db");
+        const count = await getUnreadNotificationCount(ctx.user.id);
+        return { count };
+      }),
+  }),
+
 });
 
 // Helper function to anonymize names for privacy on public leaderboard

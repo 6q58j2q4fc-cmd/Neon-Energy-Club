@@ -11,6 +11,8 @@ import {
 import ProfileDropdown from "./ProfileDropdown";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useCart } from "@/contexts/CartContext";
+import { SiteSearch } from "./SiteSearch";
+import NotificationBell from "./NotificationBell";
 
 const navItems = [
   { label: "HOME", path: "/", icon: Home },
@@ -305,6 +307,9 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
                 )}
               </button>
 
+              {/* Notification Bell */}
+              <NotificationBell />
+
               {/* User Account Button with Full Portal Access */}
               <ProfileDropdown accentColor={accentColor[variant]} />
 
@@ -581,6 +586,9 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
           </div>
         </div>
       </div>
+      
+      {/* Site-Wide Search Modal */}
+      <SiteSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }

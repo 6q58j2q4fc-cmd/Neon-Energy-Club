@@ -3252,3 +3252,22 @@
 - [x] Add breadcrumbs to Distributor Portal pages (DistributorPortal, DistributorDashboard)
 - [x] Add breadcrumbs to Customer Portal pages
 - [x] Ensure consistent navigation within dashboards
+
+
+## Site-Wide Search & Push Notifications (Jan 29, 2026)
+
+### Site-Wide Search
+- [x] Create SiteSearch component with modal/dropdown interface
+- [x] Build searchable content index (products, FAQ, blog posts, pages)
+- [x] Add search bar to HamburgerHeader navigation
+- [x] Implement keyboard shortcuts (Cmd/Ctrl+K to open search)
+- [x] Add search result highlighting and categorization
+- [x] Support fuzzy matching for typo tolerance
+
+### Push Notifications for Distributors
+- [x] Create NotificationBell component with dropdown
+- [x] Implement notification triggers for new referrals
+- [x] Implement notification triggers for commission payouts
+- [x] Add in-app notification bell with unread count
+- [x] Add notification router with CRUD operations
+- [x] Use built-in notification API for delivery

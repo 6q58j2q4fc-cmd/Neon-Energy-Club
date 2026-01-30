@@ -576,6 +576,21 @@ export async function calculateCommission(saleId: number) {
     })
     .where(eq(distributors.id, dist.id));
   
+  // Send notification about new commission
+  if (dist.userId && commissionAmount > 0) {
+    try {
+      await createNotification({
+        userId: dist.userId,
+        type: 'commission_pending',
+        title: '💰 New Commission Earned!',
+        message: `You earned $${(commissionAmount / 100).toFixed(2)} from a direct sale. Keep up the great work!`,
+        data: { amount: commissionAmount, type: 'direct', saleId: saleData.id },
+      });
+    } catch (err) {
+      console.warn('[Commission] Failed to send notification:', err);
+    }
+  }
+  
   // Calculate upline commissions (multi-level)
   if (dist.sponsorId) {
     await calculateUplineCommissions(dist.sponsorId, saleData.commissionVolume, 2);
@@ -625,6 +640,21 @@ async function calculateUplineCommissions(sponsorId: number, saleAmount: number,
         teamSales: dist.teamSales + saleAmount,
       })
       .where(eq(distributors.id, dist.id));
+    
+    // Send notification about team commission
+    if (dist.userId) {
+      try {
+        await createNotification({
+          userId: dist.userId,
+          type: 'commission_pending',
+          title: '💰 Team Commission Earned!',
+          message: `You earned $${(commissionAmount / 100).toFixed(2)} from your team's sales (Level ${level}). Your team is growing!`,
+          data: { amount: commissionAmount, type: 'team', level },
+        });
+      } catch (err) {
+        console.warn('[Commission] Failed to send team notification:', err);
+      }
+    }
   }
   
   // Continue up the chain
@@ -3169,6 +3199,21 @@ export async function recordCustomerReferral(
   await db.update(customerReferralCodes)
     .set({ usageCount: sql`${customerReferralCodes.usageCount} + 1` })
     .where(eq(customerReferralCodes.code, referralCode));
+
+  // Send notification to referrer about new referral
+  try {
+    const referredUser = await db.select({ name: users.name }).from(users).where(eq(users.id, referredId)).limit(1);
+    const referredName = referredUser[0]?.name || 'Someone';
+    await createNotification({
+      userId: referrerId,
+      type: 'new_referral',
+      title: '🎉 New Referral!',
+      message: `${referredName} just signed up using your referral code! Keep sharing to earn more rewards.`,
+      data: { referredId, referralCode },
+    });
+  } catch (err) {
+    console.warn('[Referral] Failed to send notification:', err);
+  }
 }
 
 /**
