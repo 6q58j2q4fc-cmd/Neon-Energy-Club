@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRoute, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Zap, Share2, ShoppingCart, Users, TrendingUp, Sparkles, MapPin, Star, CheckCircle, Copy, ExternalLink } from "lucide-react";
+import { Zap, Share2, ShoppingCart, Users, TrendingUp, Sparkles, MapPin, Star, CheckCircle, Copy, ExternalLink, Instagram, Facebook, Twitter, Youtube, Linkedin } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
@@ -18,6 +18,13 @@ interface DistributorProfile {
   joinDate: string;
   totalCustomers: number;
   isActive: boolean;
+  // Social media links
+  instagram?: string | null;
+  tiktok?: string | null;
+  facebook?: string | null;
+  twitter?: string | null;
+  youtube?: string | null;
+  linkedin?: string | null;
 }
 
 export default function DistributorSite() {
@@ -221,6 +228,80 @@ export default function DistributorSite() {
               </div>
               {profile.bio && (
                 <p className="text-gray-300 max-w-xl">{profile.bio}</p>
+              )}
+              
+              {/* Social Media Links */}
+              {(profile.instagram || profile.tiktok || profile.facebook || profile.twitter || profile.youtube || profile.linkedin) && (
+                <div className="flex items-center gap-3 mt-4">
+                  {profile.instagram && (
+                    <a
+                      href={`https://instagram.com/${profile.instagram}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-full bg-gradient-to-br from-purple-600 to-pink-500 hover:opacity-80 transition-opacity"
+                      title={`@${profile.instagram}`}
+                    >
+                      <Instagram className="w-5 h-5 text-white" />
+                    </a>
+                  )}
+                  {profile.tiktok && (
+                    <a
+                      href={`https://tiktok.com/@${profile.tiktok}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-full bg-black border border-white/20 hover:border-[#c8ff00] transition-colors"
+                      title={`@${profile.tiktok}`}
+                    >
+                      <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                      </svg>
+                    </a>
+                  )}
+                  {profile.facebook && (
+                    <a
+                      href={profile.facebook.startsWith('http') ? profile.facebook : `https://facebook.com/${profile.facebook}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-full bg-blue-600 hover:bg-blue-700 transition-colors"
+                      title="Facebook"
+                    >
+                      <Facebook className="w-5 h-5 text-white" />
+                    </a>
+                  )}
+                  {profile.twitter && (
+                    <a
+                      href={`https://twitter.com/${profile.twitter}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-full bg-black border border-white/20 hover:border-sky-400 transition-colors"
+                      title={`@${profile.twitter}`}
+                    >
+                      <Twitter className="w-5 h-5 text-white" />
+                    </a>
+                  )}
+                  {profile.youtube && (
+                    <a
+                      href={profile.youtube.startsWith('http') ? profile.youtube : `https://youtube.com/@${profile.youtube}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-full bg-red-600 hover:bg-red-700 transition-colors"
+                      title="YouTube"
+                    >
+                      <Youtube className="w-5 h-5 text-white" />
+                    </a>
+                  )}
+                  {profile.linkedin && (
+                    <a
+                      href={profile.linkedin.startsWith('http') ? profile.linkedin : `https://linkedin.com/in/${profile.linkedin}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-full bg-blue-700 hover:bg-blue-800 transition-colors"
+                      title="LinkedIn"
+                    >
+                      <Linkedin className="w-5 h-5 text-white" />
+                    </a>
+                  )}
+                </div>
               )}
             </div>
 

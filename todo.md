@@ -3481,3 +3481,24 @@
 - [x] Build profile settings UI with photo upload (ProfileEditor component)
 - [x] Display photo and bio on cloned distributor website (getDistributorPublicProfile returns profile data)
 - [x] Add profile preview in settings (Preview button in ProfileEditor)
+
+
+## Social Media Links, Preview Mode & Profile Completion (Jan 30, 2026)
+
+### Social Media Links
+- [x] Add social media fields to userProfiles table (instagram, tiktok, facebook, twitter, youtube, linkedin)
+- [x] Update profile.updateProfile procedure to accept social media handles
+- [x] Add social media inputs to ProfileEditor UI (Instagram, TikTok, Facebook, Twitter, YouTube, LinkedIn)
+- [x] Display social media links on cloned distributor website
+- [x] Add social media icons with links to distributor profile section
+
+### Profile Preview Mode
+- [x] Add "Preview as Visitor" button to ProfileEditor
+- [x] Open cloned website in new tab when clicked
+- [x] Show preview using current profile data
+
+### Profile Completion Progress
+- [x] Calculate profile completion percentage (photo, bio, location, vanity URL, social links)
+- [x] Add progress bar/indicator to ProfileEditor
+- [x] Show checklist of incomplete items
+- [x] Encourage completion with visual feedback

@@ -2995,6 +2995,13 @@ Provide step-by-step instructions with specific button names and locations. Keep
         location: z.string().max(255).optional(),
         bio: z.string().max(1000).optional(),
         profilePhotoUrl: z.string().url().optional(),
+        // Social media handles
+        instagram: z.string().max(100).optional(),
+        tiktok: z.string().max(100).optional(),
+        facebook: z.string().max(255).optional(),
+        twitter: z.string().max(100).optional(),
+        youtube: z.string().max(255).optional(),
+        linkedin: z.string().max(255).optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const { getPersonalizedProfile, upsertUserProfile, getDistributorByUserId, generateUniqueSlug } = await import("./db");
@@ -3015,6 +3022,12 @@ Provide step-by-step instructions with specific button names and locations. Keep
             location: input.location,
             bio: input.bio,
             profilePhotoUrl: input.profilePhotoUrl,
+            instagram: input.instagram,
+            tiktok: input.tiktok,
+            facebook: input.facebook,
+            twitter: input.twitter,
+            youtube: input.youtube,
+            linkedin: input.linkedin,
             userType,
           });
         } else {
@@ -3025,6 +3038,12 @@ Provide step-by-step instructions with specific button names and locations. Keep
             location: input.location,
             bio: input.bio,
             profilePhotoUrl: input.profilePhotoUrl,
+            instagram: input.instagram,
+            tiktok: input.tiktok,
+            facebook: input.facebook,
+            twitter: input.twitter,
+            youtube: input.youtube,
+            linkedin: input.linkedin,
             userType: existingProfile.userType,
           });
         }

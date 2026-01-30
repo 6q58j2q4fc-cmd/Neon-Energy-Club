@@ -4099,6 +4099,12 @@ export async function upsertUserProfile(data: {
   displayName?: string;
   location?: string;
   bio?: string;
+  instagram?: string;
+  tiktok?: string;
+  facebook?: string;
+  twitter?: string;
+  youtube?: string;
+  linkedin?: string;
   userType: "distributor" | "customer";
 }): Promise<number | null> {
   const db = await getDb();
@@ -4119,6 +4125,12 @@ export async function upsertUserProfile(data: {
         displayName: data.displayName || null,
         location: data.location || null,
         bio: data.bio || null,
+        instagram: data.instagram || null,
+        tiktok: data.tiktok || null,
+        facebook: data.facebook || null,
+        twitter: data.twitter || null,
+        youtube: data.youtube || null,
+        linkedin: data.linkedin || null,
         updatedAt: new Date(),
       })
       .where(eq(userProfiles.id, existing[0].id));
@@ -4133,6 +4145,12 @@ export async function upsertUserProfile(data: {
     displayName: data.displayName || null,
     location: data.location || null,
     bio: data.bio || null,
+    instagram: data.instagram || null,
+    tiktok: data.tiktok || null,
+    facebook: data.facebook || null,
+    twitter: data.twitter || null,
+    youtube: data.youtube || null,
+    linkedin: data.linkedin || null,
     userType: data.userType,
     isPublished: true,
   });
@@ -4828,6 +4846,13 @@ export async function getDistributorPublicProfile(code: string) {
     joinDate: distributor.createdAt?.toISOString() || new Date().toISOString(),
     totalCustomers: totalCustomers,
     isActive: distributor.isActive === 1,
+    // Social media links
+    instagram: profile?.instagram || null,
+    tiktok: profile?.tiktok || null,
+    facebook: profile?.facebook || null,
+    twitter: profile?.twitter || null,
+    youtube: profile?.youtube || null,
+    linkedin: profile?.linkedin || null,
   };
   console.log('[getDistributorPublicProfile] Returning:', JSON.stringify(result));
   return result;

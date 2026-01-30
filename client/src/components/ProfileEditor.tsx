@@ -23,8 +23,16 @@ import {
   ExternalLink,
   Eye,
   AlertCircle,
-  Sparkles
+  Sparkles,
+  Instagram,
+  Facebook,
+  Twitter,
+  Youtube,
+  Linkedin,
+  CheckCircle2,
+  Circle
 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
 interface ProfileEditorProps {
   userType: "distributor" | "customer";
@@ -51,6 +59,8 @@ export default function ProfileEditor({ userType, onSave }: ProfileEditorProps) 
   const [tiktok, setTiktok] = useState("");
   const [facebook, setFacebook] = useState("");
   const [twitter, setTwitter] = useState("");
+  const [youtube, setYoutube] = useState("");
+  const [linkedin, setLinkedin] = useState("");
   
   // Photo upload
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -144,6 +154,13 @@ export default function ProfileEditor({ userType, onSave }: ProfileEditorProps) 
       setLocation(profileData.personalizedProfile.location || "");
       setBio(profileData.personalizedProfile.bio || "");
       setCustomSlug(profileData.personalizedProfile.customSlug || "");
+      // Load social media handles
+      setInstagram(profileData.personalizedProfile.instagram || "");
+      setTiktok(profileData.personalizedProfile.tiktok || "");
+      setFacebook(profileData.personalizedProfile.facebook || "");
+      setTwitter(profileData.personalizedProfile.twitter || "");
+      setYoutube(profileData.personalizedProfile.youtube || "");
+      setLinkedin(profileData.personalizedProfile.linkedin || "");
     } else if (profileData?.user) {
       setDisplayName(profileData.user.name || "");
     }
@@ -242,8 +259,37 @@ export default function ProfileEditor({ userType, onSave }: ProfileEditorProps) 
       displayName: displayName || undefined,
       location: location || undefined,
       bio: bio || undefined,
+      instagram: instagram || undefined,
+      tiktok: tiktok || undefined,
+      facebook: facebook || undefined,
+      twitter: twitter || undefined,
+      youtube: youtube || undefined,
+      linkedin: linkedin || undefined,
     });
   };
+  
+  // Calculate profile completion percentage
+  const calculateProfileCompletion = () => {
+    const fields = [
+      { name: 'Photo', completed: !!(photoPreview || profileData?.personalizedProfile?.profilePhotoUrl) },
+      { name: 'Display Name', completed: !!displayName },
+      { name: 'Location', completed: !!location },
+      { name: 'Bio', completed: !!bio },
+      { name: 'Custom URL', completed: !!customSlug },
+      { name: 'Instagram', completed: !!instagram },
+      { name: 'TikTok', completed: !!tiktok },
+      { name: 'Facebook', completed: !!facebook },
+    ];
+    const completedCount = fields.filter(f => f.completed).length;
+    return {
+      percentage: Math.round((completedCount / fields.length) * 100),
+      fields,
+      completedCount,
+      totalCount: fields.length
+    };
+  };
+  
+  const profileCompletion = calculateProfileCompletion();
   
   // Save slug
   const handleSaveSlug = () => {
@@ -278,8 +324,80 @@ export default function ProfileEditor({ userType, onSave }: ProfileEditorProps) 
   
   const currentPhotoUrl = profileData?.personalizedProfile?.profilePhotoUrl;
   
+  // Open preview in new tab
+  const openPreview = () => {
+    const slug = customSlug || profileData?.personalizedProfile?.customSlug;
+    if (slug) {
+      window.open(`/d/${slug}`, '_blank');
+    } else {
+      toast.error("No Custom URL", {
+        description: "Please set a custom URL first to preview your page.",
+      });
+    }
+  };
+  
   return (
     <div className="space-y-6">
+      {/* Profile Completion Progress */}
+      <Card className="bg-gradient-to-r from-[#c8ff00]/10 to-purple-500/10 border-[#c8ff00]/30">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-white flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-[#c8ff00]" />
+              Profile Completion
+            </CardTitle>
+            <span className="text-2xl font-bold text-[#c8ff00]">{profileCompletion.percentage}%</span>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Progress value={profileCompletion.percentage} className="h-3 bg-white/10" />
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {profileCompletion.fields.map((field) => (
+              <div key={field.name} className="flex items-center gap-2 text-sm">
+                {field.completed ? (
+                  <CheckCircle2 className="h-4 w-4 text-[#c8ff00]" />
+                ) : (
+                  <Circle className="h-4 w-4 text-white/30" />
+                )}
+                <span className={field.completed ? "text-white" : "text-white/50"}>
+                  {field.name}
+                </span>
+              </div>
+            ))}
+          </div>
+          {profileCompletion.percentage < 100 && (
+            <p className="text-white/60 text-sm">
+              Complete your profile to increase trust and conversions!
+            </p>
+          )}
+          {profileCompletion.percentage === 100 && (
+            <p className="text-[#c8ff00] text-sm font-medium">
+              🎉 Your profile is complete! You're ready to attract customers.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+      
+      {/* Preview as Visitor Button */}
+      <Card className="bg-white/5 border-white/10">
+        <CardContent className="pt-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h3 className="text-white font-semibold">Preview Your Page</h3>
+              <p className="text-white/60 text-sm">See exactly how visitors will see your personalized website</p>
+            </div>
+            <Button
+              onClick={openPreview}
+              variant="outline"
+              className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              Preview as Visitor
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+      
       {/* Profile Photo Section */}
       <Card className="bg-white/5 border-white/10">
         <CardHeader>
@@ -565,6 +683,127 @@ export default function ProfileEditor({ userType, onSave }: ProfileEditorProps) 
             )}
             Save Profile Details
           </Button>
+        </CardContent>
+      </Card>
+      
+      {/* Social Media Links */}
+      <Card className="bg-white/5 border-white/10">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Globe className="h-5 w-5 text-[#c8ff00]" />
+            Social Media Links
+          </CardTitle>
+          <CardDescription>
+            Connect your social profiles to build trust and grow your following
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Instagram */}
+            <div>
+              <Label className="text-white/80 flex items-center gap-2">
+                <Instagram className="h-4 w-4 text-pink-500" />
+                Instagram
+              </Label>
+              <div className="relative mt-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">@</span>
+                <Input
+                  value={instagram}
+                  onChange={(e) => setInstagram(e.target.value.replace(/^@/, ''))}
+                  placeholder="username"
+                  className="bg-black/40 border-white/20 text-white pl-8"
+                  maxLength={100}
+                />
+              </div>
+            </div>
+            
+            {/* TikTok */}
+            <div>
+              <Label className="text-white/80 flex items-center gap-2">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                </svg>
+                TikTok
+              </Label>
+              <div className="relative mt-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">@</span>
+                <Input
+                  value={tiktok}
+                  onChange={(e) => setTiktok(e.target.value.replace(/^@/, ''))}
+                  placeholder="username"
+                  className="bg-black/40 border-white/20 text-white pl-8"
+                  maxLength={100}
+                />
+              </div>
+            </div>
+            
+            {/* Facebook */}
+            <div>
+              <Label className="text-white/80 flex items-center gap-2">
+                <Facebook className="h-4 w-4 text-blue-500" />
+                Facebook
+              </Label>
+              <Input
+                value={facebook}
+                onChange={(e) => setFacebook(e.target.value)}
+                placeholder="Profile URL or username"
+                className="mt-1 bg-black/40 border-white/20 text-white"
+                maxLength={255}
+              />
+            </div>
+            
+            {/* Twitter/X */}
+            <div>
+              <Label className="text-white/80 flex items-center gap-2">
+                <Twitter className="h-4 w-4 text-sky-500" />
+                X (Twitter)
+              </Label>
+              <div className="relative mt-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">@</span>
+                <Input
+                  value={twitter}
+                  onChange={(e) => setTwitter(e.target.value.replace(/^@/, ''))}
+                  placeholder="username"
+                  className="bg-black/40 border-white/20 text-white pl-8"
+                  maxLength={100}
+                />
+              </div>
+            </div>
+            
+            {/* YouTube */}
+            <div>
+              <Label className="text-white/80 flex items-center gap-2">
+                <Youtube className="h-4 w-4 text-red-500" />
+                YouTube
+              </Label>
+              <Input
+                value={youtube}
+                onChange={(e) => setYoutube(e.target.value)}
+                placeholder="Channel URL or @handle"
+                className="mt-1 bg-black/40 border-white/20 text-white"
+                maxLength={255}
+              />
+            </div>
+            
+            {/* LinkedIn */}
+            <div>
+              <Label className="text-white/80 flex items-center gap-2">
+                <Linkedin className="h-4 w-4 text-blue-600" />
+                LinkedIn
+              </Label>
+              <Input
+                value={linkedin}
+                onChange={(e) => setLinkedin(e.target.value)}
+                placeholder="Profile URL"
+                className="mt-1 bg-black/40 border-white/20 text-white"
+                maxLength={255}
+              />
+            </div>
+          </div>
+          
+          <p className="text-white/40 text-xs">
+            Social links will be displayed on your personalized landing page
+          </p>
         </CardContent>
       </Card>
       

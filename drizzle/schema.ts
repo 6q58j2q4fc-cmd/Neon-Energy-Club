@@ -1324,6 +1324,18 @@ export const userProfiles = mysqlTable("user_profiles", {
   location: varchar("location", { length: 255 }),
   /** Bio/tagline for landing page */
   bio: text("bio"),
+  /** Instagram handle (without @) */
+  instagram: varchar("instagram", { length: 100 }),
+  /** TikTok handle (without @) */
+  tiktok: varchar("tiktok", { length: 100 }),
+  /** Facebook profile URL or username */
+  facebook: varchar("facebook", { length: 255 }),
+  /** Twitter/X handle (without @) */
+  twitter: varchar("twitter", { length: 100 }),
+  /** YouTube channel URL or handle */
+  youtube: varchar("youtube", { length: 255 }),
+  /** LinkedIn profile URL */
+  linkedin: varchar("linkedin", { length: 255 }),
   /** User type: distributor or customer */
   userType: mysqlEnum("userType", ["distributor", "customer"]).notNull(),
   /** Whether the personalized page is published */

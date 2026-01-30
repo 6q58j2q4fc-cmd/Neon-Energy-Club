@@ -169,6 +169,13 @@
       "when": 1769746778316,
       "tag": "0023_purple_giant_man",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1769802990582,
+      "tag": "0024_fair_sister_grimm",
+      "breakpoints": true
     }
   ]
 }
