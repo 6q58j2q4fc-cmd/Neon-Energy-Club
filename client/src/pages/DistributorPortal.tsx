@@ -56,6 +56,7 @@ import ProfileEditor from "@/components/ProfileEditor";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import NavigationHeader from "@/components/NavigationHeader";
 import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
+import NeonLogo from "@/components/NeonLogo";
 
 export default function DistributorPortal() {
   const [location, setLocation] = useLocation();
@@ -245,14 +246,10 @@ export default function DistributorPortal() {
       
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 h-full w-64 bg-[#0a0a0a] border-r border-[#c8ff00]/20 z-50 hidden lg:block">
-        <div className="p-6">
-          <h1 
-            className="text-2xl font-bold text-[#c8ff00] neon-text cursor-pointer flex items-center gap-2" 
-            onClick={() => setLocation("/")}
-          >
-            <Zap className="w-6 h-6" />
-            NEON®
-          </h1>
+        <div className="p-4">
+          <button onClick={() => setLocation("/")} className="group">
+            <NeonLogo className="h-12 w-auto transition-all duration-300 group-hover:drop-shadow-[0_0_15px_rgba(200,255,0,0.5)]" />
+          </button>
         </div>
 
         <nav className="px-4 space-y-2">

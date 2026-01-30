@@ -324,19 +324,26 @@ export default function ProfileDropdown({ accentColor = "#c8ff00" }: ProfileDrop
 
             {/* Distributor Section */}
             <div className="mb-2">
-              <button
-                onClick={() => setActiveSection(activeSection === 'distributor' ? null : 'distributor')}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-white/5 transition-all"
-              >
-                <div className="flex items-center gap-2">
+              <div className="flex items-center">
+                <button
+                  onClick={() => isDistributor ? handleNavClick("/portal") : handleNavClick("/join")}
+                  className="flex-1 flex items-center gap-2 px-3 py-2 rounded-l-lg hover:bg-[#00ffff]/10 transition-all"
+                  title={isDistributor ? "Go to Distributor Portal" : "Join as Distributor"}
+                >
                   <Users className="w-4 h-4 text-[#00ffff]" />
                   <span className="text-sm font-semibold text-white">Distributor Portal</span>
                   {!isDistributor && (
                     <span className="px-1.5 py-0.5 rounded bg-[#00ffff]/20 text-[#00ffff] text-[10px]">JOIN</span>
                   )}
-                </div>
-                <ChevronRight className={`w-4 h-4 text-white/40 transition-transform ${activeSection === 'distributor' ? 'rotate-90' : ''}`} />
-              </button>
+                </button>
+                <button
+                  onClick={() => setActiveSection(activeSection === 'distributor' ? null : 'distributor')}
+                  className="px-2 py-2 rounded-r-lg hover:bg-white/5 transition-all"
+                  title="Show options"
+                >
+                  <ChevronRight className={`w-4 h-4 text-white/40 transition-transform ${activeSection === 'distributor' ? 'rotate-90' : ''}`} />
+                </button>
+              </div>
               {activeSection === 'distributor' && (
                 <div className="ml-6 mt-1 space-y-1">
                   {isDistributor ? (
