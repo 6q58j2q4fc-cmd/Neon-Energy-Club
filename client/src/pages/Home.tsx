@@ -178,9 +178,9 @@ export default function Home() {
 
               {/* Headline - AIDA: Attention */}
               <h1 className="text-5xl md:text-7xl font-black leading-[0.9] tracking-tight">
-                <span className="text-white">TIRED OF</span>
+                <span className="text-white">FUEL YOUR</span>
                 <br />
-                <span className="gradient-text font-vice">CRASHING?</span>
+                <span className="gradient-text font-vice">POTENTIAL</span>
               </h1>
 
               {/* Subheadline - AIDA: Interest + Desire */}

@@ -341,7 +341,7 @@ export default function DistributorSite() {
             </div>
 
             <h1 className="text-5xl lg:text-7xl font-black leading-none">
-              FUEL YOUR <span className="text-[#c8ff00] neon-text">FUTURE</span>
+              FUEL YOUR <span className="text-[#c8ff00] neon-text">POTENTIAL</span>
             </h1>
 
             <p className="text-xl text-gray-300 leading-relaxed max-w-2xl mx-auto">

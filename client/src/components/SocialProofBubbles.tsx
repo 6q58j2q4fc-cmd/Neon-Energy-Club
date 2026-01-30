@@ -9,6 +9,15 @@ interface JoinedUser {
   location: string | null;
 }
 
+// Real people photos for social proof - diverse professional headshots
+const REAL_PEOPLE_PHOTOS = [
+  "/person-1.jpg", // Professional woman smiling
+  "/person-2.jpg", // Professional woman headshot
+  "/person-3.jpg", // Professional man headshot
+  "/person-4.jpg", // Professional man portrait
+  "/person-5.jpg", // Professional man business
+];
+
 export function SocialProofBubbles() {
   const { data, isLoading } = trpc.homepage.recentJoinedUsers.useQuery({ limit: 8 });
   const [visibleBubbles, setVisibleBubbles] = useState<number[]>([]);
@@ -28,17 +37,13 @@ export function SocialProofBubbles() {
     }
   }, [data?.users]);
 
-  // Generate avatar URL - use profile photo if available, otherwise generate one
+  // Generate avatar URL - use profile photo if available, otherwise use real people photos
   const getAvatarUrl = (user: JoinedUser, index: number) => {
     if (user.profilePhotoUrl) {
       return user.profilePhotoUrl;
     }
-    // Use DiceBear with user's name or ID as seed for consistent avatars
-    const seed = user.name || `user-${user.id}`;
-    // Alternate between different avatar styles for variety
-    const styles = ['avataaars', 'lorelei', 'micah', 'notionists', 'personas'];
-    const style = styles[index % styles.length];
-    return `https://api.dicebear.com/7.x/${style}/svg?seed=${encodeURIComponent(seed)}&backgroundColor=c8ff00,00ffff,ff0080`;
+    // Use real people photos instead of cartoon avatars
+    return REAL_PEOPLE_PHOTOS[index % REAL_PEOPLE_PHOTOS.length];
   };
 
   // Format the total count with suffix

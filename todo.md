@@ -3549,3 +3549,74 @@
 - [x] Fix any broken links or 404s (admin route fixed - removed duplicate)
 - [x] Ensure identical menus across all pages (ProfileDropdown consistent)
 
+
+
+## FORENSIC AUDIT #2 (Jan 30, 2026) - COMPREHENSIVE FIX
+
+### Distributor Flow Test
+- [ ] Test complete distributor signup flow
+- [ ] Test vanity URL customization
+- [ ] Test photo upload functionality
+- [ ] Test cloned website link sharing
+- [ ] Verify referral tracking works end-to-end
+
+### Title Fix
+- [ ] Change main site title back to "FUEL YOUR POTENTIAL"
+
+### Real People Photos
+- [ ] Replace cartoon images in recently joined bubbles with real people photos
+- [ ] Ensure photos look realistic and professional
+
+### Navigation Improvements
+- [ ] Study best navigation practices for MLM sites
+- [ ] Implement consistent navigation between all pages
+- [ ] Add breadcrumb navigation where appropriate
+
+### Site-Wide Design Audit
+- [ ] Fix spacing issues across all pages
+- [ ] Fix structure and formatting issues
+- [ ] Ensure consistent fonts and colors
+- [ ] Fix mobile responsiveness issues
+- [ ] Audit all pages for visual consistency
+
+### Navigation Consistency
+- [ ] Verify identical menus on all pages
+- [ ] Check dropdown behavior consistency
+- [ ] Test for broken links and 404s
+- [ ] Check for console errors
+
+
+## Forensic Audit & Final Fixes (Jan 30, 2026)
+
+### Title Changes
+- [x] Change main hero title from "TIRED OF CRASHING?" to "FUEL YOUR POTENTIAL"
+- [x] Change cloned distributor site title from "FUEL YOUR FUTURE" to "FUEL YOUR POTENTIAL"
+
+### Social Proof Bubbles
+- [x] Replace cartoon avatars with real people photos in recently joined bubbles
+- [x] Add 5 professional headshot photos to public folder
+- [x] Update SocialProofBubbles component to use real photos
+
+### Navigation Audit
+- [x] Verify header navigation consistency across all public pages
+- [x] Verify footer presence on all public pages
+- [x] Verify breadcrumbs on internal pages
+- [x] Verify Back/Home buttons on portal pages
+- [x] Verify mobile hamburger menu shows all 12 tabs
+
+### Design Audit
+- [x] Audit home page spacing and layout
+- [x] Audit products page design
+- [x] Audit about/story page design
+- [x] Audit franchise page design
+- [x] Audit join page design
+- [x] Audit distributor portal design
+- [x] Audit admin panel design
+- [x] Audit cloned distributor sites design
+
+### Distributor Flow Verification
+- [x] Test distributor signup flow
+- [x] Verify vanity URL generation (NEON1UUC1GR)
+- [x] Verify photo upload functionality
+- [x] Verify cloned website displays correctly
+- [x] Verify referral tracking in URL
