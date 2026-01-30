@@ -3271,3 +3271,41 @@
 - [x] Add in-app notification bell with unread count
 - [x] Add notification router with CRUD operations
 - [x] Use built-in notification API for delivery
+
+
+## Distributor Enrollment & Vending Network (Jan 29, 2026)
+
+### Distributor Portal Enrollment Features
+- [x] Add "Enroll New Distributor" button to distributor portal (Quick Actions section)
+- [x] Add "Enroll New Customer" button to distributor portal (Quick Actions section)
+- [x] Create enrollment forms with sponsor tracking (JoinNow.tsx with sponsor code)
+- [x] Generate unique referral links for new enrollees (via distributor code)
+
+### Vending Machine Network Tree
+- [x] Create VendingNetworkTree component (VendingNetworkTree.tsx)
+- [x] Display vending machines in hierarchical tree view (tree/list toggle)
+- [x] Show machine status, location, and revenue
+- [x] Track referral relationships for machine sales
+
+### Vending Micro-Franchise Compensation Plan
+- [x] Add commission structure for vending machine referrals (10% direct, 5% network CV)
+- [x] Implement CV (Commission Volume) on vending network
+- [x] Calculate commissions on machine sales referrals (vending_commissions table)
+- [x] Add vending compensation to distributor earnings display (Vending Network tab)
+
+### Notification Bell Fix
+- [x] Fix notification bell clickability across all pages (z-[9999], pointer-events-auto)
+- [x] Ensure proper z-index and pointer events
+- [x] Test on all major pages
+
+### MLM System Audit
+- [x] Audit distributor enrollment flow (JoinNow.tsx verified)
+- [x] Audit customer portal functionality (CustomerWelcome verified)
+- [x] Audit all page buttons and links
+- [x] Fix any broken features
+- [x] Simplify navigation paths
+
+### Navigation & UX Cleanup
+- [x] Move jungle noise button to bottom-left corner (out of the way)
+- [x] Simplify overall navigation flows
+- [x] Ensure consistent navigation across all pages

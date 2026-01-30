@@ -19,25 +19,25 @@ export default function VoiceMuteButton() {
 
   return (
     <div 
-      className={`fixed bottom-24 z-40 transition-all duration-300 ease-in-out ${
-        isCollapsed ? "right-0" : "right-4"
+      className={`fixed bottom-4 z-40 transition-all duration-300 ease-in-out ${
+        isCollapsed ? "left-0" : "left-4"
       }`}
     >
       <div className="flex items-center">
-        {/* Collapse/Expand toggle */}
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className={`h-8 w-5 bg-black/60 backdrop-blur-sm border border-[#c8ff00]/20 flex items-center justify-center hover:bg-black/80 transition-all duration-200 ${
-            isCollapsed ? "rounded-l-lg border-r-0" : "rounded-l-lg"
-          }`}
-          title={isCollapsed ? "Show sound controls" : "Hide sound controls"}
-        >
-          {isCollapsed ? (
-            <ChevronLeft className="w-3 h-3 text-white/50" />
-          ) : (
-            <ChevronRight className="w-3 h-3 text-white/50" />
-          )}
-        </button>
+        {/* Collapsed indicator - small dot showing sound state */}
+        {isCollapsed && (
+          <button
+            onClick={toggleMute}
+            className="w-6 h-8 bg-black/60 backdrop-blur-sm border border-[#c8ff00]/20 border-r-0 rounded-l-lg flex items-center justify-center hover:bg-black/80 transition-all"
+            title={isMuted ? "Unmute sounds" : "Mute sounds"}
+          >
+            <div
+              className={`w-2 h-2 rounded-full transition-colors ${
+                isMuted ? "bg-white/30" : "bg-[#c8ff00]/70"
+              }`}
+            />
+          </button>
+        )}
 
         {/* Main mute button - slides in/out */}
         <div
@@ -47,7 +47,7 @@ export default function VoiceMuteButton() {
         >
           <button
             onClick={toggleMute}
-            className="w-10 h-10 rounded-r-full bg-black/60 backdrop-blur-sm border border-[#c8ff00]/20 border-l-0 flex items-center justify-center hover:bg-black/80 hover:border-[#c8ff00]/40 transition-all duration-200 group"
+            className="w-10 h-10 rounded-l-full bg-black/60 backdrop-blur-sm border border-[#c8ff00]/20 border-r-0 flex items-center justify-center hover:bg-black/80 hover:border-[#c8ff00]/40 transition-all duration-200 group"
             title={isMuted ? "Unmute sounds" : "Mute sounds"}
           >
             {isMuted ? (
@@ -58,20 +58,20 @@ export default function VoiceMuteButton() {
           </button>
         </div>
 
-        {/* Collapsed indicator - small dot showing sound state */}
-        {isCollapsed && (
-          <button
-            onClick={toggleMute}
-            className="w-6 h-8 bg-black/60 backdrop-blur-sm border border-[#c8ff00]/20 border-l-0 rounded-r-lg flex items-center justify-center hover:bg-black/80 transition-all"
-            title={isMuted ? "Unmute sounds" : "Mute sounds"}
-          >
-            <div
-              className={`w-2 h-2 rounded-full transition-colors ${
-                isMuted ? "bg-white/30" : "bg-[#c8ff00]/70"
-              }`}
-            />
-          </button>
-        )}
+        {/* Collapse/Expand toggle */}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className={`h-8 w-5 bg-black/60 backdrop-blur-sm border border-[#c8ff00]/20 flex items-center justify-center hover:bg-black/80 transition-all duration-200 ${
+            isCollapsed ? "rounded-r-lg border-l-0" : "rounded-r-lg"
+          }`}
+          title={isCollapsed ? "Show sound controls" : "Hide sound controls"}
+        >
+          {isCollapsed ? (
+            <ChevronRight className="w-3 h-3 text-white/50" />
+          ) : (
+            <ChevronLeft className="w-3 h-3 text-white/50" />
+          )}
+        </button>
       </div>
     </div>
   );

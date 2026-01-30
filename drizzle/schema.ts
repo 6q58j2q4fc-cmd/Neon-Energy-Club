@@ -1496,3 +1496,72 @@ export const vendingPaymentHistory = mysqlTable("vending_payment_history", {
 
 export type VendingPaymentHistory = typeof vendingPaymentHistory.$inferSelect;
 export type InsertVendingPaymentHistory = typeof vendingPaymentHistory.$inferInsert;
+
+
+/**
+ * Vending machine network table.
+ * Tracks vending machines and their referral relationships for the micro-franchise compensation plan.
+ */
+export const vendingNetwork = mysqlTable("vending_network", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Unique machine identifier */
+  machineId: varchar("machineId", { length: 50 }).notNull().unique(),
+  /** Owner user ID */
+  ownerId: int("ownerId").notNull(),
+  /** Referrer user ID (who referred this machine owner) */
+  referrerId: int("referrerId"),
+  /** Machine location description */
+  location: varchar("location", { length: 255 }).notNull(),
+  /** Machine status */
+  status: mysqlEnum("status", ["active", "inactive", "maintenance"]).default("active").notNull(),
+  /** Monthly revenue in cents */
+  monthlyRevenue: int("monthlyRevenue").default(0).notNull(),
+  /** Total lifetime sales in cents */
+  totalSales: int("totalSales").default(0).notNull(),
+  /** Commission volume (CV) for network calculations */
+  commissionVolume: int("commissionVolume").default(0).notNull(),
+  /** Level in the network tree (0 = direct, 1 = first level, etc.) */
+  networkLevel: int("networkLevel").default(0).notNull(),
+  /** Installation date */
+  installedAt: timestamp("installedAt"),
+  /** Created timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Updated timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type VendingNetwork = typeof vendingNetwork.$inferSelect;
+export type InsertVendingNetwork = typeof vendingNetwork.$inferInsert;
+
+/**
+ * Vending commission table.
+ * Tracks commissions earned from vending machine referrals and network volume.
+ */
+export const vendingCommissions = mysqlTable("vending_commissions", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User ID who earned the commission */
+  userId: int("userId").notNull(),
+  /** Source machine ID (if direct referral commission) */
+  sourceMachineId: int("sourceMachineId"),
+  /** Commission type */
+  commissionType: mysqlEnum("commissionType", ["direct_referral", "network_cv", "bonus"]).notNull(),
+  /** Commission amount in cents */
+  amountCents: int("amountCents").notNull(),
+  /** Commission volume that generated this commission */
+  cvAmount: int("cvAmount").default(0).notNull(),
+  /** Commission percentage applied */
+  commissionRate: int("commissionRate").notNull(), // Stored as basis points (1000 = 10%)
+  /** Period start date */
+  periodStart: timestamp("periodStart").notNull(),
+  /** Period end date */
+  periodEnd: timestamp("periodEnd").notNull(),
+  /** Status */
+  status: mysqlEnum("status", ["pending", "approved", "paid", "cancelled"]).default("pending").notNull(),
+  /** Paid date */
+  paidAt: timestamp("paidAt"),
+  /** Created timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type VendingCommission = typeof vendingCommissions.$inferSelect;
+export type InsertVendingCommission = typeof vendingCommissions.$inferInsert;

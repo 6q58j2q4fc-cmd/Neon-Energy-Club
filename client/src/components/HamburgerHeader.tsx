@@ -308,7 +308,9 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
               </button>
 
               {/* Notification Bell */}
-              <NotificationBell />
+              <div className="relative z-[9999] pointer-events-auto">
+                <NotificationBell />
+              </div>
 
               {/* User Account Button with Full Portal Access */}
               <ProfileDropdown accentColor={accentColor[variant]} />

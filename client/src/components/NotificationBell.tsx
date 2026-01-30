@@ -103,11 +103,11 @@ export function NotificationBell() {
   if (!isAuthenticated) return null;
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative z-[9999]" ref={dropdownRef}>
       {/* Bell Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/20 hover:bg-white/10 hover:border-white/30 transition-all duration-200"
+        onClick={(e) => { e.stopPropagation(); setIsOpen(!isOpen); }}
+        className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/20 hover:bg-white/10 hover:border-white/30 transition-all duration-200 cursor-pointer pointer-events-auto"
         aria-label="Notifications"
       >
         <Bell className="w-5 h-5 text-[#c8ff00]" />

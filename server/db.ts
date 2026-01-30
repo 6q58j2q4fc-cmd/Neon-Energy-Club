@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption, vendingApplications, franchiseApplications, pushSubscriptions, InsertVendingApplication, InsertFranchiseApplication, InsertPushSubscription, userProfiles, InsertUserProfile, scheduledMeetings, InsertScheduledMeeting, vendingMachineOrders, vendingPaymentHistory, InsertVendingMachineOrder, InsertVendingPaymentHistory } from "../drizzle/schema";
+import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption, vendingApplications, franchiseApplications, pushSubscriptions, InsertVendingApplication, InsertFranchiseApplication, InsertPushSubscription, userProfiles, InsertUserProfile, scheduledMeetings, InsertScheduledMeeting, vendingMachineOrders, vendingPaymentHistory, InsertVendingMachineOrder, InsertVendingPaymentHistory, vendingNetwork, vendingCommissions, InsertVendingNetwork, InsertVendingCommission } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -4814,4 +4814,264 @@ export async function getDistributorPublicProfile(code: string) {
   };
   console.log('[getDistributorPublicProfile] Returning:', JSON.stringify(result));
   return result;
+}
+
+
+// ==================== VENDING NETWORK FUNCTIONS ====================
+
+/**
+ * Register a vending machine in the network
+ */
+export async function registerVendingMachine(data: {
+  machineId: string;
+  ownerId: number;
+  referrerId?: number;
+  location: string;
+}): Promise<{ id: number } | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  // Calculate network level based on referrer
+  let networkLevel = 0;
+  if (data.referrerId) {
+    const referrerMachines = await db
+      .select({ level: vendingNetwork.networkLevel })
+      .from(vendingNetwork)
+      .where(eq(vendingNetwork.ownerId, data.referrerId))
+      .limit(1);
+    if (referrerMachines.length > 0) {
+      networkLevel = referrerMachines[0].level + 1;
+    }
+  }
+
+  const result = await db.insert(vendingNetwork).values({
+    machineId: data.machineId,
+    ownerId: data.ownerId,
+    referrerId: data.referrerId || null,
+    location: data.location,
+    networkLevel,
+    status: "active",
+    monthlyRevenue: 0,
+    totalSales: 0,
+    commissionVolume: 0,
+  });
+
+  return { id: Number(result[0].insertId) };
+}
+
+/**
+ * Get vending machines owned by a user
+ */
+export async function getUserVendingMachines(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db
+    .select()
+    .from(vendingNetwork)
+    .where(eq(vendingNetwork.ownerId, userId))
+    .orderBy(desc(vendingNetwork.createdAt));
+}
+
+/**
+ * Get vending network tree for a user (machines they referred)
+ */
+export async function getVendingNetworkTree(userId: number, maxDepth: number = 5) {
+  const db = await getDb();
+  if (!db) return [];
+
+  // Get all machines where this user is the referrer
+  const directReferrals = await db
+    .select()
+    .from(vendingNetwork)
+    .where(eq(vendingNetwork.referrerId, userId));
+
+  // Recursively build tree
+  const buildTree = async (machines: typeof directReferrals, depth: number): Promise<any[]> => {
+    if (depth >= maxDepth) return machines;
+
+    return Promise.all(
+      machines.map(async (machine) => {
+        const children = await db
+          .select()
+          .from(vendingNetwork)
+          .where(eq(vendingNetwork.referrerId, machine.ownerId));
+
+        return {
+          ...machine,
+          referrals: children.length > 0 ? await buildTree(children, depth + 1) : [],
+        };
+      })
+    );
+  };
+
+  return buildTree(directReferrals, 0);
+}
+
+/**
+ * Update vending machine revenue and CV
+ */
+export async function updateVendingMachineRevenue(
+  machineId: string,
+  monthlyRevenue: number,
+  totalSales: number,
+  commissionVolume: number
+) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(vendingNetwork)
+    .set({
+      monthlyRevenue,
+      totalSales,
+      commissionVolume,
+    })
+    .where(eq(vendingNetwork.machineId, machineId));
+}
+
+/**
+ * Calculate vending network stats for a user
+ */
+export async function getVendingNetworkStats(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  // Get direct machines
+  const directMachines = await db
+    .select()
+    .from(vendingNetwork)
+    .where(eq(vendingNetwork.referrerId, userId));
+
+  // Calculate totals
+  let totalNetworkCV = 0;
+  let totalNetworkRevenue = 0;
+  let totalMachines = directMachines.length;
+
+  for (const machine of directMachines) {
+    totalNetworkCV += machine.commissionVolume;
+    totalNetworkRevenue += machine.monthlyRevenue;
+  }
+
+  // Get all downstream machines (recursive)
+  const getAllDownstream = async (referrerId: number): Promise<typeof directMachines> => {
+    const machines = await db
+      .select()
+      .from(vendingNetwork)
+      .where(eq(vendingNetwork.referrerId, referrerId));
+
+    let allMachines = [...machines];
+    for (const machine of machines) {
+      const downstream = await getAllDownstream(machine.ownerId);
+      allMachines = [...allMachines, ...downstream];
+    }
+    return allMachines;
+  };
+
+  // Get all downstream for CV calculation
+  for (const machine of directMachines) {
+    const downstream = await getAllDownstream(machine.ownerId);
+    totalMachines += downstream.length;
+    for (const dm of downstream) {
+      totalNetworkCV += dm.commissionVolume;
+      totalNetworkRevenue += dm.monthlyRevenue;
+    }
+  }
+
+  // Calculate commissions (10% direct referral, 5% network CV)
+  const directReferralCommission = Math.floor(
+    directMachines.reduce((sum, m) => sum + m.monthlyRevenue, 0) * 0.10
+  );
+  const networkCommission = Math.floor(totalNetworkCV * 0.05);
+
+  return {
+    totalMachines,
+    totalNetworkCV,
+    totalNetworkRevenue,
+    directReferralCommission,
+    networkCommission,
+    directMachinesCount: directMachines.length,
+  };
+}
+
+/**
+ * Record a vending commission
+ */
+export async function recordVendingCommission(data: {
+  userId: number;
+  sourceMachineId?: number;
+  commissionType: "direct_referral" | "network_cv" | "bonus";
+  amountCents: number;
+  cvAmount: number;
+  commissionRate: number;
+  periodStart: Date;
+  periodEnd: Date;
+}): Promise<{ id: number } | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.insert(vendingCommissions).values({
+    userId: data.userId,
+    sourceMachineId: data.sourceMachineId || null,
+    commissionType: data.commissionType,
+    amountCents: data.amountCents,
+    cvAmount: data.cvAmount,
+    commissionRate: data.commissionRate,
+    periodStart: data.periodStart,
+    periodEnd: data.periodEnd,
+    status: "pending",
+  });
+
+  // Create notification for the user
+  await createNotification({
+    userId: data.userId,
+    type: "commission",
+    title: "Vending Commission Earned",
+    message: `You earned $${(data.amountCents / 100).toFixed(2)} from your vending network!`,
+  });
+
+  return { id: Number(result[0].insertId) };
+}
+
+/**
+ * Get vending commissions for a user
+ */
+export async function getVendingCommissions(userId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db
+    .select()
+    .from(vendingCommissions)
+    .where(eq(vendingCommissions.userId, userId))
+    .orderBy(desc(vendingCommissions.createdAt))
+    .limit(limit);
+}
+
+/**
+ * Get total vending earnings for a user
+ */
+export async function getTotalVendingEarnings(userId: number) {
+  const db = await getDb();
+  if (!db) return { total: 0, pending: 0, paid: 0 };
+
+  const commissions = await db
+    .select()
+    .from(vendingCommissions)
+    .where(eq(vendingCommissions.userId, userId));
+
+  let total = 0;
+  let pending = 0;
+  let paid = 0;
+
+  for (const c of commissions) {
+    total += c.amountCents;
+    if (c.status === "pending" || c.status === "approved") {
+      pending += c.amountCents;
+    } else if (c.status === "paid") {
+      paid += c.amountCents;
+    }
+  }
+
+  return { total, pending, paid };
 }

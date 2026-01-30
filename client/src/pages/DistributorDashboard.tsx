@@ -14,6 +14,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useState, useRef } from "react";
 import GenealogyTree from "@/components/GenealogyTree";
+import VendingNetworkTree from "@/components/VendingNetworkTree";
 import { Camera, Globe, Image as ImageIcon } from "lucide-react";
 import { Breadcrumb } from "@/components/Breadcrumb";
 
@@ -247,6 +248,87 @@ export default function DistributorDashboard() {
           </Card>
         </div>
 
+        {/* Quick Actions - Enroll New Members */}
+        <div className="grid md:grid-cols-2 gap-6 mb-12">
+          <Card className="bg-gradient-to-br from-[#00e5ff]/20 to-[#0a0a0a] border-[#00e5ff]">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
+                <Users className="w-5 h-5 text-[#00e5ff]" />
+                Enroll New Distributor
+              </CardTitle>
+              <CardDescription className="text-gray-400">
+                Grow your team by enrolling new distributors under your sponsorship
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-gray-300">
+                Share your unique enrollment link to sign up new distributors. They'll automatically be placed in your downline.
+              </p>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => {
+                    const enrollUrl = `${window.location.origin}/join?sponsor=${distributor.distributorCode}&type=distributor`;
+                    copyToClipboard(enrollUrl);
+                  }}
+                  className="bg-[#00e5ff] text-black hover:bg-[#00c4d4] flex-1"
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy Enrollment Link
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    const enrollUrl = `${window.location.origin}/join?sponsor=${distributor.distributorCode}&type=distributor`;
+                    window.open(enrollUrl, '_blank');
+                  }}
+                  className="border-[#00e5ff]/30 text-[#00e5ff] hover:bg-[#00e5ff]/10"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-[#ff0080]/20 to-[#0a0a0a] border-[#ff0080]">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
+                <Users className="w-5 h-5 text-[#ff0080]" />
+                Enroll New Customer
+              </CardTitle>
+              <CardDescription className="text-gray-400">
+                Add customers to your network and earn commissions on their purchases
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-gray-300">
+                Share your customer referral link. You'll earn commissions on all their orders!
+              </p>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => {
+                    const customerUrl = `${window.location.origin}/join?sponsor=${distributor.distributorCode}&type=customer`;
+                    copyToClipboard(customerUrl);
+                  }}
+                  className="bg-[#ff0080] text-white hover:bg-[#d4006a] flex-1"
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy Customer Link
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    const customerUrl = `${window.location.origin}/join?sponsor=${distributor.distributorCode}&type=customer`;
+                    window.open(customerUrl, '_blank');
+                  }}
+                  className="border-[#ff0080]/30 text-[#ff0080] hover:bg-[#ff0080]/10"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Rank Badge */}
         <div className="mb-12">
           <Card className="bg-gradient-to-r from-[#c8ff00]/10 to-transparent border-[#c8ff00]/30">
@@ -398,6 +480,7 @@ export default function DistributorDashboard() {
             <TabsTrigger value="team">My Team</TabsTrigger>
             <TabsTrigger value="genealogy">Genealogy</TabsTrigger>
             <TabsTrigger value="commissions">Commissions</TabsTrigger>
+            <TabsTrigger value="vending">Vending Network</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -784,6 +867,45 @@ export default function DistributorDashboard() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Vending Network Tab */}
+          <TabsContent value="vending" className="space-y-8">
+            <div className="mb-6">
+              <h2 className="text-2xl font-black text-white mb-2">Vending Micro-Franchise Network</h2>
+              <p className="text-gray-400">Track your vending machine referrals and earn commissions from your network</p>
+            </div>
+            
+            {/* Compensation Plan Overview */}
+            <Card className="bg-gradient-to-br from-[#c8ff00]/10 to-black border-[#c8ff00]/30 mb-6">
+              <CardHeader>
+                <CardTitle className="text-[#c8ff00]">Vending Compensation Plan</CardTitle>
+                <CardDescription>Earn from machine sales and network volume</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="p-4 bg-black/50 rounded-lg border border-[#c8ff00]/20">
+                    <h4 className="font-bold text-white mb-2">Direct Referral Commission</h4>
+                    <div className="text-3xl font-black text-[#c8ff00] mb-2">10%</div>
+                    <p className="text-sm text-gray-400">Earn 10% of monthly revenue from machines you directly refer</p>
+                  </div>
+                  <div className="p-4 bg-black/50 rounded-lg border border-[#00e5ff]/20">
+                    <h4 className="font-bold text-white mb-2">Network CV Commission</h4>
+                    <div className="text-3xl font-black text-[#00e5ff] mb-2">5%</div>
+                    <p className="text-sm text-gray-400">Earn 5% of total Commission Volume from your entire network</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Vending Network Tree */}
+            <VendingNetworkTree
+              machines={[]}
+              totalNetworkCV={0}
+              totalNetworkRevenue={0}
+              directReferralCommission={0}
+              networkCommission={0}
+            />
           </TabsContent>
         </Tabs>
       </div>
