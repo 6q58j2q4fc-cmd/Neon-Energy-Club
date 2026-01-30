@@ -71,7 +71,7 @@ function Router() {
         <Route path={"/products"} component={Products} />
         <Route path={"/product"} component={Product} />
         <Route path={"/success"} component={Success} />
-        <Route path={"/admin"} component={Admin} />
+        {/* OLD Admin route removed - using AdminPanel instead */}
         <Route path={"/franchise"} component={Franchise} />
         <Route path={"/celebrities"} component={Celebrities} />
         <Route path={"/crowdfund"} component={Crowdfund} />

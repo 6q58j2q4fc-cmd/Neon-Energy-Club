@@ -1141,9 +1141,9 @@ export default function DistributorPortal() {
         </div>
       </main>
 
-      {/* Mobile Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#0a0a0a] border-t border-[#c8ff00]/20 px-4 py-2 z-50">
-        <div className="flex justify-around">
+      {/* Mobile Navigation - Full Menu */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#0a0a0a] border-t border-[#c8ff00]/20 px-2 py-2 z-50">
+        <div className="flex justify-around items-center">
           {[
             { id: "dashboard", icon: BarChart3, label: "Home" },
             { id: "team", icon: Users, label: "Team" },
@@ -1153,16 +1153,92 @@ export default function DistributorPortal() {
             <button
               key={item.id}
               onClick={() => handleTabChange(item.id)}
-              className={`flex flex-col items-center py-2 px-3 rounded-lg ${
+              className={`flex flex-col items-center py-2 px-2 rounded-lg transition-colors ${
                 activeTab === item.id ? 'text-[#c8ff00]' : 'text-gray-500'
               }`}
             >
               <item.icon className="w-5 h-5" />
-              <span className="text-xs mt-1">{item.label}</span>
+              <span className="text-[10px] mt-1">{item.label}</span>
             </button>
           ))}
+          {/* More Menu Button */}
+          <MobileMoreMenu activeTab={activeTab} onTabChange={handleTabChange} />
         </div>
       </nav>
+    </div>
+  );
+}
+
+// Mobile More Menu Component - Shows all navigation items that don't fit in bottom bar
+function MobileMoreMenu({ activeTab, onTabChange }: { activeTab: string; onTabChange: (tab: string) => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  const menuItems = [
+    { id: "my-website", icon: Globe, label: "My Website" },
+    { id: "sales", icon: ShoppingCart, label: "Sales" },
+    { id: "payouts", icon: CreditCard, label: "Payouts" },
+    { id: "rank-history", icon: Award, label: "Rank History" },
+    { id: "training", icon: BookOpen, label: "Training" },
+    { id: "autoship", icon: Repeat, label: "Auto-Ship" },
+    { id: "rewards", icon: Gift, label: "3-for-Free" },
+    { id: "settings", icon: Settings, label: "Settings" },
+  ];
+  
+  const handleItemClick = (id: string) => {
+    onTabChange(id);
+    setIsOpen(false);
+  };
+  
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex flex-col items-center py-2 px-2 rounded-lg transition-colors ${
+          isOpen || menuItems.some(item => item.id === activeTab) ? 'text-[#c8ff00]' : 'text-gray-500'
+        }`}
+      >
+        <Settings className="w-5 h-5" />
+        <span className="text-[10px] mt-1">More</span>
+      </button>
+      
+      {/* Dropdown Menu */}
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 z-[60]" 
+            onClick={() => setIsOpen(false)}
+          />
+          
+          {/* Menu Panel */}
+          <div className="absolute bottom-full right-0 mb-2 w-56 bg-[#0a0a0a] border border-[#c8ff00]/30 rounded-xl shadow-2xl z-[70] overflow-hidden">
+            <div className="py-2 max-h-[60vh] overflow-y-auto">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleItemClick(item.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${
+                      isActive 
+                        ? 'bg-[#c8ff00]/20 text-[#c8ff00]' 
+                        : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    <span className="text-sm font-medium">{item.label}</span>
+                    {isActive && (
+                      <Check className="w-4 h-4 ml-auto text-[#c8ff00]" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -3411,6 +3411,70 @@ Provide step-by-step instructions with specific button names and locations. Keep
         return { success: true };
       }),
 
+    // DELETE order - CRITICAL FIX: This was missing and user requested multiple times
+    deleteOrder: protectedProcedure
+      .input(z.object({
+        orderId: z.number().int(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        // Delete the preorder from database
+        await db.delete(preorders).where(eq(preorders.id, input.orderId));
+        
+        console.log(`[Admin] Deleted preorder ID: ${input.orderId}`);
+        return { success: true, message: `Order ${input.orderId} deleted successfully` };
+      }),
+
+    // Bulk delete orders - for removing multiple test orders at once
+    bulkDeleteOrders: protectedProcedure
+      .input(z.object({
+        orderIds: z.array(z.number().int()),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        // Delete all specified preorders
+        for (const orderId of input.orderIds) {
+          await db.delete(preorders).where(eq(preorders.id, orderId));
+        }
+        
+        console.log(`[Admin] Bulk deleted ${input.orderIds.length} preorders`);
+        return { success: true, message: `${input.orderIds.length} orders deleted successfully` };
+      }),
+
+    // Delete ALL test/simulated orders
+    deleteAllTestOrders: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        // Delete orders that look like test data (simulated emails, test names, etc.)
+        const result = await db.delete(preorders)
+          .where(
+            or(
+              like(preorders.email, '%simulated%'),
+              like(preorders.email, '%test%'),
+              like(preorders.name, '%Test%'),
+              like(preorders.name, '%Simulated%')
+            )
+          );
+        
+        console.log(`[Admin] Deleted all test/simulated preorders`);
+        return { success: true, message: 'All test orders deleted successfully' };
+      }),
+
     // Commission management
     commissions: protectedProcedure
       .input(z.object({

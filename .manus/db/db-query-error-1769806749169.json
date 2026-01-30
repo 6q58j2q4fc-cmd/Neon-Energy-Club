@@ -1,0 +1,8 @@
+{
+  "query": "DELETE FROM preorders WHERE customer_email IN ('test@example.com', 'john@example.com') OR customer_name IN ('Test User', 'John Doe');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute DELETE FROM preorders WHERE customer_email IN ('test@example.com', 'john@example.com') OR customer_name IN ('Test User', 'John Doe');",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'customer_email' in 'where clause'"
+  ]
+}

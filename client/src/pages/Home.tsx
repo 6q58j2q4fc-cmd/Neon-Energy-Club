@@ -551,7 +551,7 @@ export default function Home() {
                 <div key={setIndex} className="flex gap-8">
                   {[
                     {
-                      image: "/images/passion-fruit-transparent.png",
+                      image: "/images/passion-fruit-white-bg.jpg",
                       name: "Passion Fruit",
                       benefit: "Heart health support with vitamins A, B6, B12 & C",
                     },
@@ -571,12 +571,12 @@ export default function Home() {
                       benefit: "Vitamin C & antioxidants for immune support",
                     },
                     {
-                      image: "/cherry-transparent.png",
+                      image: "/cherry-white-bg.jpg",
                       name: "Cherry",
                       benefit: "Rich in antioxidants & natural anti-inflammatory compounds",
                     },
                     {
-                      image: "/cranberry.png",
+                      image: "/cranberry-white-bg.jpg",
                       name: "Cranberry",
                       benefit: "Urinary tract health & immune-boosting vitamin C",
                     },

@@ -1,0 +1,29 @@
+{
+  "query": "SELECT * FROM preorders LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT * FROM preorders LIMIT 1;",
+  "rows": [
+    {
+      "id": "840001",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "555-1234",
+      "quantity": "2",
+      "address": "123 Main St",
+      "city": "New York",
+      "state": "NY",
+      "postalCode": "10001",
+      "country": "USA",
+      "status": "confirmed",
+      "notes": "Please deliver in the morning",
+      "createdAt": "2026-01-29 18:58:46",
+      "updatedAt": "2026-01-29 18:58:46",
+      "trackingNumber": "NULL",
+      "carrier": "NULL",
+      "estimatedDelivery": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tphone\tquantity\taddress\tcity\tstate\tpostalCode\tcountry\tstatus\tnotes\tcreatedAt\tupdatedAt\ttrackingNumber\tcarrier\testimatedDelivery\n840001\tJohn Doe\tjohn@example.com\t555-1234\t2\t123 Main St\tNew York\tNY\t10001\tUSA\tconfirmed\tPlease deliver in the morning\t2026-01-29 18:58:46\t2026-01-29 18:58:46\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

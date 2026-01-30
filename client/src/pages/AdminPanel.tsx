@@ -598,6 +598,40 @@ function OrderManagement() {
     },
   });
 
+  // DELETE ORDER MUTATION - CRITICAL FIX
+  const deleteOrderMutation = trpc.admin.deleteOrder.useMutation({
+    onSuccess: () => {
+      toast.success("Order deleted successfully");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete order: ${error.message}`);
+    },
+  });
+
+  // DELETE ALL TEST ORDERS MUTATION
+  const deleteAllTestOrdersMutation = trpc.admin.deleteAllTestOrders.useMutation({
+    onSuccess: () => {
+      toast.success("All test orders deleted successfully");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete test orders: ${error.message}`);
+    },
+  });
+
+  const handleDeleteOrder = (orderId: number, orderNumber: string) => {
+    if (window.confirm(`Are you sure you want to DELETE order ${orderNumber}? This cannot be undone.`)) {
+      deleteOrderMutation.mutate({ orderId });
+    }
+  };
+
+  const handleDeleteAllTestOrders = () => {
+    if (window.confirm('Are you sure you want to DELETE ALL test/simulated orders? This cannot be undone.')) {
+      deleteAllTestOrdersMutation.mutate();
+    }
+  };
+
   const orders = ordersData?.orders || [];
   const totalPages = ordersData?.totalPages || 1;
 
@@ -636,6 +670,15 @@ function OrderManagement() {
             <Button className="bg-[#c8ff00] text-black hover:bg-[#a8d600]">
               <Download className="h-4 w-4 mr-2" />
               Export
+            </Button>
+            <Button 
+              variant="destructive" 
+              className="bg-red-600 hover:bg-red-700"
+              onClick={handleDeleteAllTestOrders}
+              disabled={deleteAllTestOrdersMutation.isPending}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete All Test Orders
             </Button>
           </div>
         </div>
@@ -679,6 +722,15 @@ function OrderManagement() {
                       <SelectItem value="cancelled">Cancelled</SelectItem>
                     </SelectContent>
                   </Select>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-red-500 hover:text-red-400 hover:bg-red-500/10"
+                    onClick={() => handleDeleteOrder(order.id, order.orderNumber || `#${order.id}`)}
+                    disabled={deleteOrderMutation.isPending}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             )) : (
