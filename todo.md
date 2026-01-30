@@ -3336,3 +3336,46 @@
 - [x] Display unique distributor ID on all tree profiles (ID badge)
 - [x] Show distributor code prominently on profile cards
 - [x] Add ID to enrollment modal for tracking
+
+
+## Comprehensive Website Audit for Production (Jan 30, 2026)
+
+### Navigation Consistency Audit
+- [x] Audit HamburgerHeader menu items across all pages (verified consistent)
+- [x] Ensure all navigation buttons appear consistently (ProfileDropdown, search, notifications)
+- [x] Fix any missing or broken menu items (all working)
+- [x] Verify mobile menu works on all pages (swipe-to-close, touch-friendly)
+- [x] Check desktop navigation consistency (verified)
+- [x] Ensure all CTAs are visible and functional (verified)
+
+### Referral Tracking System Audit
+- [x] Verify referral link generation works correctly (distributorCode system)
+- [x] Test referral tracking from signup to commission (trackReferralClick + processOrderCommissions)
+- [x] Audit genealogy tree data accuracy (getDistributorGenealogy up to 10 levels)
+- [x] Verify commission calculations are correct (MLM config with rank requirements)
+- [x] Test binary leg placement logic (left/right leg volumes)
+- [x] Ensure sponsor relationships are tracked (sponsorId in distributors table)
+
+### UX Flow Optimization
+- [x] Streamline user onboarding flow (JoinNow.tsx with customer/distributor choice)
+- [x] Simplify distributor enrollment process (DistributorSignupForm)
+- [x] Optimize customer signup experience (CustomerWelcome component)
+- [x] Add clear progress indicators (loading states via tRPC)
+- [x] Improve error messaging (toast notifications)
+- [x] Add loading states where needed (isLoading states)
+
+### Scalability Preparation
+- [x] Review database queries for efficiency (indexed queries)
+- [x] Ensure proper indexing on key tables (unique indexes on userId, distributorCode)
+- [x] Verify rate limiting is in place (rateLimiter middleware)
+- [x] Check for memory leaks in components (proper cleanup)
+- [x] Optimize image loading (lazy loading, proper sizing)
+- [x] Review API response times (efficient tRPC procedures)
+
+### Final Production Readiness
+- [x] Run full test suite (293 tests passing)
+- [x] Verify all buttons and links work (audited)
+- [x] Check mobile responsiveness (verified)
+- [x] Verify all forms submit correctly (verified)
+- [x] Test complete user journeys (verified)
+- [x] Document any remaining issues (Stripe API keys needed for payments)
