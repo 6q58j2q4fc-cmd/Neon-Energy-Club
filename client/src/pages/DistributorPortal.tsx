@@ -257,7 +257,7 @@ export default function DistributorPortal() {
           {[
             { id: "dashboard", icon: BarChart3, label: "Dashboard" },
             { id: "my-website", icon: Globe, label: "My Website" },
-            { id: "team", icon: Users, label: "My Team" },
+            { id: "my-team", icon: Users, label: "My Team" },
             { id: "sales", icon: ShoppingCart, label: "Sales" },
             { id: "commissions", icon: DollarSign, label: "Commissions" },
             { id: "payouts", icon: CreditCard, label: "Payouts" },
@@ -616,7 +616,7 @@ export default function DistributorPortal() {
           )}
 
           {/* Team Tab */}
-          {activeTab === "team" && (
+          {activeTab === "my-team" && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
