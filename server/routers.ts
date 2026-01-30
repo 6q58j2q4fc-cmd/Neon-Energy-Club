@@ -4053,6 +4053,163 @@ Provide step-by-step instructions with specific button names and locations. Keep
       }),
   }),
 
+  // SMS verification routes
+  smsVerification: router({
+    // Send SMS verification code
+    sendCode: protectedProcedure
+      .input(z.object({ 
+        phoneNumber: z.string().min(10, "Phone number must be at least 10 digits"),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { createSmsVerification, isPhoneVerified } = await import("./db");
+        const { sendSmsVerificationCode, isValidPhoneNumber } = await import("./smsService");
+        
+        // Validate phone number format
+        if (!isValidPhoneNumber(input.phoneNumber)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid phone number format. Please enter a valid US phone number.",
+          });
+        }
+        
+        // Check if already verified
+        const verified = await isPhoneVerified(ctx.user.id);
+        if (verified) {
+          return { success: false, message: "Phone number is already verified" };
+        }
+        
+        // Create verification record (with rate limiting)
+        const result = await createSmsVerification(ctx.user.id, input.phoneNumber);
+        
+        if ('error' in result) {
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: result.error,
+          });
+        }
+        
+        // Send SMS with verification code
+        const smsResult = await sendSmsVerificationCode({
+          phoneNumber: input.phoneNumber,
+          code: result.code,
+          userName: ctx.user.name || undefined,
+        });
+        
+        if (!smsResult.success) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: smsResult.error || "Failed to send SMS",
+          });
+        }
+        
+        return { 
+          success: true, 
+          message: "Verification code sent!",
+          expiresAt: result.expiresAt,
+        };
+      }),
+
+    // Verify SMS code
+    verifyCode: protectedProcedure
+      .input(z.object({ 
+        code: z.string().length(6, "Code must be 6 digits"),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { verifySmsCode, getDistributorByUserId } = await import("./db");
+        const { sendSmsVerificationSuccess } = await import("./smsService");
+        
+        const result = await verifySmsCode(ctx.user.id, input.code);
+        
+        if (!result.success) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: result.error || "Verification failed",
+          });
+        }
+        
+        // Send success SMS
+        try {
+          if (ctx.user.phone) {
+            await sendSmsVerificationSuccess({
+              phoneNumber: ctx.user.phone,
+              userName: ctx.user.name || undefined,
+            });
+          }
+        } catch (smsError) {
+          console.warn("[SMSVerification] Failed to send success SMS:", smsError);
+        }
+        
+        return { success: true, message: "Phone number verified successfully!" };
+      }),
+
+    // Resend SMS code
+    resendCode: protectedProcedure
+      .input(z.object({ 
+        phoneNumber: z.string().min(10, "Phone number must be at least 10 digits"),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { createSmsVerification, isPhoneVerified } = await import("./db");
+        const { sendSmsVerificationCode, isValidPhoneNumber } = await import("./smsService");
+        
+        // Validate phone number format
+        if (!isValidPhoneNumber(input.phoneNumber)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid phone number format",
+          });
+        }
+        
+        // Check if already verified
+        const verified = await isPhoneVerified(ctx.user.id);
+        if (verified) {
+          return { success: false, message: "Phone number is already verified" };
+        }
+        
+        // Create new verification (with rate limiting)
+        const result = await createSmsVerification(ctx.user.id, input.phoneNumber);
+        
+        if ('error' in result) {
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: result.error,
+          });
+        }
+        
+        // Send SMS
+        const smsResult = await sendSmsVerificationCode({
+          phoneNumber: input.phoneNumber,
+          code: result.code,
+          userName: ctx.user.name || undefined,
+        });
+        
+        if (!smsResult.success) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: smsResult.error || "Failed to send SMS",
+          });
+        }
+        
+        return { 
+          success: true, 
+          message: "New verification code sent!",
+          expiresAt: result.expiresAt,
+        };
+      }),
+
+    // Check SMS verification status
+    status: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getVerificationStatus } = await import("./db");
+        const status = await getVerificationStatus(ctx.user.id);
+        return {
+          phoneVerified: status?.phoneVerified || false,
+          phone: status?.phone || null,
+          emailVerified: status?.emailVerified || false,
+          email: status?.email || null,
+        };
+      }),
+  }),
+
 });
 
 // Helper function to anonymize names for privacy on public leaderboard

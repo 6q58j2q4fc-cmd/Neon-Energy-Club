@@ -268,3 +268,97 @@ export async function sendTestSMS(phoneNumber: string): Promise<boolean> {
   
   return await sendTwilioSMS(formattedPhone, message);
 }
+
+/**
+ * SMS Verification Functions
+ */
+
+/**
+ * Send SMS verification code for phone verification
+ */
+export async function sendSmsVerificationCode(params: {
+  phoneNumber: string;
+  code: string;
+  userName?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const { phoneNumber, code, userName } = params;
+  
+  if (!validatePhoneNumber(phoneNumber)) {
+    console.log("[SMS] Invalid phone number:", phoneNumber);
+    return { success: false, error: "Invalid phone number format" };
+  }
+
+  const formattedPhone = formatPhoneNumber(phoneNumber);
+  const message = `Your NEON verification code is: ${code}. This code expires in 10 minutes. Do not share this code with anyone.`;
+  
+  // If Twilio is not configured, simulate success for development
+  if (!isTwilioConfigured) {
+    console.log(`[SMS] Development mode - Verification code ${code} would be sent to ${formattedPhone}`);
+    return { success: true };
+  }
+  
+  const success = await sendTwilioSMS(formattedPhone, message);
+  
+  if (success) {
+    await notifyOwner({
+      title: "SMS Sent: Verification Code",
+      content: `Sent verification code to ${userName || 'user'} (${phoneNumber})`,
+    });
+    return { success: true };
+  }
+  
+  return { success: false, error: "Failed to send SMS. Please try again." };
+}
+
+/**
+ * Send SMS notification for successful phone verification
+ */
+export async function sendSmsVerificationSuccess(params: {
+  phoneNumber: string;
+  userName?: string;
+}): Promise<boolean> {
+  const { phoneNumber, userName } = params;
+  
+  if (!validatePhoneNumber(phoneNumber)) {
+    return false;
+  }
+
+  const formattedPhone = formatPhoneNumber(phoneNumber);
+  const message = `Welcome to NEON${userName ? `, ${userName}` : ''}! Your phone number has been verified. You now have full access to your distributor account.`;
+  
+  // If Twilio is not configured, just log
+  if (!isTwilioConfigured) {
+    console.log(`[SMS] Development mode - Success message would be sent to ${formattedPhone}`);
+    return true;
+  }
+  
+  return await sendTwilioSMS(formattedPhone, message);
+}
+
+/**
+ * Check if phone number is valid for SMS
+ */
+export function isValidPhoneNumber(phone: string): boolean {
+  return validatePhoneNumber(phone);
+}
+
+/**
+ * Country codes for phone number formatting
+ */
+export const countryCodes = [
+  { code: '1', name: 'United States', flag: '🇺🇸' },
+  { code: '1', name: 'Canada', flag: '🇨🇦' },
+  { code: '44', name: 'United Kingdom', flag: '🇬🇧' },
+  { code: '61', name: 'Australia', flag: '🇦🇺' },
+  { code: '49', name: 'Germany', flag: '🇩🇪' },
+  { code: '33', name: 'France', flag: '🇫🇷' },
+  { code: '39', name: 'Italy', flag: '🇮🇹' },
+  { code: '34', name: 'Spain', flag: '🇪🇸' },
+  { code: '81', name: 'Japan', flag: '🇯🇵' },
+  { code: '82', name: 'South Korea', flag: '🇰🇷' },
+  { code: '86', name: 'China', flag: '🇨🇳' },
+  { code: '91', name: 'India', flag: '🇮🇳' },
+  { code: '55', name: 'Brazil', flag: '🇧🇷' },
+  { code: '52', name: 'Mexico', flag: '🇲🇽' },
+  { code: '7', name: 'Russia', flag: '🇷🇺' },
+];

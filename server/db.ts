@@ -226,6 +226,165 @@ export async function resendVerificationEmail(userId: number): Promise<{ token: 
 }
 
 /**
+ * SMS Verification Functions
+ */
+
+/**
+ * Generate a 6-digit OTP code for SMS verification
+ */
+export function generateSmsCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+/**
+ * Create SMS verification record for a user
+ * Rate limited: max 3 SMS per hour, 10 per day
+ */
+export async function createSmsVerification(userId: number, phoneNumber: string): Promise<{ code: string; expiresAt: Date } | { error: string }> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  // Get user to check rate limits
+  const userResult = await db.select()
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  if (userResult.length === 0) {
+    return { error: "User not found" };
+  }
+
+  const user = userResult[0];
+
+  // Check rate limiting - max 1 SMS per minute
+  if (user.lastSmsSentAt) {
+    const timeSinceLastSms = Date.now() - user.lastSmsSentAt.getTime();
+    if (timeSinceLastSms < 60 * 1000) {
+      const secondsRemaining = Math.ceil((60 * 1000 - timeSinceLastSms) / 1000);
+      return { error: `Please wait ${secondsRemaining} seconds before requesting another code` };
+    }
+  }
+
+  // Check max attempts (reset after 1 hour)
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  if (user.lastSmsSentAt && user.lastSmsSentAt > oneHourAgo && user.smsVerificationAttempts >= 5) {
+    return { error: "Too many verification attempts. Please try again in an hour." };
+  }
+
+  const code = generateSmsCode();
+  // Code expires in 10 minutes
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+  // Reset attempts if last SMS was more than 1 hour ago
+  const newAttempts = (user.lastSmsSentAt && user.lastSmsSentAt > oneHourAgo) 
+    ? user.smsVerificationAttempts + 1 
+    : 1;
+
+  await db.update(users)
+    .set({
+      phone: phoneNumber,
+      smsVerificationCode: code,
+      smsVerificationExpiry: expiresAt,
+      smsVerificationAttempts: newAttempts,
+      lastSmsSentAt: new Date(),
+      phoneVerified: false,
+    })
+    .where(eq(users.id, userId));
+
+  return { code, expiresAt };
+}
+
+/**
+ * Verify SMS code
+ */
+export async function verifySmsCode(userId: number, code: string): Promise<{ success: boolean; error?: string }> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  // Find user
+  const result = await db.select()
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  if (result.length === 0) {
+    return { success: false, error: "User not found" };
+  }
+
+  const user = result[0];
+
+  // Check if code matches
+  if (!user.smsVerificationCode || user.smsVerificationCode !== code) {
+    return { success: false, error: "Invalid verification code" };
+  }
+
+  // Check if code has expired
+  if (user.smsVerificationExpiry && new Date() > user.smsVerificationExpiry) {
+    return { success: false, error: "Verification code has expired. Please request a new one." };
+  }
+
+  // Mark phone as verified and clear code
+  await db.update(users)
+    .set({
+      phoneVerified: true,
+      smsVerificationCode: null,
+      smsVerificationExpiry: null,
+      smsVerificationAttempts: 0,
+    })
+    .where(eq(users.id, userId));
+
+  return { success: true };
+}
+
+/**
+ * Check if user's phone is verified
+ */
+export async function isPhoneVerified(userId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.select({ phoneVerified: users.phoneVerified })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  return result.length > 0 ? result[0].phoneVerified : false;
+}
+
+/**
+ * Get user's verification status (both email and phone)
+ */
+export async function getVerificationStatus(userId: number): Promise<{
+  emailVerified: boolean;
+  phoneVerified: boolean;
+  email: string | null;
+  phone: string | null;
+} | null> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.select({
+    emailVerified: users.emailVerified,
+    phoneVerified: users.phoneVerified,
+    email: users.email,
+    phone: users.phone,
+  })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}
+
+/**
  * Pre-order management queries
  */
 

@@ -3635,3 +3635,19 @@
 - [x] Show verification status in distributor portal (EmailVerificationIndicator component)
 - [x] Create email verification banner for unverified users
 - [x] Write vitest tests for email verification flow (12 tests passing)
+
+
+## SMS Verification for Distributor Signups (Jan 30, 2026)
+
+- [x] Add phone number and SMS verification fields to user schema (phone, phoneVerified, smsVerificationCode, smsVerificationExpiry, smsVerificationAttempts, lastSmsSentAt)
+- [x] Create 6-digit OTP code generation function (generateSmsCode in db.ts)
+- [x] Create SMS verification token validation with 10-minute expiry
+- [x] Implement SMS sending using Twilio API (sendSmsVerificationCode in smsService.ts)
+- [x] Create tRPC procedures for SMS verification (sendCode, verifyCode, resendCode, status)
+- [x] Build phone number input component with country code selector (SmsVerification.tsx)
+- [x] Create OTP input component for code entry (6-digit auto-advancing inputs)
+- [x] Add SMS verification option in distributor signup flow
+- [x] Add SMS verification tab in portal settings (VerificationBanner.tsx with tabs)
+- [x] Allow users to choose between email or SMS verification (combined verification banner)
+- [x] Write vitest tests for SMS verification flow (18 tests passing)
+- [x] Add rate limiting (1 SMS per minute, max 5 per hour)

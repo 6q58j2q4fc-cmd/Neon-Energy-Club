@@ -37,6 +37,16 @@ export const users = mysqlTable("users", {
   emailVerificationToken: varchar("emailVerificationToken", { length: 64 }),
   /** Expiration time for email verification token */
   emailVerificationExpiry: timestamp("emailVerificationExpiry"),
+  /** Whether the user's phone has been verified */
+  phoneVerified: boolean("phoneVerified").default(false).notNull(),
+  /** 6-digit OTP code for SMS verification */
+  smsVerificationCode: varchar("smsVerificationCode", { length: 6 }),
+  /** Expiration time for SMS verification code (10 minutes) */
+  smsVerificationExpiry: timestamp("smsVerificationExpiry"),
+  /** Number of SMS verification attempts (rate limiting) */
+  smsVerificationAttempts: int("smsVerificationAttempts").default(0).notNull(),
+  /** Last SMS sent timestamp (rate limiting) */
+  lastSmsSentAt: timestamp("lastSmsSentAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
