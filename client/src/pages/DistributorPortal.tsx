@@ -907,19 +907,167 @@ export default function DistributorPortal() {
               animate={{ opacity: 1, y: 0 }}
               className="space-y-6"
             >
-              <Card className="bg-gradient-to-br from-[#c8ff00]/10 to-purple-500/10 border-[#c8ff00]/30">
+              {/* Prominent Cloned Website Section */}
+              <Card className="bg-gradient-to-br from-[#c8ff00]/20 via-purple-500/10 to-pink-500/10 border-2 border-[#c8ff00] shadow-lg shadow-[#c8ff00]/20">
                 <CardContent className="pt-6">
                   <div className="text-center mb-6">
-                    <Globe className="w-12 h-12 text-[#c8ff00] mx-auto mb-3" />
-                    <h3 className="text-2xl font-bold text-white mb-2">Your Personal NEON Website</h3>
-                    <p className="text-gray-400">
-                      Customize your landing page to attract customers and build your team
+                    <div className="relative inline-block">
+                      <Globe className="w-16 h-16 text-[#c8ff00] mx-auto mb-3 animate-pulse" />
+                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <Check className="w-4 h-4 text-white" />
+                      </div>
+                    </div>
+                    <h3 className="text-3xl font-bold text-white mb-2">Your Personal NEON Website</h3>
+                    <p className="text-gray-300 text-lg">
+                      Your cloned website is <span className="text-[#c8ff00] font-bold">LIVE</span> and ready to share!
                     </p>
+                  </div>
+                  
+                  {/* Website URL Display */}
+                  <div className="bg-black/60 rounded-xl p-6 border border-[#c8ff00]/30 mb-6">
+                    <div className="text-sm text-gray-400 mb-2 flex items-center gap-2">
+                      <Link className="w-4 h-4" />
+                      Your Unique Website URL
+                    </div>
+                    <div className="flex flex-col md:flex-row gap-3">
+                      <div className="flex-1 bg-black rounded-lg p-4 border border-[#c8ff00]/50 font-mono text-lg text-[#c8ff00] break-all">
+                        {window.location.origin}/d/{distributorProfile?.distributorCode}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => copyToClipboard(`${window.location.origin}/d/${distributorProfile?.distributorCode}`, "Website URL")}
+                          className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold px-6"
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copy
+                        </Button>
+                        <Button
+                          onClick={() => window.open(`/d/${distributorProfile?.distributorCode}`, '_blank')}
+                          variant="outline"
+                          className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10 font-bold px-6"
+                        >
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          Visit
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Quick Share Buttons */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <Button
+                      onClick={() => {
+                        const url = encodeURIComponent(`${window.location.origin}/d/${distributorProfile?.distributorCode}`);
+                        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      Share on Facebook
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        const url = encodeURIComponent(`${window.location.origin}/d/${distributorProfile?.distributorCode}`);
+                        const text = encodeURIComponent("Check out NEON Energy Drink! Use my link:");
+                        window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+                      }}
+                      className="bg-sky-500 hover:bg-sky-600 text-white"
+                    >
+                      Share on X
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        const url = `${window.location.origin}/d/${distributorProfile?.distributorCode}`;
+                        navigator.clipboard.writeText(`Check out NEON Energy Drink! ${url}`);
+                        toast.success("Message copied! Paste it in WhatsApp");
+                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      Share on WhatsApp
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        const url = `${window.location.origin}/d/${distributorProfile?.distributorCode}`;
+                        const subject = encodeURIComponent("Check out NEON Energy Drink!");
+                        const body = encodeURIComponent(`Hey! I wanted to share this amazing energy drink with you. Check it out here: ${url}`);
+                        window.open(`mailto:?subject=${subject}&body=${body}`);
+                      }}
+                      variant="outline"
+                      className="border-gray-500 text-gray-300 hover:bg-gray-800"
+                    >
+                      Share via Email
+                    </Button>
+                  </div>
+                  
+                  {/* Website Preview */}
+                  <div className="bg-black/40 rounded-xl p-4 border border-gray-700">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm text-gray-400">Website Preview</span>
+                      <Button
+                        onClick={() => window.open(`/d/${distributorProfile?.distributorCode}`, '_blank')}
+                        variant="ghost"
+                        size="sm"
+                        className="text-[#c8ff00] hover:bg-[#c8ff00]/10"
+                      >
+                        Open Full Page <ExternalLink className="w-3 h-3 ml-1" />
+                      </Button>
+                    </div>
+                    <div className="aspect-video bg-black rounded-lg overflow-hidden border border-gray-700">
+                      <iframe
+                        src={`/d/${distributorProfile?.distributorCode}`}
+                        className="w-full h-full"
+                        title="Your NEON Website Preview"
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
               
-              <ProfileEditor userType="distributor" />
+              {/* Distributor ID Card */}
+              <Card className="bg-[#0a0a0a] border-[#c8ff00]/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Award className="w-5 h-5 text-[#c8ff00]" />
+                    Your Distributor ID
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#c8ff00]/20 to-purple-500/20 rounded-lg border border-[#c8ff00]/30">
+                    <div>
+                      <div className="text-sm text-gray-400">Unique Distributor Code</div>
+                      <div className="text-3xl font-bold font-mono text-[#c8ff00]">
+                        {distributorProfile?.distributorCode}
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => copyToClipboard(distributorProfile?.distributorCode || '', "Distributor ID")}
+                      variant="outline"
+                      className="border-[#c8ff00]/50 text-[#c8ff00]"
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copy ID
+                    </Button>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-3">
+                    Share this code with prospects so they can join under you. They can enter it during signup.
+                  </p>
+                </CardContent>
+              </Card>
+              
+              {/* Profile Customization */}
+              <Card className="bg-[#0a0a0a] border-[#c8ff00]/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Settings className="w-5 h-5 text-[#c8ff00]" />
+                    Customize Your Website
+                  </CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Personalize your cloned website with your photo, bio, and contact info
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ProfileEditor userType="distributor" />
+                </CardContent>
+              </Card>
             </motion.div>
           )}
 

@@ -131,9 +131,9 @@ describe("MLM Configuration", () => {
     const { ACTIVITY_REQUIREMENTS } = await import("../shared/mlmConfig");
     
     expect(ACTIVITY_REQUIREMENTS).toBeDefined();
-    expect(ACTIVITY_REQUIREMENTS.MIN_MONTHLY_PV).toBe(48);
-    expect(ACTIVITY_REQUIREMENTS.MIN_ACTIVE_DOWNLINE).toBe(1);
-    expect(ACTIVITY_REQUIREMENTS.MIN_DOWNLINE_PV).toBe(48);
+    expect(ACTIVITY_REQUIREMENTS.MIN_MONTHLY_PV).toBe(50); // Updated for 65% margin plan
+    expect(ACTIVITY_REQUIREMENTS.MIN_ACTIVE_DOWNLINE).toBe(2); // Increased for more breakage
+    expect(ACTIVITY_REQUIREMENTS.MIN_DOWNLINE_PV).toBe(50); // Updated for 65% margin plan
   });
 
   it("should calculate rank progress correctly", async () => {
@@ -158,11 +158,11 @@ describe("MLM Configuration", () => {
     // Inactive: has PV but no active downline
     expect(isDistributorActive(48, 0, 0)).toBe(false);
     
-    // Active: meets all requirements (function only checks monthlyPV and activeDownlineCount)
-    expect(isDistributorActive(48, 1, 48)).toBe(true);
+    // Active: meets all requirements (50 PV + 2 active downline)
+    expect(isDistributorActive(50, 2, 50)).toBe(true);
     
-    // Active: downline PV is not checked in the function signature
-    expect(isDistributorActive(48, 1, 20)).toBe(true);
+    // Active: exceeds requirements
+    expect(isDistributorActive(100, 3, 50)).toBe(true);
   });
 
   it("should have valid commission rates", async () => {

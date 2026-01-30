@@ -4,23 +4,28 @@
  */
 
 // Product PV values (Personal Volume points)
+// BV set at ~75% of retail price for built-in breakage
 export const PRODUCT_PV = {
   SINGLE_CAN: 1,
-  "12_PACK": 12,
-  "24_PACK": 24,
-  STARTER_KIT: 100,
-  PRO_KIT: 250,
-  ELITE_KIT: 500,
+  "12_PACK": 10, // Reduced from 12 (BV ratio)
+  "24_PACK": 20, // Reduced from 24 (BV ratio)
+  STARTER_KIT: 75, // Reduced from 100 (BV ratio)
+  PRO_KIT: 185, // Reduced from 250 (BV ratio)
+  ELITE_KIT: 375, // Reduced from 500 (BV ratio)
 };
 
-// Monthly activity requirements
+// Monthly activity requirements (creates breakage from inactive distributors)
 export const ACTIVITY_REQUIREMENTS = {
-  // Minimum monthly autoship PV to stay active
-  MIN_MONTHLY_PV: 48, // 2x 24-packs = 48 PV
-  // Minimum active personally enrolled distributors
-  MIN_ACTIVE_DOWNLINE: 1,
-  // Minimum PV for active downline member
-  MIN_DOWNLINE_PV: 48, // 2x 24-packs
+  // Minimum monthly autoship PV to stay active and receive commissions
+  MIN_MONTHLY_PV: 50, // ~$75 retail value required
+  // Minimum active personally enrolled distributors for team commissions
+  MIN_ACTIVE_DOWNLINE: 2, // Increased from 1 for more breakage
+  // Minimum PV for downline member to count as "active"
+  MIN_DOWNLINE_PV: 50,
+  // Grace period before rank decay (months)
+  RANK_MAINTENANCE_MONTHS: 2,
+  // Compression: skip inactive levels in payout
+  COMPRESSION_ENABLED: true,
 };
 
 // Rank definitions with requirements
@@ -38,71 +43,71 @@ export const RANKS = {
   bronze: {
     name: "Bronze",
     level: 1,
-    personalPV: 100,
-    teamPV: 500,
+    personalPV: 75, // Reduced slightly for achievability
+    teamPV: 400,
     activeLegs: 1,
-    legVolume: 250,
-    monthlyBonus: 50,
+    legVolume: 200,
+    monthlyBonus: 25, // Reduced from 50
     color: "#CD7F32", // bronze
   },
   silver: {
     name: "Silver",
     level: 2,
-    personalPV: 150,
-    teamPV: 2000,
+    personalPV: 100,
+    teamPV: 1500, // Reduced from 2000
     activeLegs: 2,
-    legVolume: 800,
-    monthlyBonus: 150,
+    legVolume: 600,
+    monthlyBonus: 75, // Reduced from 150
     color: "#C0C0C0", // silver
   },
   gold: {
     name: "Gold",
     level: 3,
-    personalPV: 200,
-    teamPV: 5000,
+    personalPV: 150,
+    teamPV: 4000, // Reduced from 5000
     activeLegs: 2,
-    legVolume: 2000,
-    monthlyBonus: 400,
+    legVolume: 1500,
+    monthlyBonus: 200, // Reduced from 400
     color: "#FFD700", // gold
   },
   platinum: {
     name: "Platinum",
     level: 4,
-    personalPV: 250,
-    teamPV: 15000,
+    personalPV: 200,
+    teamPV: 12000, // Reduced from 15000
     activeLegs: 2,
-    legVolume: 6000,
-    monthlyBonus: 1000,
+    legVolume: 5000,
+    monthlyBonus: 500, // Reduced from 1000
     color: "#E5E4E2", // platinum
   },
   diamond: {
     name: "Diamond",
     level: 5,
-    personalPV: 300,
-    teamPV: 50000,
+    personalPV: 250,
+    teamPV: 40000, // Reduced from 50000
     activeLegs: 2,
-    legVolume: 20000,
-    monthlyBonus: 3000,
+    legVolume: 15000,
+    monthlyBonus: 1500, // Reduced from 3000
     color: "#B9F2FF", // diamond blue
   },
   crown: {
     name: "Crown Diamond",
     level: 6,
-    personalPV: 400,
-    teamPV: 150000,
+    personalPV: 300,
+    teamPV: 120000, // Reduced from 150000
     activeLegs: 2,
-    legVolume: 60000,
-    monthlyBonus: 10000,
+    legVolume: 50000,
+    monthlyBonus: 5000, // Reduced from 10000
     color: "#9333EA", // purple
   },
   ambassador: {
     name: "Ambassador",
     level: 7,
-    personalPV: 500,
-    teamPV: 500000,
+    personalPV: 400,
+    teamPV: 400000, // Reduced from 500000
     activeLegs: 2,
-    legVolume: 200000,
-    monthlyBonus: 25000,
+    legVolume: 150000,
+    monthlyBonus: 15000, // Reduced from 25000
     color: "#DC2626", // red
   },
 } as const;
@@ -110,57 +115,99 @@ export const RANKS = {
 export type RankKey = keyof typeof RANKS;
 
 // Commission percentages by type
+// Optimized for ~35% total payout (65% company retention)
 export const COMMISSION_RATES = {
   // Retail profit margin (customer purchases)
-  RETAIL_PROFIT: 25, // 25% of retail price
+  // This is the main distributor income - kept competitive
+  RETAIL_PROFIT: 20, // Reduced from 25% (industry: 20-25%)
   
   // Fast Start Bonus (first 30 days after enrollment)
+  // Creates urgency but limited duration = controlled payout
   FAST_START: {
-    CUSTOMER: 20, // 20% on customer orders
-    DISTRIBUTOR: 25, // 25% on new distributor kit purchases
+    CUSTOMER: 15, // Reduced from 20%
+    DISTRIBUTOR: 20, // Reduced from 25%
     DURATION_DAYS: 30,
   },
   
   // Binary Team Commission (requires balanced legs)
+  // Balance requirement creates significant breakage
   BINARY: {
-    RATE: 10, // 10% of lesser leg volume
-    MAX_DAILY: 5000, // $5,000 daily cap
-    BALANCE_RATIO: 0.4, // 40/60 max imbalance allowed
+    RATE: 8, // Reduced from 10% (industry: 8-12%)
+    MAX_DAILY: 2500, // Reduced from $5,000 (cap creates breakage)
+    MAX_WEEKLY: 10000, // Weekly cap for additional control
+    BALANCE_RATIO: 0.33, // 33/67 max imbalance (stricter = more breakage)
+    FLUSH_EXCESS: true, // Excess volume flushes weekly
   },
   
   // Unilevel Override (direct sponsor bonuses)
+  // Reduced percentages, limited depth = controlled payout
   UNILEVEL: {
-    LEVEL_1: 5, // 5% on personally enrolled
-    LEVEL_2: 3, // 3% on level 2
-    LEVEL_3: 2, // 2% on level 3
-    LEVEL_4: 1, // 1% on level 4
-    LEVEL_5: 1, // 1% on level 5
+    LEVEL_1: 4, // Reduced from 5%
+    LEVEL_2: 2, // Reduced from 3%
+    LEVEL_3: 1, // Reduced from 2%
+    LEVEL_4: 0.5, // Reduced from 1%
+    LEVEL_5: 0.5, // Reduced from 1%
+    // Total: 8% (down from 12%)
   },
   
   // Matching Bonus (match on downline's binary earnings)
+  // Requires higher ranks to unlock = breakage
   MATCHING: {
-    GENERATION_1: 10, // 10% match on gen 1
-    GENERATION_2: 5, // 5% match on gen 2
-    GENERATION_3: 5, // 5% match on gen 3
+    GENERATION_1: 8, // Reduced from 10% (requires Gold rank)
+    GENERATION_2: 4, // Reduced from 5% (requires Platinum rank)
+    GENERATION_3: 2, // Reduced from 5% (requires Diamond rank)
+    // Total: 14% (down from 20%)
   },
   
   // Rank Achievement Bonus (one-time)
+  // One-time = controlled expense
   RANK_BONUS: {
-    bronze: 100,
-    silver: 250,
-    gold: 500,
-    platinum: 1000,
-    diamond: 2500,
-    crown: 5000,
-    ambassador: 10000,
+    bronze: 50, // Reduced from 100
+    silver: 150, // Reduced from 250
+    gold: 300, // Reduced from 500
+    platinum: 600, // Reduced from 1000
+    diamond: 1500, // Reduced from 2500
+    crown: 3000, // Reduced from 5000
+    ambassador: 7500, // Reduced from 10000
   },
   
   // Leadership Pool (% of company volume)
+  // Shared pool = variable expense based on qualifiers
   LEADERSHIP_POOL: {
-    diamond: 1, // 1% share
-    crown: 2, // 2% share
-    ambassador: 3, // 3% share
+    diamond: 0.5, // Reduced from 1%
+    crown: 1, // Reduced from 2%
+    ambassador: 1.5, // Reduced from 3%
+    // Total pool: 3% (down from 6%)
   },
+  
+  // Vending Machine Network Commissions
+  VENDING: {
+    DIRECT_REFERRAL: 8, // 8% on direct machine sales (reduced from 10%)
+    NETWORK_CV: 3, // 3% on network CV (reduced from 5%)
+    MAX_DEPTH: 5, // Limit depth for vending network
+  },
+};
+
+// Breakage Configuration
+// These settings ensure ~30-40% breakage for 65% company margins
+export const BREAKAGE_CONFIG = {
+  // BV to Retail ratio (commissions paid on BV, not retail)
+  BV_RATIO: 0.75, // 75% of retail price = 25% immediate breakage
+  
+  // Estimated inactive distributor rate
+  INACTIVE_RATE: 0.35, // ~35% of distributors typically inactive
+  
+  // Qualification failure rate (don't meet requirements)
+  UNQUALIFIED_RATE: 0.25, // ~25% fail to qualify for team commissions
+  
+  // Volume flush rate (excess binary volume lost)
+  FLUSH_RATE: 0.15, // ~15% of volume flushes weekly
+  
+  // Expected total breakage
+  EXPECTED_BREAKAGE: 0.35, // ~35% of gross commissions not paid
+  
+  // Target company retention
+  TARGET_RETENTION: 0.65, // 65% of revenue retained by company
 };
 
 // Calculate if distributor is active

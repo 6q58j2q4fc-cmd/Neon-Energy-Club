@@ -479,6 +479,142 @@ function TreeLevel({
   );
 }
 
+// Interactive Tree Container with Pan/Zoom
+function InteractiveTreeContainer({ children }: { children: React.ReactNode }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+  
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    setScale(prev => Math.min(Math.max(prev * delta, 0.25), 2));
+  }, []);
+  
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (e.button !== 0) return; // Only left click
+    setIsDragging(true);
+    setDragStart({ x: e.clientX, y: e.clientY });
+    setStartPosition(position);
+  }, [position]);
+  
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const dx = e.clientX - dragStart.x;
+    const dy = e.clientY - dragStart.y;
+    setPosition({
+      x: startPosition.x + dx,
+      y: startPosition.y + dy
+    });
+  }, [isDragging, dragStart, startPosition]);
+  
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+  
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+      setStartPosition(position);
+    }
+  }, [position]);
+  
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isDragging || e.touches.length !== 1) return;
+    const dx = e.touches[0].clientX - dragStart.x;
+    const dy = e.touches[0].clientY - dragStart.y;
+    setPosition({
+      x: startPosition.x + dx,
+      y: startPosition.y + dy
+    });
+  }, [isDragging, dragStart, startPosition]);
+  
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+  
+  const zoomIn = useCallback(() => {
+    setScale(prev => Math.min(prev * 1.2, 2));
+  }, []);
+  
+  const zoomOut = useCallback(() => {
+    setScale(prev => Math.max(prev * 0.8, 0.25));
+  }, []);
+  
+  const resetView = useCallback(() => {
+    setScale(1);
+    setPosition({ x: 0, y: 0 });
+  }, []);
+  
+  return (
+    <div className="relative">
+      {/* Zoom Controls */}
+      <div className="absolute top-2 left-2 z-10 flex flex-col gap-1 bg-black/80 backdrop-blur-sm rounded-lg p-1 border border-[#c8ff00]/30">
+        <button
+          onClick={zoomIn}
+          className="p-2 hover:bg-[#c8ff00]/20 rounded transition-colors text-[#c8ff00]"
+          title="Zoom In"
+        >
+          <ZoomIn className="w-4 h-4" />
+        </button>
+        <button
+          onClick={zoomOut}
+          className="p-2 hover:bg-[#c8ff00]/20 rounded transition-colors text-[#c8ff00]"
+          title="Zoom Out"
+        >
+          <ZoomOut className="w-4 h-4" />
+        </button>
+        <button
+          onClick={resetView}
+          className="p-2 hover:bg-[#c8ff00]/20 rounded transition-colors text-[#c8ff00]"
+          title="Reset View"
+        >
+          <Maximize2 className="w-4 h-4" />
+        </button>
+        <div className="text-[10px] text-center text-gray-400 px-1">
+          {Math.round(scale * 100)}%
+        </div>
+      </div>
+      
+      {/* Pan/Zoom Instructions */}
+      <div className="absolute bottom-2 left-2 z-10 text-[10px] text-gray-500 bg-black/60 px-2 py-1 rounded">
+        Drag to pan • Scroll to zoom
+      </div>
+      
+      {/* Interactive Container */}
+      <div
+        ref={containerRef}
+        className={`overflow-hidden min-h-[500px] ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+        onWheel={handleWheel}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div
+          ref={contentRef}
+          className="transition-transform duration-75 origin-center p-8"
+          style={{
+            transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
+            transformOrigin: 'center center',
+            minWidth: 'max-content'
+          }}
+        >
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function GenealogyTree({ rootDistributor, team, useApi = true, showTutorial = false }: GenealogyTreeProps) {
   const [selectedNode, setSelectedNode] = useState<TreeNode | null>(null);
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
@@ -802,18 +938,20 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true, sh
             </div>
           )}
           
-          {/* Tree Visualization */}
-          <div className="relative min-h-[400px] overflow-auto p-4 bg-black/50 rounded-lg border border-[#c8ff00]/20">
+          {/* Tree Visualization with Pan/Zoom */}
+          <div className="relative bg-black/50 rounded-lg border border-[#c8ff00]/20">
             {treeData?.tree && treeData.tree.length > 0 ? (
-              <TreeLevel
-                nodes={treeData.tree}
-                expandedNodes={expandedNodes}
-                toggleNode={toggleNode}
-                selectedNode={selectedNode}
-                setSelectedNode={setSelectedNode}
-                showEmptyPositions={showEmptyPositions}
-                onEnrollPosition={(parentCode, position) => setEnrollmentModal({ parentCode, position })}
-              />
+              <InteractiveTreeContainer>
+                <TreeLevel
+                  nodes={treeData.tree}
+                  expandedNodes={expandedNodes}
+                  toggleNode={toggleNode}
+                  selectedNode={selectedNode}
+                  setSelectedNode={setSelectedNode}
+                  showEmptyPositions={showEmptyPositions}
+                  onEnrollPosition={(parentCode, position) => setEnrollmentModal({ parentCode, position })}
+                />
+              </InteractiveTreeContainer>
             ) : (
               <div className="flex flex-col items-center justify-center h-64 text-gray-500">
                 <Users className="w-16 h-16 mb-4 opacity-30" />
