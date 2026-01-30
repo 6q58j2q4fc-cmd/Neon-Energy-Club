@@ -1,0 +1,60 @@
+{
+  "query": "SELECT id, distributorCode, `rank` FROM distributors LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT id, distributorCode, `rank` FROM distributors LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "distributorCode": "NEON100RS8ZGQ",
+      "rank": "starter"
+    },
+    {
+      "id": "2",
+      "distributorCode": "NEON101WLT40Q",
+      "rank": "starter"
+    },
+    {
+      "id": "3",
+      "distributorCode": "NEON102BP5CGC",
+      "rank": "starter"
+    },
+    {
+      "id": "4",
+      "distributorCode": "NEON103XUBLLC",
+      "rank": "starter"
+    },
+    {
+      "id": "5",
+      "distributorCode": "NEON1043HSOCY",
+      "rank": "starter"
+    },
+    {
+      "id": "6",
+      "distributorCode": "NEON105CHBOW4",
+      "rank": "starter"
+    },
+    {
+      "id": "7",
+      "distributorCode": "NEON10697PFFR",
+      "rank": "starter"
+    },
+    {
+      "id": "8",
+      "distributorCode": "NEON107B8NMAF",
+      "rank": "starter"
+    },
+    {
+      "id": "9",
+      "distributorCode": "NEON200FHSRUN",
+      "rank": "starter"
+    },
+    {
+      "id": "10",
+      "distributorCode": "NEON300LQH28H",
+      "rank": "starter"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tdistributorCode\trank\n1\tNEON100RS8ZGQ\tstarter\n2\tNEON101WLT40Q\tstarter\n3\tNEON102BP5CGC\tstarter\n4\tNEON103XUBLLC\tstarter\n5\tNEON1043HSOCY\tstarter\n6\tNEON105CHBOW4\tstarter\n7\tNEON10697PFFR\tstarter\n8\tNEON107B8NMAF\tstarter\n9\tNEON200FHSRUN\tstarter\n10\tNEON300LQH28H\tstarter\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

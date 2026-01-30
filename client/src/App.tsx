@@ -90,6 +90,16 @@ function Router() {
         <Route path="/admin/dashboard" component={AdminDashboard} />
         <Route path="/admin/mlm" component={MLMAdminPanel} />
         <Route path="/admin/territories" component={AdminTerritories} />
+        <Route path="/admin/users" component={AdminPanel} />
+        <Route path="/admin/distributors" component={AdminPanel} />
+        <Route path="/admin/orders" component={AdminPanel} />
+        <Route path="/admin/commissions" component={AdminPanel} />
+        <Route path="/admin/settings" component={AdminPanel} />
+        <Route path="/franchise/territories" component={FranchiseDashboard} />
+        <Route path="/franchise/vending" component={FranchiseDashboard} />
+        <Route path="/franchise/earnings" component={FranchiseDashboard} />
+        <Route path="/franchise/applications" component={FranchiseDashboard} />
+        <Route path="/orders" component={CustomerPortal} />
         <Route path="/nft-gallery" component={NFTGallery} />
         <Route path="/nft" component={NFTGallery} />
         <Route path="/nft/:tokenId" component={NFTDetail} />

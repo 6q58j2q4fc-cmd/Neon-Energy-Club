@@ -49,9 +49,25 @@ import NavigationHeader from "@/components/NavigationHeader";
 import { format, formatDistanceToNow } from "date-fns";
 
 export default function AdminPanel() {
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const { user, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState("dashboard");
+  
+  // Determine active tab from URL
+  const getTabFromUrl = () => {
+    if (location.includes('/admin/users')) return 'users';
+    if (location.includes('/admin/distributors')) return 'distributors';
+    if (location.includes('/admin/orders')) return 'orders';
+    if (location.includes('/admin/commissions')) return 'commissions';
+    if (location.includes('/admin/settings')) return 'settings';
+    return 'dashboard';
+  };
+  
+  const [activeTab, setActiveTab] = useState(getTabFromUrl());
+  
+  // Update tab when URL changes
+  useEffect(() => {
+    setActiveTab(getTabFromUrl());
+  }, [location]);
   
   // Show loading state
   if (loading) {

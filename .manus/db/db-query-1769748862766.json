@@ -1,0 +1,35 @@
+{
+  "query": "SELECT id, userId, distributorCode FROM distributors WHERE userId IS NOT NULL LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT id, userId, distributorCode FROM distributors WHERE userId IS NOT NULL LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "userId": "100",
+      "distributorCode": "NEON100RS8ZGQ"
+    },
+    {
+      "id": "2",
+      "userId": "101",
+      "distributorCode": "NEON101WLT40Q"
+    },
+    {
+      "id": "3",
+      "userId": "102",
+      "distributorCode": "NEON102BP5CGC"
+    },
+    {
+      "id": "4",
+      "userId": "103",
+      "distributorCode": "NEON103XUBLLC"
+    },
+    {
+      "id": "5",
+      "userId": "104",
+      "distributorCode": "NEON1043HSOCY"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tdistributorCode\n1\t100\tNEON100RS8ZGQ\n2\t101\tNEON101WLT40Q\n3\t102\tNEON102BP5CGC\n4\t103\tNEON103XUBLLC\n5\t104\tNEON1043HSOCY\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

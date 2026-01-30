@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, name, email FROM users LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT id, name, email FROM users LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Dakota Rea",
+      "email": "b4429bc6tn@privaterelay.appleid.com"
+    },
+    {
+      "id": "510004",
+      "name": "Dakota Rea",
+      "email": "b4429bc6tn@privaterelay.appleid.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\n1\tDakota Rea\tb4429bc6tn@privaterelay.appleid.com\n510004\tDakota Rea\tb4429bc6tn@privaterelay.appleid.com\n",
+  "stderr": "",
+  "execution_time_ms": 49
+}
