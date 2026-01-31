@@ -3948,3 +3948,24 @@
 - [x] Add "Learn How It Works" button to Join page
 - [x] Add tutorial link to Compensation page
 - [ ] Add tutorial link to distributor dashboard
+
+
+## MFA Login Flow & Dashboard Enhancements (Jan 31)
+
+### Distributor Dashboard Tutorial Link
+- [x] Add genealogy tutorial link to distributor dashboard Quick Actions
+- [x] Make tutorial button prominent with neon styling
+
+### MFA Verification on Login
+- [x] Create MFA verification page (/mfa-verify)
+- [x] Implement TOTP code verification step after OAuth login
+- [x] Handle backup code verification as alternative (8-char codes)
+- [x] Add session flag for MFA-verified status (sessionStorage)
+- [x] Create useMfaVerification and useMfaProtection hooks
+
+### MFA Email Notifications
+- [x] Send email when MFA is enabled on account (sendMfaEnabledEmail)
+- [x] Send email when MFA is disabled on account (sendMfaDisabledEmail)
+- [x] Send alert email when backup code is used (sendMfaBackupCodeUsedEmail)
+- [x] Include security tips and remaining codes count in emails
+- [x] Add getBackupCodesRemaining function to db.ts

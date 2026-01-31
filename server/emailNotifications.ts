@@ -936,3 +936,339 @@ The NEON Energy Team
     return false;
   }
 }
+
+
+/**
+ * MFA Email Notifications
+ * Send security-related emails for MFA events
+ */
+
+interface MfaEmailData {
+  userName: string;
+  userEmail: string;
+  eventType: 'enabled' | 'disabled' | 'backup_used';
+  ipAddress?: string;
+  userAgent?: string;
+  timestamp: Date;
+  backupCodesRemaining?: number;
+}
+
+/**
+ * Send email when MFA is enabled on an account
+ */
+export async function sendMfaEnabledEmail(data: {
+  userName: string;
+  userEmail: string;
+  ipAddress?: string;
+  userAgent?: string;
+}): Promise<boolean> {
+  try {
+    const timestamp = new Date();
+    const formattedDate = timestamp.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    });
+
+    const emailHtml = generateEmailTemplate({
+      title: '🔐 Two-Factor Authentication Enabled',
+      preheader: 'Your account is now more secure with 2FA enabled',
+      content: `
+        <h2 style="color: #c8ff00; margin-bottom: 16px;">Two-Factor Authentication Enabled</h2>
+        <p style="color: #ffffff; font-size: 16px; line-height: 1.6;">
+          Hi ${data.userName},
+        </p>
+        <p style="color: #cccccc; font-size: 15px; line-height: 1.6;">
+          Great news! Two-factor authentication (2FA) has been successfully enabled on your NEON Energy account.
+          Your account is now protected with an extra layer of security.
+        </p>
+        
+        <div style="background: rgba(200, 255, 0, 0.1); border: 1px solid rgba(200, 255, 0, 0.3); border-radius: 8px; padding: 20px; margin: 24px 0;">
+          <h3 style="color: #c8ff00; margin: 0 0 12px 0; font-size: 16px;">Security Details</h3>
+          <table style="width: 100%; color: #cccccc; font-size: 14px;">
+            <tr>
+              <td style="padding: 4px 0; color: #888888;">Date & Time:</td>
+              <td style="padding: 4px 0;">${formattedDate}</td>
+            </tr>
+            ${data.ipAddress ? `
+            <tr>
+              <td style="padding: 4px 0; color: #888888;">IP Address:</td>
+              <td style="padding: 4px 0;">${data.ipAddress}</td>
+            </tr>
+            ` : ''}
+            ${data.userAgent ? `
+            <tr>
+              <td style="padding: 4px 0; color: #888888;">Device:</td>
+              <td style="padding: 4px 0;">${data.userAgent.substring(0, 50)}...</td>
+            </tr>
+            ` : ''}
+          </table>
+        </div>
+
+        <div style="background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 8px; padding: 16px; margin: 24px 0;">
+          <p style="color: #ffc107; margin: 0; font-size: 14px;">
+            <strong>⚠️ Important:</strong> Make sure to save your backup codes in a secure location.
+            You'll need them if you ever lose access to your authenticator app.
+          </p>
+        </div>
+
+        <p style="color: #888888; font-size: 13px; margin-top: 24px;">
+          If you didn't make this change, please contact our support team immediately and change your password.
+        </p>
+        
+        <div style="text-align: center; margin-top: 24px;">
+          <a href="https://neonenergy.com/security" style="display: inline-block; background: #c8ff00; color: #000000; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 6px;">View Security Settings</a>
+        </div>
+      `
+    });
+
+    // Send via notification system
+    const success = await notifyOwner({
+      title: `🔐 MFA Enabled: ${data.userName}`,
+      content: `User ${data.userName} (${data.userEmail}) has enabled two-factor authentication on their account.`
+    });
+
+    console.log(`[Email] MFA enabled notification sent for ${data.userEmail}`);
+    return success;
+  } catch (error) {
+    console.error(`[Email] Error sending MFA enabled email:`, error);
+    return false;
+  }
+}
+
+/**
+ * Send email when MFA is disabled on an account
+ */
+export async function sendMfaDisabledEmail(data: {
+  userName: string;
+  userEmail: string;
+  ipAddress?: string;
+  userAgent?: string;
+}): Promise<boolean> {
+  try {
+    const timestamp = new Date();
+    const formattedDate = timestamp.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    });
+
+    const emailHtml = generateEmailTemplate({
+      title: '⚠️ Two-Factor Authentication Disabled',
+      preheader: 'Your account security settings have changed',
+      content: `
+        <h2 style="color: #ff6b6b; margin-bottom: 16px;">Two-Factor Authentication Disabled</h2>
+        <p style="color: #ffffff; font-size: 16px; line-height: 1.6;">
+          Hi ${data.userName},
+        </p>
+        <p style="color: #cccccc; font-size: 15px; line-height: 1.6;">
+          Two-factor authentication (2FA) has been disabled on your NEON Energy account.
+          Your account is now less secure without this extra layer of protection.
+        </p>
+        
+        <div style="background: rgba(255, 107, 107, 0.1); border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 8px; padding: 20px; margin: 24px 0;">
+          <h3 style="color: #ff6b6b; margin: 0 0 12px 0; font-size: 16px;">Security Alert Details</h3>
+          <table style="width: 100%; color: #cccccc; font-size: 14px;">
+            <tr>
+              <td style="padding: 4px 0; color: #888888;">Date & Time:</td>
+              <td style="padding: 4px 0;">${formattedDate}</td>
+            </tr>
+            ${data.ipAddress ? `
+            <tr>
+              <td style="padding: 4px 0; color: #888888;">IP Address:</td>
+              <td style="padding: 4px 0;">${data.ipAddress}</td>
+            </tr>
+            ` : ''}
+            ${data.userAgent ? `
+            <tr>
+              <td style="padding: 4px 0; color: #888888;">Device:</td>
+              <td style="padding: 4px 0;">${data.userAgent.substring(0, 50)}...</td>
+            </tr>
+            ` : ''}
+          </table>
+        </div>
+
+        <div style="background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 8px; padding: 16px; margin: 24px 0;">
+          <p style="color: #ffc107; margin: 0; font-size: 14px;">
+            <strong>🔒 Security Recommendation:</strong> We strongly recommend re-enabling 2FA to protect your account
+            from unauthorized access. Without 2FA, your account is more vulnerable to security threats.
+          </p>
+        </div>
+
+        <p style="color: #ff6b6b; font-size: 14px; font-weight: bold; margin-top: 24px;">
+          If you didn't make this change, your account may be compromised. Please:
+        </p>
+        <ol style="color: #cccccc; font-size: 14px; line-height: 1.8;">
+          <li>Change your password immediately</li>
+          <li>Re-enable two-factor authentication</li>
+          <li>Contact our support team</li>
+        </ol>
+        
+        <div style="text-align: center; margin-top: 24px;">
+          <a href="https://neonenergy.com/security" style="display: inline-block; background: #c8ff00; color: #000000; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 6px;">Re-enable 2FA Now</a>
+        </div>
+      `
+    });
+
+    // Send via notification system
+    const success = await notifyOwner({
+      title: `⚠️ MFA Disabled: ${data.userName}`,
+      content: `User ${data.userName} (${data.userEmail}) has disabled two-factor authentication on their account.`
+    });
+
+    console.log(`[Email] MFA disabled notification sent for ${data.userEmail}`);
+    return success;
+  } catch (error) {
+    console.error(`[Email] Error sending MFA disabled email:`, error);
+    return false;
+  }
+}
+
+/**
+ * Send email when a backup code is used
+ */
+export async function sendMfaBackupCodeUsedEmail(data: {
+  userName: string;
+  userEmail: string;
+  backupCodesRemaining: number;
+  ipAddress?: string;
+  userAgent?: string;
+}): Promise<boolean> {
+  try {
+    const timestamp = new Date();
+    const formattedDate = timestamp.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    });
+
+    const urgencyLevel = data.backupCodesRemaining <= 2 ? 'high' : data.backupCodesRemaining <= 5 ? 'medium' : 'low';
+    const urgencyColor = urgencyLevel === 'high' ? '#ff6b6b' : urgencyLevel === 'medium' ? '#ffc107' : '#c8ff00';
+
+    const emailHtml = generateEmailTemplate({
+      title: '🔑 Backup Code Used for Login',
+      preheader: `A backup code was used to access your account. ${data.backupCodesRemaining} codes remaining.`,
+      content: `
+        <h2 style="color: #ffc107; margin-bottom: 16px;">Backup Code Used</h2>
+        <p style="color: #ffffff; font-size: 16px; line-height: 1.6;">
+          Hi ${data.userName},
+        </p>
+        <p style="color: #cccccc; font-size: 15px; line-height: 1.6;">
+          A backup code was just used to sign in to your NEON Energy account.
+          This is a security notification to keep you informed about your account activity.
+        </p>
+        
+        <div style="background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 8px; padding: 20px; margin: 24px 0;">
+          <h3 style="color: #ffc107; margin: 0 0 12px 0; font-size: 16px;">Login Details</h3>
+          <table style="width: 100%; color: #cccccc; font-size: 14px;">
+            <tr>
+              <td style="padding: 4px 0; color: #888888;">Date & Time:</td>
+              <td style="padding: 4px 0;">${formattedDate}</td>
+            </tr>
+            ${data.ipAddress ? `
+            <tr>
+              <td style="padding: 4px 0; color: #888888;">IP Address:</td>
+              <td style="padding: 4px 0;">${data.ipAddress}</td>
+            </tr>
+            ` : ''}
+            ${data.userAgent ? `
+            <tr>
+              <td style="padding: 4px 0; color: #888888;">Device:</td>
+              <td style="padding: 4px 0;">${data.userAgent.substring(0, 50)}...</td>
+            </tr>
+            ` : ''}
+          </table>
+        </div>
+
+        <div style="background: rgba(${urgencyLevel === 'high' ? '255, 107, 107' : urgencyLevel === 'medium' ? '255, 193, 7' : '200, 255, 0'}, 0.1); border: 1px solid ${urgencyColor}; border-radius: 8px; padding: 16px; margin: 24px 0; text-align: center;">
+          <p style="color: ${urgencyColor}; margin: 0 0 8px 0; font-size: 24px; font-weight: bold;">
+            ${data.backupCodesRemaining}
+          </p>
+          <p style="color: #cccccc; margin: 0; font-size: 14px;">
+            Backup codes remaining
+          </p>
+          ${data.backupCodesRemaining <= 2 ? `
+          <p style="color: #ff6b6b; margin: 8px 0 0 0; font-size: 13px; font-weight: bold;">
+            ⚠️ Critical: Generate new backup codes immediately!
+          </p>
+          ` : data.backupCodesRemaining <= 5 ? `
+          <p style="color: #ffc107; margin: 8px 0 0 0; font-size: 13px;">
+            Consider generating new backup codes soon.
+          </p>
+          ` : ''}
+        </div>
+
+        <p style="color: #cccccc; font-size: 14px; line-height: 1.6;">
+          <strong>Why did this happen?</strong><br>
+          Backup codes are used when you can't access your authenticator app. If this wasn't you,
+          someone may have access to your backup codes.
+        </p>
+
+        <p style="color: #888888; font-size: 13px; margin-top: 24px;">
+          If you didn't use a backup code to sign in, please change your password and generate new backup codes immediately.
+        </p>
+        
+        <div style="text-align: center; margin-top: 24px;">
+          <a href="https://neonenergy.com/security" style="display: inline-block; background: #c8ff00; color: #000000; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 6px;">Manage Security Settings</a>
+        </div>
+      `
+    });
+
+    // Send via notification system
+    const success = await notifyOwner({
+      title: `🔑 Backup Code Used: ${data.userName}`,
+      content: `User ${data.userName} (${data.userEmail}) used a backup code to log in. ${data.backupCodesRemaining} codes remaining.`
+    });
+
+    console.log(`[Email] Backup code used notification sent for ${data.userEmail}`);
+    return success;
+  } catch (error) {
+    console.error(`[Email] Error sending backup code used email:`, error);
+    return false;
+  }
+}
+
+/**
+ * Send all MFA-related email notifications
+ */
+export async function sendMfaNotification(data: MfaEmailData): Promise<boolean> {
+  switch (data.eventType) {
+    case 'enabled':
+      return sendMfaEnabledEmail({
+        userName: data.userName,
+        userEmail: data.userEmail,
+        ipAddress: data.ipAddress,
+        userAgent: data.userAgent
+      });
+    case 'disabled':
+      return sendMfaDisabledEmail({
+        userName: data.userName,
+        userEmail: data.userEmail,
+        ipAddress: data.ipAddress,
+        userAgent: data.userAgent
+      });
+    case 'backup_used':
+      return sendMfaBackupCodeUsedEmail({
+        userName: data.userName,
+        userEmail: data.userEmail,
+        backupCodesRemaining: data.backupCodesRemaining || 0,
+        ipAddress: data.ipAddress,
+        userAgent: data.userAgent
+      });
+    default:
+      console.error(`[Email] Unknown MFA event type: ${data.eventType}`);
+      return false;
+  }
+}

@@ -8,7 +8,7 @@ import { useLocation } from "wouter";
 import { 
   TrendingUp, Users, DollarSign, Link as LinkIcon, Copy, ExternalLink, 
   Award, Target, Zap, ArrowUp, ArrowDown, Clock, CheckCircle, XCircle,
-  Share2, BarChart3, PieChart, Activity, Sparkles, MapPin, Settings
+  Share2, BarChart3, PieChart, Activity, Sparkles, MapPin, Settings, GraduationCap
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -510,6 +510,14 @@ export default function DistributorDashboard() {
                   <Button variant="outline" className="w-full border-[#c8ff00]/30 justify-start">
                     <Target className="w-4 h-4 mr-2" />
                     Set Goals
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-[#c8ff00]/30 justify-start bg-[#c8ff00]/10 hover:bg-[#c8ff00]/20"
+                    onClick={() => setLocation('/genealogy-tutorial')}
+                  >
+                    <GraduationCap className="w-4 h-4 mr-2 text-[#c8ff00]" />
+                    <span className="text-[#c8ff00]">Learn How Teams Work</span>
                   </Button>
                 </CardContent>
               </Card>

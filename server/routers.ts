@@ -4392,6 +4392,19 @@ Provide step-by-step instructions with specific button names and locations. Keep
         // Enable MFA
         await enableMfa(ctx.user.id);
         
+        // Send email notification
+        try {
+          const { sendMfaEnabledEmail } = await import("./emailNotifications");
+          await sendMfaEnabledEmail({
+            userName: ctx.user.name || 'User',
+            userEmail: ctx.user.email || '',
+            ipAddress: ctx.req.ip || ctx.req.headers['x-forwarded-for']?.toString(),
+            userAgent: ctx.req.headers['user-agent'],
+          });
+        } catch (emailError) {
+          console.error('[MFA] Failed to send enabled email:', emailError);
+        }
+        
         return {
           success: true,
           backupCodes,
@@ -4418,6 +4431,23 @@ Provide step-by-step instructions with specific button names and locations. Keep
           const isBackupValid = await verifyBackupCode(ctx.user.id, input.code);
           if (isBackupValid) {
             await recordMfaVerification(ctx.user.id);
+            
+            // Send backup code used notification
+            try {
+              const { sendMfaBackupCodeUsedEmail } = await import("./emailNotifications");
+              const { getBackupCodesRemaining } = await import("./db");
+              const remaining = await getBackupCodesRemaining(ctx.user.id);
+              await sendMfaBackupCodeUsedEmail({
+                userName: ctx.user.name || 'User',
+                userEmail: ctx.user.email || '',
+                backupCodesRemaining: remaining,
+                ipAddress: ctx.req.ip || ctx.req.headers['x-forwarded-for']?.toString(),
+                userAgent: ctx.req.headers['user-agent'],
+              });
+            } catch (emailError) {
+              console.error('[MFA] Failed to send backup code used email:', emailError);
+            }
+            
             return { success: true, message: "Verified with backup code" };
           }
         }
@@ -4470,6 +4500,20 @@ Provide step-by-step instructions with specific button names and locations. Keep
         }
         
         await disableMfa(ctx.user.id);
+        
+        // Send email notification
+        try {
+          const { sendMfaDisabledEmail } = await import("./emailNotifications");
+          await sendMfaDisabledEmail({
+            userName: ctx.user.name || 'User',
+            userEmail: ctx.user.email || '',
+            ipAddress: ctx.req.ip || ctx.req.headers['x-forwarded-for']?.toString(),
+            userAgent: ctx.req.headers['user-agent'],
+          });
+        } catch (emailError) {
+          console.error('[MFA] Failed to send disabled email:', emailError);
+        }
+        
         return { success: true, message: "MFA disabled successfully" };
       }),
 

@@ -6076,6 +6076,21 @@ export async function recordMfaVerification(userId: number) {
     .where(eq(mfaSettings.userId, userId));
 }
 
+/**
+ * Get remaining backup codes count
+ */
+export async function getBackupCodesRemaining(userId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  const settings = await db.select()
+    .from(mfaSettings)
+    .where(eq(mfaSettings.userId, userId))
+    .limit(1);
+  
+  return settings[0]?.backupCodesRemaining || 0;
+}
+
 
 // ============ Vending Machine IoT Functions ============
 
