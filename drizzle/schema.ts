@@ -1698,3 +1698,228 @@ export const territoryReservations = mysqlTable("territory_reservations", {
 
 export type TerritoryReservation = typeof territoryReservations.$inferSelect;
 export type InsertTerritoryReservation = typeof territoryReservations.$inferInsert;
+
+
+/**
+ * Multi-Factor Authentication (MFA) settings table.
+ * Stores TOTP secrets and backup codes for user accounts.
+ */
+export const mfaSettings = mysqlTable("mfa_settings", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User ID (foreign key to users table) */
+  userId: int("userId").notNull().unique(),
+  /** TOTP secret key (encrypted) */
+  totpSecret: varchar("totpSecret", { length: 255 }).notNull(),
+  /** Whether MFA is enabled for this user */
+  isEnabled: boolean("isEnabled").default(false).notNull(),
+  /** Backup codes (JSON array of hashed codes) */
+  backupCodes: text("backupCodes"),
+  /** Number of backup codes remaining */
+  backupCodesRemaining: int("backupCodesRemaining").default(10).notNull(),
+  /** Last successful MFA verification timestamp */
+  lastVerifiedAt: timestamp("lastVerifiedAt"),
+  /** Number of failed verification attempts */
+  failedAttempts: int("failedAttempts").default(0).notNull(),
+  /** Lockout until timestamp (after too many failed attempts) */
+  lockedUntil: timestamp("lockedUntil"),
+  /** MFA setup timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Last update timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MfaSetting = typeof mfaSettings.$inferSelect;
+export type InsertMfaSetting = typeof mfaSettings.$inferInsert;
+
+/**
+ * Vending machines table for IoT monitoring.
+ * Stores vending machine information and real-time status.
+ */
+export const vendingMachines = mysqlTable("vending_machines", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Machine serial number */
+  serialNumber: varchar("serialNumber", { length: 50 }).notNull().unique(),
+  /** Machine nickname/label */
+  nickname: varchar("nickname", { length: 100 }),
+  /** Owner user ID */
+  ownerId: int("ownerId").notNull(),
+  /** Territory license ID (if applicable) */
+  territoryLicenseId: int("territoryLicenseId"),
+  /** Machine model */
+  model: varchar("model", { length: 100 }).default("NEON-VM-2000").notNull(),
+  /** Installation location address */
+  locationAddress: text("locationAddress"),
+  /** Location latitude */
+  locationLat: decimal("locationLat", { precision: 10, scale: 7 }),
+  /** Location longitude */
+  locationLng: decimal("locationLng", { precision: 10, scale: 7 }),
+  /** Location type (mall, gym, office, etc.) */
+  locationType: mysqlEnum("locationType", ["mall", "gym", "office", "school", "hospital", "airport", "hotel", "gas_station", "other"]).default("other").notNull(),
+  /** Machine status */
+  status: mysqlEnum("status", ["online", "offline", "maintenance", "error"]).default("offline").notNull(),
+  /** Last heartbeat/ping timestamp */
+  lastHeartbeat: timestamp("lastHeartbeat"),
+  /** Current temperature in Fahrenheit */
+  temperature: decimal("temperature", { precision: 5, scale: 2 }),
+  /** Temperature status */
+  temperatureStatus: mysqlEnum("temperatureStatus", ["normal", "warning", "critical"]).default("normal").notNull(),
+  /** Door status */
+  doorStatus: mysqlEnum("doorStatus", ["closed", "open", "jammed"]).default("closed").notNull(),
+  /** Payment system status */
+  paymentStatus: mysqlEnum("paymentStatus", ["operational", "card_only", "cash_only", "offline"]).default("operational").notNull(),
+  /** Total lifetime sales count */
+  totalSalesCount: int("totalSalesCount").default(0).notNull(),
+  /** Total lifetime revenue in cents */
+  totalRevenue: int("totalRevenue").default(0).notNull(),
+  /** Today's sales count */
+  todaySalesCount: int("todaySalesCount").default(0).notNull(),
+  /** Today's revenue in cents */
+  todayRevenue: int("todayRevenue").default(0).notNull(),
+  /** Installation date */
+  installedAt: timestamp("installedAt"),
+  /** Last maintenance date */
+  lastMaintenanceAt: timestamp("lastMaintenanceAt"),
+  /** Next scheduled maintenance */
+  nextMaintenanceAt: timestamp("nextMaintenanceAt"),
+  /** Machine creation timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Last update timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type VendingMachine = typeof vendingMachines.$inferSelect;
+export type InsertVendingMachine = typeof vendingMachines.$inferInsert;
+
+/**
+ * Vending machine inventory table.
+ * Tracks product stock levels in each machine.
+ */
+export const vendingInventory = mysqlTable("vending_inventory", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Vending machine ID */
+  machineId: int("machineId").notNull(),
+  /** Product slot number (1-12 typically) */
+  slotNumber: int("slotNumber").notNull(),
+  /** Product name */
+  productName: varchar("productName", { length: 100 }).notNull(),
+  /** Product SKU */
+  productSku: varchar("productSku", { length: 50 }).notNull(),
+  /** Current stock quantity */
+  currentStock: int("currentStock").default(0).notNull(),
+  /** Maximum capacity for this slot */
+  maxCapacity: int("maxCapacity").default(10).notNull(),
+  /** Low stock threshold for alerts */
+  lowStockThreshold: int("lowStockThreshold").default(3).notNull(),
+  /** Price in cents */
+  priceInCents: int("priceInCents").notNull(),
+  /** Last restocked timestamp */
+  lastRestockedAt: timestamp("lastRestockedAt"),
+  /** Created timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Updated timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type VendingInventoryItem = typeof vendingInventory.$inferSelect;
+export type InsertVendingInventoryItem = typeof vendingInventory.$inferInsert;
+
+/**
+ * Vending machine sales log.
+ * Records each transaction from vending machines.
+ */
+export const vendingSales = mysqlTable("vending_sales", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Vending machine ID */
+  machineId: int("machineId").notNull(),
+  /** Product slot number */
+  slotNumber: int("slotNumber").notNull(),
+  /** Product name at time of sale */
+  productName: varchar("productName", { length: 100 }).notNull(),
+  /** Product SKU */
+  productSku: varchar("productSku", { length: 50 }).notNull(),
+  /** Quantity sold */
+  quantity: int("quantity").default(1).notNull(),
+  /** Sale amount in cents */
+  amountInCents: int("amountInCents").notNull(),
+  /** Payment method */
+  paymentMethod: mysqlEnum("paymentMethod", ["card", "cash", "mobile", "free"]).default("card").notNull(),
+  /** Transaction reference */
+  transactionRef: varchar("transactionRef", { length: 100 }),
+  /** Sale timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type VendingSale = typeof vendingSales.$inferSelect;
+export type InsertVendingSale = typeof vendingSales.$inferInsert;
+
+/**
+ * Vending machine alerts table.
+ * Stores alerts and notifications for machine issues.
+ */
+export const vendingAlerts = mysqlTable("vending_alerts", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Vending machine ID */
+  machineId: int("machineId").notNull(),
+  /** Alert type */
+  alertType: mysqlEnum("alertType", ["low_stock", "temperature", "offline", "door_open", "payment_error", "maintenance_due", "error"]).notNull(),
+  /** Alert severity */
+  severity: mysqlEnum("severity", ["info", "warning", "critical"]).default("info").notNull(),
+  /** Alert title */
+  title: varchar("title", { length: 200 }).notNull(),
+  /** Alert message/description */
+  message: text("message"),
+  /** Whether alert has been acknowledged */
+  acknowledged: boolean("acknowledged").default(false).notNull(),
+  /** User who acknowledged the alert */
+  acknowledgedBy: int("acknowledgedBy"),
+  /** Acknowledgment timestamp */
+  acknowledgedAt: timestamp("acknowledgedAt"),
+  /** Whether alert has been resolved */
+  resolved: boolean("resolved").default(false).notNull(),
+  /** Resolution timestamp */
+  resolvedAt: timestamp("resolvedAt"),
+  /** Alert creation timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type VendingAlert = typeof vendingAlerts.$inferSelect;
+export type InsertVendingAlert = typeof vendingAlerts.$inferInsert;
+
+/**
+ * Maintenance requests table.
+ * Tracks service requests for vending machines.
+ */
+export const maintenanceRequests = mysqlTable("maintenance_requests", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Vending machine ID */
+  machineId: int("machineId").notNull(),
+  /** Requester user ID */
+  requesterId: int("requesterId").notNull(),
+  /** Request type */
+  requestType: mysqlEnum("requestType", ["repair", "restock", "cleaning", "inspection", "relocation", "upgrade"]).notNull(),
+  /** Priority level */
+  priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).default("medium").notNull(),
+  /** Request title */
+  title: varchar("title", { length: 200 }).notNull(),
+  /** Detailed description */
+  description: text("description"),
+  /** Attached photos (JSON array of URLs) */
+  photos: text("photos"),
+  /** Request status */
+  status: mysqlEnum("status", ["pending", "assigned", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
+  /** Assigned technician ID */
+  assignedTo: int("assignedTo"),
+  /** Scheduled service date */
+  scheduledDate: timestamp("scheduledDate"),
+  /** Completion date */
+  completedAt: timestamp("completedAt"),
+  /** Service notes */
+  serviceNotes: text("serviceNotes"),
+  /** Request creation timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Last update timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MaintenanceRequest = typeof maintenanceRequests.$inferSelect;
+export type InsertMaintenanceRequest = typeof maintenanceRequests.$inferInsert;

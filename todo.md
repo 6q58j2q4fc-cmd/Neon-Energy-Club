@@ -3887,3 +3887,36 @@
 - [x] Document persona-specific dashboard requirements
 - [x] Outline IoT integration for vending machines
 - [x] Document security features (MFA, SSL, backups)
+
+
+## MFA, Genealogy Tree & IoT Dashboard (Jan 31)
+
+### Multi-Factor Authentication (MFA)
+- [x] Install otplib and qrcode dependencies
+- [x] Create MFA database schema (user secrets, backup codes)
+- [x] Build MFA setup flow with QR code generation
+- [x] Implement TOTP verification on login
+- [x] Add backup codes generation and recovery
+- [x] Create MFA settings page in user profile
+- [ ] Write vitest tests for MFA procedures
+
+### Interactive Genealogy Tree Tutorial
+- [x] Install react-d3-tree library
+- [x] Create sample binary tree data structure
+- [x] Build interactive tree visualization component
+- [x] Add zoom, pan, and node selection features
+- [x] Create tutorial overlay explaining tree mechanics
+- [x] Show commission flow visualization
+- [x] Add spillover logic demonstration
+- [x] Create /genealogy-tutorial page
+
+### IoT Vending Machine Dashboard
+- [x] Create mock vending machine data generator
+- [x] Build real-time status cards (temperature, stock, connectivity)
+- [x] Add machine health indicators with alerts
+- [x] Create revenue tracking per machine
+- [x] Build inventory level visualization
+- [x] Add maintenance request system
+- [x] Create analytics charts (sales by hour, product popularity)
+- [x] Implement simulated real-time data updates
+- [x] Create /vending-dashboard page

@@ -4280,6 +4280,338 @@ Provide step-by-step instructions with specific button names and locations. Keep
       }),
   }),
 
+  // Multi-Factor Authentication (MFA) router
+  mfa: router({
+    // Get MFA status
+    getStatus: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getMfaSettings } = await import("./db");
+        const settings = await getMfaSettings(ctx.user.id);
+        return {
+          isEnabled: settings?.isEnabled || false,
+          hasSecret: !!settings?.totpSecret,
+          backupCodesRemaining: settings?.backupCodesRemaining || 0,
+          lastVerifiedAt: settings?.lastVerifiedAt || null,
+        };
+      }),
+
+    // Initialize MFA setup (generate secret and QR code)
+    initSetup: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const otplib = await import("otplib");
+        const QRCode = await import("qrcode");
+        const { createOrUpdateMfaSettings } = await import("./db");
+        
+        // Generate a new secret
+        const secret = otplib.generateSecret();
+        
+        // Create the otpauth URL for QR code
+        const otpauthUrl = otplib.generateURI({
+          secret,
+          issuer: "NEON Energy",
+          label: ctx.user.email || ctx.user.name || `user-${ctx.user.id}`,
+        });
+        
+        // Generate QR code as data URL
+        const qrCodeDataUrl = await QRCode.toDataURL(otpauthUrl);
+        
+        // Store the secret (not enabled yet)
+        await createOrUpdateMfaSettings(ctx.user.id, {
+          totpSecret: secret,
+          isEnabled: false,
+        });
+        
+        return {
+          secret,
+          qrCodeDataUrl,
+          otpauthUrl,
+        };
+      }),
+
+    // Verify and enable MFA
+    verifyAndEnable: protectedProcedure
+      .input(z.object({
+        code: z.string().length(6, "Code must be 6 digits"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const otplib = await import("otplib");
+        const { getMfaSettings, enableMfa, generateBackupCodes } = await import("./db");
+        
+        const settings = await getMfaSettings(ctx.user.id);
+        if (!settings?.totpSecret) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "MFA setup not initialized. Please start setup first.",
+          });
+        }
+        
+        // Verify the code
+        const isValid = otplib.verify({
+          token: input.code,
+          secret: settings.totpSecret,
+        });
+        
+        if (!isValid) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid verification code. Please try again.",
+          });
+        }
+        
+        // Generate backup codes
+        const backupCodes = await generateBackupCodes(ctx.user.id);
+        
+        // Enable MFA
+        await enableMfa(ctx.user.id);
+        
+        return {
+          success: true,
+          backupCodes,
+          message: "MFA enabled successfully! Save your backup codes in a safe place.",
+        };
+      }),
+
+    // Verify MFA code (for login)
+    verify: protectedProcedure
+      .input(z.object({
+        code: z.string().min(6).max(10),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const otplib = await import("otplib");
+        const { getMfaSettings, recordMfaVerification, verifyBackupCode } = await import("./db");
+        
+        const settings = await getMfaSettings(ctx.user.id);
+        if (!settings?.isEnabled) {
+          return { success: true, message: "MFA not enabled" };
+        }
+        
+        // Check if it's a backup code (8 characters)
+        if (input.code.length === 8) {
+          const isBackupValid = await verifyBackupCode(ctx.user.id, input.code);
+          if (isBackupValid) {
+            await recordMfaVerification(ctx.user.id);
+            return { success: true, message: "Verified with backup code" };
+          }
+        }
+        
+        // Verify TOTP code
+        const isValid = otplib.verify({
+          token: input.code,
+          secret: settings.totpSecret,
+        });
+        
+        if (!isValid) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid verification code",
+          });
+        }
+        
+        await recordMfaVerification(ctx.user.id);
+        return { success: true, message: "MFA verified successfully" };
+      }),
+
+    // Disable MFA
+    disable: protectedProcedure
+      .input(z.object({
+        code: z.string().length(6, "Code must be 6 digits"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const otplib = await import("otplib");
+        const { getMfaSettings, disableMfa } = await import("./db");
+        
+        const settings = await getMfaSettings(ctx.user.id);
+        if (!settings?.isEnabled) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "MFA is not enabled",
+          });
+        }
+        
+        // Verify the code before disabling
+        const isValid = otplib.verify({
+          token: input.code,
+          secret: settings.totpSecret,
+        });
+        
+        if (!isValid) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid verification code",
+          });
+        }
+        
+        await disableMfa(ctx.user.id);
+        return { success: true, message: "MFA disabled successfully" };
+      }),
+
+    // Regenerate backup codes
+    regenerateBackupCodes: protectedProcedure
+      .input(z.object({
+        code: z.string().length(6, "Code must be 6 digits"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const otplib = await import("otplib");
+        const { getMfaSettings, generateBackupCodes } = await import("./db");
+        
+        const settings = await getMfaSettings(ctx.user.id);
+        if (!settings?.isEnabled) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "MFA is not enabled",
+          });
+        }
+        
+        // Verify the code
+        const isValid = otplib.verify({
+          token: input.code,
+          secret: settings.totpSecret,
+        });
+        
+        if (!isValid) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid verification code",
+          });
+        }
+        
+        const backupCodes = await generateBackupCodes(ctx.user.id);
+        return { success: true, backupCodes };
+      }),
+  }),
+
+  // Vending Machine IoT Dashboard router
+  vendingIot: router({
+    // Get all machines for the current user
+    getMyMachines: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getUserVendingMachines } = await import("./db");
+        return await getUserVendingMachines(ctx.user.id);
+      }),
+
+    // Get single machine details
+    getMachine: protectedProcedure
+      .input(z.object({ machineId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const { getVendingMachineById } = await import("./db");
+        const machine = await getVendingMachineById(input.machineId);
+        if (!machine) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Machine not found" });
+        }
+        if (machine.ownerId !== ctx.user.id && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Not authorized" });
+        }
+        return machine;
+      }),
+
+    // Get machine inventory
+    getMachineInventory: protectedProcedure
+      .input(z.object({ machineId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const { getVendingMachineInventory, getVendingMachineById } = await import("./db");
+        const machine = await getVendingMachineById(input.machineId);
+        if (!machine || (machine.ownerId !== ctx.user.id && ctx.user.role !== "admin")) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Not authorized" });
+        }
+        return await getVendingMachineInventory(input.machineId);
+      }),
+
+    // Get machine sales history
+    getMachineSales: protectedProcedure
+      .input(z.object({
+        machineId: z.number(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        limit: z.number().default(100),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { getVendingMachineSales, getVendingMachineById } = await import("./db");
+        const machine = await getVendingMachineById(input.machineId);
+        if (!machine || (machine.ownerId !== ctx.user.id && ctx.user.role !== "admin")) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Not authorized" });
+        }
+        return await getVendingMachineSales(input.machineId, {
+          startDate: input.startDate ? new Date(input.startDate) : undefined,
+          endDate: input.endDate ? new Date(input.endDate) : undefined,
+          limit: input.limit,
+        });
+      }),
+
+    // Get machine alerts
+    getMachineAlerts: protectedProcedure
+      .input(z.object({
+        machineId: z.number().optional(),
+        unacknowledgedOnly: z.boolean().default(false),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { getVendingAlerts } = await import("./db");
+        return await getVendingAlerts(ctx.user.id, input.machineId, input.unacknowledgedOnly);
+      }),
+
+    // Acknowledge an alert
+    acknowledgeAlert: protectedProcedure
+      .input(z.object({ alertId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { acknowledgeVendingAlert } = await import("./db");
+        await acknowledgeVendingAlert(input.alertId, ctx.user.id);
+        return { success: true };
+      }),
+
+    // Create maintenance request
+    createMaintenanceRequest: protectedProcedure
+      .input(z.object({
+        machineId: z.number(),
+        requestType: z.enum(["repair", "restock", "cleaning", "inspection", "relocation", "upgrade"]),
+        priority: z.enum(["low", "medium", "high", "urgent"]).default("medium"),
+        title: z.string().min(1),
+        description: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { createMaintenanceRequest, getVendingMachineById } = await import("./db");
+        const machine = await getVendingMachineById(input.machineId);
+        if (!machine || (machine.ownerId !== ctx.user.id && ctx.user.role !== "admin")) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Not authorized" });
+        }
+        return await createMaintenanceRequest({
+          machineId: input.machineId,
+          requesterId: ctx.user.id,
+          requestType: input.requestType,
+          priority: input.priority,
+          title: input.title,
+          description: input.description,
+        });
+      }),
+
+    // Get maintenance requests
+    getMaintenanceRequests: protectedProcedure
+      .input(z.object({
+        machineId: z.number().optional(),
+        status: z.enum(["pending", "assigned", "in_progress", "completed", "cancelled", "all"]).default("all"),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { getMaintenanceRequests } = await import("./db");
+        return await getMaintenanceRequests(ctx.user.id, input.machineId, input.status);
+      }),
+
+    // Get dashboard summary
+    getDashboardSummary: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getVendingDashboardSummary } = await import("./db");
+        return await getVendingDashboardSummary(ctx.user.id);
+      }),
+
+    // Get analytics data
+    getAnalytics: protectedProcedure
+      .input(z.object({
+        machineId: z.number().optional(),
+        period: z.enum(["day", "week", "month", "year"]).default("week"),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { getVendingAnalytics } = await import("./db");
+        return await getVendingAnalytics(ctx.user.id, input.machineId, input.period);
+      }),
+  }),
+
 });
 
 // Helper function to anonymize names for privacy on public leaderboard

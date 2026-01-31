@@ -45,6 +45,9 @@ import PersonalizedLanding from "./pages/PersonalizedLanding";
 import VerifyEmail from "./pages/VerifyEmail";
 import GiveBack from "./pages/GiveBack";
 import OrderHistory from "./pages/OrderHistory";
+import GenealogyTutorial from "./pages/GenealogyTutorial";
+import VendingDashboard from "./pages/VendingDashboard";
+import MfaSettings from "./pages/MfaSettings";
 // AmbientSoundToggle moved to header as HeaderSoundControl
 import UnifiedChatBot from "./components/UnifiedChatBot";
 import CartDrawer from "./components/CartDrawer";
@@ -122,6 +125,10 @@ function Router() {
         <Route path="/give-back" component={GiveBack} />
         <Route path="/customer-portal" component={CustomerPortal} />
         <Route path="/order-history" component={OrderHistory} />
+        <Route path="/genealogy-tutorial" component={GenealogyTutorial} />
+        <Route path="/vending-dashboard" component={VendingDashboard} />
+        <Route path="/mfa-settings" component={MfaSettings} />
+        <Route path="/security" component={MfaSettings} />
         <Route path="/my-rewards" component={CustomerPortal} />
         <Route path="/franchise/dashboard" component={FranchiseDashboard} />
         <Route path="/distributor" component={DistributorPortal} />

@@ -1,6 +1,6 @@
-import { desc, eq, sql, and, gt, lt } from "drizzle-orm";
+import { desc, eq, sql, and, gt, lt, gte, or, like } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption, vendingApplications, franchiseApplications, pushSubscriptions, InsertVendingApplication, InsertFranchiseApplication, InsertPushSubscription, userProfiles, InsertUserProfile, scheduledMeetings, InsertScheduledMeeting, vendingMachineOrders, vendingPaymentHistory, InsertVendingMachineOrder, InsertVendingPaymentHistory, vendingNetwork, vendingCommissions, InsertVendingNetwork, InsertVendingCommission, notificationPreferences, emailDigestQueue, InsertNotificationPreference, InsertEmailDigestQueueItem } from "../drizzle/schema";
+import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption, vendingApplications, franchiseApplications, pushSubscriptions, InsertVendingApplication, InsertFranchiseApplication, InsertPushSubscription, userProfiles, InsertUserProfile, scheduledMeetings, InsertScheduledMeeting, vendingMachineOrders, vendingPaymentHistory, InsertVendingMachineOrder, InsertVendingPaymentHistory, vendingNetwork, vendingCommissions, InsertVendingNetwork, InsertVendingCommission, notificationPreferences, emailDigestQueue, InsertNotificationPreference, InsertEmailDigestQueueItem, mfaSettings, vendingMachines, vendingInventory, vendingSales, vendingAlerts, maintenanceRequests } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -5919,4 +5919,512 @@ export async function getReservationById(reservationId: number) {
     .limit(1);
   
   return result[0] || null;
+}
+
+
+// ============ MFA (Multi-Factor Authentication) Functions ============
+
+/**
+ * Get MFA settings for a user
+ */
+export async function getMfaSettings(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(mfaSettings)
+    .where(eq(mfaSettings.userId, userId))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Create or update MFA settings
+ */
+export async function createOrUpdateMfaSettings(userId: number, data: {
+  totpSecret: string;
+  isEnabled: boolean;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const existing = await getMfaSettings(userId);
+  
+  if (existing) {
+    await db.update(mfaSettings)
+      .set({
+        totpSecret: data.totpSecret,
+        isEnabled: data.isEnabled,
+      })
+      .where(eq(mfaSettings.userId, userId));
+  } else {
+    await db.insert(mfaSettings).values({
+      userId,
+      totpSecret: data.totpSecret,
+      isEnabled: data.isEnabled,
+      backupCodesRemaining: 10,
+    });
+  }
+  
+  return { success: true };
+}
+
+/**
+ * Enable MFA for a user
+ */
+export async function enableMfa(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(mfaSettings)
+    .set({
+      isEnabled: true,
+      lastVerifiedAt: new Date(),
+    })
+    .where(eq(mfaSettings.userId, userId));
+  
+  return { success: true };
+}
+
+/**
+ * Disable MFA for a user
+ */
+export async function disableMfa(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(mfaSettings)
+    .set({
+      isEnabled: false,
+      totpSecret: '',
+      backupCodes: null,
+      backupCodesRemaining: 0,
+    })
+    .where(eq(mfaSettings.userId, userId));
+  
+  return { success: true };
+}
+
+/**
+ * Generate backup codes for MFA
+ */
+export async function generateBackupCodes(userId: number): Promise<string[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Generate 10 random backup codes
+  const codes: string[] = [];
+  const hashedCodes: string[] = [];
+  
+  for (let i = 0; i < 10; i++) {
+    const code = crypto.randomBytes(4).toString('hex').toUpperCase();
+    codes.push(code);
+    hashedCodes.push(crypto.createHash('sha256').update(code).digest('hex'));
+  }
+  
+  await db.update(mfaSettings)
+    .set({
+      backupCodes: JSON.stringify(hashedCodes),
+      backupCodesRemaining: 10,
+    })
+    .where(eq(mfaSettings.userId, userId));
+  
+  return codes;
+}
+
+/**
+ * Verify a backup code
+ */
+export async function verifyBackupCode(userId: number, code: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  
+  const settings = await getMfaSettings(userId);
+  if (!settings?.backupCodes) return false;
+  
+  const hashedCodes: string[] = JSON.parse(settings.backupCodes);
+  const inputHash = crypto.createHash('sha256').update(code.toUpperCase()).digest('hex');
+  
+  const codeIndex = hashedCodes.indexOf(inputHash);
+  if (codeIndex === -1) return false;
+  
+  // Remove used code
+  hashedCodes.splice(codeIndex, 1);
+  
+  await db.update(mfaSettings)
+    .set({
+      backupCodes: JSON.stringify(hashedCodes),
+      backupCodesRemaining: hashedCodes.length,
+    })
+    .where(eq(mfaSettings.userId, userId));
+  
+  return true;
+}
+
+/**
+ * Record successful MFA verification
+ */
+export async function recordMfaVerification(userId: number) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.update(mfaSettings)
+    .set({
+      lastVerifiedAt: new Date(),
+      failedAttempts: 0,
+    })
+    .where(eq(mfaSettings.userId, userId));
+}
+
+
+// ============ Vending Machine IoT Functions ============
+
+/**
+ * Get all vending machines for a user (IoT dashboard)
+ */
+export async function getUserVendingMachinesIot(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(vendingMachines)
+    .where(eq(vendingMachines.ownerId, userId))
+    .orderBy(desc(vendingMachines.createdAt));
+}
+
+/**
+ * Get vending machine by ID
+ */
+export async function getVendingMachineById(machineId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(vendingMachines)
+    .where(eq(vendingMachines.id, machineId))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Get machine inventory
+ */
+export async function getVendingMachineInventory(machineId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(vendingInventory)
+    .where(eq(vendingInventory.machineId, machineId))
+    .orderBy(vendingInventory.slotNumber);
+}
+
+/**
+ * Get machine sales history
+ */
+export async function getVendingMachineSales(machineId: number, options?: {
+  startDate?: Date;
+  endDate?: Date;
+  limit?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [eq(vendingSales.machineId, machineId)];
+  
+  if (options?.startDate) {
+    conditions.push(gte(vendingSales.createdAt, options.startDate));
+  }
+  if (options?.endDate) {
+    conditions.push(lt(vendingSales.createdAt, options.endDate));
+  }
+  
+  return await db.select().from(vendingSales)
+    .where(and(...conditions))
+    .orderBy(desc(vendingSales.createdAt))
+    .limit(options?.limit || 100);
+}
+
+/**
+ * Get vending alerts for a user
+ */
+export async function getVendingAlerts(userId: number, machineId?: number, unacknowledgedOnly?: boolean) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // Get user's machines first
+  const userMachines = await db.select({ id: vendingMachines.id })
+    .from(vendingMachines)
+    .where(eq(vendingMachines.ownerId, userId));
+  
+  const machineIds = userMachines.map(m => m.id);
+  if (machineIds.length === 0) return [];
+  
+  let conditions: any[] = [];
+  
+  if (machineId) {
+    conditions.push(eq(vendingAlerts.machineId, machineId));
+  } else {
+    conditions.push(sql`${vendingAlerts.machineId} IN (${sql.join(machineIds.map(id => sql`${id}`), sql`, `)})`);
+  }
+  
+  if (unacknowledgedOnly) {
+    conditions.push(eq(vendingAlerts.acknowledged, false));
+  }
+  
+  return await db.select().from(vendingAlerts)
+    .where(and(...conditions))
+    .orderBy(desc(vendingAlerts.createdAt))
+    .limit(100);
+}
+
+/**
+ * Acknowledge a vending alert
+ */
+export async function acknowledgeVendingAlert(alertId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(vendingAlerts)
+    .set({
+      acknowledged: true,
+      acknowledgedBy: userId,
+      acknowledgedAt: new Date(),
+    })
+    .where(eq(vendingAlerts.id, alertId));
+  
+  return { success: true };
+}
+
+/**
+ * Create a maintenance request
+ */
+export async function createMaintenanceRequest(data: {
+  machineId: number;
+  requesterId: number;
+  requestType: "repair" | "restock" | "cleaning" | "inspection" | "relocation" | "upgrade";
+  priority: "low" | "medium" | "high" | "urgent";
+  title: string;
+  description?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(maintenanceRequests).values({
+    machineId: data.machineId,
+    requesterId: data.requesterId,
+    requestType: data.requestType,
+    priority: data.priority,
+    title: data.title,
+    description: data.description || null,
+    status: "pending",
+  });
+  
+  return { id: Number(result[0].insertId) };
+}
+
+/**
+ * Get maintenance requests
+ */
+export async function getMaintenanceRequests(userId: number, machineId?: number, status?: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // Get user's machines
+  const userMachines = await db.select({ id: vendingMachines.id })
+    .from(vendingMachines)
+    .where(eq(vendingMachines.ownerId, userId));
+  
+  const machineIds = userMachines.map(m => m.id);
+  if (machineIds.length === 0) return [];
+  
+  let conditions: any[] = [];
+  
+  if (machineId) {
+    conditions.push(eq(maintenanceRequests.machineId, machineId));
+  } else {
+    conditions.push(sql`${maintenanceRequests.machineId} IN (${sql.join(machineIds.map(id => sql`${id}`), sql`, `)})`);
+  }
+  
+  if (status && status !== "all") {
+    conditions.push(eq(maintenanceRequests.status, status as any));
+  }
+  
+  return await db.select().from(maintenanceRequests)
+    .where(and(...conditions))
+    .orderBy(desc(maintenanceRequests.createdAt))
+    .limit(50);
+}
+
+/**
+ * Get vending dashboard summary
+ */
+export async function getVendingDashboardSummary(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  // Get all user's machines
+  const machines = await db.select().from(vendingMachines)
+    .where(eq(vendingMachines.ownerId, userId));
+  
+  if (machines.length === 0) {
+    return {
+      totalMachines: 0,
+      onlineMachines: 0,
+      offlineMachines: 0,
+      totalRevenue: 0,
+      todayRevenue: 0,
+      totalSales: 0,
+      todaySales: 0,
+      activeAlerts: 0,
+      pendingMaintenance: 0,
+      lowStockSlots: 0,
+    };
+  }
+  
+  const machineIds = machines.map(m => m.id);
+  
+  // Count online/offline
+  const onlineMachines = machines.filter(m => m.status === "online").length;
+  const offlineMachines = machines.filter(m => m.status !== "online").length;
+  
+  // Sum revenue and sales
+  const totalRevenue = machines.reduce((sum, m) => sum + (m.totalRevenue || 0), 0);
+  const todayRevenue = machines.reduce((sum, m) => sum + (m.todayRevenue || 0), 0);
+  const totalSales = machines.reduce((sum, m) => sum + (m.totalSalesCount || 0), 0);
+  const todaySales = machines.reduce((sum, m) => sum + (m.todaySalesCount || 0), 0);
+  
+  // Count active alerts
+  const alertsResult = await db.select({ count: sql<number>`count(*)` })
+    .from(vendingAlerts)
+    .where(and(
+      sql`${vendingAlerts.machineId} IN (${sql.join(machineIds.map(id => sql`${id}`), sql`, `)})`,
+      eq(vendingAlerts.acknowledged, false)
+    ));
+  const activeAlerts = alertsResult[0]?.count || 0;
+  
+  // Count pending maintenance
+  const maintenanceResult = await db.select({ count: sql<number>`count(*)` })
+    .from(maintenanceRequests)
+    .where(and(
+      sql`${maintenanceRequests.machineId} IN (${sql.join(machineIds.map(id => sql`${id}`), sql`, `)})`,
+      eq(maintenanceRequests.status, "pending")
+    ));
+  const pendingMaintenance = maintenanceResult[0]?.count || 0;
+  
+  // Count low stock slots
+  const inventoryResult = await db.select({ count: sql<number>`count(*)` })
+    .from(vendingInventory)
+    .where(and(
+      sql`${vendingInventory.machineId} IN (${sql.join(machineIds.map(id => sql`${id}`), sql`, `)})`,
+      sql`${vendingInventory.currentStock} <= ${vendingInventory.lowStockThreshold}`
+    ));
+  const lowStockSlots = inventoryResult[0]?.count || 0;
+  
+  return {
+    totalMachines: machines.length,
+    onlineMachines,
+    offlineMachines,
+    totalRevenue,
+    todayRevenue,
+    totalSales,
+    todaySales,
+    activeAlerts,
+    pendingMaintenance,
+    lowStockSlots,
+  };
+}
+
+/**
+ * Get vending analytics
+ */
+export async function getVendingAnalytics(userId: number, machineId?: number, period: "day" | "week" | "month" | "year" = "week") {
+  const db = await getDb();
+  if (!db) return null;
+  
+  // Get user's machines
+  const machines = await db.select().from(vendingMachines)
+    .where(eq(vendingMachines.ownerId, userId));
+  
+  if (machines.length === 0) {
+    return {
+      salesByHour: [],
+      salesByProduct: [],
+      revenueByDay: [],
+      topProducts: [],
+    };
+  }
+  
+  const machineIds = machineId ? [machineId] : machines.map(m => m.id);
+  
+  // Calculate date range
+  const now = new Date();
+  let startDate: Date;
+  switch (period) {
+    case "day":
+      startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      break;
+    case "week":
+      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      break;
+    case "month":
+      startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      break;
+    case "year":
+      startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+      break;
+  }
+  
+  // Get sales in the period
+  const sales = await db.select().from(vendingSales)
+    .where(and(
+      sql`${vendingSales.machineId} IN (${sql.join(machineIds.map(id => sql`${id}`), sql`, `)})`,
+      gte(vendingSales.createdAt, startDate)
+    ))
+    .orderBy(vendingSales.createdAt);
+  
+  // Aggregate by hour
+  const salesByHour: { hour: number; count: number; revenue: number }[] = [];
+  for (let h = 0; h < 24; h++) {
+    const hourSales = sales.filter(s => new Date(s.createdAt!).getHours() === h);
+    salesByHour.push({
+      hour: h,
+      count: hourSales.length,
+      revenue: hourSales.reduce((sum, s) => sum + (s.amountInCents || 0), 0),
+    });
+  }
+  
+  // Aggregate by product
+  const productMap = new Map<string, { count: number; revenue: number }>();
+  for (const sale of sales) {
+    const existing = productMap.get(sale.productName) || { count: 0, revenue: 0 };
+    productMap.set(sale.productName, {
+      count: existing.count + (sale.quantity || 1),
+      revenue: existing.revenue + (sale.amountInCents || 0),
+    });
+  }
+  
+  const salesByProduct = Array.from(productMap.entries()).map(([name, data]) => ({
+    productName: name,
+    count: data.count,
+    revenue: data.revenue,
+  })).sort((a, b) => b.revenue - a.revenue);
+  
+  const topProducts = salesByProduct.slice(0, 5);
+  
+  // Revenue by day
+  const dayMap = new Map<string, number>();
+  for (const sale of sales) {
+    const day = new Date(sale.createdAt!).toISOString().split('T')[0];
+    dayMap.set(day, (dayMap.get(day) || 0) + (sale.amountInCents || 0));
+  }
+  
+  const revenueByDay = Array.from(dayMap.entries())
+    .map(([date, revenue]) => ({ date, revenue }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+  
+  return {
+    salesByHour,
+    salesByProduct,
+    revenueByDay,
+    topProducts,
+  };
 }
