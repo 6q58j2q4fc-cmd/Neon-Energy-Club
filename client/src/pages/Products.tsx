@@ -209,12 +209,10 @@ export default function Products() {
                     </h3>
                     <p className="text-white/50 text-lg font-medium">The "Top Shelf" Energy Drink</p>
                     
-                    {/* Rating */}
-                    <div className="flex items-center justify-center gap-1.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-5 h-5 fill-[#c8ff00] text-[#c8ff00]" />
-                      ))}
-                      <span className="text-white/40 text-sm ml-3">(2,847 reviews)</span>
+                    {/* Pre-order Notice */}
+                    <div className="bg-[#c8ff00]/10 border border-[#c8ff00]/30 rounded-xl px-4 py-2">
+                      <p className="text-[#c8ff00] text-sm font-semibold">PRE-ORDER NOW</p>
+                      <p className="text-white/60 text-xs">Ships after 90-day early bird period & crowdfunding goals met</p>
                     </div>
                     
                     {/* Price */}
@@ -332,12 +330,10 @@ export default function Products() {
                     <p className="text-white/50 text-lg font-medium">Electric Pom Passion</p>
                     <p className="text-pink-300/80 text-sm italic">The first energy drink engineered for women's health</p>
                     
-                    {/* Rating */}
-                    <div className="flex items-center justify-center gap-1.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-5 h-5 fill-pink-400 text-pink-400" />
-                      ))}
-                      <span className="text-white/40 text-sm ml-3">(2,156 reviews)</span>
+                    {/* Pre-order Notice */}
+                    <div className="bg-pink-500/10 border border-pink-500/30 rounded-xl px-4 py-2">
+                      <p className="text-pink-400 text-sm font-semibold">PRE-ORDER NOW</p>
+                      <p className="text-white/60 text-xs">Ships after 90-day early bird period & crowdfunding goals met</p>
                     </div>
                     
                     {/* Price */}

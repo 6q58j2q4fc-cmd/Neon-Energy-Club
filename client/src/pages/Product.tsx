@@ -7,7 +7,6 @@ import {
   Leaf, 
   Heart, 
   Shield, 
-  Star,
   Check,
   ArrowRight,
   Package,
@@ -86,24 +85,21 @@ const benefits = [
   },
 ];
 
-const reviews = [
+const preOrderInfo = [
   {
-    name: "Marcus T.",
-    rating: 5,
-    comment: "Finally an energy drink that doesn't make me crash! The taste is amazing too.",
-    verified: true,
+    icon: Package,
+    title: "Early Bird Pricing",
+    description: "Lock in special pre-launch pricing during our 90-day early bird period.",
   },
   {
-    name: "Sarah K.",
-    rating: 5,
-    comment: "I love that it's made with natural ingredients. My go-to for morning workouts.",
-    verified: true,
+    icon: Truck,
+    title: "Shipping Timeline",
+    description: "Orders ship once crowdfunding goals are met and production runs complete.",
   },
   {
-    name: "James R.",
-    rating: 5,
-    comment: "The neon green color is so cool and the energy boost is real. Highly recommend!",
-    verified: true,
+    icon: RefreshCw,
+    title: "Full Refund Guarantee",
+    description: "If goals aren't met, you'll receive a complete refund. Zero risk.",
   },
 ];
 
@@ -148,17 +144,10 @@ export default function Product() {
                 </p>
               </div>
               
-              {/* Rating */}
-              <div className="flex items-center gap-2">
-                <div className="flex">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className="w-5 h-5 fill-[#c8ff00] text-[#c8ff00]"
-                    />
-                  ))}
-                </div>
-                <span className="text-white/70">4.9 (2,847 reviews)</span>
+              {/* Pre-order Notice */}
+              <div className="bg-[#c8ff00]/10 border border-[#c8ff00]/30 rounded-xl px-4 py-3">
+                <p className="text-[#c8ff00] font-semibold">PRE-ORDER NOW</p>
+                <p className="text-white/60 text-sm">Ships after 90-day early bird period & crowdfunding goals met</p>
               </div>
               
               {/* Key Benefits */}
@@ -359,7 +348,7 @@ export default function Product() {
         </div>
       </section>
       
-      {/* Reviews Section */}
+      {/* Pre-Order Info Section */}
       <section className="py-20 bg-black">
         <div className="container mx-auto px-4">
           <motion.div
@@ -369,15 +358,15 @@ export default function Product() {
             className="text-center mb-12"
           >
             <h2 className="text-4xl font-black mb-4">
-              What People Are <span className="text-[#c8ff00]">Saying</span>
+              How <span className="text-[#c8ff00]">Pre-Orders</span> Work
             </h2>
             <p className="text-white/60">
-              Join thousands of satisfied NEON fans
+              Join our early bird campaign and be first to experience NEON
             </p>
           </motion.div>
           
           <div className="grid md:grid-cols-3 gap-6">
-            {reviews.map((review, index) => (
+            {preOrderInfo.map((info, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 30 }}
@@ -387,33 +376,28 @@ export default function Product() {
               >
                 <Card className="bg-white/5 border-white/10 h-full">
                   <CardContent className="p-6">
-                    <div className="flex mb-4">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          className={`w-4 h-4 ${
-                            star <= review.rating
-                              ? "fill-[#c8ff00] text-[#c8ff00]"
-                              : "text-white/20"
-                          }`}
-                        />
-                      ))}
+                    <div className="w-12 h-12 rounded-xl bg-[#c8ff00]/10 flex items-center justify-center mb-4">
+                      <info.icon className="w-6 h-6 text-[#c8ff00]" />
                     </div>
-                    <p className="text-white/80 mb-4">"{review.comment}"</p>
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-white">{review.name}</span>
-                      {review.verified && (
-                        <Badge variant="outline" className="text-xs border-[#c8ff00]/50 text-[#c8ff00]">
-                          <Check className="w-3 h-3 mr-1" />
-                          Verified
-                        </Badge>
-                      )}
-                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">{info.title}</h3>
+                    <p className="text-white/60">{info.description}</p>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-8 text-center"
+          >
+            <p className="text-white/40 text-sm max-w-2xl mx-auto">
+              All pre-orders are expected to begin shipping once the 90-day early bird pre-launch period concludes 
+              and crowdfunding goals have been reached, due to standard production run minimum order quantities.
+            </p>
+          </motion.div>
         </div>
       </section>
       

@@ -21,6 +21,34 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    // Check if user needs MFA verification (for distributors/vending owners)
+    checkMfaRequired: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getMfaSettings, getDistributorByUserId, getUserVendingMachines } = await import("./db");
+        
+        // Check if user is a distributor or vending machine owner
+        const distributor = await getDistributorByUserId(ctx.user.id);
+        const vendingMachines = await getUserVendingMachines(ctx.user.id);
+        
+        const isDistributor = !!distributor;
+        const isVendingOwner = vendingMachines && vendingMachines.length > 0;
+        const requiresMfa = isDistributor || isVendingOwner;
+        
+        if (!requiresMfa) {
+          return { requiresMfa: false, mfaEnabled: false, needsSetup: false };
+        }
+        
+        // Check MFA status
+        const mfaSettings = await getMfaSettings(ctx.user.id);
+        const mfaEnabled = mfaSettings?.isEnabled || false;
+        
+        return {
+          requiresMfa: true,
+          mfaEnabled,
+          needsSetup: !mfaEnabled,
+          role: isDistributor ? 'distributor' : 'vending_owner',
+        };
+      }),
   }),
 
   preorder: router({

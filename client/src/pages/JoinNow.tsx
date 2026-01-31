@@ -150,6 +150,15 @@ export default function JoinNow() {
                       Become a Distributor
                       <Sparkles className="w-5 h-5 ml-2" />
                     </Button>
+                    
+                    <Button
+                      variant="outline"
+                      onClick={() => setLocation('/genealogy-tutorial')}
+                      className="w-full border-[#c8ff00]/50 text-[#c8ff00] hover:bg-[#c8ff00]/10 font-semibold h-10"
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      Learn How the Team Structure Works
+                    </Button>
                   </CardContent>
                 </Card>
               </div>

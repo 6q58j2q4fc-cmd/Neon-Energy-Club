@@ -3920,3 +3920,31 @@
 - [x] Create analytics charts (sales by hour, product popularity)
 - [x] Implement simulated real-time data updates
 - [x] Create /vending-dashboard page
+
+
+## Product Page Updates & Feature Enhancements (Jan 31)
+
+### Product Page Cleanup
+- [x] Remove fake/simulated reviews from Products page
+- [x] Remove fake reviews from individual product expandable sections (ProductQuickView)
+- [x] Remove fake reviews from Product.tsx page
+- [x] Add pre-order shipping notice explaining 90-day early bird period
+- [x] Add crowdfunding goal requirement notice for shipping
+- [x] Replace reviews section with "How Pre-Orders Work" section
+
+### MFA Enforcement
+- [x] Add MFA requirement check for distributor accounts
+- [x] Add MFA requirement check for vending machine owner accounts
+- [x] Create MFA setup redirect flow (MfaEnforcementGuard component)
+- [x] Add auth.checkMfaRequired procedure to routers
+
+### IoT Integration Preparation
+- [x] Create WebSocket connection structure for real-time data (server/iot/websocket.ts)
+- [x] Add MQTT integration placeholder for vending machines
+- [x] Document IoT API endpoints for future device connection (docs/IOT_INTEGRATION.md)
+- [x] Create IoT event bus for real-time updates
+
+### Genealogy Tutorial Links
+- [x] Add "Learn How It Works" button to Join page
+- [x] Add tutorial link to Compensation page
+- [ ] Add tutorial link to distributor dashboard

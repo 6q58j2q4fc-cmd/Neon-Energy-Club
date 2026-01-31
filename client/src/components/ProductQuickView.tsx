@@ -218,18 +218,16 @@ export function ProductQuickView({ product, isOpen, onClose }: ProductQuickViewP
               </h2>
               <p className="text-white/50 text-lg">{product.tagline}</p>
               
-              {/* Rating */}
-              <div className="flex items-center gap-2 mt-3">
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={i} 
-                      className={`w-4 h-4 ${i < Math.floor(product.rating) ? "fill-yellow-400 text-yellow-400" : "text-white/20"}`} 
-                    />
-                  ))}
-                </div>
-                <span className="text-white/70 text-sm">{product.rating}</span>
-                <span className="text-white/40 text-sm">({product.reviews.toLocaleString()} reviews)</span>
+              {/* Pre-order Notice */}
+              <div 
+                className="mt-3 px-4 py-2 rounded-xl border"
+                style={{ 
+                  backgroundColor: `${accentColor}10`, 
+                  borderColor: `${accentColor}30` 
+                }}
+              >
+                <p className="text-sm font-semibold" style={{ color: accentColor }}>PRE-ORDER NOW</p>
+                <p className="text-white/60 text-xs">Ships after 90-day early bird period & crowdfunding goals met</p>
               </div>
             </div>
 

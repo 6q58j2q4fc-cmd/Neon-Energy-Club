@@ -466,6 +466,16 @@ export default function Compensation() {
               Join Now
             </Button>
           </div>
+          <div className="mt-6">
+            <Button
+              onClick={() => setLocation('/genealogy-tutorial')}
+              variant="ghost"
+              className="text-gray-400 hover:text-[#c8ff00] hover:bg-transparent font-medium"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Learn How the Team Structure Works →
+            </Button>
+          </div>
         </div>
       </section>
 
