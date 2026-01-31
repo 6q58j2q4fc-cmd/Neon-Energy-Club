@@ -19,6 +19,8 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import MeetingScheduler from "@/components/MeetingScheduler";
 import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
+import { TerritoryPricingCalculator } from "@/components/TerritoryPricingCalculator";
+import type { TerritoryPricingOutput } from "../../../shared/territoryPricing";
 
 // Territory pricing data (price per square mile per month)
 const territoryPricing = {
@@ -58,6 +60,7 @@ export default function Franchise() {
   const [territory, setTerritory] = useState<TerritoryData | null>(null);
   const [termMonths, setTermMonths] = useState<number>(12);
   const [financing, setFinancing] = useState<string>("full");
+  const [forensicPricing, setForensicPricing] = useState<TerritoryPricingOutput | null>(null);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -327,6 +330,31 @@ export default function Franchise() {
           </div>
         </div>
       </section>
+
+      {/* Forensic Audit Pricing Calculator */}
+      {territory && (
+        <section className="py-16 px-4 bg-gradient-to-b from-[#0d2818] to-[#0a1a1a] animated-bg">
+          <div className="container mx-auto max-w-5xl">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl md:text-4xl font-black mb-4">
+                <span className="text-[#c8ff00] neon-text">FORENSIC AUDIT</span> PRICING MODEL
+              </h2>
+              <p className="text-gray-400 max-w-2xl mx-auto">
+                Our territory pricing is calculated using the 2025-2026 U.S. Energy Drink Licensing Fees 
+                and Territory Valuation Metrics forensic audit formula.
+              </p>
+            </div>
+            <TerritoryPricingCalculator
+              state={territory.address?.split(',').pop()?.trim().split(' ')[0] || 'CA'}
+              city={territory.address?.split(',')[0]}
+              population={territory.estimatedPopulation || 50000}
+              areaSqMiles={territory.squareMiles}
+              populationDensity={territory.estimatedPopulation ? territory.estimatedPopulation / territory.squareMiles : undefined}
+              onPriceCalculated={setForensicPricing}
+            />
+          </div>
+        </section>
+      )}
 
       {/* Application Form */}
       <section className="py-16 px-4 bg-gradient-to-b from-[#0a0a0a] to-black animated-bg">

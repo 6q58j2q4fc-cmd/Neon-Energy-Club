@@ -86,6 +86,15 @@ export default function TerritoryMapSelector({ onTerritoryChange }: TerritoryMap
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const drawingManagerRef = useRef<google.maps.drawing.DrawingManager | null>(null);
   const initializationRef = useRef(false);
+  const initialCallRef = useRef(false);
+
+  // Call onTerritoryChange on initial mount with default territory
+  useEffect(() => {
+    if (!initialCallRef.current) {
+      initialCallRef.current = true;
+      onTerritoryChange(territory);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const getPopulationDensity = (demandMultiplier: number): number => {
     if (demandMultiplier >= 2.0) return 27000;

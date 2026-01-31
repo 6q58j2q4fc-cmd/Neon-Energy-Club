@@ -3820,3 +3820,27 @@
 - [ ] Add population density multipliers
 - [ ] Add demographic value drivers
 - [ ] Add Blue Sky multiple calculations
+
+
+## Territory Pricing Calculator (Jan 31)
+
+### Forensic Audit Pricing Formula Implementation
+- [x] Create territoryPricing.ts config with all state licensing fees
+- [x] Add municipal excise tax rates (Boulder, Seattle, Philadelphia, SF, Oakland, etc.)
+- [x] Add population density multipliers (urban 4000-6000, suburban 1500-3500, rural <500)
+- [x] Add demographic value drivers (income >$100k, age 18-34 weighting)
+- [x] Add Blue Sky multiples (8x-16x EBITDA)
+- [x] Add logistics cost calculations ($0.15-$0.80 per case-mile)
+- [x] Implement V_sqm formula: (P_z * C_p * S_m * G_margin - F_lic - T_vol) / A_z * B_multi
+
+### TerritoryPricingCalculator Component
+- [x] Create calculator component with real-time pricing display
+- [x] Show breakdown of all pricing factors
+- [x] Display per square mile cost
+- [x] Display total territory cost for selected radius
+- [x] Show fairness rationale for pricing
+
+### Integration
+- [x] Integrate calculator into Franchise page territory selector
+- [x] Update territory selection to use new pricing model
+- [x] Test pricing calculations across different states/cities
