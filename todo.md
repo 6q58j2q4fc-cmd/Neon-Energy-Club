@@ -3705,3 +3705,28 @@
   - GenealogyTree: Updated RANK_COLORS with consistent colors
   - Server db.ts: Updated commission rates and rank requirements
 - [x] Test and verify rank consistency across all pages - VERIFIED with screenshots
+
+
+## Product Page Updates - Jan 30, 2026 (Batch 2)
+
+- [ ] Copy NEON Pink can image (no background) to project public folder
+- [ ] Copy Rainforest Trust Conservation Circle emblem to project public folder
+- [ ] Update Products page to use new pink can image
+- [ ] Add Rainforest Trust emblem near NEON Original section
+- [ ] Add Rainforest Trust charity description and NEON's commitment statement
+- [ ] Test changes and verify visual appearance
+
+
+## Products Page Image Updates (Jan 30)
+
+- [x] Copy NEON Pink can image with no background to /client/public/
+- [x] Copy Rainforest Trust Conservation Circle Member emblem to /client/public/
+- [x] Update Products.tsx to use new NEON Pink can image
+- [x] Add Rainforest Trust partnership section near NEON Original
+- [x] Add "SUPPORTS RAINFOREST TRUST" badge on NEON Original card
+- [x] Add "FIGHTS BREAST CANCER" badge on NEON Pink card
+- [x] Add Rainforest Trust emblem with Conservation Circle Member badge
+- [x] Add compelling description about 100% donations going to conservation
+- [x] Add NEON mission statement quote about giving back to the jungle
+- [x] Add trust badges (4-Star Charity Navigator, 100% to Conservation, 50M+ Acres Protected)
+- [x] Verify both images display correctly on Products page

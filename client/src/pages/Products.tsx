@@ -152,6 +152,12 @@ export default function Products() {
               <div className="absolute inset-0 bg-gradient-to-b from-[#c8ff00]/15 via-black/40 to-black/60 backdrop-blur-sm" />
               <div className="absolute inset-0 border border-[#c8ff00]/20 rounded-3xl" />
               
+              {/* Rainforest Trust Badge */}
+              <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-green-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                <Leaf className="w-3 h-3" />
+                SUPPORTS RAINFOREST TRUST
+              </div>
+              
               <div className="relative p-8 text-center">
                 {/* Product image with seamless glow */}
                 <div className="relative mb-6 product-image-seamless">
@@ -227,7 +233,7 @@ export default function Products() {
                 <div className="relative mb-6 product-image-seamless-pink">
                   <div className="absolute inset-0 bg-gradient-radial from-pink-500/30 via-pink-500/10 to-transparent blur-[80px] scale-150" />
                   <img
-                    src="/neon-pink-can.png"
+                    src="/neon-pink-can-nobg.png"
                     alt="NEON Pink Electric Pom Passion"
                     className="w-48 h-auto mx-auto animate-float relative z-10"
                     style={{ 
@@ -361,6 +367,67 @@ export default function Products() {
                 <span className="text-white/70 text-sm">{item.text}</span>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Rainforest Trust Partnership Section */}
+      <section className="py-16 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-green-900/20 via-black/40 to-transparent" />
+        
+        <div className="container mx-auto max-w-5xl relative z-10">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            {/* Emblem and Visual */}
+            <div className="text-center md:text-left">
+              <img 
+                src="/rainforest-trust-emblem.png" 
+                alt="Rainforest Trust Conservation Circle Member" 
+                className="w-48 h-48 mx-auto md:mx-0 object-contain drop-shadow-[0_0_30px_rgba(0,255,100,0.3)]"
+              />
+            </div>
+            
+            {/* Content */}
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-600/20 border border-green-500/30">
+                <Leaf className="w-4 h-4 text-green-400" />
+                <span className="text-green-400 font-semibold text-sm">CONSERVATION CIRCLE MEMBER</span>
+              </div>
+              
+              <h2 className="text-3xl md:text-4xl font-bold text-white">
+                Proud Partner of <span className="text-green-400 drop-shadow-[0_0_20px_rgba(0,255,100,0.5)]">Rainforest Trust</span>
+              </h2>
+              
+              <p className="text-white/80 leading-relaxed">
+                Rainforest Trust is one of the most efficient and transparent conservation organizations in the world. 
+                With a remarkable <span className="text-green-400 font-bold">100% of donations going directly to conservation</span>, 
+                they've protected over 50 million acres of critical rainforest habitat. Their 4-star Charity Navigator 
+                rating and commitment to transparency make them a rare gem in the nonprofit world.
+              </p>
+              
+              <blockquote className="border-l-4 border-green-500 pl-4 py-2 bg-green-900/20 rounded-r-lg">
+                <p className="text-white/90 italic">
+                  "At NEON, we believe in giving back to the jungle that bears our fruits. Every can of NEON Original 
+                  you buy or sell makes a real difference. Join us in our mission to support a charity where you 
+                  know your contribution creates genuine, lasting impact."
+                </p>
+                <footer className="text-green-400 text-sm mt-2 font-semibold">— NEON Energy Drink</footer>
+              </blockquote>
+              
+              <div className="flex flex-wrap gap-4">
+                <div className="flex items-center gap-2 text-white/70">
+                  <Award className="w-5 h-5 text-green-400" />
+                  <span>4-Star Charity Navigator</span>
+                </div>
+                <div className="flex items-center gap-2 text-white/70">
+                  <Shield className="w-5 h-5 text-green-400" />
+                  <span>100% to Conservation</span>
+                </div>
+                <div className="flex items-center gap-2 text-white/70">
+                  <Heart className="w-5 h-5 text-green-400" />
+                  <span>50M+ Acres Protected</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
