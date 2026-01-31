@@ -13,6 +13,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import { useCart } from "@/contexts/CartContext";
 import { SiteSearch } from "./SiteSearch";
 import NotificationBell from "./NotificationBell";
+import HeaderSoundControl from "./HeaderSoundControl";
 
 const navItems = [
   { label: "HOME", path: "/", icon: Home },
@@ -308,6 +309,9 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
                   </span>
                 )}
               </button>
+
+              {/* Jungle Sound Control */}
+              <HeaderSoundControl accentColor={accentColor[variant]} />
 
               {/* Notification Bell */}
               <div className="relative z-[9999] pointer-events-auto">

@@ -9,11 +9,15 @@ import { toast } from "sonner";
 import { ShoppingCart, Check, Zap, Leaf, Apple, Cherry, Sparkles, Star, Award, Heart, Shield, ExternalLink, Flame, Droplets, Battery, Globe } from "lucide-react";
 import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
+import CustomerPhotoGallery from "@/components/CustomerPhotoGallery";
+import { ProductQuickView, products as productData, ProductData } from "@/components/ProductQuickView";
+import { Eye } from "lucide-react";
 
 export default function Products() {
   const [, setLocation] = useLocation();
   const [isVisible, setIsVisible] = useState(false);
   const { addItem, setIsOpen } = useCart();
+  const [quickViewProduct, setQuickViewProduct] = useState<ProductData | null>(null);
 
   // Initialize hash navigation
   const { getShareableUrl } = useHashNavigation({ offset: 120 });
@@ -241,13 +245,23 @@ export default function Products() {
                     ))}
                   </div>
 
-                  <Button
-                    onClick={() => handlePreOrder("original")}
-                    className="w-full bg-gradient-to-r from-[#c8ff00] to-[#a8e600] text-black hover:opacity-90 font-black py-7 text-lg rounded-2xl shadow-[0_10px_40px_rgba(200,255,0,0.3)] hover:shadow-[0_15px_60px_rgba(200,255,0,0.5)] transition-all"
-                  >
-                    <ShoppingCart className="w-6 h-6 mr-3" />
-                    Add to Cart
-                  </Button>
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={() => handlePreOrder("original")}
+                      className="flex-1 bg-gradient-to-r from-[#c8ff00] to-[#a8e600] text-black hover:opacity-90 font-black py-7 text-lg rounded-2xl shadow-[0_10px_40px_rgba(200,255,0,0.3)] hover:shadow-[0_15px_60px_rgba(200,255,0,0.5)] transition-all"
+                    >
+                      <ShoppingCart className="w-6 h-6 mr-3" />
+                      Add to Cart
+                    </Button>
+                    <Button
+                      onClick={() => setQuickViewProduct(productData[0])}
+                      variant="outline"
+                      className="w-16 border-2 border-[#c8ff00]/30 hover:border-[#c8ff00] hover:bg-[#c8ff00]/10 rounded-2xl transition-all"
+                      title="Quick View"
+                    >
+                      <Eye className="w-6 h-6 text-[#c8ff00]" />
+                    </Button>
+                  </div>
                   
                   <p className="text-white/30 text-[10px] text-center leading-tight">
                     *This statement has not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease.
@@ -355,13 +369,23 @@ export default function Products() {
                     ))}
                   </div>
 
-                  <Button
-                    onClick={() => handlePreOrder("pink")}
-                    className="w-full bg-gradient-to-r from-pink-500 to-pink-400 text-white hover:opacity-90 font-black py-7 text-lg rounded-2xl shadow-[0_10px_40px_rgba(255,0,128,0.3)] hover:shadow-[0_15px_60px_rgba(255,0,128,0.5)] transition-all"
-                  >
-                    <ShoppingCart className="w-6 h-6 mr-3" />
-                    Add to Cart
-                  </Button>
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={() => handlePreOrder("pink")}
+                      className="flex-1 bg-gradient-to-r from-pink-500 to-pink-400 text-white hover:opacity-90 font-black py-7 text-lg rounded-2xl shadow-[0_10px_40px_rgba(255,0,128,0.3)] hover:shadow-[0_15px_60px_rgba(255,0,128,0.5)] transition-all"
+                    >
+                      <ShoppingCart className="w-6 h-6 mr-3" />
+                      Add to Cart
+                    </Button>
+                    <Button
+                      onClick={() => setQuickViewProduct(productData[1])}
+                      variant="outline"
+                      className="w-16 border-2 border-pink-500/30 hover:border-pink-500 hover:bg-pink-500/10 rounded-2xl transition-all"
+                      title="Quick View"
+                    >
+                      <Eye className="w-6 h-6 text-pink-400" />
+                    </Button>
+                  </div>
                   
                   <p className="text-white/30 text-[10px] text-center leading-tight">
                     *This statement has not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease.
@@ -536,6 +560,9 @@ export default function Products() {
         </div>
       </section>
 
+      {/* Customer Photo Gallery */}
+      <CustomerPhotoGallery />
+
       {/* Final CTA - Premium Design */}
       <section className="py-24 px-4 relative">
         <div className="absolute inset-0 bg-gradient-to-t from-[#c8ff00]/10 to-transparent" />
@@ -556,6 +583,13 @@ export default function Products() {
           <p className="text-sm text-white/30 mt-6">Free shipping on orders over $100</p>
         </div>
       </section>
+
+      {/* Product Quick View Modal */}
+      <ProductQuickView
+        product={quickViewProduct}
+        isOpen={!!quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+      />
 
       <Footer />
     </div>

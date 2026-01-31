@@ -44,7 +44,7 @@ import FranchiseDashboard from "./pages/FranchiseDashboard";
 import PersonalizedLanding from "./pages/PersonalizedLanding";
 import VerifyEmail from "./pages/VerifyEmail";
 import GiveBack from "./pages/GiveBack";
-import AmbientSoundToggle from "./components/AmbientSoundToggle";
+// AmbientSoundToggle moved to header as HeaderSoundControl
 import UnifiedChatBot from "./components/UnifiedChatBot";
 import CartDrawer from "./components/CartDrawer";
 import VoiceMuteButton from "./components/VoiceMuteButton";
@@ -144,7 +144,6 @@ function App() {
             <Router />
             <CartDrawer />
             <VoiceMuteButton />
-            <AmbientSoundToggle />
             <UnifiedChatBot />
           </TooltipProvider>
         </ThemeProvider>
