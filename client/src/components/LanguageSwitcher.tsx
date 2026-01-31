@@ -21,7 +21,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
           size="sm"
           className={`flex items-center gap-2 text-white/70 hover:text-white hover:bg-white/10 ${className}`}
         >
-          <Globe className="w-4 h-4" />
+          <Globe className="w-5 h-5" strokeWidth={2.5} />
           <span className="hidden sm:inline">{currentLang?.flag} {currentLang?.code.toUpperCase()}</span>
           <span className="sm:hidden">{currentLang?.flag}</span>
         </Button>

@@ -110,7 +110,7 @@ export function NotificationBell() {
         className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/20 hover:bg-white/10 hover:border-white/30 transition-all duration-200 cursor-pointer pointer-events-auto"
         aria-label="Notifications"
       >
-        <Bell className="w-5 h-5 text-[#c8ff00]" />
+        <Bell className="w-6 h-6 text-[#c8ff00]" strokeWidth={2.5} />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center bg-[#ff0080] text-white text-xs font-bold rounded-full animate-pulse">
             {unreadCount > 9 ? '9+' : unreadCount}

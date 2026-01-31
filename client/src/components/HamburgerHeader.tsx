@@ -293,7 +293,7 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
                 className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/20 hover:bg-white/10 hover:border-white/30 transition-all duration-200"
                 aria-label="Search"
               >
-                <Search className="w-5 h-5" style={{ color: accentColor[variant] }} />
+                <Search className="w-6 h-6" strokeWidth={2.5} style={{ color: accentColor[variant] }} />
               </button>
 
               {/* Shopping Cart Button */}
@@ -302,7 +302,7 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
                 className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/20 hover:bg-white/10 hover:border-white/30 transition-all duration-200"
                 aria-label="Shopping Cart"
               >
-                <ShoppingCart className="w-5 h-5" style={{ color: accentColor[variant] }} />
+                <ShoppingCart className="w-6 h-6" strokeWidth={2.5} style={{ color: accentColor[variant] }} />
                 {totalItems > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#ff0080] text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
                     {totalItems > 9 ? '9+' : totalItems}

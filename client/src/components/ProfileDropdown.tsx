@@ -120,7 +120,7 @@ export default function ProfileDropdown({ accentColor = "#c8ff00" }: ProfileDrop
           onClick={() => setIsOpen(!isOpen)}
           className="h-10 px-4 flex items-center gap-2 rounded-xl bg-[#c8ff00]/20 border border-[#c8ff00]/50 hover:bg-[#c8ff00]/30 transition-all duration-200"
         >
-          <User className="w-4 h-4 text-[#c8ff00]" />
+          <User className="w-5 h-5 text-[#c8ff00]" strokeWidth={2.5} />
           <span className="text-sm font-bold text-[#c8ff00] hidden sm:inline">Login</span>
           <ChevronDown className={`w-4 h-4 text-[#c8ff00] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </button>
@@ -222,7 +222,7 @@ export default function ProfileDropdown({ accentColor = "#c8ff00" }: ProfileDrop
         }`}
       >
         <div className="w-7 h-7 rounded-lg bg-[#c8ff00]/20 flex items-center justify-center">
-          <User className="w-4 h-4 text-[#c8ff00]" />
+          <User className="w-5 h-5 text-[#c8ff00]" strokeWidth={2.5} />
         </div>
         <span className="text-sm font-bold text-white hidden sm:inline max-w-[100px] truncate">
           {user.name?.split(' ')[0] || 'User'}

@@ -133,9 +133,9 @@ export function HeaderSoundControl({ accentColor = "#c8ff00" }: HeaderSoundContr
           aria-label={isPlaying ? "Mute jungle sounds" : "Play jungle sounds"}
         >
           {isPlaying ? (
-            <Volume2 className="w-5 h-5" style={{ color: accentColor }} />
+            <Volume2 className="w-6 h-6" strokeWidth={2.5} style={{ color: accentColor }} />
           ) : (
-            <VolumeX className="w-5 h-5 text-white/60" />
+            <VolumeX className="w-6 h-6" strokeWidth={2.5} style={{ color: 'rgba(255,255,255,0.6)' }} />
           )}
           {/* Playing indicator pulse */}
           {isPlaying && (

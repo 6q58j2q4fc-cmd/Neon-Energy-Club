@@ -3871,3 +3871,19 @@
 - [x] Factor in population density and foot traffic
 - [x] Display ROI projections in pricing calculator
 - [x] Add investment payback period calculation
+
+
+## Header Icon Fix & MLM Platform Architecture (Jan 31)
+
+### Header Icon Fix
+- [x] Increase header icon sizes (search, cart, sound, notifications)
+- [x] Make icons more visible with proper stroke width (2.5)
+- [x] Test icon visibility on all screen sizes
+
+### MLM Platform Architecture
+- [ ] Create technical architecture document
+- [ ] Design user journey map for Vending Machine Owner
+- [ ] Design user journey map for Distributor
+- [ ] Document persona-specific dashboard requirements
+- [ ] Outline IoT integration for vending machines
+- [ ] Document security features (MFA, SSL, backups)
