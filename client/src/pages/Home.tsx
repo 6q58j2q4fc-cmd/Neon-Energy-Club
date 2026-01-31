@@ -682,8 +682,11 @@ export default function Home() {
                 <span className="text-[#c8ff00] font-bold">Imagine this:</span> Passive income from AI-powered vending machines 
                 that sell themselves. No employees. No inventory headaches. Just <span className="text-[#c8ff00]">recurring revenue</span> while you sleep.
               </p>
-              <p className="text-white/60 text-base mb-8">
+              <p className="text-white/60 text-base mb-4">
                 Our top partners earn $5,000-$15,000/month per territory. And territories are going fast.
+              </p>
+              <p className="text-white/40 text-xs italic mb-8">
+                *Results may vary. Income examples are not guarantees of earnings.
               </p>
 
               <div className="grid grid-cols-2 gap-4 mb-8">

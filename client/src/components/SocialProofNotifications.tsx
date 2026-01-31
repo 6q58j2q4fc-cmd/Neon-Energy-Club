@@ -50,8 +50,8 @@ const SIMULATED_LOCATIONS = [
 
 // Products for simulated pre-orders
 const SIMULATED_PRODUCTS = [
-  "NEON Original 12-Pack", "NEON Organic 6-Pack", "NEON Variety Pack",
-  "NEON Original 24-Pack", "NEON Organic 12-Pack", "NEON Original 6-Pack",
+  "NEON Original 12-Pack", "NEON Pink 6-Pack", "NEON Variety Pack",
+  "NEON Original 24-Pack", "NEON Pink 12-Pack", "NEON Original 6-Pack",
   "NEON Starter Bundle", "NEON Family Pack", "NEON Party Pack"
 ];
 

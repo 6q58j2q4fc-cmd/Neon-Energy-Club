@@ -39,12 +39,12 @@ const products = [
     variants: ["8.4 fl oz", "12-pack", "24-pack"]
   },
   { 
-    title: "NEON Organic", 
+    title: "NEON Pink", 
     path: "/products", 
-    keywords: ["organic", "usda", "40 calories", "orange", "natural", "healthy"],
+    keywords: ["pink", "women", "breast cancer", "pomegranate", "passion fruit", "healthy"],
     category: "product",
     price: "$3.49",
-    description: "40 calories, USDA certified organic",
+    description: "Women's health formula, supports Susan G. Komen",
     availability: "Pre-Order",
     variants: ["8.4 fl oz", "12-pack", "24-pack"]
   },

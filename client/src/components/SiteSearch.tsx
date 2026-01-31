@@ -18,13 +18,13 @@ const searchableContent = [
     keywords: ['energy drink', 'original', 'classic', 'caffeine', 'natural']
   },
   { 
-    id: 'product-organic', 
-    title: 'NEON Organic', 
-    description: 'USDA certified organic energy with zero artificial ingredients',
+    id: 'product-pink', 
+    title: 'NEON Pink', 
+    description: 'Electric Pom Passion - Women\'s health formula supporting Susan G. Komen',
     category: 'Products',
-    path: '/products#organic',
+    path: '/products#pink',
     icon: Package,
-    keywords: ['organic', 'usda', 'certified', 'natural', 'clean']
+    keywords: ['pink', 'women', 'breast cancer', 'pomegranate', 'passion fruit', 'komen']
   },
   { 
     id: 'product-mixed', 

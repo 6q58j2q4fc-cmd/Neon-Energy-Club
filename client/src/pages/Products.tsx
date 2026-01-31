@@ -29,7 +29,7 @@ export default function Products() {
     toast.success('Link copied!', { description: url });
   };
 
-  const handlePreOrder = (product: "original" | "organic" | "mixed") => {
+  const handlePreOrder = (product: "original" | "pink" | "mixed") => {
     const products = {
       original: {
         id: "neon-original-case",
@@ -39,17 +39,17 @@ export default function Products() {
         flavor: "original" as const,
         image: "/neon-original-can.png",
       },
-      organic: {
-        id: "neon-organic-case",
-        name: "NEON Organic Case (24 Cans)",
+      pink: {
+        id: "neon-pink-case",
+        name: "NEON Pink Electric Pom Passion Case (24 Cans)",
         price: 64.99,
         type: "product" as const,
-        flavor: "organic" as const,
-        image: "/neon-organic-can.png",
+        flavor: "pink" as const,
+        image: "/neon-pink-can.png",
       },
       mixed: {
         id: "neon-mixed-case",
-        name: "NEON Mixed Case (12 Original + 12 Organic)",
+        name: "NEON Mixed Case (12 Original + 12 Pink)",
         price: 62.99,
         type: "product" as const,
         flavor: "mixed" as const,
@@ -202,72 +202,84 @@ export default function Products() {
                   <ShoppingCart className="w-5 h-5 mr-2" />
                   Add to Cart
                 </Button>
+                
+                {/* FDA Disclaimer */}
+                <p className="text-white/40 text-[10px] text-center mt-2 leading-tight">
+                  *This statement has not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease.
+                </p>
               </div>
             </div>
 
-            {/* NEON Organic - Seamless design */}
-            <div id="organic" className={`relative rounded-3xl overflow-hidden transition-all duration-500 hover:scale-[1.02] scroll-focus-target ${isVisible ? 'animate-slide-in-right' : 'opacity-0'}`}>
+            {/* NEON Pink - Electric Pom Passion - Women's Health Edition */}
+            <div id="pink" className={`relative rounded-3xl overflow-hidden transition-all duration-500 hover:scale-[1.02] scroll-focus-target ${isVisible ? 'animate-slide-in-right' : 'opacity-0'}`}>
               {/* Gradient background that blends with page */}
-              <div className="absolute inset-0 bg-gradient-to-b from-orange-500/15 via-black/40 to-black/60 backdrop-blur-sm" />
-              <div className="absolute inset-0 border border-orange-500/20 rounded-3xl" />
+              <div className="absolute inset-0 bg-gradient-to-b from-pink-500/15 via-black/40 to-black/60 backdrop-blur-sm" />
+              <div className="absolute inset-0 border border-pink-500/20 rounded-3xl" />
               
-              {/* USDA Organic Badge */}
-              <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-green-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full">
-                <Award className="w-3 h-3" />
-                USDA ORGANIC
+              {/* Susan G. Komen Badge */}
+              <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-pink-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                <Heart className="w-3 h-3" />
+                FIGHTS BREAST CANCER
               </div>
               
               <div className="relative p-8 text-center">
                 {/* Product image with seamless glow */}
-                <div className="relative mb-6 product-image-seamless-orange">
-                  <div className="absolute inset-0 bg-gradient-radial from-orange-500/30 via-orange-500/10 to-transparent blur-[80px] scale-150" />
+                <div className="relative mb-6 product-image-seamless-pink">
+                  <div className="absolute inset-0 bg-gradient-radial from-pink-500/30 via-pink-500/10 to-transparent blur-[80px] scale-150" />
                   <img
-                    src="/neon-organic-can.png"
-                    alt="NEON Organic"
+                    src="/neon-pink-can.png"
+                    alt="NEON Pink Electric Pom Passion"
                     className="w-48 h-auto mx-auto animate-float relative z-10"
                     style={{ 
-                      filter: 'drop-shadow(0 0 50px rgba(255, 140, 0, 0.6)) drop-shadow(0 0 100px rgba(255, 140, 0, 0.3))',
+                      filter: 'drop-shadow(0 0 50px rgba(255, 0, 128, 0.6)) drop-shadow(0 0 100px rgba(255, 0, 128, 0.3))',
                       animationDelay: '0.5s',
                       background: 'transparent'
                     }}
                   />
                 </div>
                 
-                <h3 className="text-4xl font-black text-orange-400 mb-2 drop-shadow-[0_0_20px_rgba(255,140,0,0.5)]">NEON ORGANIC</h3>
-                <p className="text-white/60 mb-2">USDA Certified Organic</p>
+                <h3 className="text-4xl font-black text-pink-400 mb-2 drop-shadow-[0_0_20px_rgba(255,0,128,0.5)]">NEON PINK™</h3>
+                <p className="text-white/60 mb-2">Electric Pom Passion</p>
+                <p className="text-pink-300/80 text-sm mb-2 italic">The first energy drink engineered for women's health</p>
                 <div className="flex items-center justify-center gap-2 mb-4">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-orange-400 text-orange-400" />
+                    <Star key={i} className="w-4 h-4 fill-pink-400 text-pink-400" />
                   ))}
-                  <span className="text-white/50 text-sm ml-2">(1,923 reviews)</span>
+                  <span className="text-white/50 text-sm ml-2">(2,156 reviews)</span>
                 </div>
-                <p className="text-3xl font-black text-white mb-6">$64.99 <span className="text-sm text-white/50 font-normal">/ case of 24</span></p>
+                <p className="text-3xl font-black text-white mb-4">$64.99 <span className="text-sm text-white/50 font-normal">/ case of 24</span></p>
+                <p className="text-pink-300/70 text-xs mb-2">A portion of every sale supports Susan G. Komen®</p>
               </div>
 
               <div className="relative p-6 pt-0 space-y-4">
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   {[
-                    "100mg Natural Caffeine",
-                    "Only 40 Calories!",
-                    "Vegan & Non-GMO",
-                    "No Artificial Anything",
-                    "Stevia Sweetened",
-                    "Glows Orange!"
+                    "Women's Health Formula",
+                    "Breast Cancer Fighting Ingredients",
+                    "Pomegranate & Passion Fruit",
+                    "Antioxidant Rich",
+                    "Supports Susan G. Komen®",
+                    "Fight Back - Not Just in October!"
                   ].map((feature, i) => (
                     <div key={i} className="flex items-center gap-2 text-white/80">
-                      <Check className="w-4 h-4 text-orange-400 flex-shrink-0" />
+                      <Check className="w-4 h-4 text-pink-400 flex-shrink-0" />
                       <span>{feature}</span>
                     </div>
                   ))}
                 </div>
 
                 <Button
-                  onClick={() => handlePreOrder("organic")}
-                  className="w-full bg-orange-500 text-black hover:bg-orange-400 font-bold py-6 text-lg rounded-xl shadow-[0_0_30px_rgba(255,140,0,0.3)] hover:shadow-[0_0_50px_rgba(255,140,0,0.5)] transition-all"
+                  onClick={() => handlePreOrder("pink")}
+                  className="w-full bg-pink-500 text-white hover:bg-pink-400 font-bold py-6 text-lg rounded-xl shadow-[0_0_30px_rgba(255,0,128,0.3)] hover:shadow-[0_0_50px_rgba(255,0,128,0.5)] transition-all"
                 >
                   <ShoppingCart className="w-5 h-5 mr-2" />
                   Add to Cart
                 </Button>
+                
+                {/* FDA Disclaimer */}
+                <p className="text-white/40 text-[10px] text-center mt-2 leading-tight">
+                  *This statement has not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease.
+                </p>
               </div>
             </div>
           </div>
@@ -283,7 +295,7 @@ export default function Products() {
                 <span className="text-white font-semibold text-sm">BEST VALUE</span>
               </div>
               <h3 className="text-3xl font-bold text-white mb-2">Can't Decide? Try Both!</h3>
-              <p className="text-white/60 mb-6">Mixed Case: 12 Original + 12 Organic</p>
+              <p className="text-white/60 mb-6">Mixed Case: 12 Original + 12 Pink</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <span className="text-4xl font-black text-white">$62.99</span>
                 <Button

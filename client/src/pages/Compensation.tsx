@@ -107,6 +107,9 @@ export default function Compensation() {
                 <div className="text-gray-400">To Earn</div>
               </div>
             </div>
+            <p className="text-gray-500 text-xs italic mt-6">
+              *Results may vary. Income examples are not guarantees of earnings. Your success depends on your effort, skill, and market conditions.
+            </p>
           </motion.div>
         </div>
       </section>

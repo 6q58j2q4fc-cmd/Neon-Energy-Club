@@ -6,7 +6,7 @@ export interface CartItem {
   price: number;
   quantity: number;
   type?: "product" | "package";
-  flavor?: "original" | "organic" | "mixed";
+  flavor?: "original" | "organic" | "pink" | "mixed";
   image?: string;
   distributorCode?: string;
 }

@@ -3679,3 +3679,15 @@
 - [x] Cloned site title changed from "FUEL YOUR FUTURE" to "FUEL YOUR POTENTIAL"
 - [x] Social proof bubbles now use real people photos instead of cartoon avatars
 
+
+
+## New Updates - Jan 30, 2026 (Batch 2)
+
+- [x] Create printable compensation plan PDF document (5-page PDF at /compensation-plan.pdf)
+- [x] Remove squared backgrounds from neon pink palm tree images (blend properly with luminosity blend mode)
+- [x] Replace NEON Organic with NEON Pink Electric Pom Passion flavor
+- [x] Add NEON Pink product description (Susan G. Komen, women's health, breast cancer awareness)
+- [x] Add FDA disclaimer near each product: "This statement has not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease."
+- [x] Add FTC disclaimer near income claims: "Results may vary"
+- [x] Test all changes and verify visual appearance
+

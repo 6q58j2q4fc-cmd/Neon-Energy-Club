@@ -269,36 +269,10 @@
   z-index: 3;
 }
 
-/* Neon Palm Tree Silhouettes - Fixed checkered background */
-.palm-tree-left {
-  position: absolute;
-  left: -50px;
-  bottom: 0;
-  width: 250px;
-  height: auto;
-  opacity: 0.5;
-  filter: drop-shadow(0 0 30px rgba(200, 255, 0, 0.4)) drop-shadow(0 0 60px rgba(0, 255, 255, 0.3));
-  pointer-events: none;
-  z-index: 2;
-  /* Ensure proper transparency handling */
-  mix-blend-mode: screen;
-  background: transparent !important;
-}
-
+/* Neon Palm Tree Silhouettes - Hidden due to boxy background issues */
+.palm-tree-left,
 .palm-tree-right {
-  position: absolute;
-  right: -50px;
-  bottom: 0;
-  width: 250px;
-  height: auto;
-  opacity: 0.5;
-  filter: drop-shadow(0 0 30px rgba(255, 0, 128, 0.4)) drop-shadow(0 0 60px rgba(157, 78, 221, 0.3));
-  pointer-events: none;
-  z-index: 2;
-  transform: scaleX(-1);
-  /* Ensure proper transparency handling */
-  mix-blend-mode: screen;
-  background: transparent !important;
+  display: none !important;
 }
 
 /* Miami Neon Glow Effects */
