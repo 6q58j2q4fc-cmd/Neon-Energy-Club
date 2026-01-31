@@ -143,7 +143,7 @@ function App() {
             <AvatarJungleAtmosphere intensity="low" />
             <Router />
             <CartDrawer />
-            <VoiceMuteButton />
+            {/* VoiceMuteButton removed - sound control now in header only */}
             <UnifiedChatBot />
           </TooltipProvider>
         </ThemeProvider>
