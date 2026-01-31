@@ -1975,6 +1975,76 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
         
         return { success: true, applicationId: application.id };
       }),
+
+    // Create a 48-hour territory reservation
+    createReservation: protectedProcedure
+      .input(
+        z.object({
+          territoryName: z.string().min(1),
+          state: z.string().min(1),
+          centerLat: z.string(),
+          centerLng: z.string(),
+          radiusMiles: z.string(),
+          areaSqMiles: z.string(),
+          population: z.number().int(),
+          licenseFee: z.number(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const { createTerritoryReservation } = await import("./db");
+        
+        // Create the reservation (validation happens in createTerritoryReservation)
+        try {
+          const reservation = await createTerritoryReservation({
+            userId: ctx.user.id,
+            territoryName: input.territoryName,
+            state: input.state,
+            centerLat: input.centerLat,
+            centerLng: input.centerLng,
+            radiusMiles: input.radiusMiles,
+            areaSqMiles: input.areaSqMiles,
+            population: input.population,
+            licenseFee: input.licenseFee,
+          });
+          return reservation;
+        } catch (error: any) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: error.message || "Failed to create reservation",
+          });
+        }
+      }),
+
+    // Get user's active reservation
+    getMyReservation: protectedProcedure.query(async ({ ctx }) => {
+      const { getUserActiveReservation } = await import("./db");
+      return await getUserActiveReservation(ctx.user.id);
+    }),
+
+    // Cancel a reservation
+    cancelReservation: protectedProcedure
+      .input(z.object({ reservationId: z.number().int() }))
+      .mutation(async ({ input, ctx }) => {
+        const { cancelTerritoryReservation } = await import("./db");
+        
+        try {
+          return await cancelTerritoryReservation(ctx.user.id, input.reservationId);
+        } catch (error: any) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: error.message || "Reservation not found or you don't have permission to cancel it.",
+          });
+        }
+      }),
+
+    // Admin: Get all active reservations
+    listReservations: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+      const { getActiveReservations } = await import("./db");
+      return await getActiveReservations();
+    }),
   }),
 
   // NFT Gallery and Management

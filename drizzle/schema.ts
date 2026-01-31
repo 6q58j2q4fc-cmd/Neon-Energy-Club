@@ -1656,3 +1656,45 @@ export const emailDigestQueue = mysqlTable("email_digest_queue", {
 
 export type EmailDigestQueueItem = typeof emailDigestQueue.$inferSelect;
 export type InsertEmailDigestQueueItem = typeof emailDigestQueue.$inferInsert;
+
+
+/**
+ * Territory reservations table for 48-hour hold system.
+ * Allows users to reserve a territory while completing their application.
+ */
+export const territoryReservations = mysqlTable("territory_reservations", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User ID who made the reservation */
+  userId: int("userId").notNull(),
+  /** Territory name/description */
+  territoryName: varchar("territoryName", { length: 255 }).notNull(),
+  /** State abbreviation */
+  state: varchar("state", { length: 2 }).notNull(),
+  /** Territory center latitude */
+  centerLat: decimal("centerLat", { precision: 10, scale: 7 }).notNull(),
+  /** Territory center longitude */
+  centerLng: decimal("centerLng", { precision: 10, scale: 7 }).notNull(),
+  /** Territory radius in miles */
+  radiusMiles: decimal("radiusMiles", { precision: 10, scale: 2 }).notNull(),
+  /** Territory area in square miles */
+  areaSqMiles: decimal("areaSqMiles", { precision: 10, scale: 2 }).notNull(),
+  /** Estimated population */
+  population: int("population").notNull(),
+  /** Calculated license fee */
+  licenseFee: int("licenseFee").notNull(),
+  /** Reservation status */
+  status: mysqlEnum("status", ["active", "expired", "converted", "cancelled"]).default("active").notNull(),
+  /** Reservation expiration timestamp (48 hours from creation) */
+  expiresAt: timestamp("expiresAt").notNull(),
+  /** Email reminder sent flag */
+  reminderSent: boolean("reminderSent").default(false).notNull(),
+  /** Converted to license application ID */
+  convertedToLicenseId: int("convertedToLicenseId"),
+  /** Reservation creation timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Last update timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TerritoryReservation = typeof territoryReservations.$inferSelect;
+export type InsertTerritoryReservation = typeof territoryReservations.$inferInsert;

@@ -21,6 +21,9 @@ import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
 import { TerritoryPricingCalculator } from "@/components/TerritoryPricingCalculator";
 import type { TerritoryPricingOutput } from "../../../shared/territoryPricing";
+import { TerritoryPDFExport } from "@/components/TerritoryPDFExport";
+import ROICalculator from "@/components/ROICalculator";
+import TerritoryReservation from "@/components/TerritoryReservation";
 
 // Territory pricing data (price per square mile per month)
 const territoryPricing = {
@@ -352,6 +355,73 @@ export default function Franchise() {
               populationDensity={territory.estimatedPopulation ? territory.estimatedPopulation / territory.squareMiles : undefined}
               onPriceCalculated={setForensicPricing}
             />
+            
+            {/* ROI Calculator */}
+            <div className="mt-8">
+              <ROICalculator
+                territory={{
+                  name: territory.address?.split(',')[0] || 'Selected Territory',
+                  state: territory.address?.split(',').pop()?.trim().split(' ')[0] || 'CA',
+                  area: territory.squareMiles,
+                  population: territory.estimatedPopulation || 50000,
+                  density: territory.estimatedPopulation ? territory.estimatedPopulation / territory.squareMiles : 1000,
+                  licenseFee: forensicPricing?.finalPrice || 5000,
+                }}
+                pricePerSqMile={forensicPricing?.pricePerSqMile || 500}
+              />
+            </div>
+            
+            {/* PDF Export */}
+            <div className="mt-8">
+              <TerritoryPDFExport
+                territory={{
+                  name: territory.address?.split(',')[0] || 'Selected Territory',
+                  state: territory.address?.split(',').pop()?.trim().split(' ')[0] || 'CA',
+                  area: territory.squareMiles,
+                  population: territory.estimatedPopulation || 50000,
+                  density: territory.estimatedPopulation ? territory.estimatedPopulation / territory.squareMiles : 1000,
+                  demandFactor: territory.demandMultiplier || 1,
+                  licenseFee: forensicPricing?.finalPrice || 5000,
+                }}
+                pricing={forensicPricing ? {
+                  baseValue: forensicPricing.totalBasePrice,
+                  stateFees: forensicPricing.licensingFees,
+                  densityAdjustment: 0,
+                  demographicPremium: forensicPricing.totalBasePrice * (forensicPricing.demographicMultiplier - 1),
+                  regionalAdjustment: forensicPricing.totalBasePrice * (forensicPricing.regionalMultiplier - 1),
+                  municipalTaxImpact: forensicPricing.exciseTaxImpact,
+                  volumeDiscount: forensicPricing.volumeDiscount,
+                  total: forensicPricing.finalPrice,
+                } : { baseValue: 0, stateFees: 0, densityAdjustment: 0, demographicPremium: 0, regionalAdjustment: 0, municipalTaxImpact: 0, volumeDiscount: 0, total: 0 }}
+                stateLicensing={{
+                  state: territory.address?.split(',').pop()?.trim().split(' ')[0] || 'CA',
+                  baseFee: 1200,
+                  renewalFee: 1200,
+                  additionalFees: 76,
+                }}
+                densityMultiplier={forensicPricing?.densityMultiplier || 1}
+                demographicMultiplier={forensicPricing?.demographicMultiplier || 1}
+                regionalMultiplier={forensicPricing?.regionalMultiplier || 1}
+                volumeDiscountPercent={forensicPricing?.volumeDiscount ? (forensicPricing.volumeDiscount / forensicPricing.totalBasePrice) * 100 : 0}
+                blueSkyMultiple={forensicPricing?.blueSkyMultiple || 10}
+              />
+            </div>
+            
+            {/* Territory Reservation */}
+            <div className="mt-8">
+              <TerritoryReservation
+                territory={{
+                  name: territory.address?.split(',')[0] || 'Selected Territory',
+                  state: territory.address?.split(',').pop()?.trim().split(' ')[0] || 'CA',
+                  area: territory.squareMiles,
+                  population: territory.estimatedPopulation || 50000,
+                  centerLat: territory.center?.lat || 0,
+                  centerLng: territory.center?.lng || 0,
+                  radiusMiles: territory.radiusMiles || Math.sqrt(territory.squareMiles / Math.PI),
+                  licenseFee: forensicPricing?.finalPrice || 5000,
+                }}
+              />
+            </div>
           </div>
         </section>
       )}

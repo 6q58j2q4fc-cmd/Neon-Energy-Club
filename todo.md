@@ -3844,3 +3844,30 @@
 - [x] Integrate calculator into Franchise page territory selector
 - [x] Update territory selection to use new pricing model
 - [x] Test pricing calculations across different states/cities
+
+
+## Territory Advanced Features (Jan 31)
+
+### 1. Territory PDF Export
+- [x] Create PDF generation utility for territory pricing breakdown
+- [x] Include territory map snapshot in PDF
+- [x] Add pricing breakdown table with all forensic audit data
+- [x] Include state licensing fees and municipal tax details
+- [x] Add company branding and professional formatting
+- [x] Add download button to Franchise page
+
+### 2. Territory Reservation System (48-Hour Hold)
+- [x] Create territory_reservations database table
+- [x] Add reservation tRPC procedures (create, check, release)
+- [x] Implement 48-hour expiration logic
+- [x] Add visual indicator for reserved territories on map
+- [x] Show reservation countdown timer
+- [ ] Send email notification when reservation expires (future enhancement)
+
+### 3. ROI Calculator Integration
+- [x] Create ROI calculation logic based on territory demographics
+- [x] Calculate vending machine placement density
+- [x] Project monthly/annual revenue estimates
+- [x] Factor in population density and foot traffic
+- [x] Display ROI projections in pricing calculator
+- [x] Add investment payback period calculation

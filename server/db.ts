@@ -1,4 +1,4 @@
-import { desc, eq, sql, and, gt } from "drizzle-orm";
+import { desc, eq, sql, and, gt, lt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption, vendingApplications, franchiseApplications, pushSubscriptions, InsertVendingApplication, InsertFranchiseApplication, InsertPushSubscription, userProfiles, InsertUserProfile, scheduledMeetings, InsertScheduledMeeting, vendingMachineOrders, vendingPaymentHistory, InsertVendingMachineOrder, InsertVendingPaymentHistory, vendingNetwork, vendingCommissions, InsertVendingNetwork, InsertVendingCommission, notificationPreferences, emailDigestQueue, InsertNotificationPreference, InsertEmailDigestQueueItem } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -5707,4 +5707,216 @@ export async function getUsersDueForDigest(frequency: "daily" | "weekly") {
 
     return true;
   });
+}
+
+
+// ============ Territory Reservation Functions ============
+
+import { territoryReservations, InsertTerritoryReservation } from "../drizzle/schema";
+
+/**
+ * Create a new territory reservation (48-hour hold)
+ */
+export async function createTerritoryReservation(data: Omit<InsertTerritoryReservation, 'expiresAt' | 'status'>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Check for existing active reservation for this user
+  const existingUserReservation = await db.select().from(territoryReservations)
+    .where(and(
+      eq(territoryReservations.userId, data.userId),
+      eq(territoryReservations.status, "active")
+    ));
+  
+  if (existingUserReservation.length > 0) {
+    throw new Error("You already have an active territory reservation. Please complete or cancel it first.");
+  }
+  
+  // Check for overlapping reservations in the same area
+  const overlapping = await db.select().from(territoryReservations)
+    .where(and(
+      eq(territoryReservations.status, "active"),
+      eq(territoryReservations.state, data.state)
+    ));
+  
+  // Simple overlap check based on center distance and radius
+  for (const existing of overlapping) {
+    const existingLat = parseFloat(existing.centerLat as unknown as string);
+    const existingLng = parseFloat(existing.centerLng as unknown as string);
+    const existingRadius = parseFloat(existing.radiusMiles as unknown as string);
+    const newLat = parseFloat(data.centerLat as unknown as string);
+    const newLng = parseFloat(data.centerLng as unknown as string);
+    const newRadius = parseFloat(data.radiusMiles as unknown as string);
+    
+    // Calculate distance between centers (simplified)
+    const latDiff = Math.abs(existingLat - newLat);
+    const lngDiff = Math.abs(existingLng - newLng);
+    const distance = Math.sqrt(latDiff * latDiff + lngDiff * lngDiff) * 69; // Rough miles conversion
+    
+    if (distance < (existingRadius + newRadius)) {
+      throw new Error("This territory overlaps with an existing reservation. Please select a different area.");
+    }
+  }
+  
+  // Set expiration to 48 hours from now
+  const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000);
+  
+  const result = await db.insert(territoryReservations).values({
+    ...data,
+    expiresAt,
+    status: "active",
+  });
+  
+  return { 
+    success: true, 
+    reservationId: result[0].insertId,
+    expiresAt,
+  };
+}
+
+/**
+ * Get user's active territory reservation
+ */
+export async function getUserActiveReservation(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  // First, expire any old reservations
+  await expireOldReservations();
+  
+  const result = await db.select().from(territoryReservations)
+    .where(and(
+      eq(territoryReservations.userId, userId),
+      eq(territoryReservations.status, "active")
+    ))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Get all active territory reservations (for map display)
+ */
+export async function getActiveReservations() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // First, expire any old reservations
+  await expireOldReservations();
+  
+  return await db.select().from(territoryReservations)
+    .where(eq(territoryReservations.status, "active"));
+}
+
+/**
+ * Cancel a territory reservation
+ */
+export async function cancelTerritoryReservation(userId: number, reservationId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const reservation = await db.select().from(territoryReservations)
+    .where(and(
+      eq(territoryReservations.id, reservationId),
+      eq(territoryReservations.userId, userId)
+    ))
+    .limit(1);
+  
+  if (!reservation[0]) {
+    throw new Error("Reservation not found");
+  }
+  
+  if (reservation[0].status !== "active") {
+    throw new Error("Reservation is no longer active");
+  }
+  
+  await db.update(territoryReservations)
+    .set({ status: "cancelled" })
+    .where(eq(territoryReservations.id, reservationId));
+  
+  return { success: true };
+}
+
+/**
+ * Convert reservation to license application
+ */
+export async function convertReservationToLicense(userId: number, reservationId: number, licenseId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(territoryReservations)
+    .set({ 
+      status: "converted",
+      convertedToLicenseId: licenseId,
+    })
+    .where(and(
+      eq(territoryReservations.id, reservationId),
+      eq(territoryReservations.userId, userId)
+    ));
+  
+  return { success: true };
+}
+
+/**
+ * Expire old reservations (called automatically)
+ */
+export async function expireOldReservations() {
+  const db = await getDb();
+  if (!db) return;
+  
+  const now = new Date();
+  
+  await db.update(territoryReservations)
+    .set({ status: "expired" })
+    .where(and(
+      eq(territoryReservations.status, "active"),
+      lt(territoryReservations.expiresAt, now)
+    ));
+}
+
+/**
+ * Get reservations expiring soon (for reminder emails)
+ */
+export async function getExpiringReservations(hoursBeforeExpiry: number = 6) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const now = new Date();
+  const threshold = new Date(now.getTime() + hoursBeforeExpiry * 60 * 60 * 1000);
+  
+  return await db.select().from(territoryReservations)
+    .where(and(
+      eq(territoryReservations.status, "active"),
+      eq(territoryReservations.reminderSent, false),
+      lt(territoryReservations.expiresAt, threshold),
+      gt(territoryReservations.expiresAt, now)
+    ));
+}
+
+/**
+ * Mark reminder as sent
+ */
+export async function markReservationReminderSent(reservationId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(territoryReservations)
+    .set({ reminderSent: true })
+    .where(eq(territoryReservations.id, reservationId));
+  
+  return { success: true };
+}
+
+/**
+ * Get reservation by ID
+ */
+export async function getReservationById(reservationId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(territoryReservations)
+    .where(eq(territoryReservations.id, reservationId))
+    .limit(1);
+  
+  return result[0] || null;
 }
