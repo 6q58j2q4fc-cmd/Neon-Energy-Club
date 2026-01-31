@@ -6,7 +6,7 @@ import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { 
   Zap, Home, BookOpen, Store, Star, MapPin, Building2, Gem, Users, Trophy, 
-  Search, X, User, Package, LogOut, ChevronDown, Settings, ShoppingBag, TrendingUp, ShoppingCart
+  Search, X, User, Package, LogOut, ChevronDown, Settings, ShoppingBag, TrendingUp, ShoppingCart, Heart
 } from "lucide-react";
 import ProfileDropdown from "./ProfileDropdown";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -18,6 +18,7 @@ const navItems = [
   { label: "HOME", path: "/", icon: Home },
   { label: "OUR STORY", path: "/about", icon: BookOpen },
   { label: "PRODUCTS", path: "/products", icon: Store },
+  { label: "GIVE BACK", path: "/give-back", icon: Heart },
   { label: "CELEBRITY FANS", path: "/celebrities", icon: Star },
   { label: "FRANCHISE", path: "/franchise", icon: MapPin },
   { label: "VENDING", path: "/vending", icon: Building2 },
@@ -87,6 +88,7 @@ const searchablePages = [
   { title: "Investors", path: "/investors", keywords: ["invest", "investors", "funding", "equity", "capital", "opportunity"], category: "page" },
   { title: "Leaderboard", path: "/leaderboard", keywords: ["leaderboard", "ranking", "top", "referrals", "points"], category: "page" },
   { title: "Blog", path: "/blog", keywords: ["blog", "news", "articles", "posts", "updates"], category: "page" },
+  { title: "Give Back", path: "/give-back", keywords: ["give back", "charity", "rainforest", "komen", "breast cancer", "conservation", "donate"], category: "page" },
   { title: "Policies & Procedures", path: "/policies", keywords: ["policies", "procedures", "rules", "guidelines"], category: "page" },
   { title: "Leaderboard", path: "/leaderboard", keywords: ["leaderboard", "referral", "ranking", "top", "champions", "rewards"], category: "page" },
 ];

@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { SEO } from "@/components/SEO";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
-import { ShoppingCart, Check, Zap, Leaf, Apple, Cherry, Sparkles, Star, Award, Heart, Shield, Link as LinkIcon } from "lucide-react";
+import { ShoppingCart, Check, Zap, Leaf, Apple, Cherry, Sparkles, Star, Award, Heart, Shield, Link as LinkIcon, ExternalLink } from "lucide-react";
 import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
 
@@ -153,10 +153,16 @@ export default function Products() {
               <div className="absolute inset-0 border border-[#c8ff00]/20 rounded-3xl" />
               
               {/* Rainforest Trust Badge */}
-              <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-green-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full">
+              <a 
+                href="https://www.rainforesttrust.org/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-green-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full hover:bg-green-500 transition-colors cursor-pointer"
+              >
                 <Leaf className="w-3 h-3" />
                 SUPPORTS RAINFOREST TRUST
-              </div>
+                <ExternalLink className="w-3 h-3" />
+              </a>
               
               <div className="relative p-8 text-center">
                 {/* Product image with seamless glow */}
@@ -223,12 +229,34 @@ export default function Products() {
               <div className="absolute inset-0 border border-pink-500/20 rounded-3xl" />
               
               {/* Susan G. Komen Badge */}
-              <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-pink-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full">
+              <a 
+                href="https://www.komen.org/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-pink-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full hover:bg-pink-500 transition-colors cursor-pointer"
+              >
                 <Heart className="w-3 h-3" />
                 FIGHTS BREAST CANCER
-              </div>
+                <ExternalLink className="w-3 h-3" />
+              </a>
               
               <div className="relative p-8 text-center">
+                {/* Susan G. Komen Logo */}
+                <div className="flex justify-center mb-4">
+                  <a 
+                    href="https://www.komen.org/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:scale-105 transition-transform"
+                  >
+                    <img 
+                      src="/susan-g-komen-logo.jpeg" 
+                      alt="Susan G. Komen More Than Pink Walk" 
+                      className="w-48 h-auto rounded-lg shadow-lg"
+                    />
+                  </a>
+                </div>
+                
                 {/* Product image with seamless glow */}
                 <div className="relative mb-6 product-image-seamless-pink">
                   <div className="absolute inset-0 bg-gradient-radial from-pink-500/30 via-pink-500/10 to-transparent blur-[80px] scale-150" />
@@ -394,7 +422,7 @@ export default function Products() {
               </div>
               
               <h2 className="text-3xl md:text-4xl font-bold text-white">
-                Proud Partner of <span className="text-green-400 drop-shadow-[0_0_20px_rgba(0,255,100,0.5)]">Rainforest Trust</span>
+                Proud Partner of <a href="https://www.rainforesttrust.org/" target="_blank" rel="noopener noreferrer" className="text-green-400 drop-shadow-[0_0_20px_rgba(0,255,100,0.5)] hover:text-green-300 transition-colors">Rainforest Trust <ExternalLink className="inline w-5 h-5 ml-1" /></a>
               </h2>
               
               <p className="text-white/80 leading-relaxed">
@@ -427,6 +455,17 @@ export default function Products() {
                   <span>50M+ Acres Protected</span>
                 </div>
               </div>
+              
+              {/* Learn More Link */}
+              <a 
+                href="https://www.rainforesttrust.org/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg transition-all hover:scale-105 shadow-[0_0_20px_rgba(0,255,100,0.3)]"
+              >
+                Learn More About Rainforest Trust
+                <ExternalLink className="w-4 h-4" />
+              </a>
             </div>
           </div>
         </div>

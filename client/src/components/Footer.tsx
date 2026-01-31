@@ -60,6 +60,7 @@ export default function Footer() {
             <h4 className="text-[#c8ff00] font-bold mb-4 text-sm tracking-wider">Company</h4>
             <ul className="space-y-2">
               <li><Link href="/about" className="text-white/60 hover:text-[#c8ff00] text-sm transition-colors">Our Story</Link></li>
+              <li><Link href="/give-back" className="text-white/60 hover:text-[#c8ff00] text-sm transition-colors">Give Back</Link></li>
               <li><Link href="/compensation" className="text-white/60 hover:text-[#c8ff00] text-sm transition-colors">Compensation Plan</Link></li>
               <li><Link href="/join" className="text-white/60 hover:text-[#c8ff00] text-sm transition-colors">Join Now</Link></li>
               <li><Link href="/nft-gallery" className="text-white/60 hover:text-[#c8ff00] text-sm transition-colors">NFT Gallery</Link></li>

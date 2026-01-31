@@ -3730,3 +3730,17 @@
 - [x] Add NEON mission statement quote about giving back to the jungle
 - [x] Add trust badges (4-Star Charity Navigator, 100% to Conservation, 50M+ Acres Protected)
 - [x] Verify both images display correctly on Products page
+
+
+## Charity Partnerships Enhancement (Jan 30)
+
+- [x] Copy Susan G. Komen "More Than Pink Walk" logo to /client/public/
+- [x] Add Susan G. Komen logo near NEON Pink can on Products page
+- [x] Add clickable link to Rainforest Trust donation page
+- [x] Add clickable link to Susan G. Komen foundation
+- [x] Create dedicated "Give Back" page
+- [x] Add impact metrics for both charities on Give Back page
+- [x] Add photos of conservation efforts on Give Back page
+- [x] Add testimonials section on Give Back page
+- [x] Add Give Back page to main navigation
+- [x] Test all charity links and Give Back page
