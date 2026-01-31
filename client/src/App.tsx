@@ -44,6 +44,7 @@ import FranchiseDashboard from "./pages/FranchiseDashboard";
 import PersonalizedLanding from "./pages/PersonalizedLanding";
 import VerifyEmail from "./pages/VerifyEmail";
 import GiveBack from "./pages/GiveBack";
+import OrderHistory from "./pages/OrderHistory";
 // AmbientSoundToggle moved to header as HeaderSoundControl
 import UnifiedChatBot from "./components/UnifiedChatBot";
 import CartDrawer from "./components/CartDrawer";
@@ -120,6 +121,7 @@ function Router() {
         <Route path="/verify-email" component={VerifyEmail} />
         <Route path="/give-back" component={GiveBack} />
         <Route path="/customer-portal" component={CustomerPortal} />
+        <Route path="/order-history" component={OrderHistory} />
         <Route path="/my-rewards" component={CustomerPortal} />
         <Route path="/franchise/dashboard" component={FranchiseDashboard} />
         <Route path="/distributor" component={DistributorPortal} />

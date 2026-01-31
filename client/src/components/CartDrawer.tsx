@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import { X, Plus, Minus, ShoppingBag, Trash2, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function CartDrawer() {
   const { items, removeItem, updateQuantity, clearCart, totalItems, totalPrice, isOpen, setIsOpen } = useCart();
   const [, setLocation] = useLocation();
+  const { t } = useLanguage();
 
   const handleCheckout = () => {
     setIsOpen(false);
@@ -46,8 +48,8 @@ export default function CartDrawer() {
                   <ShoppingBag className="w-5 h-5 text-[#c8ff00]" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-white">Your Cart</h2>
-                  <p className="text-sm text-white/50">{totalItems} {totalItems === 1 ? "item" : "items"}</p>
+                  <h2 className="text-lg font-bold text-white">{t("shop.title")}</h2>
+                  <p className="text-sm text-white/50">{totalItems} {totalItems === 1 ? t("shop.quantity") : t("shop.quantity")}</p>
                 </div>
               </div>
               <button
@@ -65,7 +67,7 @@ export default function CartDrawer() {
                   <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-4">
                     <ShoppingBag className="w-10 h-10 text-white/30" />
                   </div>
-                  <p className="text-white/50 mb-2">Your cart is empty</p>
+                  <p className="text-white/50 mb-2">{t("shop.freeShipping") || "Your cart is empty"}</p>
                   <p className="text-sm text-white/30">Add some NEON energy to your life!</p>
                   <Button
                     onClick={() => {
@@ -75,7 +77,7 @@ export default function CartDrawer() {
                     className="mt-6 bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold"
                   >
                     <Zap className="w-4 h-4 mr-2" />
-                    Browse Products
+                    {t("common.viewMore") || "Browse Products"}
                   </Button>
                 </div>
               ) : (
@@ -142,10 +144,10 @@ export default function CartDrawer() {
                   onClick={clearCart}
                   className="w-full text-sm text-white/50 hover:text-[#ff0080] transition-colors"
                 >
-                  Clear Cart
+                  {t("common.delete") || "Clear Cart"}
                 </button>
                 <div className="flex items-center justify-between text-lg">
-                  <span className="text-white/70">Total</span>
+                  <span className="text-white/70">{t("shop.total")}</span>
                   <span className="text-2xl font-black text-[#c8ff00]">${totalPrice.toFixed(2)}</span>
                 </div>
                 <Button
@@ -153,7 +155,7 @@ export default function CartDrawer() {
                   className="w-full h-14 bg-[#c8ff00] text-black hover:bg-[#a8d600] font-black text-lg"
                 >
                   <ShoppingBag className="w-5 h-5 mr-2" />
-                  Checkout
+                  {t("shop.checkout")}
                 </Button>
                 <p className="text-xs text-center text-white/30">Secure checkout powered by Stripe</p>
               </div>

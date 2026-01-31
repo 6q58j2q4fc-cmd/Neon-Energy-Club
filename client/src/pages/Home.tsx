@@ -72,8 +72,8 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll);
     
     const calculateTimeLeft = () => {
-      // Fixed launch date: April 19, 2026
-      const launchDate = new Date('2026-04-19T00:00:00');
+      // Fixed launch date: May 6, 2026 (95 days from Jan 31, 2026)
+      const launchDate = new Date('2026-05-06T00:00:00');
       const now = new Date();
       const difference = launchDate.getTime() - now.getTime();
       
