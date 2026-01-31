@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-// Rank configuration with icons and colors
+// Rank configuration with icons and colors - consistent with compensation plan PDF
 export const RANK_CONFIG = {
   starter: {
     name: "Starter",
@@ -17,7 +17,7 @@ export const RANK_CONFIG = {
     color: "#CD7F32",
     bgColor: "rgba(205, 127, 50, 0.2)",
     description: "Bronze rank - Building momentum!",
-    requirements: "100 PV personal, 500 PV team, 1 active leg",
+    requirements: "100 PV personal, 500 TV team, 200 Lesser Leg",
   },
   silver: {
     name: "Silver",
@@ -25,7 +25,7 @@ export const RANK_CONFIG = {
     color: "#C0C0C0",
     bgColor: "rgba(192, 192, 192, 0.2)",
     description: "Silver rank - Rising star!",
-    requirements: "150 PV personal, 2,000 PV team, 2 active legs",
+    requirements: "100 PV personal, 2,000 TV team, 800 Lesser Leg",
   },
   gold: {
     name: "Gold",
@@ -33,7 +33,7 @@ export const RANK_CONFIG = {
     color: "#FFD700",
     bgColor: "rgba(255, 215, 0, 0.2)",
     description: "Gold rank - Proven leader!",
-    requirements: "200 PV personal, 5,000 PV team, 2 active legs",
+    requirements: "100 PV personal, 5,000 TV team, 2,000 Lesser Leg",
   },
   platinum: {
     name: "Platinum",
@@ -41,7 +41,7 @@ export const RANK_CONFIG = {
     color: "#E5E4E2",
     bgColor: "rgba(229, 228, 226, 0.2)",
     description: "Platinum rank - Elite performer!",
-    requirements: "250 PV personal, 15,000 PV team, 2 active legs",
+    requirements: "100 PV personal, 15,000 TV team, 6,000 Lesser Leg",
   },
   diamond: {
     name: "Diamond",
@@ -49,23 +49,23 @@ export const RANK_CONFIG = {
     color: "#B9F2FF",
     bgColor: "rgba(185, 242, 255, 0.2)",
     description: "Diamond rank - Top 1% achiever!",
-    requirements: "300 PV personal, 50,000 PV team, 2 active legs",
+    requirements: "100 PV personal, 50,000 TV team, 20,000 Lesser Leg",
   },
-  crown: {
+  crown_diamond: {
     name: "Crown Diamond",
     icon: "👑",
     color: "#9333EA",
     bgColor: "rgba(147, 51, 234, 0.2)",
     description: "Crown Diamond - Industry legend!",
-    requirements: "400 PV personal, 150,000 PV team, 2 active legs",
+    requirements: "100 PV personal, 150,000 TV team, 60,000 Lesser Leg",
   },
-  ambassador: {
-    name: "Ambassador",
+  royal_diamond: {
+    name: "Royal Diamond",
     icon: "🏆",
-    color: "#DC2626",
-    bgColor: "rgba(220, 38, 38, 0.2)",
-    description: "Ambassador - Pinnacle of success!",
-    requirements: "500 PV personal, 500,000 PV team, 2 active legs",
+    color: "#FF0080",
+    bgColor: "rgba(255, 0, 128, 0.2)",
+    description: "Royal Diamond - Pinnacle of success!",
+    requirements: "100 PV personal, 500,000 TV team, 200,000 Lesser Leg",
   },
 };
 
@@ -230,16 +230,16 @@ export function RankProgress({ currentRank, personalPV, teamPV }: RankProgressPr
     );
   }
 
-  // Simplified progress calculation (would need actual rank requirements in production)
+  // Rank requirements consistent with compensation plan PDF
   const pvRequirements: Record<RankKey, { personal: number; team: number }> = {
     starter: { personal: 0, team: 0 },
     bronze: { personal: 100, team: 500 },
-    silver: { personal: 150, team: 2000 },
-    gold: { personal: 200, team: 5000 },
-    platinum: { personal: 250, team: 15000 },
-    diamond: { personal: 300, team: 50000 },
-    crown: { personal: 400, team: 150000 },
-    ambassador: { personal: 500, team: 500000 },
+    silver: { personal: 100, team: 2000 },
+    gold: { personal: 100, team: 5000 },
+    platinum: { personal: 100, team: 15000 },
+    diamond: { personal: 100, team: 50000 },
+    crown_diamond: { personal: 100, team: 150000 },
+    royal_diamond: { personal: 100, team: 500000 },
   };
 
   const nextReqs = pvRequirements[nextRank];

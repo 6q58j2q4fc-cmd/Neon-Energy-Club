@@ -838,13 +838,16 @@ export async function calculateCommission(saleId: number) {
   
   const dist = distributor[0];
   
-  // Commission rates by rank
+  // Commission rates by rank - consistent with compensation plan PDF
   const commissionRates: Record<string, number> = {
-    starter: 0.20, // 20%
-    bronze: 0.25,  // 25%
-    silver: 0.30,  // 30%
-    gold: 0.35,    // 35%
-    platinum: 0.40, // 40%
+    starter: 0.20,       // 20%
+    bronze: 0.25,        // 25%
+    silver: 0.27,        // 27%
+    gold: 0.30,          // 30%
+    platinum: 0.32,      // 32%
+    diamond: 0.35,       // 35%
+    crown_diamond: 0.37, // 37%
+    royal_diamond: 0.40, // 40%
   };
   
   const rate = commissionRates[dist.rank] || 0.20;
@@ -988,16 +991,19 @@ export async function checkRankAdvancement(userId: number) {
     throw new Error("Distributor not found");
   }
   
-  // Rank requirements (team sales in cents)
+  // Rank requirements (team volume in cents) - consistent with compensation plan PDF
   const rankRequirements: Record<string, number> = {
     starter: 0,
-    bronze: 500000,    // $5,000
-    silver: 2000000,   // $20,000
-    gold: 10000000,    // $100,000
-    platinum: 50000000, // $500,000
+    bronze: 50000,       // $500 TV
+    silver: 200000,      // $2,000 TV
+    gold: 500000,        // $5,000 TV
+    platinum: 1500000,   // $15,000 TV
+    diamond: 5000000,    // $50,000 TV
+    crown_diamond: 15000000, // $150,000 TV
+    royal_diamond: 50000000, // $500,000 TV
   };
   
-  const ranks = ["starter", "bronze", "silver", "gold", "platinum"];
+  const ranks = ["starter", "bronze", "silver", "gold", "platinum", "diamond", "crown_diamond", "royal_diamond"];
   const currentRankIndex = ranks.indexOf(distributor.rank);
   
   // Check if eligible for next rank
@@ -3284,10 +3290,10 @@ export async function getLeaderboardByRank(limit = 50) {
   const db = await getDb();
   if (!db) return [];
   
-  // Rank order for sorting
+  // Rank order for sorting - consistent with compensation plan PDF
   const rankOrder = sql`CASE 
-    WHEN rank = 'ambassador' THEN 8
-    WHEN rank = 'crown' THEN 7
+    WHEN rank = 'royal_diamond' THEN 8
+    WHEN rank = 'crown_diamond' THEN 7
     WHEN rank = 'diamond' THEN 6
     WHEN rank = 'platinum' THEN 5
     WHEN rank = 'gold' THEN 4

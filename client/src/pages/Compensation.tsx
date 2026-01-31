@@ -24,13 +24,16 @@ import {
 import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
 
-// Rank definitions
+// Rank definitions - consistent with compensation plan PDF
 const ranks = [
-  { name: "Associate", icon: Star, color: "text-gray-400", requirement: "Join with any pack", bonus: "$0", teamReq: "None" },
-  { name: "Manager", icon: Star, color: "text-green-500", requirement: "500 GV + 2 active legs", bonus: "$500", teamReq: "2 personally enrolled" },
-  { name: "Director", icon: Award, color: "text-blue-500", requirement: "2,500 GV + 4 active legs", bonus: "$2,500", teamReq: "4 personally enrolled" },
-  { name: "Executive", icon: Crown, color: "text-purple-500", requirement: "10,000 GV + 6 active legs", bonus: "$10,000", teamReq: "2 Directors in team" },
-  { name: "Presidential", icon: Crown, color: "text-[#c8ff00]", requirement: "50,000 GV + 8 active legs", bonus: "$25,000", teamReq: "2 Executives in team" },
+  { name: "Starter", icon: Star, color: "text-gray-400", requirement: "Join with any pack", bonus: "$0", teamReq: "None" },
+  { name: "Bronze", icon: Star, color: "text-amber-600", requirement: "100 PV + 500 TV", bonus: "$100", teamReq: "200 Lesser Leg Volume" },
+  { name: "Silver", icon: Star, color: "text-gray-300", requirement: "100 PV + 2,000 TV", bonus: "$250", teamReq: "800 Lesser Leg Volume" },
+  { name: "Gold", icon: Award, color: "text-yellow-500", requirement: "100 PV + 5,000 TV", bonus: "$500", teamReq: "2,000 Lesser Leg Volume" },
+  { name: "Platinum", icon: Award, color: "text-slate-300", requirement: "100 PV + 15,000 TV", bonus: "$1,000", teamReq: "6,000 Lesser Leg Volume" },
+  { name: "Diamond", icon: Crown, color: "text-cyan-400", requirement: "100 PV + 50,000 TV", bonus: "$5,000", teamReq: "20,000 Lesser Leg Volume" },
+  { name: "Crown Diamond", icon: Crown, color: "text-purple-500", requirement: "100 PV + 150,000 TV", bonus: "$25,000", teamReq: "60,000 Lesser Leg Volume" },
+  { name: "Royal Diamond", icon: Crown, color: "text-[#c8ff00]", requirement: "100 PV + 500,000 TV", bonus: "$100,000", teamReq: "200,000 Lesser Leg Volume" },
 ];
 
 // Commission structure
@@ -42,13 +45,16 @@ const commissionLevels = [
   { level: 5, name: "Level 5", rate: "3%", description: "Maximum depth for unilevel commissions" },
 ];
 
-// Binary bonuses
+// Binary bonuses - consistent with compensation plan PDF
 const binaryBonuses = [
-  { rank: "Associate", weeklyMax: "$2,500", rate: "10%" },
-  { rank: "Manager", weeklyMax: "$5,000", rate: "10%" },
-  { rank: "Director", weeklyMax: "$7,500", rate: "10%" },
-  { rank: "Executive", weeklyMax: "$10,000", rate: "10%" },
-  { rank: "Presidential", weeklyMax: "Uncapped", rate: "10%" },
+  { rank: "Starter", weeklyMax: "$500", rate: "10%" },
+  { rank: "Bronze", weeklyMax: "$1,000", rate: "10%" },
+  { rank: "Silver", weeklyMax: "$2,500", rate: "10%" },
+  { rank: "Gold", weeklyMax: "$2,500", rate: "10%" },
+  { rank: "Platinum", weeklyMax: "$5,000", rate: "12%" },
+  { rank: "Diamond", weeklyMax: "$10,000", rate: "15%" },
+  { rank: "Crown Diamond", weeklyMax: "$25,000", rate: "15%" },
+  { rank: "Royal Diamond", weeklyMax: "Uncapped", rate: "15%" },
 ];
 
 export default function Compensation() {

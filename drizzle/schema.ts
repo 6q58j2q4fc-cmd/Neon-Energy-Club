@@ -184,7 +184,7 @@ export const distributors = mysqlTable("distributors", {
   /** Unique subdomain for affiliate site (e.g., john.neonenergy.com) */
   subdomain: varchar("subdomain", { length: 50 }).unique(),
   /** Current rank/level */
-  rank: mysqlEnum("rank", ["starter", "bronze", "silver", "gold", "platinum", "diamond", "crown", "ambassador"]).default("starter").notNull(),
+  rank: mysqlEnum("rank", ["starter", "bronze", "silver", "gold", "platinum", "diamond", "crown_diamond", "royal_diamond"]).default("starter").notNull(),
   /** Total personal sales volume (PV) */
   personalSales: int("personalSales").default(0).notNull(),
   /** Total team sales volume (GV) */

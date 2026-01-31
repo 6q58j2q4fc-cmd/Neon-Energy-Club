@@ -202,7 +202,7 @@ const SAMPLE_TREE_DATA: GenealogyData = {
   depth: 3,
 };
 
-// Rank colors for visualization
+// Rank colors for visualization - consistent with compensation plan PDF
 const RANK_COLORS: Record<string, { bg: string; border: string; text: string }> = {
   starter: { bg: "rgba(200, 255, 0, 0.15)", border: "#c8ff00", text: "#c8ff00" },
   bronze: { bg: "rgba(205, 127, 50, 0.2)", border: "#cd7f32", text: "#cd7f32" },
@@ -210,10 +210,8 @@ const RANK_COLORS: Record<string, { bg: string; border: string; text: string }> 
   gold: { bg: "rgba(255, 215, 0, 0.2)", border: "#ffd700", text: "#ffd700" },
   platinum: { bg: "rgba(229, 228, 226, 0.2)", border: "#e5e4e2", text: "#e5e4e2" },
   diamond: { bg: "rgba(185, 242, 255, 0.2)", border: "#b9f2ff", text: "#b9f2ff" },
-  executive: { bg: "rgba(138, 43, 226, 0.2)", border: "#8a2be2", text: "#8a2be2" },
-  presidential: { bg: "rgba(255, 0, 128, 0.2)", border: "#ff0080", text: "#ff0080" },
-  ambassador: { bg: "rgba(255, 69, 0, 0.2)", border: "#ff4500", text: "#ff4500" },
-  crown: { bg: "rgba(255, 215, 0, 0.3)", border: "#ffd700", text: "#ffd700" },
+  crown_diamond: { bg: "rgba(138, 43, 226, 0.2)", border: "#8a2be2", text: "#8a2be2" },
+  royal_diamond: { bg: "rgba(255, 0, 128, 0.2)", border: "#ff0080", text: "#ff0080" },
 };
 
 // Empty Position Placeholder Component

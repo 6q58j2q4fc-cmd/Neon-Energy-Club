@@ -1,0 +1,1 @@
+ALTER TABLE `distributors` MODIFY COLUMN `rank` enum('starter','bronze','silver','gold','platinum','diamond','crown_diamond','royal_diamond') NOT NULL DEFAULT 'starter';
