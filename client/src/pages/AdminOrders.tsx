@@ -38,8 +38,10 @@ import {
   Edit,
   ChevronLeft,
   ChevronRight,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Tag
 } from "lucide-react";
+import { ShippingLabelModal } from "@/components/ShippingLabelModal";
 
 type OrderStatus = "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled";
 
@@ -68,6 +70,9 @@ export default function AdminOrders() {
   const [newTrackingNumber, setNewTrackingNumber] = useState("");
   const [bulkModalOpen, setBulkModalOpen] = useState(false);
   const [bulkStatus, setBulkStatus] = useState<OrderStatus>("processing");
+  const [shippingModalOpen, setShippingModalOpen] = useState(false);
+  const [shippingOrderId, setShippingOrderId] = useState<number | null>(null);
+  const [shippingOrderNumber, setShippingOrderNumber] = useState("");
   
   const ordersPerPage = 20;
 
@@ -191,26 +196,128 @@ export default function AdminOrders() {
     });
   };
 
-  const exportOrders = () => {
-    const csv = [
-      ["Order #", "Customer", "Email", "Status", "Total", "Tracking", "Date"].join(","),
-      ...orders.map((o: Order) => [
-        o.orderNumber,
-        o.customerName,
-        o.customerEmail,
+  // Export mutation to get all orders
+  const exportMutation = trpc.admin.exportAllOrders.useQuery({
+    status: statusFilter === "all" ? undefined : statusFilter,
+    search: searchQuery || undefined
+  }, { enabled: false });
+
+  const exportOrders = async () => {
+    const result = await exportMutation.refetch();
+    if (!result.data) return;
+    
+    const exportData = result.data.orders;
+    const headers = [
+      "Order #", "Customer Name", "Email", "Phone", "Status", "Quantity", 
+      "Total ($)", "Address", "City", "State", "Postal Code", 
+      "Country", "Tracking #", "Carrier", "NFT ID", "NFT Status", "Notes", "Created At", "Updated At"
+    ];
+    
+    const csvContent = [
+      headers.join(","),
+      ...exportData.map((o: any) => [
+        `"${o.orderNumber}"`,
+        `"${o.customerName}"`,
+        `"${o.customerEmail}"`,
+        `"${o.phone}"`,
         o.status,
-        o.total.toFixed(2),
-        o.trackingNumber || "",
-        new Date(o.createdAt).toLocaleDateString()
+        o.quantity,
+        o.total,
+        `"${o.address}"`,
+        `"${o.city}"`,
+        `"${o.state}"`,
+        `"${o.postalCode}"`,
+        o.country,
+        `"${o.trackingNumber}"`,
+        `"${o.carrier}"`,
+        `"${o.nftId}"`,
+        o.nftMintStatus,
+        `"${(o.notes || '').replace(/"/g, '""')}"`,
+        o.createdAt,
+        o.updatedAt
       ].join(","))
     ].join("\n");
     
-    const blob = new Blob([csv], { type: "text/csv" });
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `orders-${new Date().toISOString().split("T")[0]}.csv`;
+    a.download = `neon-orders-${new Date().toISOString().split("T")[0]}.csv`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const exportToExcel = async () => {
+    const result = await exportMutation.refetch();
+    if (!result.data) return;
+    
+    const exportData = result.data.orders;
+    // Create Excel-compatible XML
+    let excelContent = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <Worksheet ss:Name="Orders">
+    <Table>
+      <Row>
+        <Cell><Data ss:Type="String">Order #</Data></Cell>
+        <Cell><Data ss:Type="String">Customer Name</Data></Cell>
+        <Cell><Data ss:Type="String">Email</Data></Cell>
+        <Cell><Data ss:Type="String">Phone</Data></Cell>
+        <Cell><Data ss:Type="String">Status</Data></Cell>
+        <Cell><Data ss:Type="String">Quantity</Data></Cell>
+        <Cell><Data ss:Type="String">Total ($)</Data></Cell>
+        <Cell><Data ss:Type="String">Address</Data></Cell>
+        <Cell><Data ss:Type="String">City</Data></Cell>
+        <Cell><Data ss:Type="String">State</Data></Cell>
+        <Cell><Data ss:Type="String">Postal Code</Data></Cell>
+        <Cell><Data ss:Type="String">Country</Data></Cell>
+        <Cell><Data ss:Type="String">Tracking #</Data></Cell>
+        <Cell><Data ss:Type="String">Carrier</Data></Cell>
+        <Cell><Data ss:Type="String">NFT ID</Data></Cell>
+        <Cell><Data ss:Type="String">NFT Status</Data></Cell>
+        <Cell><Data ss:Type="String">Created At</Data></Cell>
+      </Row>`;
+    
+    exportData.forEach((o: any) => {
+      excelContent += `
+      <Row>
+        <Cell><Data ss:Type="String">${o.orderNumber}</Data></Cell>
+        <Cell><Data ss:Type="String">${o.customerName}</Data></Cell>
+        <Cell><Data ss:Type="String">${o.customerEmail}</Data></Cell>
+        <Cell><Data ss:Type="String">${o.phone}</Data></Cell>
+        <Cell><Data ss:Type="String">${o.status}</Data></Cell>
+        <Cell><Data ss:Type="Number">${o.quantity}</Data></Cell>
+        <Cell><Data ss:Type="Number">${o.total}</Data></Cell>
+        <Cell><Data ss:Type="String">${o.address}</Data></Cell>
+        <Cell><Data ss:Type="String">${o.city}</Data></Cell>
+        <Cell><Data ss:Type="String">${o.state}</Data></Cell>
+        <Cell><Data ss:Type="String">${o.postalCode}</Data></Cell>
+        <Cell><Data ss:Type="String">${o.country}</Data></Cell>
+        <Cell><Data ss:Type="String">${o.trackingNumber}</Data></Cell>
+        <Cell><Data ss:Type="String">${o.carrier}</Data></Cell>
+        <Cell><Data ss:Type="String">${o.nftId}</Data></Cell>
+        <Cell><Data ss:Type="String">${o.nftMintStatus}</Data></Cell>
+        <Cell><Data ss:Type="String">${o.createdAt}</Data></Cell>
+      </Row>`;
+    });
+    
+    excelContent += `
+    </Table>
+  </Worksheet>
+</Workbook>`;
+    
+    const blob = new Blob([excelContent], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `neon-orders-${new Date().toISOString().split("T")[0]}.xls`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -240,7 +347,15 @@ export default function AdminOrders() {
                 onClick={exportOrders}
               >
                 <Download className="w-4 h-4 mr-2" />
-                Export CSV
+                CSV
+              </Button>
+              <Button 
+                variant="outline" 
+                className="border-green-500/30 text-green-400 hover:bg-green-500/10"
+                onClick={exportToExcel}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Excel
               </Button>
               <Button 
                 variant="outline" 
@@ -433,6 +548,19 @@ export default function AdminOrders() {
                             >
                               <Edit className="w-4 h-4" />
                             </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="text-zinc-400 hover:text-amber-400"
+                              onClick={() => {
+                                setShippingOrderId(order.id);
+                                setShippingOrderNumber(order.orderNumber);
+                                setShippingModalOpen(true);
+                              }}
+                              title="Generate Shipping Label"
+                            >
+                              <Tag className="w-4 h-4" />
+                            </Button>
                           </div>
                         </td>
                       </tr>
@@ -581,6 +709,17 @@ export default function AdminOrders() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Shipping Label Modal */}
+      {shippingOrderId && (
+        <ShippingLabelModal
+          open={shippingModalOpen}
+          onOpenChange={setShippingModalOpen}
+          orderId={shippingOrderId}
+          orderNumber={shippingOrderNumber}
+          onSuccess={() => refetch()}
+        />
+      )}
     </div>
   );
 }

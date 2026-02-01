@@ -245,6 +245,45 @@ export const appRouter = router({
           },
         };
       }),
+
+    // Get orders for current logged-in user
+    getMyOrders: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (!ctx.user.email) {
+          return { orders: [] };
+        }
+        const db = await getDb();
+        if (!db) {
+          return { orders: [] };
+        }
+        const userEmail = ctx.user.email;
+        const userOrders = await db
+          .select()
+          .from(preorders)
+          .where(eq(preorders.email, userEmail))
+          .orderBy(desc(preorders.createdAt));
+        
+        return {
+          orders: userOrders.map(order => ({
+            id: order.id,
+            orderNumber: order.nftId || `NEON-${String(order.id).padStart(5, '0')}`,
+            status: order.status || 'pending',
+            quantity: order.quantity,
+            name: order.name,
+            email: order.email,
+            address: order.address,
+            city: order.city,
+            state: order.state,
+            postalCode: order.postalCode,
+            country: order.country,
+            trackingNumber: order.trackingNumber,
+            nftImageUrl: order.nftImageUrl,
+            nftId: order.nftId,
+            createdAt: order.createdAt,
+            updatedAt: order.updatedAt,
+          })),
+        };
+      }),
   }),
 
   user: router({
@@ -3727,6 +3766,153 @@ Provide step-by-step instructions with specific button names and locations. Keep
         
         console.log(`[Admin] Bulk updated ${input.orderIds.length} orders to status: ${input.status}`);
         return { success: true, updatedCount: input.orderIds.length };
+      }),
+
+    // Export all orders for CSV/Excel download
+    exportAllOrders: protectedProcedure
+      .input(z.object({
+        status: z.string().optional(),
+        search: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        // Build where conditions
+        const conditions = [];
+        if (input.status) {
+          conditions.push(eq(preorders.status, input.status as any));
+        }
+        if (input.search) {
+          conditions.push(
+            or(
+              like(preorders.name, `%${input.search}%`),
+              like(preorders.email, `%${input.search}%`),
+              like(preorders.nftId, `%${input.search}%`)
+            )
+          );
+        }
+        
+        const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+        
+        // Get ALL orders (no pagination for export)
+        const orders = await db.select()
+          .from(preorders)
+          .where(whereClause)
+          .orderBy(desc(preorders.createdAt));
+        
+        // Format orders for export with all fields
+        const exportData = orders.map(o => ({
+          orderNumber: o.nftId?.replace('NEON-NFT-', 'NEON-') || `NEON-${String(o.id).padStart(5, '0')}`,
+          customerName: o.name || '',
+          customerEmail: o.email || '',
+          phone: o.phone || '',
+          status: o.status || 'pending',
+          quantity: o.quantity || 1,
+          total: ((o.quantity || 1) * 30).toFixed(2),
+          address: o.address || '',
+          city: o.city || '',
+          state: o.state || '',
+          postalCode: o.postalCode || '',
+          country: o.country || 'US',
+          trackingNumber: o.trackingNumber || '',
+          carrier: o.carrier || '',
+          nftId: o.nftId || '',
+          nftMintStatus: o.nftMintStatus || 'pending',
+          notes: o.notes || '',
+          createdAt: o.createdAt?.toISOString() || '',
+          updatedAt: o.updatedAt?.toISOString() || '',
+        }));
+        
+        return { orders: exportData, total: exportData.length };
+      }),
+
+    // Get shipping rates for an order
+    getShippingRates: protectedProcedure
+      .input(z.object({
+        orderId: z.number().int(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        // Get order details
+        const order = await db.select().from(preorders).where(eq(preorders.id, input.orderId)).limit(1);
+        if (!order.length) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Order not found" });
+        }
+        
+        const { getShippingRates } = await import("./shipping");
+        const destination = {
+          name: order[0].name,
+          street1: order[0].address,
+          city: order[0].city,
+          state: order[0].state,
+          postalCode: order[0].postalCode,
+          country: order[0].country,
+          phone: order[0].phone || undefined,
+          email: order[0].email,
+        };
+        
+        const rates = await getShippingRates(destination);
+        return { rates, order: order[0] };
+      }),
+
+    // Generate shipping label for an order
+    generateShippingLabel: protectedProcedure
+      .input(z.object({
+        orderId: z.number().int(),
+        carrier: z.enum(['ups', 'fedex', 'usps']),
+        service: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        // Get order details
+        const order = await db.select().from(preorders).where(eq(preorders.id, input.orderId)).limit(1);
+        if (!order.length) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Order not found" });
+        }
+        
+        const { generateShippingLabel, getTrackingUrl } = await import("./shipping");
+        const destination = {
+          name: order[0].name,
+          street1: order[0].address,
+          city: order[0].city,
+          state: order[0].state,
+          postalCode: order[0].postalCode,
+          country: order[0].country,
+          phone: order[0].phone || undefined,
+          email: order[0].email,
+        };
+        
+        const orderId = order[0].nftId || `NEON-${String(order[0].id).padStart(5, '0')}`;
+        const label = await generateShippingLabel(input.carrier, input.service, destination, undefined, orderId);
+        
+        // Update order with tracking info
+        await db.update(preorders)
+          .set({
+            trackingNumber: label.trackingNumber,
+            carrier: input.carrier.toUpperCase(),
+            status: 'shipped',
+            estimatedDelivery: label.estimatedDelivery ? new Date(label.estimatedDelivery) : null,
+          })
+          .where(eq(preorders.id, input.orderId));
+        
+        const trackingUrl = getTrackingUrl(input.carrier, label.trackingNumber);
+        
+        console.log(`[Admin] Generated ${input.carrier} label for order ${input.orderId}: ${label.trackingNumber}`);
+        return { ...label, trackingUrl };
       }),
 
     // DELETE order - CRITICAL FIX: This was missing and user requested multiple times

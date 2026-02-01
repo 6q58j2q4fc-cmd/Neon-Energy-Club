@@ -4117,3 +4117,30 @@
 - [x] Create order detail view modal
 - [x] Add bulk delete functionality
 - [x] Add order statistics summary
+
+
+## Order Export, Shipping & Customer History (Feb 1)
+
+### CSV/Excel Export for Admin Orders
+- [x] Add CSV export button to admin orders panel
+- [x] Add Excel export button to admin orders panel
+- [x] Create exportAllOrders server endpoint
+- [x] Include all order fields (id, name, email, quantity, address, status, tracking, dates)
+- [x] Support full data export for accounting/fulfillment
+
+### Shipping Label Integration
+- [x] Create shipping service abstraction layer (server/shipping.ts)
+- [x] Add UPS API integration placeholder with rate calculation
+- [x] Add FedEx API integration placeholder with rate calculation
+- [x] Add USPS API integration placeholder with rate calculation
+- [x] Create ShippingLabelModal component for admin panel
+- [x] Add getRates and createLabel endpoints
+- [x] Auto-populate tracking numbers after label creation
+
+### Customer Order History Page
+- [x] Create MyOrders page component (/my-orders)
+- [x] Display all past orders with status timeline
+- [x] Show NFT gallery with social share buttons (Twitter, Facebook)
+- [x] Add order detail expansion with shipping info
+- [x] Add getMyOrders endpoint to preorder router
+- [x] Include tracking links and carrier information
