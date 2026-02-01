@@ -1,47 +1,75 @@
 /**
  * NFT Image Generation Service
  * Generates unique, one-of-a-kind NFT artwork for each order
+ * All artwork themed around NEON Energy Drink with neon environments
  */
 
 import { generateImage } from "./_core/imageGeneration";
 import { storagePut } from "./storage";
 
-// NFT visual themes for variety
+// NFT visual themes - all NEON energy drink focused with neon environments
 const NFT_THEMES = [
-  "cyberpunk neon cityscape",
-  "futuristic energy vortex",
-  "digital lightning storm",
-  "abstract geometric power grid",
-  "holographic energy waves",
-  "neon aurora borealis",
-  "electric plasma sphere",
-  "digital crystal formation",
-  "cyber dragon breathing neon fire",
-  "futuristic energy drink floating in space",
+  "NEON energy drink can floating in a cyberpunk neon cityscape at night with glowing billboards",
+  "futuristic NEON energy drink vending machine in a neon-lit Tokyo alley with rain reflections",
+  "NEON energy drink can surrounded by electric lightning in a neon storm",
+  "holographic NEON energy drink advertisement in a synthwave sunset city",
+  "NEON energy drink can emerging from a neon portal with energy waves",
+  "giant NEON energy drink can as a skyscraper in a futuristic neon metropolis",
+  "NEON energy drink can with neon aurora borealis in the arctic night sky",
+  "NEON energy drink can in a neon-lit underground cyberpunk club scene",
+  "NEON energy drink can floating in zero gravity with neon space station background",
+  "NEON energy drink can with neon dragon wrapping around it breathing electric fire",
+  "NEON energy drink can on a neon-lit race track with light trails",
+  "NEON energy drink can in a neon jungle with bioluminescent plants",
+  "NEON energy drink can at the center of a neon mandala energy explosion",
+  "NEON energy drink can in a retro arcade with neon game characters",
+  "NEON energy drink can surfing a neon wave in a digital ocean",
 ];
 
-// Color schemes for variety
+// Color schemes - vibrant neon palettes
 const COLOR_SCHEMES = [
-  "neon green and electric blue",
-  "hot pink and cyan",
-  "golden yellow and purple",
-  "electric orange and teal",
-  "lime green and magenta",
-  "neon yellow and deep violet",
-  "bright cyan and coral",
-  "electric lime and royal blue",
+  "electric lime green (#c8ff00) and deep purple neon",
+  "hot pink neon and electric cyan blue",
+  "neon yellow and magenta with black accents",
+  "electric orange and teal neon glow",
+  "lime green (#c8ff00) and hot pink neon",
+  "neon blue and golden yellow energy",
+  "bright cyan and coral neon highlights",
+  "electric green (#c8ff00) and royal purple",
+  "neon red and electric blue contrast",
+  "vibrant green (#c8ff00) and neon pink gradient",
 ];
 
-// Style modifiers
+// Style modifiers for high-quality output
 const STYLE_MODIFIERS = [
-  "highly detailed digital art",
-  "3D rendered masterpiece",
-  "cinematic lighting",
-  "ultra HD quality",
-  "vibrant colors",
-  "dramatic composition",
-  "professional artwork",
-  "award-winning design",
+  "ultra-detailed digital art, 8K resolution, cinematic neon lighting",
+  "3D rendered masterpiece with volumetric neon fog",
+  "hyper-realistic with dramatic neon reflections",
+  "award-winning digital illustration, neon glow effects",
+  "professional concept art with vibrant neon atmosphere",
+  "cinematic composition with lens flare and neon bloom",
+  "photorealistic 3D render with neon ray tracing",
+  "stunning digital painting with neon rim lighting",
+];
+
+// NEON can design elements to include
+const CAN_ELEMENTS = [
+  "the iconic black NEON can with lime green (#c8ff00) logo glowing",
+  "NEON energy drink can with electric green text pulsing with energy",
+  "sleek black NEON can with neon green accents radiating power",
+  "NEON can design with the signature lime green glow effect",
+  "premium NEON energy drink can with holographic neon finish",
+];
+
+// Environment details for neon settings
+const NEON_ENVIRONMENTS = [
+  "surrounded by floating neon signs and holographic advertisements",
+  "with neon light trails and electric particle effects",
+  "in a scene filled with glowing neon tubes and LED strips",
+  "with reflective wet surfaces showing neon reflections",
+  "amidst neon geometric shapes and energy grids",
+  "with cyberpunk neon graffiti and digital displays",
+  "featuring neon wireframe structures and light beams",
 ];
 
 /**
@@ -54,21 +82,26 @@ export function formatOrderNumber(orderNum: number): string {
 /**
  * Generate a unique NFT prompt based on order number
  * Uses deterministic selection based on order number for reproducibility
+ * All prompts are NEON energy drink themed with neon environments
  */
 function generateNftPrompt(orderNumber: number): string {
   // Use order number to deterministically select theme elements
   const themeIndex = orderNumber % NFT_THEMES.length;
   const colorIndex = (orderNumber * 7) % COLOR_SCHEMES.length;
   const styleIndex = (orderNumber * 13) % STYLE_MODIFIERS.length;
+  const canIndex = (orderNumber * 3) % CAN_ELEMENTS.length;
+  const envIndex = (orderNumber * 11) % NEON_ENVIRONMENTS.length;
   
   const theme = NFT_THEMES[themeIndex];
   const colors = COLOR_SCHEMES[colorIndex];
   const style = STYLE_MODIFIERS[styleIndex];
+  const canDesign = CAN_ELEMENTS[canIndex];
+  const environment = NEON_ENVIRONMENTS[envIndex];
   
   // Add unique elements based on order number
   const uniqueElement = getUniqueElement(orderNumber);
   
-  return `NEON Energy Drink exclusive NFT #${formatOrderNumber(orderNumber)}: ${theme} with ${colors} color palette, featuring ${uniqueElement}. ${style}. The NEON logo subtly integrated into the design. Collectible digital artwork, unique edition.`;
+  return `NEON Energy Drink exclusive collector's NFT #${formatOrderNumber(orderNumber)}: ${theme}, featuring ${canDesign}, ${environment}. Color palette: ${colors}. Additional details: ${uniqueElement}. Art style: ${style}. The NEON brand prominently displayed. Synthwave and cyberpunk aesthetic. Premium collectible digital artwork.`;
 }
 
 /**
@@ -76,21 +109,26 @@ function generateNftPrompt(orderNumber: number): string {
  */
 function getUniqueElement(orderNumber: number): string {
   const elements = [
-    "a glowing energy can at the center",
-    "lightning bolts emanating from the core",
-    "digital particles swirling in a vortex",
-    "crystalline energy formations",
-    "holographic NEON text floating",
-    "an energy wave explosion",
-    "geometric sacred patterns",
-    "a phoenix made of neon light",
-    "fractal energy spirals",
-    "a futuristic energy reactor",
-    "floating energy orbs",
-    "a digital thunderstorm",
-    "neon circuit board patterns",
-    "an abstract power surge",
-    "cosmic energy ribbons",
+    "energy lightning bolts emanating from the NEON can",
+    "digital neon particles swirling around the can",
+    "crystalline neon energy formations growing from the base",
+    "holographic NEON logo floating above the can",
+    "neon energy wave explosion behind the can",
+    "geometric neon sacred patterns surrounding the can",
+    "a neon phoenix rising from the can's energy",
+    "fractal neon energy spirals connecting to the can",
+    "a futuristic neon energy reactor powering the can",
+    "floating neon orbs orbiting the NEON can",
+    "a digital neon thunderstorm above the can",
+    "neon circuit board patterns flowing from the can",
+    "an abstract neon power surge from the can",
+    "cosmic neon energy ribbons trailing the can",
+    "neon DNA helix structure around the can",
+    "electric neon wings sprouting from the can",
+    "neon sound waves pulsing from the can",
+    "holographic neon butterflies around the can",
+    "neon crystal shards floating near the can",
+    "electric neon vines growing from the can",
   ];
   
   // Combine multiple elements for higher order numbers
@@ -98,7 +136,7 @@ function getUniqueElement(orderNumber: number): string {
   const secondaryIndex = (orderNumber * 3 + 5) % elements.length;
   
   if (orderNumber > 100) {
-    return `${elements[primaryIndex]} and ${elements[secondaryIndex]}`;
+    return `${elements[primaryIndex]} combined with ${elements[secondaryIndex]}`;
   }
   
   return elements[primaryIndex];
@@ -171,14 +209,16 @@ export function generateNftMetadata(
     formattedOrderNumber: formattedNumber,
     imageUrl,
     name: `NEON Energy Collector's Edition #${formattedNumber}`,
-    description: `Exclusive NEON Energy NFT #${formattedNumber}. This unique digital collectible was generated for early supporters during the pre-launch crowdfunding campaign. Each NFT is one-of-a-kind and will be minted on the blockchain once the 90-day pre-launch period ends and crowdfunding goals are met.`,
+    description: `Exclusive NEON Energy NFT #${formattedNumber}. This unique digital collectible features the iconic NEON Energy Drink in a stunning neon-lit environment. Generated for early supporters during the pre-launch crowdfunding campaign. Each NFT is one-of-a-kind with unique neon artwork and will be minted on the blockchain once the 90-day pre-launch period ends and crowdfunding goals are met.`,
     attributes: [
       { trait_type: "Edition Number", value: orderNumber },
-      { trait_type: "Theme", value: NFT_THEMES[themeIndex] },
+      { trait_type: "Theme", value: NFT_THEMES[themeIndex].split(',')[0] },
       { trait_type: "Color Scheme", value: COLOR_SCHEMES[colorIndex] },
       { trait_type: "Rarity", value: getRarityTier(orderNumber) },
       { trait_type: "Collection", value: "NEON Energy Founders" },
       { trait_type: "Pre-Launch Supporter", value: "Yes" },
+      { trait_type: "Aesthetic", value: "Cyberpunk Neon" },
+      { trait_type: "Brand", value: "NEON Energy Drink" },
     ],
     createdAt: new Date(),
     mintStatus: 'pending',

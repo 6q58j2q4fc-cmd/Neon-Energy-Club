@@ -3997,3 +3997,22 @@
 - [x] Add toggles for team update notifications
 - [x] Implement daily/weekly digest options with day/hour selection
 - [x] Save preferences to database via notification.updatePreferences
+
+
+## NFT Social Sharing & Theming (Jan 31)
+
+### NFT NEON Theming
+- [x] Update NFT generation prompts for NEON energy drink theme
+- [x] Include neon environments in artwork prompts (15 themed environments)
+- [x] Add cyberpunk/synthwave aesthetic elements
+- [x] Add NEON can design elements to all prompts
+- [x] Include neon color palettes (lime green #c8ff00)
+
+### Social Media Share Buttons
+- [x] Add Twitter/X share button to NFT preview
+- [x] Add Facebook share button to NFT preview
+- [x] Add WhatsApp share button
+- [x] Add Telegram share button
+- [x] Add LinkedIn share button
+- [x] Add copy link button
+- [x] Add download button for NFT image
