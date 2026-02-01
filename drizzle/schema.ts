@@ -89,6 +89,12 @@ export const preorders = mysqlTable("preorders", {
   estimatedDelivery: timestamp("estimatedDelivery"),
   /** Additional notes from customer */
   notes: text("notes"),
+  /** Unique NFT ID for this order (e.g., NEON-NFT-00001) */
+  nftId: varchar("nftId", { length: 50 }),
+  /** URL to the generated NFT artwork image */
+  nftImageUrl: text("nftImageUrl"),
+  /** NFT mint status */
+  nftMintStatus: mysqlEnum("nftMintStatus", ["pending", "ready", "minted"]).default("pending"),
   /** Order creation timestamp */
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   /** Last update timestamp */
@@ -1730,6 +1736,41 @@ export const mfaSettings = mysqlTable("mfa_settings", {
 
 export type MfaSetting = typeof mfaSettings.$inferSelect;
 export type InsertMfaSetting = typeof mfaSettings.$inferInsert;
+
+/**
+ * MFA recovery requests table.
+ * Stores account recovery requests for users who lost MFA access.
+ */
+export const mfaRecoveryRequests = mysqlTable("mfa_recovery_requests", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User ID requesting recovery */
+  userId: int("userId").notNull(),
+  /** User email for verification */
+  email: varchar("email", { length: 320 }).notNull(),
+  /** Recovery token (sent via email) */
+  recoveryToken: varchar("recoveryToken", { length: 64 }).notNull().unique(),
+  /** Token expiration (24 hours) */
+  tokenExpiry: timestamp("tokenExpiry").notNull(),
+  /** Recovery request status */
+  status: mysqlEnum("status", ["pending", "email_verified", "approved", "rejected", "completed", "expired"]).default("pending").notNull(),
+  /** Identity verification answers (JSON) */
+  verificationAnswers: text("verificationAnswers"),
+  /** Admin notes for approval/rejection */
+  adminNotes: text("adminNotes"),
+  /** Admin who processed the request */
+  processedBy: int("processedBy"),
+  /** IP address of request */
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  /** User agent of request */
+  userAgent: text("userAgent"),
+  /** Request timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Last update timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MfaRecoveryRequest = typeof mfaRecoveryRequests.$inferSelect;
+export type InsertMfaRecoveryRequest = typeof mfaRecoveryRequests.$inferInsert;
 
 /**
  * Vending machines table for IoT monitoring.

@@ -1272,3 +1272,157 @@ export async function sendMfaNotification(data: MfaEmailData): Promise<boolean> 
       return false;
   }
 }
+
+
+// ============ MFA Recovery Email Functions ============
+
+/**
+ * Send MFA recovery request email with verification link
+ */
+export async function sendMfaRecoveryEmail(data: {
+  userName: string;
+  userEmail: string;
+  recoveryToken: string;
+  ipAddress?: string;
+}): Promise<boolean> {
+  try {
+    const timestamp = new Date();
+    const formattedDate = timestamp.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    });
+
+    // Recovery link (frontend will handle this route)
+    const recoveryLink = `${process.env.VITE_APP_URL || ''}/mfa-recovery?token=${data.recoveryToken}`;
+
+    const emailHtml = generateEmailTemplate({
+      title: '🔐 MFA Account Recovery Request',
+      preheader: 'A request was made to recover access to your account.',
+      content: `
+        <h2 style="color: #ffc107; margin-bottom: 16px;">Account Recovery Request</h2>
+        <p style="color: #ffffff; font-size: 16px; line-height: 1.6;">
+          Hi ${data.userName},
+        </p>
+        <p style="color: #cccccc; font-size: 15px; line-height: 1.6;">
+          We received a request to recover access to your NEON Energy account. If you lost access to your 
+          authenticator app and backup codes, you can use the link below to start the recovery process.
+        </p>
+        
+        <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #c8ff00; border-radius: 12px; padding: 24px; margin: 24px 0;">
+          <p style="color: #c8ff00; font-size: 14px; margin-bottom: 16px; font-weight: 600;">
+            ⚠️ IMPORTANT SECURITY NOTICE
+          </p>
+          <ul style="color: #cccccc; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
+            <li>This link expires in <strong style="color: #ffffff;">24 hours</strong></li>
+            <li>You will need to verify your identity</li>
+            <li>An administrator will review your request</li>
+            <li>If you did not request this, please ignore this email</li>
+          </ul>
+        </div>
+
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="${recoveryLink}" style="display: inline-block; background: linear-gradient(135deg, #c8ff00 0%, #a8e600 100%); color: #000000; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-weight: bold; font-size: 16px;">
+            Start Recovery Process
+          </a>
+        </div>
+
+        <div style="background: rgba(255, 107, 107, 0.1); border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 8px; padding: 16px; margin-top: 24px;">
+          <p style="color: #ff6b6b; font-size: 14px; margin: 0;">
+            <strong>Request Details:</strong><br>
+            Time: ${formattedDate}<br>
+            IP Address: ${data.ipAddress || 'Unknown'}
+          </p>
+        </div>
+      `,
+    });
+
+    await notifyOwner({
+      title: `MFA Recovery Request - ${data.userEmail}`,
+      content: emailHtml,
+    });
+
+    console.log(`[Email] MFA recovery email sent to ${data.userEmail}`);
+    return true;
+  } catch (error) {
+    console.error('[Email] Failed to send MFA recovery email:', error);
+    return false;
+  }
+}
+
+/**
+ * Send MFA recovery completion email (approved or rejected)
+ */
+export async function sendMfaRecoveryCompletedEmail(data: {
+  userName: string;
+  userEmail: string;
+  approved: boolean;
+  reason?: string;
+}): Promise<boolean> {
+  try {
+    const statusColor = data.approved ? '#c8ff00' : '#ff6b6b';
+    const statusText = data.approved ? 'Approved' : 'Rejected';
+    const statusIcon = data.approved ? '✅' : '❌';
+
+    const emailHtml = generateEmailTemplate({
+      title: `${statusIcon} MFA Recovery ${statusText}`,
+      preheader: `Your account recovery request has been ${statusText.toLowerCase()}.`,
+      content: `
+        <h2 style="color: ${statusColor}; margin-bottom: 16px;">Recovery Request ${statusText}</h2>
+        <p style="color: #ffffff; font-size: 16px; line-height: 1.6;">
+          Hi ${data.userName},
+        </p>
+        
+        ${data.approved ? `
+          <p style="color: #cccccc; font-size: 15px; line-height: 1.6;">
+            Great news! Your account recovery request has been <strong style="color: #c8ff00;">approved</strong>. 
+            Two-factor authentication has been disabled on your account.
+          </p>
+          
+          <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #c8ff00; border-radius: 12px; padding: 24px; margin: 24px 0;">
+            <p style="color: #c8ff00; font-size: 14px; margin-bottom: 16px; font-weight: 600;">
+              🔒 RECOMMENDED NEXT STEPS
+            </p>
+            <ol style="color: #cccccc; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
+              <li>Log in to your account</li>
+              <li>Go to Security Settings</li>
+              <li>Set up MFA again with a new authenticator app</li>
+              <li>Save your new backup codes in a secure location</li>
+            </ol>
+          </div>
+        ` : `
+          <p style="color: #cccccc; font-size: 15px; line-height: 1.6;">
+            Unfortunately, your account recovery request has been <strong style="color: #ff6b6b;">rejected</strong>.
+          </p>
+          
+          ${data.reason ? `
+            <div style="background: rgba(255, 107, 107, 0.1); border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 8px; padding: 16px; margin: 24px 0;">
+              <p style="color: #ff6b6b; font-size: 14px; margin: 0;">
+                <strong>Reason:</strong> ${data.reason}
+              </p>
+            </div>
+          ` : ''}
+          
+          <p style="color: #cccccc; font-size: 15px; line-height: 1.6;">
+            If you believe this was a mistake or need further assistance, please contact our support team.
+          </p>
+        `}
+      `,
+    });
+
+    await notifyOwner({
+      title: `MFA Recovery ${statusText} - ${data.userEmail}`,
+      content: emailHtml,
+    });
+
+    console.log(`[Email] MFA recovery ${statusText.toLowerCase()} email sent to ${data.userEmail}`);
+    return true;
+  } catch (error) {
+    console.error('[Email] Failed to send MFA recovery completion email:', error);
+    return false;
+  }
+}

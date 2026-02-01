@@ -211,6 +211,20 @@
       "when": 1769901093980,
       "tag": "0029_fuzzy_paper_doll",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "5",
+      "when": 1769904081015,
+      "tag": "0030_typical_molten_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "5",
+      "when": 1769904276258,
+      "tag": "0031_bright_viper",
+      "breakpoints": true
     }
   ]
 }

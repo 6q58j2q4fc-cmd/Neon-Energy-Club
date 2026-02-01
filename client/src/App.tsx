@@ -49,6 +49,8 @@ import GenealogyTutorial from "./pages/GenealogyTutorial";
 import VendingDashboard from "./pages/VendingDashboard";
 import MfaSettings from "./pages/MfaSettings";
 import MfaVerify from "./pages/MfaVerify";
+import MfaRecovery from "./pages/MfaRecovery";
+import NotificationPreferences from "./pages/NotificationPreferences";
 // AmbientSoundToggle moved to header as HeaderSoundControl
 import UnifiedChatBot from "./components/UnifiedChatBot";
 import CartDrawer from "./components/CartDrawer";
@@ -131,6 +133,8 @@ function Router() {
         <Route path="/mfa-settings" component={MfaSettings} />
         <Route path="/security" component={MfaSettings} />
         <Route path="/mfa-verify" component={MfaVerify} />
+        <Route path="/mfa-recovery" component={MfaRecovery} />
+        <Route path="/notification-preferences" component={NotificationPreferences} />
         <Route path="/my-rewards" component={CustomerPortal} />
         <Route path="/franchise/dashboard" component={FranchiseDashboard} />
         <Route path="/distributor" component={DistributorPortal} />

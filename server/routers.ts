@@ -69,7 +69,9 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         const { createPreorder } = await import("./db");
+        const { formatOrderNumber } = await import("./nftGeneration");
         const result = await createPreorder(input);
+        const orderId = result?.id || Date.now();
         
         // Send order confirmation email
         try {
@@ -77,7 +79,7 @@ export const appRouter = router({
           await sendOrderConfirmation({
             customerName: input.name,
             customerEmail: input.email,
-            orderId: result?.id || Date.now(),
+            orderId,
             orderType: "preorder",
             quantity: input.quantity,
             shippingAddress: `${input.address}, ${input.city}, ${input.state} ${input.postalCode}, ${input.country}`,
@@ -86,7 +88,13 @@ export const appRouter = router({
           console.warn("[Preorder] Failed to send confirmation email:", emailError);
         }
         
-        return { success: true };
+        // Return order info with NFT details
+        return { 
+          success: true,
+          orderId,
+          nftId: `NEON-NFT-${formatOrderNumber(orderId)}`,
+          message: "Your unique NFT artwork is being generated! It will be available shortly.",
+        };
       }),
 
     list: protectedProcedure.query(async ({ ctx }) => {
@@ -141,6 +149,33 @@ export const appRouter = router({
         }
         
         return { success: true };
+      }),
+
+    // Get NFT details for a specific order
+    getNft: publicProcedure
+      .input(z.object({
+        orderId: z.number().int(),
+      }))
+      .query(async ({ input }) => {
+        const { getPreorderNft } = await import("./db");
+        const nft = await getPreorderNft(input.orderId);
+        
+        if (!nft) {
+          return { found: false, nft: null };
+        }
+        
+        // Calculate pre-launch end date (90 days from now for demo)
+        const prelaunchEndDate = new Date();
+        prelaunchEndDate.setDate(prelaunchEndDate.getDate() + 90);
+        
+        return {
+          found: true,
+          nft: {
+            ...nft,
+            mintingNotice: "NFT minting will begin once the 90-day pre-launch period ends and crowdfunding goals have been reached.",
+            prelaunchDaysRemaining: 90,
+          },
+        };
       }),
   }),
 
@@ -4549,6 +4584,202 @@ Provide step-by-step instructions with specific button names and locations. Keep
         
         const backupCodes = await generateBackupCodes(ctx.user.id);
         return { success: true, backupCodes };
+      }),
+
+    // Request MFA recovery (for users who lost authenticator and backup codes)
+    requestRecovery: publicProcedure
+      .input(z.object({
+        email: z.string().email("Valid email required"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { getUserByEmail, createMfaRecoveryRequest, getMfaSettings } = await import("./db");
+        
+        // Find user by email
+        const user = await getUserByEmail(input.email);
+        if (!user) {
+          // Don't reveal if email exists
+          return { 
+            success: true, 
+            message: "If an account exists with this email, you will receive recovery instructions." 
+          };
+        }
+        
+        // Check if MFA is enabled
+        const mfaSettings = await getMfaSettings(user.id);
+        if (!mfaSettings?.isEnabled) {
+          return { 
+            success: true, 
+            message: "If an account exists with this email, you will receive recovery instructions." 
+          };
+        }
+        
+        // Create recovery request
+        const recovery = await createMfaRecoveryRequest({
+          userId: user.id,
+          email: input.email,
+          ipAddress: ctx.req.ip || ctx.req.headers['x-forwarded-for']?.toString(),
+          userAgent: ctx.req.headers['user-agent'],
+        });
+        
+        if (recovery) {
+          // Send recovery email
+          try {
+            const { sendMfaRecoveryEmail } = await import("./emailNotifications");
+            await sendMfaRecoveryEmail({
+              userName: user.name || 'User',
+              userEmail: input.email,
+              recoveryToken: recovery.recoveryToken,
+              ipAddress: ctx.req.ip || ctx.req.headers['x-forwarded-for']?.toString(),
+            });
+          } catch (emailError) {
+            console.error('[MFA Recovery] Failed to send email:', emailError);
+          }
+        }
+        
+        return { 
+          success: true, 
+          message: "If an account exists with this email, you will receive recovery instructions." 
+        };
+      }),
+
+    // Verify recovery token and submit identity verification
+    verifyRecoveryToken: publicProcedure
+      .input(z.object({
+        token: z.string().min(1, "Recovery token required"),
+      }))
+      .query(async ({ input }) => {
+        const { getMfaRecoveryByToken } = await import("./db");
+        
+        const recovery = await getMfaRecoveryByToken(input.token);
+        if (!recovery) {
+          return { valid: false, reason: "Invalid or expired recovery token" };
+        }
+        
+        // Check if token is expired
+        if (new Date() > recovery.tokenExpiry) {
+          return { valid: false, reason: "Recovery token has expired" };
+        }
+        
+        // Check status
+        if (recovery.status === 'completed') {
+          return { valid: false, reason: "This recovery request has already been completed" };
+        }
+        
+        if (recovery.status === 'rejected') {
+          return { valid: false, reason: "This recovery request was rejected" };
+        }
+        
+        return { 
+          valid: true, 
+          recoveryId: recovery.id,
+          email: recovery.email,
+          status: recovery.status,
+        };
+      }),
+
+    // Submit identity verification answers
+    submitVerification: publicProcedure
+      .input(z.object({
+        token: z.string().min(1),
+        answers: z.object({
+          accountCreationDate: z.string().optional(),
+          lastOrderDetails: z.string().optional(),
+          securityQuestion: z.string().optional(),
+          additionalInfo: z.string().optional(),
+        }),
+      }))
+      .mutation(async ({ input }) => {
+        const { getMfaRecoveryByToken, submitRecoveryVerification } = await import("./db");
+        
+        const recovery = await getMfaRecoveryByToken(input.token);
+        if (!recovery || new Date() > recovery.tokenExpiry) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid or expired recovery token",
+          });
+        }
+        
+        await submitRecoveryVerification(recovery.id, input.answers);
+        
+        return { 
+          success: true, 
+          message: "Your identity verification has been submitted. An administrator will review your request within 24-48 hours." 
+        };
+      }),
+
+    // Admin: Get pending recovery requests
+    getPendingRecoveries: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        
+        const { getPendingMfaRecoveryRequests } = await import("./db");
+        return await getPendingMfaRecoveryRequests();
+      }),
+
+    // Admin: Approve or reject recovery request
+    processRecovery: protectedProcedure
+      .input(z.object({
+        recoveryId: z.number().int(),
+        action: z.enum(['approve', 'reject']),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        
+        const { getMfaRecoveryByToken, updateMfaRecoveryStatus, completeMfaRecovery, getUserById } = await import("./db");
+        const db = await import("./db").then(m => m.getDb());
+        
+        // Get the recovery request by ID
+        const { mfaRecoveryRequests } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        const recoveryResult = await db?.select().from(mfaRecoveryRequests).where(eq(mfaRecoveryRequests.id, input.recoveryId)).limit(1);
+        const recovery = recoveryResult?.[0];
+        
+        if (!recovery) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Recovery request not found" });
+        }
+        
+        if (input.action === 'approve') {
+          // Complete the recovery - disable MFA for user
+          await completeMfaRecovery(input.recoveryId, recovery.userId);
+          
+          // Send notification email
+          try {
+            const user = await getUserById(recovery.userId);
+            const { sendMfaRecoveryCompletedEmail } = await import("./emailNotifications");
+            await sendMfaRecoveryCompletedEmail({
+              userName: user?.name || 'User',
+              userEmail: recovery.email,
+              approved: true,
+            });
+          } catch (emailError) {
+            console.error('[MFA Recovery] Failed to send completion email:', emailError);
+          }
+          
+          return { success: true, message: "Recovery approved. MFA has been disabled for the user." };
+        } else {
+          // Reject the request
+          await updateMfaRecoveryStatus(input.recoveryId, 'rejected', input.notes, ctx.user.id);
+          
+          // Send rejection email
+          try {
+            const { sendMfaRecoveryCompletedEmail } = await import("./emailNotifications");
+            await sendMfaRecoveryCompletedEmail({
+              userName: recovery.email.split('@')[0],
+              userEmail: recovery.email,
+              approved: false,
+              reason: input.notes,
+            });
+          } catch (emailError) {
+            console.error('[MFA Recovery] Failed to send rejection email:', emailError);
+          }
+          
+          return { success: true, message: "Recovery request rejected." };
+        }
       }),
   }),
 

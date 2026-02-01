@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gt, lt, gte, or, like } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption, vendingApplications, franchiseApplications, pushSubscriptions, InsertVendingApplication, InsertFranchiseApplication, InsertPushSubscription, userProfiles, InsertUserProfile, scheduledMeetings, InsertScheduledMeeting, vendingMachineOrders, vendingPaymentHistory, InsertVendingMachineOrder, InsertVendingPaymentHistory, vendingNetwork, vendingCommissions, InsertVendingNetwork, InsertVendingCommission, notificationPreferences, emailDigestQueue, InsertNotificationPreference, InsertEmailDigestQueueItem, mfaSettings, vendingMachines, vendingInventory, vendingSales, vendingAlerts, maintenanceRequests } from "../drizzle/schema";
+import { InsertPreorder, InsertUser, InsertTerritoryLicense, InsertCrowdfunding, InsertNewsletterSubscription, preorders, users, territoryLicenses, crowdfunding, newsletterSubscriptions, distributors, sales, affiliateLinks, commissions, claimedTerritories, territoryApplications, InsertClaimedTerritory, InsertTerritoryApplication, neonNfts, InsertNeonNft, investorInquiries, InsertInvestorInquiry, blogPosts, InsertBlogPost, distributorAutoships, autoshipItems, autoshipOrders, payoutSettings, payoutRequests, payoutHistory, InsertDistributorAutoship, InsertAutoshipItem, InsertAutoshipOrder, InsertPayoutSetting, InsertPayoutRequest, InsertPayoutHistoryRecord, rankHistory, InsertRankHistoryRecord, notifications, InsertNotification, customerReferrals, customerRewards, customerReferralCodes, distributorRewardPoints, distributorFreeRewards, InsertCustomerReferral, InsertCustomerReward, InsertCustomerReferralCode, InsertDistributorRewardPoint, InsertDistributorFreeReward, rewardRedemptions, InsertRewardRedemption, vendingApplications, franchiseApplications, pushSubscriptions, InsertVendingApplication, InsertFranchiseApplication, InsertPushSubscription, userProfiles, InsertUserProfile, scheduledMeetings, InsertScheduledMeeting, vendingMachineOrders, vendingPaymentHistory, InsertVendingMachineOrder, InsertVendingPaymentHistory, vendingNetwork, vendingCommissions, InsertVendingNetwork, InsertVendingCommission, notificationPreferences, emailDigestQueue, InsertNotificationPreference, InsertEmailDigestQueueItem, mfaSettings, mfaRecoveryRequests, InsertMfaRecoveryRequest, vendingMachines, vendingInventory, vendingSales, vendingAlerts, maintenanceRequests } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -75,6 +75,22 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     console.error("[Database] Failed to upsert user:", error);
     throw error;
   }
+}
+
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function getUserById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+  return result.length > 0 ? result[0] : null;
 }
 
 export async function getUserByOpenId(openId: string) {
@@ -397,7 +413,41 @@ export async function createPreorder(data: InsertPreorder) {
   const result = await db.insert(preorders).values(data);
   // Get the inserted ID from the result
   const insertId = (result as any)[0]?.insertId;
-  return { id: insertId || Date.now() };
+  const orderId = insertId || Date.now();
+  
+  // Generate unique NFT for this order (async, don't block order creation)
+  generateOrderNftAsync(orderId).catch(err => {
+    console.error(`[NFT] Failed to generate NFT for order ${orderId}:`, err);
+  });
+  
+  return { id: orderId };
+}
+
+/**
+ * Generate NFT asynchronously after order creation
+ */
+async function generateOrderNftAsync(orderId: number) {
+  try {
+    const { generateOrderNft, formatOrderNumber } = await import("./nftGeneration");
+    const db = await getDb();
+    if (!db) return;
+    
+    // Generate the unique NFT artwork
+    const { imageUrl, nftId } = await generateOrderNft(orderId);
+    
+    // Update the order with NFT details
+    await db.update(preorders)
+      .set({
+        nftId,
+        nftImageUrl: imageUrl,
+        nftMintStatus: 'pending',
+      })
+      .where(eq(preorders.id, orderId));
+    
+    console.log(`[NFT] Generated NFT ${nftId} for order ${orderId}`);
+  } catch (error) {
+    console.error(`[NFT] Error generating NFT for order ${orderId}:`, error);
+  }
 }
 
 export async function getAllPreorders() {
@@ -426,6 +476,46 @@ export async function updatePreorderStatus(id: number, status: "pending" | "conf
   }
   
   await db.update(preorders).set({ status }).where(eq(preorders.id, id));
+}
+
+/**
+ * Get NFT details for a preorder
+ */
+export async function getPreorderNft(orderId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select({
+    nftId: preorders.nftId,
+    nftImageUrl: preorders.nftImageUrl,
+    nftMintStatus: preorders.nftMintStatus,
+    orderId: preorders.id,
+    createdAt: preorders.createdAt,
+  })
+    .from(preorders)
+    .where(eq(preorders.id, orderId))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : null;
+}
+
+/**
+ * Get all NFTs for a user's orders by email
+ */
+export async function getUserNfts(email: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select({
+    nftId: preorders.nftId,
+    nftImageUrl: preorders.nftImageUrl,
+    nftMintStatus: preorders.nftMintStatus,
+    orderId: preorders.id,
+    createdAt: preorders.createdAt,
+  })
+    .from(preorders)
+    .where(eq(preorders.email, email))
+    .orderBy(desc(preorders.createdAt));
 }
 
 /**
@@ -6089,6 +6179,156 @@ export async function getBackupCodesRemaining(userId: number): Promise<number> {
     .limit(1);
   
   return settings[0]?.backupCodesRemaining || 0;
+}
+
+
+// ============ MFA Recovery Functions ============
+
+/**
+ * Create an MFA recovery request
+ */
+export async function createMfaRecoveryRequest(data: {
+  userId: number;
+  email: string;
+  ipAddress?: string;
+  userAgent?: string;
+}): Promise<{ id: number; recoveryToken: string } | null> {
+  const db = await getDb();
+  if (!db) return null;
+  
+  // Generate secure recovery token
+  const recoveryToken = crypto.randomBytes(32).toString('hex');
+  
+  // Token expires in 24 hours
+  const tokenExpiry = new Date();
+  tokenExpiry.setHours(tokenExpiry.getHours() + 24);
+  
+  const result = await db.insert(mfaRecoveryRequests).values({
+    userId: data.userId,
+    email: data.email,
+    recoveryToken,
+    tokenExpiry,
+    ipAddress: data.ipAddress || null,
+    userAgent: data.userAgent || null,
+    status: 'pending',
+  });
+  
+  const insertId = (result as any)[0]?.insertId;
+  return { id: insertId, recoveryToken };
+}
+
+/**
+ * Get MFA recovery request by token
+ */
+export async function getMfaRecoveryByToken(token: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select()
+    .from(mfaRecoveryRequests)
+    .where(eq(mfaRecoveryRequests.recoveryToken, token))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : null;
+}
+
+/**
+ * Update MFA recovery request status
+ */
+export async function updateMfaRecoveryStatus(
+  id: number,
+  status: 'pending' | 'email_verified' | 'approved' | 'rejected' | 'completed' | 'expired',
+  adminNotes?: string,
+  processedBy?: number
+) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.update(mfaRecoveryRequests)
+    .set({
+      status,
+      adminNotes: adminNotes || null,
+      processedBy: processedBy || null,
+    })
+    .where(eq(mfaRecoveryRequests.id, id));
+}
+
+/**
+ * Submit verification answers for recovery
+ */
+export async function submitRecoveryVerification(
+  id: number,
+  answers: Record<string, string>
+) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.update(mfaRecoveryRequests)
+    .set({
+      verificationAnswers: JSON.stringify(answers),
+      status: 'email_verified',
+    })
+    .where(eq(mfaRecoveryRequests.id, id));
+}
+
+/**
+ * Get pending MFA recovery requests for admin review
+ */
+export async function getPendingMfaRecoveryRequests() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select({
+    id: mfaRecoveryRequests.id,
+    userId: mfaRecoveryRequests.userId,
+    email: mfaRecoveryRequests.email,
+    status: mfaRecoveryRequests.status,
+    verificationAnswers: mfaRecoveryRequests.verificationAnswers,
+    ipAddress: mfaRecoveryRequests.ipAddress,
+    createdAt: mfaRecoveryRequests.createdAt,
+  })
+    .from(mfaRecoveryRequests)
+    .where(eq(mfaRecoveryRequests.status, 'email_verified'))
+    .orderBy(desc(mfaRecoveryRequests.createdAt));
+}
+
+/**
+ * Complete MFA recovery - disable MFA for user
+ */
+export async function completeMfaRecovery(recoveryId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  
+  // Disable MFA for the user
+  await db.update(mfaSettings)
+    .set({
+      isEnabled: false,
+      totpSecret: '',
+      backupCodes: null,
+      backupCodesRemaining: 0,
+    })
+    .where(eq(mfaSettings.userId, userId));
+  
+  // Mark recovery as completed
+  await db.update(mfaRecoveryRequests)
+    .set({ status: 'completed' })
+    .where(eq(mfaRecoveryRequests.id, recoveryId));
+  
+  return true;
+}
+
+/**
+ * Get user's recovery request history
+ */
+export async function getUserRecoveryHistory(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select()
+    .from(mfaRecoveryRequests)
+    .where(eq(mfaRecoveryRequests.userId, userId))
+    .orderBy(desc(mfaRecoveryRequests.createdAt))
+    .limit(10);
 }
 
 

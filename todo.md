@@ -3969,3 +3969,31 @@
 - [x] Send alert email when backup code is used (sendMfaBackupCodeUsedEmail)
 - [x] Include security tips and remaining codes count in emails
 - [x] Add getBackupCodesRemaining function to db.ts
+
+
+## NFT Generation, MFA Recovery & Notification Preferences (Jan 31)
+
+### NFT Image Generation for Orders
+- [x] Create unique NFT image generation for each order (server/nftGeneration.ts)
+- [x] Generate order number formatted as 00001, 00002, etc.
+- [x] Store NFT image URL with order record (nftImageUrl, nftOrderNumber fields)
+- [x] Display NFT preview on order confirmation (NftPreview component)
+- [x] Add notice about NFT minting after 90-day pre-launch period
+- [x] Add notice about crowdfunding goals requirement
+- [x] Add getNft endpoint to preorder router
+
+### MFA Recovery Flow
+- [x] Create MFA recovery request page (/mfa-recovery)
+- [x] Implement identity verification questions (account date, order details, account type)
+- [x] Add email-based recovery link system (sendMfaRecoveryEmail)
+- [x] Create admin approval workflow for recovery requests (processRecovery endpoint)
+- [x] Add recovery audit logging (mfaRecoveryRequests table)
+- [x] Add sendMfaRecoveryCompletedEmail for approval/rejection notifications
+
+### Notification Preferences Page
+- [x] Create notification preferences page for distributors (/notification-preferences)
+- [x] Add toggles for referral notifications
+- [x] Add toggles for commission notifications
+- [x] Add toggles for team update notifications
+- [x] Implement daily/weekly digest options with day/hour selection
+- [x] Save preferences to database via notification.updatePreferences
