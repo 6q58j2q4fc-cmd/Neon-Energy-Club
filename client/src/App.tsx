@@ -54,6 +54,7 @@ import NotificationPreferences from "./pages/NotificationPreferences";
 import NftDisclosure from "./pages/NftDisclosure";
 // AmbientSoundToggle moved to header as HeaderSoundControl
 import UnifiedChatBot from "./components/UnifiedChatBot";
+import CookieConsent from "./components/CookieConsent";
 import CartDrawer from "./components/CartDrawer";
 import VoiceMuteButton from "./components/VoiceMuteButton";
 import { LanguageProvider } from "./contexts/LanguageContext";
@@ -162,6 +163,7 @@ function App() {
             <CartDrawer />
             {/* VoiceMuteButton removed - sound control now in header only */}
             <UnifiedChatBot />
+            <CookieConsent />
           </TooltipProvider>
         </ThemeProvider>
       </LanguageProvider>

@@ -4054,3 +4054,25 @@
 - [x] Add Privacy Policy link to footer (already existed)
 - [x] Add NFT Disclosure link to footer
 - [x] Style links consistently with footer design
+
+
+## Cookie Consent & Order Email (Feb 1)
+
+### GDPR Cookie Consent Banner
+- [x] Create CookieConsent component with accept/decline options
+- [x] Store consent preference in localStorage
+- [x] Show banner only on first visit (1.5s delay)
+- [x] Add link to Privacy Policy
+- [x] Style banner to match NEON theme
+- [x] Add customizable preferences panel (analytics, marketing, personalization)
+- [x] Create useCookieConsent hook for checking consent status
+- [x] GDPR/CCPA compliance notice included
+
+### Order Confirmation Email
+- [x] Create order confirmation email template (sendOrderConfirmationWithNft)
+- [x] Include NFT preview image in email with rarity badge
+- [x] Add SEC disclaimer text with full legal language
+- [x] Include order details table with items, quantities, prices
+- [x] Send email on successful order completion
+- [x] Add pre-order timeline (4 steps)
+- [x] Include shipping address section

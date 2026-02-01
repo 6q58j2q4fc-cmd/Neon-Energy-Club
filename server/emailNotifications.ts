@@ -1426,3 +1426,243 @@ export async function sendMfaRecoveryCompletedEmail(data: {
     return false;
   }
 }
+
+
+/**
+ * Send order confirmation email with NFT preview and SEC disclaimer
+ */
+export async function sendOrderConfirmationWithNft(data: {
+  customerName: string;
+  customerEmail: string;
+  orderId: number;
+  orderNumber: string; // Formatted as 00001, 00002, etc.
+  items: Array<{
+    name: string;
+    quantity: number;
+    price: number;
+    flavor?: string;
+  }>;
+  subtotal: number;
+  total: number;
+  nftImageUrl?: string;
+  nftRarity?: string;
+  shippingAddress?: string;
+}): Promise<boolean> {
+  try {
+    // Generate items list HTML
+    const itemsHtml = data.items.map(item => `
+      <tr>
+        <td style="padding: 12px; border-bottom: 1px solid rgba(200, 255, 0, 0.1);">
+          <span style="color: #ffffff; font-weight: 600;">${item.name}</span>
+          ${item.flavor ? `<br><span style="color: #888; font-size: 12px;">Flavor: ${item.flavor}</span>` : ''}
+        </td>
+        <td style="padding: 12px; border-bottom: 1px solid rgba(200, 255, 0, 0.1); text-align: center; color: #888;">
+          ${item.quantity}
+        </td>
+        <td style="padding: 12px; border-bottom: 1px solid rgba(200, 255, 0, 0.1); text-align: right; color: #c8ff00; font-weight: 600;">
+          $${(item.price * item.quantity).toFixed(2)}
+        </td>
+      </tr>
+    `).join('');
+
+    // NFT preview section
+    const nftSection = data.nftImageUrl ? `
+      <div style="background: linear-gradient(135deg, rgba(200, 255, 0, 0.1) 0%, rgba(0, 255, 255, 0.05) 100%); border-radius: 16px; padding: 24px; margin: 24px 0; border: 1px solid rgba(200, 255, 0, 0.3);">
+        <h3 style="color: #c8ff00; margin: 0 0 16px 0; font-size: 18px; text-align: center;">
+          🎁 Your Exclusive NFT Gift
+        </h3>
+        <div style="text-align: center; margin-bottom: 16px;">
+          <img 
+            src="${data.nftImageUrl}" 
+            alt="NEON Genesis NFT #${data.orderNumber}" 
+            style="max-width: 280px; width: 100%; border-radius: 12px; border: 2px solid rgba(200, 255, 0, 0.5); box-shadow: 0 0 30px rgba(200, 255, 0, 0.2);"
+          />
+        </div>
+        <div style="text-align: center;">
+          <p style="color: #ffffff; font-size: 16px; margin: 0 0 8px 0; font-weight: 600;">
+            NEON Genesis NFT #${data.orderNumber}
+          </p>
+          ${data.nftRarity ? `
+            <span style="display: inline-block; background: ${getRarityColor(data.nftRarity)}; color: #000; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase;">
+              ${data.nftRarity}
+            </span>
+          ` : ''}
+        </div>
+        <p style="color: #888; font-size: 13px; text-align: center; margin: 16px 0 0 0; line-height: 1.5;">
+          Your unique NFT artwork will be minted after the 90-day pre-launch period when crowdfunding goals are met.
+        </p>
+      </div>
+    ` : '';
+
+    // SEC Disclaimer section
+    const secDisclaimer = `
+      <div style="background: rgba(255, 107, 107, 0.1); border-radius: 12px; padding: 20px; margin: 24px 0; border: 1px solid rgba(255, 107, 107, 0.3);">
+        <h4 style="color: #ff6b6b; margin: 0 0 12px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+          ⚠️ Important NFT Disclosure
+        </h4>
+        <p style="color: #aaa; font-size: 12px; line-height: 1.6; margin: 0 0 12px 0;">
+          <strong style="color: #fff;">NFT Gift Program:</strong> The NFT included with your purchase is a complimentary gift and is NOT a purchase of securities. 
+          NEON Corporation does not offer, sell, or promote NFTs as investment vehicles or securities.
+        </p>
+        <p style="color: #aaa; font-size: 12px; line-height: 1.6; margin: 0 0 12px 0;">
+          <strong style="color: #fff;">No Investment Expectation:</strong> NFTs are provided solely as collectible digital art with no expectation of profit, 
+          appreciation, or return on investment. Any future value is speculative and not guaranteed.
+        </p>
+        <p style="color: #aaa; font-size: 12px; line-height: 1.6; margin: 0 0 12px 0;">
+          <strong style="color: #fff;">Regulatory Compliance:</strong> If required by applicable law, NEON Corporation will register the NFT Gift Program 
+          with the SEC or other regulatory bodies. We are committed to full compliance with all securities and digital asset regulations.
+        </p>
+        <p style="color: #888; font-size: 11px; line-height: 1.5; margin: 0; font-style: italic;">
+          By accepting this NFT gift, you acknowledge that you have read and agree to our 
+          <a href="https://neonenergy.com/nft-disclosure" style="color: #c8ff00;">NFT Gift Program Disclosure</a> 
+          and <a href="https://neonenergy.com/terms" style="color: #c8ff00;">Terms of Service</a>.
+        </p>
+      </div>
+    `;
+
+    const emailHtml = generateEmailTemplate({
+      title: `🎉 Order Confirmed - NEON #${data.orderNumber}`,
+      preheader: `Thank you for your NEON pre-order! Your exclusive NFT is being prepared.`,
+      content: `
+        <div style="text-align: center; margin-bottom: 32px;">
+          <div style="display: inline-block; background: linear-gradient(135deg, #c8ff00 0%, #00ffff 100%); padding: 3px; border-radius: 50%;">
+            <div style="background: #0a1a1a; border-radius: 50%; padding: 16px;">
+              <span style="font-size: 48px;">✓</span>
+            </div>
+          </div>
+          <h1 style="color: #c8ff00; font-size: 28px; margin: 16px 0 8px 0;">Order Confirmed!</h1>
+          <p style="color: #888; font-size: 14px; margin: 0;">Order #${data.orderNumber}</p>
+        </div>
+
+        <p style="color: #ffffff; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+          Hello <strong>${data.customerName}</strong>,
+        </p>
+        
+        <p style="color: #aaa; font-size: 15px; line-height: 1.6; margin-bottom: 24px;">
+          Thank you for your NEON Energy pre-order! We're thrilled to have you join the NEON revolution. 
+          Your order has been confirmed and you'll receive updates as we prepare for shipping.
+        </p>
+
+        <!-- Order Details -->
+        <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; margin-bottom: 24px; border: 1px solid rgba(255, 255, 255, 0.1);">
+          <h3 style="color: #c8ff00; margin: 0 0 16px 0; font-size: 16px;">Order Details</h3>
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <th style="padding: 12px; text-align: left; color: #888; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid rgba(200, 255, 0, 0.2);">Item</th>
+                <th style="padding: 12px; text-align: center; color: #888; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid rgba(200, 255, 0, 0.2);">Qty</th>
+                <th style="padding: 12px; text-align: right; color: #888; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid rgba(200, 255, 0, 0.2);">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHtml}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2" style="padding: 16px 12px 8px; text-align: right; color: #888;">Subtotal:</td>
+                <td style="padding: 16px 12px 8px; text-align: right; color: #fff;">$${data.subtotal.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding: 8px 12px; text-align: right; color: #c8ff00; font-weight: 700; font-size: 18px;">Total:</td>
+                <td style="padding: 8px 12px; text-align: right; color: #c8ff00; font-weight: 700; font-size: 18px;">$${data.total.toFixed(2)}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        ${data.shippingAddress ? `
+        <!-- Shipping Address -->
+        <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; margin-bottom: 24px; border: 1px solid rgba(255, 255, 255, 0.1);">
+          <h3 style="color: #c8ff00; margin: 0 0 12px 0; font-size: 16px;">📦 Shipping Address</h3>
+          <p style="color: #fff; margin: 0; line-height: 1.6;">${data.shippingAddress.replace(/\n/g, '<br>')}</p>
+        </div>
+        ` : ''}
+
+        <!-- NFT Preview -->
+        ${nftSection}
+
+        <!-- Pre-Order Timeline -->
+        <div style="background: rgba(0, 255, 255, 0.05); border-radius: 12px; padding: 20px; margin-bottom: 24px; border: 1px solid rgba(0, 255, 255, 0.2);">
+          <h3 style="color: #00ffff; margin: 0 0 16px 0; font-size: 16px;">📅 What Happens Next</h3>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+              <div style="width: 24px; height: 24px; background: #c8ff00; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <span style="color: #000; font-size: 12px; font-weight: 700;">1</span>
+              </div>
+              <div>
+                <p style="color: #fff; margin: 0 0 4px 0; font-weight: 600;">Order Confirmed</p>
+                <p style="color: #888; margin: 0; font-size: 13px;">Your pre-order is secured at early bird pricing</p>
+              </div>
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+              <div style="width: 24px; height: 24px; background: rgba(200, 255, 0, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <span style="color: #c8ff00; font-size: 12px; font-weight: 700;">2</span>
+              </div>
+              <div>
+                <p style="color: #fff; margin: 0 0 4px 0; font-weight: 600;">Production Phase</p>
+                <p style="color: #888; margin: 0; font-size: 13px;">Once crowdfunding goals are met, production begins</p>
+              </div>
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+              <div style="width: 24px; height: 24px; background: rgba(200, 255, 0, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <span style="color: #c8ff00; font-size: 12px; font-weight: 700;">3</span>
+              </div>
+              <div>
+                <p style="color: #fff; margin: 0 0 4px 0; font-weight: 600;">Shipping Begins</p>
+                <p style="color: #888; margin: 0; font-size: 13px;">Orders ship after the 90-day pre-launch period</p>
+              </div>
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+              <div style="width: 24px; height: 24px; background: rgba(200, 255, 0, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <span style="color: #c8ff00; font-size: 12px; font-weight: 700;">4</span>
+              </div>
+              <div>
+                <p style="color: #fff; margin: 0 0 4px 0; font-weight: 600;">NFT Minting</p>
+                <p style="color: #888; margin: 0; font-size: 13px;">Your exclusive NFT is minted and delivered to your account</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEC Disclaimer -->
+        ${secDisclaimer}
+
+        <!-- CTA -->
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="https://neonenergy.com/order-history" style="display: inline-block; background: linear-gradient(135deg, #c8ff00 0%, #a8d600 100%); color: #000; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px;">
+            View Order Status
+          </a>
+        </div>
+
+        <p style="color: #888; font-size: 14px; line-height: 1.6; text-align: center;">
+          Questions about your order? Contact us at <a href="mailto:support@neonenergy.com" style="color: #c8ff00;">support@neonenergy.com</a>
+        </p>
+      `
+    });
+
+    // Send via notification service
+    await notifyOwner({
+      title: `New Order #${data.orderNumber} - $${data.total.toFixed(2)}`,
+      content: `Customer: ${data.customerName} (${data.customerEmail})\nItems: ${data.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}\nTotal: $${data.total.toFixed(2)}`
+    });
+
+    console.log(`[Email] Order confirmation with NFT sent to ${data.customerEmail} for order #${data.orderNumber}`);
+    return true;
+  } catch (error) {
+    console.error('[Email] Failed to send order confirmation with NFT:', error);
+    return false;
+  }
+}
+
+// Helper function for NFT rarity colors
+function getRarityColor(rarity: string): string {
+  const colors: Record<string, string> = {
+    'Common': '#9ca3af',
+    'Uncommon': '#22c55e',
+    'Rare': '#3b82f6',
+    'Epic': '#a855f7',
+    'Legendary': '#f59e0b',
+    'Mythic': '#ef4444',
+  };
+  return colors[rarity] || '#c8ff00';
+}

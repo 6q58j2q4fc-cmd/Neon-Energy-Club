@@ -73,16 +73,25 @@ export const appRouter = router({
         const result = await createPreorder(input);
         const orderId = result?.id || Date.now();
         
-        // Send order confirmation email
+        // Send order confirmation email with NFT preview
         try {
-          const { sendOrderConfirmation } = await import("./emailNotifications");
-          await sendOrderConfirmation({
+          const { sendOrderConfirmationWithNft } = await import("./emailNotifications");
+          await sendOrderConfirmationWithNft({
             customerName: input.name,
             customerEmail: input.email,
             orderId,
-            orderType: "preorder",
-            quantity: input.quantity,
-            shippingAddress: `${input.address}, ${input.city}, ${input.state} ${input.postalCode}, ${input.country}`,
+            orderNumber: formatOrderNumber(orderId),
+            items: [{
+              name: 'NEON Energy Drink',
+              quantity: input.quantity,
+              price: 3.99,
+            }],
+            subtotal: input.quantity * 3.99,
+            total: input.quantity * 3.99,
+            // NFT image will be generated asynchronously
+            nftImageUrl: undefined,
+            nftRarity: 'Common',
+            shippingAddress: `${input.address}\n${input.city}, ${input.state} ${input.postalCode}\n${input.country}`,
           });
         } catch (emailError) {
           console.warn("[Preorder] Failed to send confirmation email:", emailError);
