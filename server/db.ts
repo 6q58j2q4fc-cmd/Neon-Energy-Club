@@ -500,6 +500,57 @@ export async function getPreorderNft(orderId: number) {
 }
 
 /**
+ * Get preorder by order number for tracking
+ * Supports both NEON-00001 format and plain number
+ */
+export async function getPreorderByOrderNumber(orderNumber: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  // Extract numeric ID from order number (e.g., "NEON-00001" -> 1, "00001" -> 1)
+  let numericId: number | null = null;
+  
+  // Try to match NEON-XXXXX format
+  const neonMatch = orderNumber.match(/NEON-?(\d+)/i);
+  if (neonMatch) {
+    numericId = parseInt(neonMatch[1], 10);
+  } else {
+    // Try plain number
+    const plainMatch = orderNumber.match(/^\d+$/);
+    if (plainMatch) {
+      numericId = parseInt(orderNumber, 10);
+    }
+  }
+  
+  if (!numericId) {
+    return null;
+  }
+  
+  const result = await db.select()
+    .from(preorders)
+    .where(eq(preorders.id, numericId))
+    .limit(1);
+  
+  if (result.length === 0) return null;
+  
+  const order = result[0];
+  return {
+    ...order,
+    nftOrderNumber: `NEON-${String(order.id).padStart(5, '0')}`,
+    nftRarity: getNftRarity(order.id),
+  };
+}
+
+// Helper function to determine NFT rarity based on order number
+function getNftRarity(orderId: number): string {
+  if (orderId <= 10) return 'Legendary';
+  if (orderId <= 50) return 'Epic';
+  if (orderId <= 200) return 'Rare';
+  if (orderId <= 500) return 'Uncommon';
+  return 'Common';
+}
+
+/**
  * Get all NFTs for a user's orders by email
  */
 export async function getUserNfts(email: string) {

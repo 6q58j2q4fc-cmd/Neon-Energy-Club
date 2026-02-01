@@ -4076,3 +4076,21 @@
 - [x] Send email on successful order completion
 - [x] Add pre-order timeline (4 steps)
 - [x] Include shipping address section
+
+
+## Order Status Tracking Page (Feb 1)
+
+### Order Tracking API
+- [x] Create getOrderByNumber endpoint in preorder router (preorder.track)
+- [x] Return order status, shipping info, and NFT details
+- [x] Handle order not found errors gracefully
+- [x] Add getPreorderByOrderNumber function to db.ts
+
+### Order Tracking Page
+- [x] Create OrderTracking page component (/track-order)
+- [x] Add order number input field with search
+- [x] Display order status timeline (Confirmed, Processing, Shipped, Delivered)
+- [x] Show NFT preview with social share buttons (Twitter, Facebook)
+- [x] Display shipping address and tracking number
+- [x] Add download NFT button
+- [x] Include SEC disclaimer with link to NFT disclosure

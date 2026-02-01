@@ -186,6 +186,65 @@ export const appRouter = router({
           },
         };
       }),
+
+    // Track order by order number (public endpoint for customers)
+    track: publicProcedure
+      .input(z.object({
+        orderNumber: z.string().min(1, "Order number is required"),
+      }))
+      .query(async ({ input }) => {
+        const { getPreorderByOrderNumber } = await import("./db");
+        const order = await getPreorderByOrderNumber(input.orderNumber);
+        
+        if (!order) {
+          return { found: false, order: null };
+        }
+        
+        // Calculate status timeline based on available statuses
+        const currentStatus = order.status || 'pending';
+        const statusTimeline = [
+          { status: 'confirmed', label: 'Order Confirmed', completed: currentStatus !== 'pending', date: order.createdAt },
+          { status: 'confirmed', label: 'Processing', completed: ['confirmed', 'shipped', 'delivered'].includes(currentStatus), date: currentStatus === 'confirmed' ? order.updatedAt : null },
+          { status: 'shipped', label: 'Shipped', completed: ['shipped', 'delivered'].includes(currentStatus), date: currentStatus === 'shipped' ? order.updatedAt : null },
+          { status: 'delivered', label: 'Delivered', completed: currentStatus === 'delivered', date: currentStatus === 'delivered' ? order.updatedAt : null },
+        ];
+        
+        // Pre-launch notice
+        const prelaunchEndDate = new Date();
+        prelaunchEndDate.setDate(prelaunchEndDate.getDate() + 90);
+        
+        return {
+          found: true,
+          order: {
+            id: order.id,
+            orderNumber: order.nftOrderNumber || `NEON-${String(order.id).padStart(5, '0')}`,
+            status: order.status || 'pending',
+            statusTimeline,
+            customerName: order.name,
+            email: order.email,
+            quantity: order.quantity,
+            total: (order.quantity || 1) * 3.99,
+            shippingAddress: {
+              address: order.address,
+              city: order.city,
+              state: order.state,
+              postalCode: order.postalCode,
+              country: order.country,
+            },
+            trackingNumber: order.trackingNumber || null,
+            trackingUrl: order.trackingNumber ? `https://track.neonenergy.com/${order.trackingNumber}` : null,
+            nft: order.nftImageUrl ? {
+              imageUrl: order.nftImageUrl,
+              orderNumber: order.nftOrderNumber,
+              rarity: order.nftRarity || 'Common',
+              mintingStatus: 'pending',
+              mintingNotice: "NFT minting will begin once the 90-day pre-launch period ends and crowdfunding goals have been reached.",
+            } : null,
+            createdAt: order.createdAt,
+            estimatedDelivery: "Ships after 90-day pre-launch period and crowdfunding goals are met",
+          },
+        };
+      }),
   }),
 
   user: router({

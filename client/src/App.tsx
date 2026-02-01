@@ -52,6 +52,7 @@ import MfaVerify from "./pages/MfaVerify";
 import MfaRecovery from "./pages/MfaRecovery";
 import NotificationPreferences from "./pages/NotificationPreferences";
 import NftDisclosure from "./pages/NftDisclosure";
+import OrderTracking from "./pages/OrderTracking";
 // AmbientSoundToggle moved to header as HeaderSoundControl
 import UnifiedChatBot from "./components/UnifiedChatBot";
 import CookieConsent from "./components/CookieConsent";
@@ -118,6 +119,7 @@ function Router() {
         <Route path="/privacy" component={Privacy} />
         <Route path="/terms" component={Terms} />
         <Route path="/nft-disclosure" component={NftDisclosure} />
+        <Route path="/track-order" component={OrderTracking} />
         <Route path="/policies" component={Policies} />
         <Route path="/profile" component={Profile} />
           <Route path="/pre-order" component={PreOrder} />
