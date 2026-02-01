@@ -4038,3 +4038,19 @@
 - [x] Create NFT-specific legal disclosures page (/nft-disclosure)
 - [x] Add regulatory compliance statements
 - [x] Add blockchain data immutability notice
+
+
+## NFT Checkout & Legal Footer (Feb 1)
+
+### NFT Acceptance Checkbox
+- [x] Add NFT disclosure acceptance checkbox to checkout
+- [x] Require checkbox before completing purchase
+- [x] Link to NFT Disclosure page from checkbox label
+- [x] Disable Pay button until checkbox is checked
+- [x] Update footer text with links to Terms, Privacy, and NFT Disclosure
+
+### Legal Footer Links
+- [x] Add Terms link to footer (already existed)
+- [x] Add Privacy Policy link to footer (already existed)
+- [x] Add NFT Disclosure link to footer
+- [x] Style links consistently with footer design

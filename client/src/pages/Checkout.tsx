@@ -18,6 +18,7 @@ export default function Checkout() {
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [nftDisclosureAccepted, setNftDisclosureAccepted] = useState(false);
 
   // Get distributor code from localStorage (set by cloned website visit)
   const getDistributorCode = (): string | undefined => {
@@ -62,6 +63,11 @@ export default function Checkout() {
     
     if (!name.trim() || !email.trim()) {
       toast.error("Please fill in all required fields");
+      return;
+    }
+
+    if (!nftDisclosureAccepted) {
+      toast.error("Please accept the NFT Gift Program terms");
       return;
     }
 
@@ -217,9 +223,39 @@ export default function Checkout() {
                   </div>
                 </div>
 
+                {/* NFT Gift Program Disclosure Acceptance */}
+                <div className="bg-[#c8ff00]/5 rounded-lg p-4 border border-[#c8ff00]/20">
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      id="nft-disclosure"
+                      checked={nftDisclosureAccepted}
+                      onChange={(e) => setNftDisclosureAccepted(e.target.checked)}
+                      className="mt-1 w-5 h-5 rounded border-[#c8ff00]/50 bg-white/10 text-[#c8ff00] focus:ring-[#c8ff00] focus:ring-offset-0 cursor-pointer"
+                    />
+                    <label htmlFor="nft-disclosure" className="text-sm text-gray-300 cursor-pointer">
+                      <span className="font-semibold text-[#c8ff00]">NFT Gift Program:</span>{" "}
+                      I acknowledge that my purchase includes a complimentary NFT gift (not a purchase of securities). 
+                      I have read and agree to the{" "}
+                      <a 
+                        href="/nft-disclosure" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-[#c8ff00] hover:underline font-medium"
+                      >
+                        NFT Gift Program Disclosure
+                      </a>
+                      , including all SEC disclaimers, risk disclosures, and minting conditions.
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2 ml-8">
+                    NFTs are gifted after the 90-day pre-launch period when crowdfunding goals are met.
+                  </p>
+                </div>
+
                 <Button
                   type="submit"
-                  disabled={isProcessing || !stripeConfig?.configured}
+                  disabled={isProcessing || !stripeConfig?.configured || !nftDisclosureAccepted}
                   className="w-full h-14 bg-[#c8ff00] text-black hover:bg-[#a8d600] font-black text-lg disabled:opacity-50"
                 >
                   {isProcessing ? (
@@ -236,7 +272,10 @@ export default function Checkout() {
                 </Button>
 
                 <p className="text-xs text-center text-gray-500">
-                  By completing this purchase, you agree to our Terms of Service and Privacy Policy.
+                  By completing this purchase, you agree to our{" "}
+                  <a href="/terms" className="text-[#c8ff00] hover:underline">Terms of Service</a>,{" "}
+                  <a href="/privacy" className="text-[#c8ff00] hover:underline">Privacy Policy</a>, and{" "}
+                  <a href="/nft-disclosure" className="text-[#c8ff00] hover:underline">NFT Disclosure</a>.
                 </p>
               </form>
             </CardContent>
