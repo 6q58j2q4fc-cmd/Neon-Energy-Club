@@ -396,6 +396,22 @@ export function NftPreview({ orderId, nftId, showMintingNotice = true }: NftPrev
             <p className="text-purple-400">Cyberpunk Neon</p>
           </div>
         </div>
+
+        {/* SEC Disclaimer */}
+        <div className="bg-gray-900/80 border border-gray-700 rounded-lg p-3 mt-4">
+          <p className="text-[10px] text-gray-500 leading-relaxed">
+            <strong className="text-gray-400">IMPORTANT LEGAL NOTICE:</strong> This NFT is provided as a complimentary gift 
+            with your NEON Energy product purchase and is not sold separately. NEON Energy does not sell, offer for sale, 
+            or market NFTs or any digital assets as securities or investment products. This NFT is a promotional gift 
+            intended solely to add value to your purchase experience. If required by applicable law, NEON Energy will 
+            register this NFT program with the U.S. Securities and Exchange Commission (SEC) or other relevant regulatory 
+            authorities. This NFT carries no guaranteed monetary value, does not represent equity, ownership, or any 
+            financial interest in NEON Energy, and should not be considered an investment. By accepting this gift, you 
+            acknowledge that you have read and agree to our{' '}
+            <a href="/terms" className="text-[#c8ff00] hover:underline">Terms & Conditions</a> and{' '}
+            <a href="/nft-disclosure" className="text-[#c8ff00] hover:underline">NFT Disclosure</a>.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

@@ -4016,3 +4016,25 @@
 - [x] Add LinkedIn share button
 - [x] Add copy link button
 - [x] Add download button for NFT image
+
+
+## SEC Disclaimers & Legal Compliance (Jan 31)
+
+### NFT SEC Disclaimer
+- [x] Add SEC disclaimer to NFT preview component
+- [x] Clarify NFTs are gifts, not purchases
+- [x] Add securities registration notice
+- [x] Include no-securities-offering statement
+
+### Terms and Conditions Updates
+- [x] Add NFT gift program section to Terms (Section 3 expanded)
+- [x] Include SEC compliance language (Howey Test analysis)
+- [x] Add crypto/digital asset disclaimers
+- [x] Include risk disclosures
+- [x] Add minting timeline conditions
+
+### Privacy Policy & Legal Documents
+- [x] Update Privacy Policy with NFT data handling (Section 5 expanded)
+- [x] Create NFT-specific legal disclosures page (/nft-disclosure)
+- [x] Add regulatory compliance statements
+- [x] Add blockchain data immutability notice

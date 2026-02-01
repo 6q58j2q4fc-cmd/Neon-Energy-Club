@@ -39,17 +39,64 @@ export default function Terms() {
             </section>
 
             <section className="bg-black/40 border border-white/10 rounded-lg p-6">
-              <h2 className="text-2xl font-bold text-[#c8ff00] mb-4">3. NFT Terms</h2>
+              <h2 className="text-2xl font-bold text-[#c8ff00] mb-4">3. NFT Gift Program & Securities Disclaimer</h2>
               <div className="space-y-4 text-white/80">
-                <p>NEON Genesis NFTs are digital collectibles minted on the Polygon blockchain. By participating in our NFT program:</p>
-                <ul className="list-disc list-inside space-y-2">
-                  <li>You receive a limited license to display the NFT artwork for personal, non-commercial use</li>
-                  <li>NFTs are provided "as is" without warranties of any kind</li>
-                  <li>Estimated values are speculative and not guaranteed</li>
-                  <li>We are not responsible for blockchain network fees or delays</li>
-                  <li>NFT ownership is determined by blockchain records, not our internal systems</li>
-                  <li>You are responsible for maintaining security of your wallet</li>
-                  <li>Lost wallet access may result in permanent loss of NFTs</li>
+                <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 mb-4">
+                  <p className="text-red-400 font-bold mb-2">IMPORTANT SECURITIES DISCLAIMER</p>
+                  <p className="text-white/70 text-sm">
+                    NEON Energy NFTs are provided exclusively as complimentary promotional gifts with qualifying product purchases. 
+                    These NFTs are NOT sold, offered for sale, or marketed as securities, investment contracts, or financial instruments. 
+                    NEON Corporation does not sell NFTs or any digital assets as standalone products.
+                  </p>
+                </div>
+                
+                <h3 className="text-lg font-semibold text-white">3.1 NFT Gift Program Terms</h3>
+                <p>NEON Energy NFTs are digital collectibles provided as gifts to customers who purchase qualifying NEON Energy products. By accepting an NFT gift, you acknowledge and agree that:</p>
+                <ul className="list-disc list-inside space-y-2 mt-2">
+                  <li>The NFT is a complimentary gift included with your product purchase at no additional cost</li>
+                  <li>You are not purchasing, investing in, or acquiring the NFT as a separate transaction</li>
+                  <li>The NFT is provided solely to enhance your customer experience and add value to your purchase</li>
+                  <li>You receive a limited, non-exclusive license to display the NFT artwork for personal, non-commercial use</li>
+                  <li>NFTs are provided "AS IS" without warranties of any kind, express or implied</li>
+                </ul>
+
+                <h3 className="text-lg font-semibold text-white mt-6">3.2 No Securities Offering</h3>
+                <p>NEON Corporation explicitly states that:</p>
+                <ul className="list-disc list-inside space-y-2 mt-2">
+                  <li>We do NOT sell, offer for sale, or market NFTs or any digital assets as securities</li>
+                  <li>NFTs provided through this program are NOT investment products or investment contracts</li>
+                  <li>We make NO representations regarding potential monetary value, appreciation, or return on investment</li>
+                  <li>NFTs do NOT represent equity, ownership interest, profit-sharing rights, or any financial interest in NEON Corporation</li>
+                  <li>NFTs do NOT entitle holders to dividends, distributions, or any form of financial return</li>
+                  <li>Acceptance of an NFT gift does NOT create an investor-company relationship</li>
+                </ul>
+
+                <h3 className="text-lg font-semibold text-white mt-6">3.3 Regulatory Compliance</h3>
+                <p>NEON Corporation is committed to full compliance with applicable securities laws and regulations:</p>
+                <ul className="list-disc list-inside space-y-2 mt-2">
+                  <li>If required by the U.S. Securities and Exchange Commission (SEC) or any other regulatory authority, we will register this NFT gift program or take any other required compliance actions</li>
+                  <li>We actively monitor regulatory guidance regarding digital assets and NFTs</li>
+                  <li>We reserve the right to modify, suspend, or terminate the NFT gift program to ensure regulatory compliance</li>
+                  <li>Users in jurisdictions where NFT gifts may be prohibited or restricted may be ineligible for this program</li>
+                </ul>
+
+                <h3 className="text-lg font-semibold text-white mt-6">3.4 Risk Acknowledgment</h3>
+                <p>By accepting an NFT gift, you acknowledge:</p>
+                <ul className="list-disc list-inside space-y-2 mt-2">
+                  <li>NFTs carry NO guaranteed monetary value and may have zero resale value</li>
+                  <li>The digital asset market is highly volatile and speculative</li>
+                  <li>You should NOT expect any financial return from receiving an NFT gift</li>
+                  <li>We are not responsible for blockchain network fees, delays, or technical issues</li>
+                  <li>NFT ownership is determined by blockchain records; lost wallet access may result in permanent loss</li>
+                  <li>You are solely responsible for the security of your digital wallet</li>
+                </ul>
+
+                <h3 className="text-lg font-semibold text-white mt-6">3.5 NFT Minting Timeline</h3>
+                <p>NFT artwork is generated at the time of qualifying purchase. Actual minting to the blockchain will occur:</p>
+                <ul className="list-disc list-inside space-y-2 mt-2">
+                  <li>After the completion of the 90-day pre-launch period</li>
+                  <li>Upon achievement of crowdfunding goals necessary for production</li>
+                  <li>Subject to regulatory approval and compliance requirements</li>
                 </ul>
               </div>
             </section>

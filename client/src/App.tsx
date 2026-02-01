@@ -51,6 +51,7 @@ import MfaSettings from "./pages/MfaSettings";
 import MfaVerify from "./pages/MfaVerify";
 import MfaRecovery from "./pages/MfaRecovery";
 import NotificationPreferences from "./pages/NotificationPreferences";
+import NftDisclosure from "./pages/NftDisclosure";
 // AmbientSoundToggle moved to header as HeaderSoundControl
 import UnifiedChatBot from "./components/UnifiedChatBot";
 import CartDrawer from "./components/CartDrawer";
@@ -115,6 +116,7 @@ function Router() {
         <Route path={"/nfts"} component={NFTGallery} />
         <Route path="/privacy" component={Privacy} />
         <Route path="/terms" component={Terms} />
+        <Route path="/nft-disclosure" component={NftDisclosure} />
         <Route path="/policies" component={Policies} />
         <Route path="/profile" component={Profile} />
           <Route path="/pre-order" component={PreOrder} />

@@ -78,10 +78,48 @@ export default function Privacy() {
             </section>
 
             <section className="bg-black/40 border border-white/10 rounded-lg p-6">
-              <h2 className="text-2xl font-bold text-[#c8ff00] mb-4">5. Blockchain and NFT Data</h2>
-              <p className="text-white/80 leading-relaxed">
-                When you mint or receive an NFT through our platform, certain information is recorded on the blockchain, which is public and immutable. This includes your wallet address and transaction history. We cannot delete or modify blockchain data. Please consider this before engaging in NFT transactions.
-              </p>
+              <h2 className="text-2xl font-bold text-[#c8ff00] mb-4">5. NFT Gift Program Data Handling</h2>
+              <div className="space-y-4 text-white/80">
+                <div className="bg-[#c8ff00]/10 border border-[#c8ff00]/30 rounded-lg p-4 mb-4">
+                  <p className="text-[#c8ff00] font-semibold mb-2">NFT Gift Program Notice</p>
+                  <p className="text-white/70 text-sm">
+                    NFTs are provided as complimentary gifts with qualifying product purchases. For complete legal 
+                    disclosures regarding our NFT Gift Program, please review our <a href="/nft-disclosure" className="text-[#c8ff00] hover:underline">NFT Gift Program Disclosure</a>.
+                  </p>
+                </div>
+
+                <h3 className="text-lg font-semibold text-white">5.1 NFT-Related Data Collection</h3>
+                <p>In connection with our NFT Gift Program, we collect and process:</p>
+                <ul className="list-disc list-inside space-y-1 mt-2">
+                  <li>Order information to generate unique NFT artwork</li>
+                  <li>Digital wallet addresses for NFT delivery (when provided)</li>
+                  <li>NFT generation metadata (order number, timestamp, artwork parameters)</li>
+                  <li>Blockchain transaction records upon minting</li>
+                </ul>
+
+                <h3 className="text-lg font-semibold text-white mt-4">5.2 Blockchain Data Immutability</h3>
+                <p>
+                  When NFTs are minted to the blockchain (after the 90-day pre-launch period and achievement of 
+                  crowdfunding goals), certain information becomes permanently recorded on the public blockchain:
+                </p>
+                <ul className="list-disc list-inside space-y-1 mt-2">
+                  <li>Your wallet address</li>
+                  <li>NFT ownership and transfer history</li>
+                  <li>Transaction timestamps and metadata</li>
+                </ul>
+                <p className="mt-2 text-white/60 text-sm">
+                  <strong>Important:</strong> Blockchain data is public and immutable. We cannot delete, modify, or 
+                  remove information once recorded on the blockchain. Please consider this before providing a wallet 
+                  address for NFT delivery.
+                </p>
+
+                <h3 className="text-lg font-semibold text-white mt-4">5.3 NFT Data Retention</h3>
+                <p>
+                  We retain NFT-related data (artwork, generation parameters, order associations) indefinitely to 
+                  support NFT verification and ownership records. Off-chain data may be deleted upon request, but 
+                  blockchain records cannot be modified.
+                </p>
+              </div>
             </section>
 
             <section className="bg-black/40 border border-white/10 rounded-lg p-6">
