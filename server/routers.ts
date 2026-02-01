@@ -3615,10 +3615,101 @@ Provide step-by-step instructions with specific button names and locations. Keep
         };
       }),
 
-    // Update order status
+    // Get orders with pagination and filtering for admin panel
+    getOrders: protectedProcedure
+      .input(z.object({
+        page: z.number().int().min(1).default(1),
+        limit: z.number().int().min(1).max(100).default(20),
+        status: z.string().optional(),
+        search: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        const offset = (input.page - 1) * input.limit;
+        
+        // Build where conditions
+        const conditions = [];
+        if (input.status) {
+          conditions.push(eq(preorders.status, input.status as any));
+        }
+        if (input.search) {
+          conditions.push(
+            or(
+              like(preorders.name, `%${input.search}%`),
+              like(preorders.email, `%${input.search}%`),
+              like(preorders.nftId, `%${input.search}%`)
+            )
+          );
+        }
+        
+        const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+        
+        // Get orders
+        const orders = await db.select()
+          .from(preorders)
+          .where(whereClause)
+          .orderBy(desc(preorders.createdAt))
+          .limit(input.limit)
+          .offset(offset);
+        
+        // Get total count
+        const countResult = await db.select({ count: sql<number>`count(*)` })
+          .from(preorders)
+          .where(whereClause);
+        const total = countResult[0]?.count || 0;
+        
+        // Format orders for frontend
+        const formattedOrders = orders.map(o => ({
+          id: o.id,
+          orderNumber: o.nftId?.replace('NEON-NFT-', '') || String(o.id).padStart(5, '0'),
+          customerName: o.name,
+          customerEmail: o.email,
+          status: o.status || 'pending',
+          total: (o.quantity || 1) * 30, // Estimate based on quantity
+          createdAt: o.createdAt?.toISOString() || new Date().toISOString(),
+          trackingNumber: o.trackingNumber || null,
+          nftImageUrl: o.nftImageUrl || null,
+          shippingAddress: o.address ? `${o.address}, ${o.city || ''} ${o.state || ''} ${o.postalCode || ''}` : null,
+        }));
+        
+        return { orders: formattedOrders, total };
+      }),
+
+    // Update order status and tracking
     updateOrder: protectedProcedure
       .input(z.object({
         orderId: z.number(),
+        status: z.string(),
+        trackingNumber: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        const updateData: any = { status: input.status };
+        if (input.trackingNumber !== undefined) {
+          updateData.trackingNumber = input.trackingNumber;
+        }
+        
+        await db.update(preorders)
+          .set(updateData)
+          .where(eq(preorders.id, input.orderId));
+        
+        return { success: true };
+      }),
+
+    // Bulk update order statuses
+    bulkUpdateOrders: protectedProcedure
+      .input(z.object({
+        orderIds: z.array(z.number().int()),
         status: z.string(),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -3628,11 +3719,14 @@ Provide step-by-step instructions with specific button names and locations. Keep
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         
-        await db.update(preorders)
-          .set({ status: input.status as any })
-          .where(eq(preorders.id, input.orderId));
+        for (const orderId of input.orderIds) {
+          await db.update(preorders)
+            .set({ status: input.status as any })
+            .where(eq(preorders.id, orderId));
+        }
         
-        return { success: true };
+        console.log(`[Admin] Bulk updated ${input.orderIds.length} orders to status: ${input.status}`);
+        return { success: true, updatedCount: input.orderIds.length };
       }),
 
     // DELETE order - CRITICAL FIX: This was missing and user requested multiple times

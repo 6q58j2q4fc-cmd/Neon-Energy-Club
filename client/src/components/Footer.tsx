@@ -52,6 +52,7 @@ export default function Footer() {
               <li><Link href="/franchise" className="text-white/60 hover:text-[#c8ff00] text-sm transition-colors">Franchise</Link></li>
               <li><Link href="/vending" className="text-white/60 hover:text-[#c8ff00] text-sm transition-colors">Vending</Link></li>
               <li><Link href="/crowdfund" className="text-white/60 hover:text-[#c8ff00] text-sm transition-colors">Back Us</Link></li>
+              <li><Link href="/track-order" className="text-white/60 hover:text-[#c8ff00] text-sm transition-colors">Track Order</Link></li>
             </ul>
           </div>
 

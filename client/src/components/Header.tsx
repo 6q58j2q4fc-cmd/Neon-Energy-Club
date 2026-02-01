@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ShoppingCart, User, Users, Building2, Heart, MapPin, Settings, LogOut, Crown, Gift, BarChart3 } from "lucide-react";
+import { Menu, X, ShoppingCart, User, Users, Building2, Heart, MapPin, Settings, LogOut, Crown, Gift, BarChart3, Package } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -163,6 +163,13 @@ export default function Header() {
                       >
                         <Gift className="w-4 h-4 mr-2" />
                         My Orders
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => setLocation("/track-order")}
+                        className="text-white/70 hover:text-white hover:bg-white/5 cursor-pointer"
+                      >
+                        <Package className="w-4 h-4 mr-2" />
+                        Track Order
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => setLocation("/profile")}

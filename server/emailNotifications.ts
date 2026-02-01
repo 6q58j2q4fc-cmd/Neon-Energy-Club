@@ -1627,11 +1627,14 @@ export async function sendOrderConfirmationWithNft(data: {
         <!-- SEC Disclaimer -->
         ${secDisclaimer}
 
-        <!-- CTA -->
+        <!-- CTA - Track Order Button -->
         <div style="text-align: center; margin: 32px 0;">
-          <a href="https://neonenergy.com/order-history" style="display: inline-block; background: linear-gradient(135deg, #c8ff00 0%, #a8d600 100%); color: #000; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px;">
-            View Order Status
+          <a href="https://neonenergy.com/track-order?order=NEON-${data.orderNumber}" style="display: inline-block; background: linear-gradient(135deg, #c8ff00 0%, #a8d600 100%); color: #000; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; box-shadow: 0 4px 15px rgba(200, 255, 0, 0.3);">
+            📦 Track Your Order
           </a>
+          <p style="color: #666; font-size: 12px; margin-top: 12px;">
+            Or visit: <a href="https://neonenergy.com/track-order" style="color: #c8ff00;">neonenergy.com/track-order</a> and enter order #NEON-${data.orderNumber}
+          </p>
         </div>
 
         <p style="color: #888; font-size: 14px; line-height: 1.6; text-align: center;">
