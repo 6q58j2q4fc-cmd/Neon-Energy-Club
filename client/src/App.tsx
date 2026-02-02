@@ -55,6 +55,7 @@ import NftDisclosure from "./pages/NftDisclosure";
 import OrderTracking from "./pages/OrderTracking";
 import AdminOrders from "./pages/AdminOrders";
 import MyOrders from "./pages/MyOrders";
+import AdminShippingSettings from "./pages/AdminShippingSettings";
 // AmbientSoundToggle moved to header as HeaderSoundControl
 import UnifiedChatBot from "./components/UnifiedChatBot";
 import CookieConsent from "./components/CookieConsent";
@@ -107,6 +108,7 @@ function Router() {
         <Route path="/admin/users" component={AdminPanel} />
         <Route path="/admin/distributors" component={AdminPanel} />
         <Route path="/admin/orders" component={AdminOrders} />
+        <Route path="/admin/shipping" component={AdminShippingSettings} />
         <Route path="/admin/commissions" component={AdminPanel} />
         <Route path="/admin/settings" component={AdminPanel} />
         <Route path="/franchise/territories" component={FranchiseDashboard} />

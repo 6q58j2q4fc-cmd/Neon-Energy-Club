@@ -4144,3 +4144,59 @@
 - [x] Add order detail expansion with shipping info
 - [x] Add getMyOrders endpoint to preorder router
 - [x] Include tracking links and carrier information
+
+
+## Shipping API, Order Notifications & NFT Gallery (Feb 1)
+
+### Shipping Carrier API Integration
+- [ ] Create admin settings page for shipping API credentials
+- [ ] Add UPS API key input fields
+- [ ] Add FedEx API key input fields
+- [ ] Add USPS API key input fields
+- [ ] Update shipping service to use real credentials when available
+- [ ] Add API key validation/testing functionality
+- [ ] Document how to obtain carrier API credentials
+
+### Order Status Change Notifications
+- [ ] Create email templates for status changes (shipped, delivered)
+- [ ] Add push notification support for browsers
+- [ ] Trigger notifications when admin updates order status
+- [ ] Include tracking information in shipped notifications
+- [ ] Add notification preferences integration
+
+### Public NFT Collection Gallery
+- [ ] Create /nfts public gallery page
+- [ ] Display all generated NFTs with order info
+- [ ] Add rarity tier filtering (Common, Uncommon, Rare, Epic, Legendary)
+- [ ] Add search by order number
+- [ ] Show NFT statistics (total minted, rarity distribution)
+- [ ] Add social sharing for individual NFTs
+
+
+## Final Features (Feb 1, 2026)
+
+### Shipping Carrier API Integration
+- [x] Create shipping integration module (server/shipping.ts) with UPS, FedEx, USPS placeholders
+- [x] Add shipping carrier credentials configuration via environment variables
+- [x] Implement test connection functions for each carrier
+- [x] Create admin shipping settings page (/admin/shipping) with carrier configuration UI
+- [x] Add shipping rate calculation endpoints
+- [x] Add shipping label generation endpoints
+
+### Order Status Change Notifications
+- [x] Add sendOrderStatusChangeEmail function for status updates (processing, shipped, in_transit, delivered)
+- [x] Add sendDeliveryConfirmationEmail function for delivery notifications
+- [x] Update order status mutation to trigger notifications automatically
+- [x] Include tracking number and carrier info in notification emails
+- [x] Add option to toggle notifications on/off when updating orders
+
+### Public NFT Collection Gallery
+- [x] Create getGalleryNfts tRPC endpoint for public NFT viewing
+- [x] Add nftRarity and nftTheme columns to preorders schema
+- [x] Update NFTGallery page to use new endpoint with real data
+- [x] Add rarity filtering (Common, Uncommon, Rare, Epic, Legendary, Mythic)
+- [x] Add search by order number functionality
+- [x] Add sorting options (newest, oldest, by rarity)
+- [x] Display NFT stats by rarity tier
+- [x] Add share and download buttons for each NFT
+- [x] Include SEC disclaimer about NFT gift program

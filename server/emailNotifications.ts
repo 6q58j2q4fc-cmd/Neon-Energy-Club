@@ -1669,3 +1669,286 @@ function getRarityColor(rarity: string): string {
   };
   return colors[rarity] || '#c8ff00';
 }
+
+
+/**
+ * Send order status change notification email
+ * Triggered when order status changes (shipped, delivered, etc.)
+ */
+export async function sendOrderStatusChangeEmail(data: {
+  customerName: string;
+  customerEmail: string;
+  orderNumber: string;
+  previousStatus: string;
+  newStatus: string;
+  trackingNumber?: string;
+  carrier?: string;
+  estimatedDelivery?: string;
+  trackingUrl?: string;
+  nftImageUrl?: string;
+}): Promise<boolean> {
+  const statusMessages: Record<string, { title: string; message: string; icon: string }> = {
+    'processing': {
+      title: 'Your Order is Being Processed',
+      message: 'Great news! We\'ve started processing your NEON Energy order. Our team is preparing your items for shipment.',
+      icon: '⚙️',
+    },
+    'shipped': {
+      title: 'Your Order Has Shipped!',
+      message: 'Your NEON Energy order is on its way! Track your package using the tracking information below.',
+      icon: '📦',
+    },
+    'in_transit': {
+      title: 'Your Order is In Transit',
+      message: 'Your NEON Energy package is making its way to you. Check the tracking link for real-time updates.',
+      icon: '🚚',
+    },
+    'out_for_delivery': {
+      title: 'Out for Delivery Today!',
+      message: 'Exciting news! Your NEON Energy order is out for delivery and should arrive today.',
+      icon: '🎉',
+    },
+    'delivered': {
+      title: 'Your Order Has Been Delivered!',
+      message: 'Your NEON Energy order has been delivered. We hope you enjoy your purchase!',
+      icon: '✅',
+    },
+    'cancelled': {
+      title: 'Order Cancelled',
+      message: 'Your NEON Energy order has been cancelled. If you have any questions, please contact our support team.',
+      icon: '❌',
+    },
+  };
+
+  const statusInfo = statusMessages[data.newStatus] || {
+    title: `Order Status Update: ${data.newStatus}`,
+    message: `Your order status has been updated to: ${data.newStatus}`,
+    icon: '📋',
+  };
+
+  const trackingSection = data.trackingNumber && data.carrier ? `
+    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 24px; margin: 24px 0; border: 1px solid rgba(200, 255, 0, 0.2);">
+      <h3 style="color: #c8ff00; margin: 0 0 16px 0; font-size: 18px;">📍 Tracking Information</h3>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 8px 0; color: #9ca3af; font-size: 14px;">Carrier:</td>
+          <td style="padding: 8px 0; color: #ffffff; font-size: 14px; font-weight: 600;">${data.carrier}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; color: #9ca3af; font-size: 14px;">Tracking Number:</td>
+          <td style="padding: 8px 0; color: #ffffff; font-size: 14px; font-family: monospace;">${data.trackingNumber}</td>
+        </tr>
+        ${data.estimatedDelivery ? `
+        <tr>
+          <td style="padding: 8px 0; color: #9ca3af; font-size: 14px;">Estimated Delivery:</td>
+          <td style="padding: 8px 0; color: #c8ff00; font-size: 14px; font-weight: 600;">${data.estimatedDelivery}</td>
+        </tr>
+        ` : ''}
+      </table>
+      ${data.trackingUrl ? `
+      <div style="margin-top: 16px; text-align: center;">
+        <a href="${data.trackingUrl}" style="display: inline-block; background: linear-gradient(135deg, #c8ff00 0%, #a8e600 100%); color: #0a0a0a; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px;">
+          Track Your Package →
+        </a>
+      </div>
+      ` : ''}
+    </div>
+  ` : '';
+
+  const nftSection = data.nftImageUrl ? `
+    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 24px; margin: 24px 0; border: 1px solid rgba(200, 255, 0, 0.2); text-align: center;">
+      <h3 style="color: #c8ff00; margin: 0 0 16px 0; font-size: 18px;">🎨 Your Exclusive NFT</h3>
+      <img src="${data.nftImageUrl}" alt="Your NEON NFT" style="max-width: 200px; border-radius: 12px; border: 2px solid #c8ff00; margin-bottom: 12px;" />
+      <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+        Your unique NFT will be minted after the pre-launch period
+      </p>
+    </div>
+  ` : '';
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${statusInfo.title}</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="color: #c8ff00; font-size: 32px; margin: 0; text-shadow: 0 0 20px rgba(200, 255, 0, 0.5);">
+            ⚡ NEON ENERGY
+          </h1>
+        </div>
+
+        <!-- Status Icon -->
+        <div style="text-align: center; margin-bottom: 24px;">
+          <span style="font-size: 64px;">${statusInfo.icon}</span>
+        </div>
+
+        <!-- Main Content -->
+        <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 16px; padding: 32px; border: 1px solid rgba(200, 255, 0, 0.3);">
+          <h2 style="color: #ffffff; font-size: 24px; margin: 0 0 16px 0; text-align: center;">
+            ${statusInfo.title}
+          </h2>
+          
+          <p style="color: #d1d5db; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0; text-align: center;">
+            Hi ${data.customerName},<br><br>
+            ${statusInfo.message}
+          </p>
+
+          <!-- Order Number -->
+          <div style="background: rgba(200, 255, 0, 0.1); border-radius: 8px; padding: 16px; text-align: center; margin-bottom: 24px;">
+            <span style="color: #9ca3af; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Order Number</span>
+            <p style="color: #c8ff00; font-size: 24px; font-weight: 700; margin: 8px 0 0 0; font-family: monospace;">
+              ${data.orderNumber}
+            </p>
+          </div>
+
+          ${trackingSection}
+          ${nftSection}
+
+          <!-- Track Order Button -->
+          <div style="text-align: center; margin-top: 24px;">
+            <a href="https://neon-energy.manus.space/track-order?order=${encodeURIComponent(data.orderNumber)}" style="display: inline-block; background: linear-gradient(135deg, #c8ff00 0%, #a8e600 100%); color: #0a0a0a; padding: 16px 40px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; box-shadow: 0 4px 20px rgba(200, 255, 0, 0.3);">
+              View Order Details
+            </a>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(200, 255, 0, 0.2);">
+          <p style="color: #6b7280; font-size: 12px; margin: 0 0 8px 0;">
+            Questions? Contact us at support@neonenergy.com
+          </p>
+          <p style="color: #4b5563; font-size: 11px; margin: 0;">
+            © 2025 NEON Energy. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    await notifyOwner({
+      title: `Order ${data.orderNumber} - ${statusInfo.title}`,
+      content: `Customer: ${data.customerName} (${data.customerEmail})\nStatus: ${data.previousStatus} → ${data.newStatus}${data.trackingNumber ? `\nTracking: ${data.trackingNumber}` : ''}`,
+    });
+    
+    console.log(`[Email] Order status change notification sent to ${data.customerEmail}: ${data.newStatus}`);
+    return true;
+  } catch (error) {
+    console.error('[Email] Failed to send order status change notification:', error);
+    return false;
+  }
+}
+
+/**
+ * Send delivery confirmation email with review request
+ */
+export async function sendDeliveryConfirmationEmail(data: {
+  customerName: string;
+  customerEmail: string;
+  orderNumber: string;
+  deliveredAt: Date;
+  nftImageUrl?: string;
+}): Promise<boolean> {
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Your NEON Order Has Arrived!</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="color: #c8ff00; font-size: 32px; margin: 0; text-shadow: 0 0 20px rgba(200, 255, 0, 0.5);">
+            ⚡ NEON ENERGY
+          </h1>
+        </div>
+
+        <!-- Celebration Icon -->
+        <div style="text-align: center; margin-bottom: 24px;">
+          <span style="font-size: 80px;">🎉</span>
+        </div>
+
+        <!-- Main Content -->
+        <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 16px; padding: 32px; border: 1px solid rgba(200, 255, 0, 0.3);">
+          <h2 style="color: #ffffff; font-size: 24px; margin: 0 0 16px 0; text-align: center;">
+            Your Order Has Arrived!
+          </h2>
+          
+          <p style="color: #d1d5db; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0; text-align: center;">
+            Hi ${data.customerName},<br><br>
+            Great news! Your NEON Energy order <strong style="color: #c8ff00;">${data.orderNumber}</strong> has been delivered.
+          </p>
+
+          <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
+            <span style="color: #22c55e; font-size: 14px;">✓ Delivered on ${data.deliveredAt.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+          </div>
+
+          ${data.nftImageUrl ? `
+          <div style="text-align: center; margin-bottom: 24px;">
+            <h3 style="color: #c8ff00; margin: 0 0 16px 0; font-size: 18px;">🎨 Your Exclusive NFT</h3>
+            <img src="${data.nftImageUrl}" alt="Your NEON NFT" style="max-width: 200px; border-radius: 12px; border: 2px solid #c8ff00;" />
+            <p style="color: #9ca3af; font-size: 12px; margin: 12px 0 0 0;">
+              NFT minting begins after the pre-launch period ends
+            </p>
+          </div>
+          ` : ''}
+
+          <!-- CTA Buttons -->
+          <div style="text-align: center; margin-top: 24px;">
+            <a href="https://neon-energy.manus.space/my-orders" style="display: inline-block; background: linear-gradient(135deg, #c8ff00 0%, #a8e600 100%); color: #0a0a0a; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px; margin: 0 8px 12px 8px;">
+              View My Orders
+            </a>
+            <a href="https://neon-energy.manus.space/shop" style="display: inline-block; background: transparent; color: #c8ff00; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px; border: 2px solid #c8ff00; margin: 0 8px 12px 8px;">
+              Shop Again
+            </a>
+          </div>
+        </div>
+
+        <!-- Share Section -->
+        <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 24px; margin-top: 24px; text-align: center; border: 1px solid rgba(200, 255, 0, 0.2);">
+          <h3 style="color: #ffffff; font-size: 18px; margin: 0 0 12px 0;">Share Your NEON Experience</h3>
+          <p style="color: #9ca3af; font-size: 14px; margin: 0 0 16px 0;">
+            Love your NEON Energy? Share it with friends!
+          </p>
+          <div>
+            <a href="https://twitter.com/intent/tweet?text=Just%20received%20my%20NEON%20Energy%20order!%20⚡%20%23NEONEnergy%20%23EnergyDrink" style="display: inline-block; background: #1da1f2; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-size: 12px; margin: 4px;">Twitter</a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://neon-energy.manus.space" style="display: inline-block; background: #4267b2; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-size: 12px; margin: 4px;">Facebook</a>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(200, 255, 0, 0.2);">
+          <p style="color: #6b7280; font-size: 12px; margin: 0 0 8px 0;">
+            Questions? Contact us at support@neonenergy.com
+          </p>
+          <p style="color: #4b5563; font-size: 11px; margin: 0;">
+            © 2025 NEON Energy. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    await notifyOwner({
+      title: `Order ${data.orderNumber} Delivered`,
+      content: `Customer: ${data.customerName} (${data.customerEmail})\nDelivered: ${data.deliveredAt.toISOString()}`,
+    });
+    
+    console.log(`[Email] Delivery confirmation sent to ${data.customerEmail}`);
+    return true;
+  } catch (error) {
+    console.error('[Email] Failed to send delivery confirmation:', error);
+    return false;
+  }
+}

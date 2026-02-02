@@ -95,6 +95,10 @@ export const preorders = mysqlTable("preorders", {
   nftImageUrl: text("nftImageUrl"),
   /** NFT mint status */
   nftMintStatus: mysqlEnum("nftMintStatus", ["pending", "ready", "minted"]).default("pending"),
+  /** NFT rarity tier (Common, Uncommon, Rare, Epic, Legendary, Mythic) */
+  nftRarity: varchar("nftRarity", { length: 50 }),
+  /** NFT theme/environment description */
+  nftTheme: text("nftTheme"),
   /** Order creation timestamp */
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   /** Last update timestamp */

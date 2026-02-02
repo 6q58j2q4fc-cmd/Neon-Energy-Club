@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { Gem, Crown, Star, Sparkles, Trophy, ArrowLeft, ExternalLink, Info, Share2, Twitter, Facebook } from "lucide-react";
@@ -18,11 +19,57 @@ const rarityConfig = {
 
 export default function NFTGallery() {
   const [, setLocation] = useLocation();
-  const nftsQuery = trpc.nft.gallery.useQuery({ limit: 100 });
-  const statsQuery = trpc.nft.stats.useQuery();
-
-  const nfts = nftsQuery.data || [];
-  const stats = statsQuery.data || { totalMinted: 0, legendaryCount: 0, epicCount: 0, rareCount: 0, uncommonCount: 0, commonCount: 0 };
+  const [page, setPage] = useState(1);
+  const [rarityFilter, setRarityFilter] = useState<string | undefined>(undefined);
+  
+  // Use the new preorder gallery endpoint
+  const nftsQuery = trpc.preorder.getGalleryNfts.useQuery({ 
+    page, 
+    pageSize: 100,
+    rarity: rarityFilter,
+    sortBy: 'newest'
+  });
+  
+  // Map the new data format to the expected format
+  type NftItem = {
+    tokenId: string;
+    name: string;
+    rarity: string;
+    imageUrl: string | null;
+    ownerName: string;
+    estimatedValue: number;
+    blockchainStatus: string;
+  };
+  
+  const nfts: NftItem[] = (nftsQuery.data?.nfts || []).map(nft => ({
+    tokenId: nft.orderNumber,
+    name: `NEON Genesis #${nft.orderNumber}`,
+    rarity: (nft.rarity || 'common').toLowerCase(),
+    imageUrl: nft.imageUrl,
+    ownerName: 'Pre-order Customer',
+    estimatedValue: getRarityValue(nft.rarity || 'Common'),
+    blockchainStatus: 'pending',
+  }));
+  
+  const galleryStats = nftsQuery.data?.stats || { total: 0, byRarity: {} };
+  const stats = {
+    totalMinted: galleryStats.total,
+    legendaryCount: (galleryStats.byRarity as any)?.Legendary || 0,
+    epicCount: (galleryStats.byRarity as any)?.Epic || 0,
+    rareCount: (galleryStats.byRarity as any)?.Rare || 0,
+    uncommonCount: (galleryStats.byRarity as any)?.Uncommon || 0,
+    commonCount: (galleryStats.byRarity as any)?.Common || 0,
+  };
+  
+  function getRarityValue(rarity: string): number {
+    switch (rarity) {
+      case 'Legendary': return 5000;
+      case 'Epic': return 1000;
+      case 'Rare': return 250;
+      case 'Uncommon': return 100;
+      default: return 50;
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a1a1a] via-[#0d2818] to-[#0a1a1a] text-white relative overflow-hidden">

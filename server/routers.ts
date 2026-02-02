@@ -8,7 +8,7 @@ import { notifyOwner } from "./_core/notification";
 import { isStripeConfigured, createCrowdfundingCheckout, createFranchiseCheckout } from "./stripe";
 import { getDb } from "./db";
 import { users, preorders, commissions, distributors } from "../drizzle/schema";
-import { sql, eq, gte, desc, like, or, and } from "drizzle-orm";
+import { sql, eq, gte, desc, asc, like, or, and, isNotNull } from "drizzle-orm";
 
 export const appRouter = router({
   system: systemRouter,
@@ -282,6 +282,119 @@ export const appRouter = router({
             createdAt: order.createdAt,
             updatedAt: order.updatedAt,
           })),
+        };
+      }),
+
+    // Public NFT Gallery - shows all NFTs for community viewing
+    getGalleryNfts: publicProcedure
+      .input(z.object({
+        page: z.number().default(1),
+        pageSize: z.number().default(12),
+        rarity: z.string().optional(),
+        search: z.string().optional(),
+        sortBy: z.enum(['newest', 'oldest', 'rarity']).default('newest'),
+      }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        const offset = (input.page - 1) * input.pageSize;
+        
+        // Build conditions - only show orders with NFT images
+        const conditions: any[] = [isNotNull(preorders.nftImageUrl)];
+        
+        if (input.search) {
+          const searchCondition = or(
+            like(preorders.nftId, `%${input.search}%`),
+            like(preorders.nftRarity, `%${input.search}%`)
+          );
+          if (searchCondition) {
+            conditions.push(searchCondition);
+          }
+        }
+        
+        if (input.rarity) {
+          conditions.push(eq(preorders.nftRarity, input.rarity));
+        }
+        
+        const whereClause = and(...conditions);
+        
+        // Determine sort order
+        let orderByClause;
+        switch (input.sortBy) {
+          case 'oldest':
+            orderByClause = asc(preorders.createdAt);
+            break;
+          case 'rarity':
+            orderByClause = sql`CASE 
+              WHEN ${preorders.nftRarity} = 'Mythic' THEN 1
+              WHEN ${preorders.nftRarity} = 'Legendary' THEN 2
+              WHEN ${preorders.nftRarity} = 'Epic' THEN 3
+              WHEN ${preorders.nftRarity} = 'Rare' THEN 4
+              WHEN ${preorders.nftRarity} = 'Uncommon' THEN 5
+              ELSE 6
+            END`;
+            break;
+          default:
+            orderByClause = desc(preorders.createdAt);
+        }
+        
+        // Get NFTs
+        const nfts = await db.select({
+          id: preorders.id,
+          orderNumber: preorders.nftId,
+          imageUrl: preorders.nftImageUrl,
+          rarity: preorders.nftRarity,
+          theme: preorders.nftTheme,
+          createdAt: preorders.createdAt,
+        })
+          .from(preorders)
+          .where(whereClause)
+          .orderBy(orderByClause)
+          .limit(input.pageSize)
+          .offset(offset);
+        
+        // Get total count
+        const countResult = await db.select({ count: sql<number>`count(*)` })
+          .from(preorders)
+          .where(whereClause);
+        const total = countResult[0]?.count || 0;
+        
+        // Get stats by rarity
+        const rarityStats = await db.select({
+          rarity: preorders.nftRarity,
+          count: sql<number>`count(*)`,
+        })
+          .from(preorders)
+          .where(isNotNull(preorders.nftImageUrl))
+          .groupBy(preorders.nftRarity);
+        
+        const byRarity: Record<string, number> = {};
+        let totalNfts = 0;
+        for (const stat of rarityStats) {
+          if (stat.rarity) {
+            byRarity[stat.rarity] = stat.count;
+            totalNfts += stat.count;
+          }
+        }
+        
+        // Format NFTs for frontend
+        const formattedNfts = nfts.map(nft => ({
+          id: nft.id,
+          orderNumber: nft.orderNumber?.replace('NEON-NFT-', '') || String(nft.id).padStart(5, '0'),
+          imageUrl: nft.imageUrl,
+          rarity: nft.rarity || 'Common',
+          theme: nft.theme,
+          createdAt: nft.createdAt?.toISOString() || new Date().toISOString(),
+        }));
+        
+        return {
+          nfts: formattedNfts,
+          total,
+          stats: {
+            total: totalNfts,
+            byRarity,
+          },
         };
       }),
   }),
@@ -3725,6 +3838,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
         orderId: z.number(),
         status: z.string(),
         trackingNumber: z.string().optional(),
+        sendNotification: z.boolean().default(true),
       }))
       .mutation(async ({ ctx, input }) => {
         if (ctx.user.role !== "admin") {
@@ -3733,7 +3847,15 @@ Provide step-by-step instructions with specific button names and locations. Keep
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         
-        const updateData: any = { status: input.status };
+        // Get current order to track status change
+        const currentOrder = await db.select().from(preorders).where(eq(preorders.id, input.orderId)).limit(1);
+        if (!currentOrder.length) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Order not found" });
+        }
+        const order = currentOrder[0];
+        const previousStatus = order.status || 'pending';
+        
+        const updateData: any = { status: input.status, updatedAt: new Date() };
         if (input.trackingNumber !== undefined) {
           updateData.trackingNumber = input.trackingNumber;
         }
@@ -3742,7 +3864,42 @@ Provide step-by-step instructions with specific button names and locations. Keep
           .set(updateData)
           .where(eq(preorders.id, input.orderId));
         
-        return { success: true };
+        // Send notification if status changed and notification is enabled
+        if (input.sendNotification && previousStatus !== input.status && order.email) {
+          const { sendOrderStatusChangeEmail, sendDeliveryConfirmationEmail } = await import("./emailNotifications");
+          const { getTrackingUrl } = await import("./shipping");
+          
+          const orderNumber = order.nftId?.replace('NEON-NFT-', 'NEON-') || `NEON-${String(order.id).padStart(5, '0')}`;
+          const trackingUrl = order.trackingNumber && order.carrier ? getTrackingUrl(order.carrier.toLowerCase() as 'ups' | 'fedex' | 'usps', order.trackingNumber) : undefined;
+          
+          if (input.status === 'delivered') {
+            // Send delivery confirmation with review request
+            await sendDeliveryConfirmationEmail({
+              customerName: order.name || 'Customer',
+              customerEmail: order.email,
+              orderNumber,
+              deliveredAt: new Date(),
+              nftImageUrl: order.nftImageUrl || undefined,
+            });
+          } else {
+            // Send status change notification
+            await sendOrderStatusChangeEmail({
+              customerName: order.name || 'Customer',
+              customerEmail: order.email,
+              orderNumber,
+              previousStatus,
+              newStatus: input.status,
+              trackingNumber: input.trackingNumber || order.trackingNumber || undefined,
+              carrier: order.carrier || undefined,
+              trackingUrl,
+              nftImageUrl: order.nftImageUrl || undefined,
+            });
+          }
+          
+          console.log(`[Admin] Order status notification sent: ${orderNumber} (${previousStatus} → ${input.status})`);
+        }
+        
+        return { success: true, notificationSent: input.sendNotification && previousStatus !== input.status };
       }),
 
     // Bulk update order statuses
@@ -3979,6 +4136,47 @@ Provide step-by-step instructions with specific button names and locations. Keep
         return { success: true, message: 'All test orders deleted successfully' };
       }),
 
+    // Test shipping carrier connection
+    testShippingConnection: protectedProcedure
+      .input(z.object({
+        carrier: z.enum(['ups', 'fedex', 'usps']),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { testCarrierConnection } = await import("./shipping");
+        const result = await testCarrierConnection(input.carrier);
+        return result;
+      }),
+
+    // Get configured shipping carriers
+    getShippingConfig: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { getConfiguredCarriers, getCarrierCredentials } = await import("./shipping");
+        const configuredCarriers = getConfiguredCarriers();
+        const credentials = getCarrierCredentials();
+        
+        return {
+          configuredCarriers,
+          ups: {
+            configured: !!credentials.ups,
+            environment: credentials.ups?.environment || null,
+          },
+          fedex: {
+            configured: !!credentials.fedex,
+            environment: credentials.fedex?.environment || null,
+          },
+          usps: {
+            configured: !!credentials.usps,
+            environment: credentials.usps?.environment || null,
+          },
+        };
+      }),
+
     // Commission management
     commissions: protectedProcedure
       .input(z.object({
@@ -4111,6 +4309,119 @@ Provide step-by-step instructions with specific button names and locations. Keep
           })),
           total,
           totalPages: Math.ceil(total / input.limit),
+        };
+      }),
+    // Public NFT Gallery - shows all NFTs for community viewing
+    getGalleryNfts: publicProcedure
+      .input(z.object({
+        page: z.number().default(1),
+        pageSize: z.number().default(12),
+        rarity: z.string().optional(),
+        search: z.string().optional(),
+        sortBy: z.enum(['newest', 'oldest', 'rarity']).default('newest'),
+      }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        const offset = (input.page - 1) * input.pageSize;
+        
+        // Build conditions - only show orders with NFT images
+        const conditions = [isNotNull(preorders.nftImageUrl)];
+        
+        if (input.search) {
+          const searchCondition = or(
+            like(preorders.nftId, `%${input.search}%`),
+            like(preorders.nftRarity, `%${input.search}%`)
+          );
+          if (searchCondition) {
+            conditions.push(searchCondition);
+          }
+        }
+        
+        if (input.rarity) {
+          conditions.push(eq(preorders.nftRarity, input.rarity));
+        }
+        
+        const whereClause = and(...conditions);
+        
+        // Determine sort order
+        let orderByClause;
+        switch (input.sortBy) {
+          case 'oldest':
+            orderByClause = asc(preorders.createdAt);
+            break;
+          case 'rarity':
+            // Sort by rarity (Mythic > Legendary > Epic > Rare > Uncommon > Common)
+            orderByClause = sql`CASE 
+              WHEN ${preorders.nftRarity} = 'Mythic' THEN 1
+              WHEN ${preorders.nftRarity} = 'Legendary' THEN 2
+              WHEN ${preorders.nftRarity} = 'Epic' THEN 3
+              WHEN ${preorders.nftRarity} = 'Rare' THEN 4
+              WHEN ${preorders.nftRarity} = 'Uncommon' THEN 5
+              ELSE 6
+            END`;
+            break;
+          default:
+            orderByClause = desc(preorders.createdAt);
+        }
+        
+        // Get NFTs
+        const nfts = await db.select({
+          id: preorders.id,
+          orderNumber: preorders.nftId,
+          imageUrl: preorders.nftImageUrl,
+          rarity: preorders.nftRarity,
+          theme: preorders.nftTheme,
+          createdAt: preorders.createdAt,
+        })
+          .from(preorders)
+          .where(whereClause)
+          .orderBy(orderByClause)
+          .limit(input.pageSize)
+          .offset(offset);
+        
+        // Get total count
+        const countResult = await db.select({ count: sql<number>`count(*)` })
+          .from(preorders)
+          .where(whereClause);
+        const total = countResult[0]?.count || 0;
+        
+        // Get stats by rarity
+        const rarityStats = await db.select({
+          rarity: preorders.nftRarity,
+          count: sql<number>`count(*)`,
+        })
+          .from(preorders)
+          .where(isNotNull(preorders.nftImageUrl))
+          .groupBy(preorders.nftRarity);
+        
+        const byRarity: Record<string, number> = {};
+        let totalNfts = 0;
+        for (const stat of rarityStats) {
+          if (stat.rarity) {
+            byRarity[stat.rarity] = stat.count;
+            totalNfts += stat.count;
+          }
+        }
+        
+        // Format NFTs for frontend
+        const formattedNfts = nfts.map(nft => ({
+          id: nft.id,
+          orderNumber: nft.orderNumber?.replace('NEON-NFT-', '') || String(nft.id).padStart(5, '0'),
+          imageUrl: nft.imageUrl,
+          rarity: nft.rarity || 'Common',
+          theme: nft.theme,
+          createdAt: nft.createdAt?.toISOString() || new Date().toISOString(),
+        }));
+        
+        return {
+          nfts: formattedNfts,
+          total,
+          stats: {
+            total: totalNfts,
+            byRarity,
+          },
         };
       }),
   }),

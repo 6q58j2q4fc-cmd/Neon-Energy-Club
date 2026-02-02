@@ -225,6 +225,13 @@
       "when": 1769904276258,
       "tag": "0031_bright_viper",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "5",
+      "when": 1769999157195,
+      "tag": "0032_clumsy_captain_cross",
+      "breakpoints": true
     }
   ]
 }
