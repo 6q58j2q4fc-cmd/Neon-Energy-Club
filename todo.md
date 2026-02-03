@@ -4538,3 +4538,7 @@
 - [ ] Fix quick action buttons in distributor dashboard to be clickable
 - [ ] Ensure unique referral links for customers vs distributors
 - [ ] Ensure unique distributor ID numbers (no duplicates)
+
+
+## SQL Error Fix - Feb 3
+- [x] Fix SQL query error on enrollment page (fixed missing migration file)
