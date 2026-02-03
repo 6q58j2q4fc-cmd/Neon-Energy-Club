@@ -875,16 +875,22 @@ export const appRouter = router({
       .input(
         z.object({
           sponsorCode: z.string().optional(),
+          country: z.string().length(2).optional(), // ISO 3166-1 alpha-2 country code
         })
       )
       .mutation(async ({ input, ctx }) => {
-        const { enrollDistributor, createDistributorProfile, createEmailVerification } = await import("./db");
+        const { enrollDistributor, createDistributorProfile, createEmailVerification, updateDistributorCountry } = await import("./db");
         const { sendEmailVerification } = await import("./emailNotifications");
         
         const distributor = await enrollDistributor({
           userId: ctx.user.id,
           sponsorCode: input.sponsorCode,
         });
+        
+        // Update distributor country if provided
+        if (distributor && input.country) {
+          await updateDistributorCountry(distributor.id, input.country);
+        }
         
         // Automatically create personalized profile for new distributor
         if (distributor) {

@@ -150,3 +150,23 @@ export const SUPPORTED_LANGUAGES = [
 
 export type CountryCode = typeof SUPPORTED_COUNTRIES[number]["code"];
 export type LanguageCode = typeof SUPPORTED_LANGUAGES[number]["code"];
+
+// Get country by code
+export function getCountryByCode(code: string | null | undefined) {
+  if (!code) return null;
+  return SUPPORTED_COUNTRIES.find(c => c.code === code.toUpperCase());
+}
+
+// Get flag emoji by country code
+export function getCountryFlag(code: string | null | undefined): string {
+  if (!code) return "";
+  const country = getCountryByCode(code);
+  return country?.flag || "";
+}
+
+// Get country name by code
+export function getCountryName(code: string | null | undefined): string {
+  if (!code) return "";
+  const country = getCountryByCode(code);
+  return country?.name || code;
+}

@@ -990,6 +990,20 @@ export async function getDistributorByUserId(userId: number) {
   return result[0] || null;
 }
 
+// Update distributor country
+export async function updateDistributorCountry(distributorId: number, country: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  await db.update(distributors)
+    .set({ country: country.toUpperCase().substring(0, 2) })
+    .where(eq(distributors.id, distributorId));
+  
+  return true;
+}
+
 // Get recent distributor enrollments for social proof (public, limited fields for privacy)
 export async function getRecentDistributorEnrollments(limit: number = 10) {
   const db = await getDb();
@@ -5437,7 +5451,7 @@ export async function getDistributorPublicProfile(code: string) {
     displayName: profile?.displayName || distributor.username || `NEON Distributor ${distributor.distributorCode}`,
     profilePhoto: profile?.profilePhotoUrl || null,
     location: profile?.location || null,
-    country: profile?.country || null,
+    country: distributor.country || profile?.country || null,
     bio: profile?.bio || null,
     rank: distributor.rank || 'starter',
     joinDate: distributor.createdAt?.toISOString() || new Date().toISOString(),

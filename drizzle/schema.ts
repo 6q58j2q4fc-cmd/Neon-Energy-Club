@@ -221,6 +221,8 @@ export const distributors = mysqlTable("distributors", {
   fastStartEligibleUntil: timestamp("fastStartEligibleUntil"),
   /** Account status */
   status: mysqlEnum("status", ["active", "inactive", "suspended"]).default("active").notNull(),
+  /** Country code (ISO 3166-1 alpha-2) for flag display */
+  country: varchar("country", { length: 2 }),
   /** Enrollment timestamp */
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   /** Last update timestamp */

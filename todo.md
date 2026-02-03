@@ -4510,3 +4510,20 @@
 - [x] Add tracking progress bar with live indicator
 - [x] Show step-by-step order status (1-6 steps)
 - [x] Display status description and last updated time
+
+
+## Country Selection for Distributors
+- [ ] Add country dropdown to distributor signup form
+- [ ] Update backend to save country to user profile
+- [ ] Display country flag on replicated distributor sites
+- [ ] Test country selection and flag display
+
+
+## Country Selection for Distributors (Feb 3)
+
+- [x] Add country selection dropdown to distributor signup form
+- [x] Create comprehensive list of 50+ countries with flags
+- [x] Update distributors table schema with country field
+- [x] Update backend enroll procedure to save country
+- [x] Display country flag on replicated distributor sites
+- [x] Test country selection dropdown functionality

@@ -6,12 +6,14 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
-import { Check, Users, ShoppingCart, TrendingUp, DollarSign, Gift, Sparkles, ArrowRight, Zap } from "lucide-react";
+import { Check, Users, ShoppingCart, TrendingUp, DollarSign, Gift, Sparkles, ArrowRight, Zap, Globe } from "lucide-react";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
 import { SEO } from "@/components/SEO";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SUPPORTED_COUNTRIES } from "@shared/countries";
 
 export default function JoinNow() {
   const { user, loading } = useAuth();
@@ -215,6 +217,7 @@ export default function JoinNow() {
 function DistributorSignupForm({ user }: { user: any }) {
   const [, setLocation] = useLocation();
   const [sponsorCode, setSponsorCode] = useState("");
+  const [country, setCountry] = useState("US");
   
   const enrollDistributor = trpc.distributor.enroll.useMutation({
     onSuccess: () => {
@@ -228,7 +231,7 @@ function DistributorSignupForm({ user }: { user: any }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    enrollDistributor.mutate({ sponsorCode: sponsorCode || undefined });
+    enrollDistributor.mutate({ sponsorCode: sponsorCode || undefined, country });
   };
 
   return (
@@ -267,6 +270,28 @@ function DistributorSignupForm({ user }: { user: any }) {
                     disabled
                     className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white"
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="country">Country</Label>
+                  <Select value={country} onValueChange={setCountry}>
+                    <SelectTrigger className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white">
+                      <SelectValue placeholder="Select your country" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#0a0a0a] border-[#c8ff00]/30 max-h-[300px]">
+                      {SUPPORTED_COUNTRIES.map((c) => (
+                        <SelectItem key={c.code} value={c.code} className="text-white hover:bg-[#c8ff00]/20">
+                          <span className="flex items-center gap-2">
+                            <span className="text-lg">{c.flag}</span>
+                            <span>{c.name}</span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-gray-500">
+                    Your country flag will be displayed on your replicated website
+                  </p>
                 </div>
 
                 <div className="space-y-2">
