@@ -239,6 +239,13 @@
       "when": 1770093049280,
       "tag": "0033_secret_goliath",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "5",
+      "when": 1770095391213,
+      "tag": "0034_regular_golden_guardian",
+      "breakpoints": true
     }
   ]
 }

@@ -304,6 +304,14 @@ export const newsletterSubscriptions = mysqlTable("newsletter_subscriptions", {
   discountTier: int("discountTier").default(1).notNull(),
   /** Total referrals made */
   referralCount: int("referralCount").default(0).notNull(),
+  /** Unique coupon code for this subscriber */
+  couponCode: varchar("couponCode", { length: 20 }).unique(),
+  /** Whether the coupon has been used */
+  couponUsed: boolean("couponUsed").default(false).notNull(),
+  /** Timestamp when coupon was used */
+  couponUsedAt: timestamp("couponUsedAt"),
+  /** Order ID where coupon was used */
+  couponUsedOrderId: int("couponUsedOrderId"),
   /** Subscription status */
   status: mysqlEnum("status", ["active", "unsubscribed"]).default("active").notNull(),
   /** Subscription timestamp */

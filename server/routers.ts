@@ -640,6 +640,18 @@ export const appRouter = router({
           name: z.string().min(1),
           email: z.string().email(),
           distributorCode: z.string().optional(), // For commission attribution
+          shippingAddress: z.object({
+            addressLine1: z.string().min(1),
+            addressLine2: z.string().optional(),
+            city: z.string().min(1),
+            state: z.string().min(1),
+            postalCode: z.string().min(1),
+            country: z.string().default("USA"),
+          }).optional(),
+          shippingMethod: z.string().optional(),
+          shippingCost: z.number().optional(),
+          couponCode: z.string().optional(),
+          discountPercent: z.number().optional(),
         })
       )
       .mutation(async ({ input, ctx }) => {
@@ -655,7 +667,12 @@ export const appRouter = router({
           customerName: input.name,
           userId: ctx.user?.id,
           origin,
-          distributorCode: input.distributorCode, // Pass distributor code for commission tracking
+          distributorCode: input.distributorCode,
+          shippingAddress: input.shippingAddress,
+          shippingMethod: input.shippingMethod,
+          shippingCost: input.shippingCost,
+          couponCode: input.couponCode,
+          discountPercent: input.discountPercent,
         });
 
         return result;
@@ -808,6 +825,25 @@ export const appRouter = router({
       const { listNewsletterSubscriptions } = await import("./db");
       return await listNewsletterSubscriptions();
     }),
+
+    // Validate a coupon code
+    validateCoupon: publicProcedure
+      .input(z.object({ couponCode: z.string().min(1) }))
+      .query(async ({ input }) => {
+        const { validateCouponCode } = await import("./db");
+        return await validateCouponCode(input.couponCode);
+      }),
+
+    // Redeem a coupon code (mark as used)
+    redeemCoupon: protectedProcedure
+      .input(z.object({
+        couponCode: z.string().min(1),
+        orderId: z.number().int(),
+      }))
+      .mutation(async ({ input }) => {
+        const { redeemCouponCode } = await import("./db");
+        return await redeemCouponCode(input.couponCode, input.orderId);
+      }),
   }),
 
   // Territory expiration management

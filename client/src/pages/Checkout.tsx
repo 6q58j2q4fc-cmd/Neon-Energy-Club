@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
@@ -6,17 +6,53 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
-import { ShoppingBag, CreditCard, Lock, ArrowLeft, Zap, AlertCircle, Loader2 } from "lucide-react";
+import { ShoppingBag, CreditCard, Lock, ArrowLeft, Zap, AlertCircle, Loader2, Truck, Tag, Check, X } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
+
+// Shipping options with prices
+const SHIPPING_OPTIONS = [
+  { id: "standard", name: "Standard Shipping", price: 8.99, days: "5-7 business days" },
+  { id: "express", name: "Express Shipping", price: 14.99, days: "2-3 business days" },
+  { id: "overnight", name: "Overnight Shipping", price: 29.99, days: "Next business day" },
+];
+
+// US States for shipping
+const US_STATES = [
+  "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
+  "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", 
+  "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", 
+  "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", 
+  "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", 
+  "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", 
+  "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", 
+  "Wisconsin", "Wyoming"
+];
 
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
   const { user } = useAuth();
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
+  const [phone, setPhone] = useState(user?.phone || "");
+  const [addressLine1, setAddressLine1] = useState("");
+  const [addressLine2, setAddressLine2] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [country] = useState("USA");
+  const [shippingMethod, setShippingMethod] = useState("standard");
+  const [couponCode, setCouponCode] = useState("");
+  const [couponValidation, setCouponValidation] = useState<{
+    valid: boolean;
+    discountPercent?: number;
+    error?: string;
+    couponCode?: string;
+  } | null>(null);
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [nftDisclosureAccepted, setNftDisclosureAccepted] = useState(false);
 
@@ -37,7 +73,25 @@ export default function Checkout() {
     return undefined;
   };
 
+  // Calculate shipping cost
+  const selectedShipping = SHIPPING_OPTIONS.find(opt => opt.id === shippingMethod) || SHIPPING_OPTIONS[0];
+  const shippingCost = selectedShipping.price;
+
+  // Calculate discount
+  const discountPercent = couponValidation?.valid ? (couponValidation.discountPercent || 0) : 0;
+  const discountAmount = (totalPrice * discountPercent) / 100;
+
+  // Calculate final total
+  const finalTotal = totalPrice - discountAmount + shippingCost;
+
   const { data: stripeConfig } = trpc.payment.isConfigured.useQuery();
+  
+  // Coupon validation query
+  const validateCouponQuery = trpc.newsletter.validateCoupon.useQuery(
+    { couponCode: couponCode.toUpperCase().trim() },
+    { enabled: false }
+  );
+
   const checkoutMutation = trpc.payment.createPreorderCheckout.useMutation({
     onSuccess: (data) => {
       // Open Stripe checkout in new tab
@@ -58,11 +112,47 @@ export default function Checkout() {
     },
   });
 
+  // Validate coupon code
+  const handleValidateCoupon = async () => {
+    if (!couponCode.trim()) {
+      toast.error("Please enter a coupon code");
+      return;
+    }
+
+    setIsValidatingCoupon(true);
+    try {
+      const result = await validateCouponQuery.refetch();
+      if (result.data) {
+        setCouponValidation(result.data);
+        if (result.data.valid) {
+          toast.success(`Coupon applied! ${result.data.discountPercent}% off`);
+        } else {
+          toast.error(result.data.error || "Invalid coupon code");
+        }
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to validate coupon");
+      setCouponValidation({ valid: false, error: "Failed to validate coupon" });
+    }
+    setIsValidatingCoupon(false);
+  };
+
+  // Remove coupon
+  const handleRemoveCoupon = () => {
+    setCouponCode("");
+    setCouponValidation(null);
+  };
+
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!name.trim() || !email.trim()) {
       toast.error("Please fill in all required fields");
+      return;
+    }
+
+    if (!addressLine1.trim() || !city.trim() || !state.trim() || !postalCode.trim()) {
+      toast.error("Please fill in your shipping address");
       return;
     }
 
@@ -90,7 +180,19 @@ export default function Checkout() {
       })),
       name: name.trim(),
       email: email.trim(),
-      distributorCode, // Pass distributor code for commission attribution
+      distributorCode,
+      shippingAddress: {
+        addressLine1: addressLine1.trim(),
+        addressLine2: addressLine2.trim(),
+        city: city.trim(),
+        state: state.trim(),
+        postalCode: postalCode.trim(),
+        country,
+      },
+      shippingMethod,
+      shippingCost,
+      couponCode: couponValidation?.valid ? couponValidation.couponCode : undefined,
+      discountPercent: couponValidation?.valid ? couponValidation.discountPercent : undefined,
     });
   };
 
@@ -127,96 +229,303 @@ export default function Checkout() {
         <h1 className="text-4xl font-black text-white mb-8">Checkout</h1>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Order Summary */}
-          <Card className="bg-white/5 border-white/10">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <ShoppingBag className="w-5 h-5 text-[#c8ff00]" />
-                Order Summary
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {items.map((item) => (
-                <div key={item.id} className="flex justify-between items-center py-3 border-b border-white/10">
-                  <div>
-                    <p className="text-white font-medium">{item.name}</p>
-                    {item.flavor && (
-                      <p className="text-sm text-gray-400 capitalize">{item.flavor}</p>
-                    )}
-                    <p className="text-sm text-gray-400">Qty: {item.quantity}</p>
+          {/* Left Column - Forms */}
+          <div className="space-y-6">
+            {/* Contact Information */}
+            <Card className="bg-white/5 border-white/10">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <CreditCard className="w-5 h-5 text-[#c8ff00]" />
+                  Contact Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-white">Full Name *</Label>
+                    <Input
+                      id="name"
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="John Doe"
+                      required
+                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-500"
+                    />
                   </div>
-                  <p className="text-[#c8ff00] font-bold">${(item.price * item.quantity).toFixed(2)}</p>
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-white">Email Address *</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="john@example.com"
+                      required
+                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-500"
+                    />
+                  </div>
                 </div>
-              ))}
-              
-              <div className="pt-4 border-t border-white/20">
-                <div className="flex justify-between items-center text-lg">
-                  <span className="text-gray-400">Subtotal</span>
-                  <span className="text-white font-bold">${totalPrice.toFixed(2)}</span>
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="text-white">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="(555) 123-4567"
+                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-500"
+                  />
                 </div>
-                <div className="flex justify-between items-center text-sm mt-2">
-                  <span className="text-gray-400">Shipping</span>
-                  <span className="text-gray-400">Calculated at checkout</span>
-                </div>
-                <div className="flex justify-between items-center text-xl mt-4 pt-4 border-t border-white/20">
-                  <span className="text-white font-bold">Total</span>
-                  <span className="text-[#c8ff00] font-black">${totalPrice.toFixed(2)}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Checkout Form */}
-          <Card className="bg-white/5 border-white/10">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <CreditCard className="w-5 h-5 text-[#c8ff00]" />
-                Payment Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {!stripeConfig?.configured ? (
-                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-6">
-                  <div className="flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+            {/* Shipping Address */}
+            <Card className="bg-white/5 border-white/10">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Truck className="w-5 h-5 text-[#c8ff00]" />
+                  Shipping Address
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="addressLine1" className="text-white">Address Line 1 *</Label>
+                  <Input
+                    id="addressLine1"
+                    type="text"
+                    value={addressLine1}
+                    onChange={(e) => setAddressLine1(e.target.value)}
+                    placeholder="123 Main Street"
+                    required
+                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-500"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="addressLine2" className="text-white">Address Line 2</Label>
+                  <Input
+                    id="addressLine2"
+                    type="text"
+                    value={addressLine2}
+                    onChange={(e) => setAddressLine2(e.target.value)}
+                    placeholder="Apt, Suite, Unit (optional)"
+                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-500"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="city" className="text-white">City *</Label>
+                    <Input
+                      id="city"
+                      type="text"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      placeholder="Los Angeles"
+                      required
+                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-500"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="state" className="text-white">State *</Label>
+                    <Select value={state} onValueChange={setState}>
+                      <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                        <SelectValue placeholder="Select state" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1a1a1a] border-white/20">
+                        {US_STATES.map((st) => (
+                          <SelectItem key={st} value={st} className="text-white hover:bg-white/10">
+                            {st}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="postalCode" className="text-white">ZIP Code *</Label>
+                    <Input
+                      id="postalCode"
+                      type="text"
+                      value={postalCode}
+                      onChange={(e) => setPostalCode(e.target.value)}
+                      placeholder="90001"
+                      required
+                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-500"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-white">Country</Label>
+                    <Input
+                      type="text"
+                      value={country}
+                      disabled
+                      className="bg-white/5 border-white/10 text-gray-400"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Shipping Method */}
+            <Card className="bg-white/5 border-white/10">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Truck className="w-5 h-5 text-[#c8ff00]" />
+                  Shipping Method
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {SHIPPING_OPTIONS.map((option) => (
+                  <label
+                    key={option.id}
+                    className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-all ${
+                      shippingMethod === option.id
+                        ? "border-[#c8ff00] bg-[#c8ff00]/10"
+                        : "border-white/20 bg-white/5 hover:border-white/40"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name="shipping"
+                        value={option.id}
+                        checked={shippingMethod === option.id}
+                        onChange={(e) => setShippingMethod(e.target.value)}
+                        className="w-4 h-4 text-[#c8ff00] bg-white/10 border-white/30 focus:ring-[#c8ff00]"
+                      />
+                      <div>
+                        <p className="text-white font-medium">{option.name}</p>
+                        <p className="text-sm text-gray-400">{option.days}</p>
+                      </div>
+                    </div>
+                    <span className="text-[#c8ff00] font-bold">${option.price.toFixed(2)}</span>
+                  </label>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - Order Summary */}
+          <div className="space-y-6">
+            {/* Order Summary */}
+            <Card className="bg-white/5 border-white/10">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <ShoppingBag className="w-5 h-5 text-[#c8ff00]" />
+                  Order Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {items.map((item) => (
+                  <div key={item.id} className="flex justify-between items-center py-3 border-b border-white/10">
                     <div>
-                      <p className="text-yellow-500 font-medium">Payment System Setup Required</p>
-                      <p className="text-yellow-500/70 text-sm mt-1">
-                        Stripe payment processing is being configured. Please check back soon or contact support.
-                      </p>
+                      <p className="text-white font-medium">{item.name}</p>
+                      {item.flavor && (
+                        <p className="text-sm text-gray-400 capitalize">{item.flavor}</p>
+                      )}
+                      <p className="text-sm text-gray-400">Qty: {item.quantity}</p>
+                    </div>
+                    <p className="text-[#c8ff00] font-bold">${(item.price * item.quantity).toFixed(2)}</p>
+                  </div>
+                ))}
+                
+                {/* Coupon Code */}
+                <div className="pt-4 border-t border-white/20">
+                  <Label className="text-white mb-2 block">Coupon Code</Label>
+                  {couponValidation?.valid ? (
+                    <div className="flex items-center justify-between p-3 bg-[#c8ff00]/10 border border-[#c8ff00]/30 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Check className="w-5 h-5 text-[#c8ff00]" />
+                        <span className="text-[#c8ff00] font-medium">{couponValidation.couponCode}</span>
+                        <span className="text-gray-400">({couponValidation.discountPercent}% off)</span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleRemoveCoupon}
+                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        placeholder="Enter coupon code"
+                        className="bg-white/10 border-white/20 text-white placeholder:text-gray-500 uppercase"
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleValidateCoupon}
+                        disabled={isValidatingCoupon || !couponCode.trim()}
+                        className="bg-[#c8ff00]/20 text-[#c8ff00] hover:bg-[#c8ff00]/30 border border-[#c8ff00]/50"
+                      >
+                        {isValidatingCoupon ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Tag className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                  {couponValidation && !couponValidation.valid && (
+                    <p className="text-red-400 text-sm mt-2">{couponValidation.error}</p>
+                  )}
+                </div>
+
+                {/* Price Breakdown */}
+                <div className="pt-4 border-t border-white/20 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Subtotal</span>
+                    <span className="text-white">${totalPrice.toFixed(2)}</span>
+                  </div>
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between items-center text-[#c8ff00]">
+                      <span>Discount ({discountPercent}%)</span>
+                      <span>-${discountAmount.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Shipping ({selectedShipping.name})</span>
+                    <span className="text-white">${shippingCost.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xl pt-4 border-t border-white/20">
+                    <span className="text-white font-bold">Total</span>
+                    <span className="text-[#c8ff00] font-black">${finalTotal.toFixed(2)}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Payment Section */}
+            <Card className="bg-white/5 border-white/10">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Lock className="w-5 h-5 text-[#c8ff00]" />
+                  Secure Payment
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {!stripeConfig?.configured ? (
+                  <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-6">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-yellow-500 font-medium">Payment System Setup Required</p>
+                        <p className="text-yellow-500/70 text-sm mt-1">
+                          Stripe payment processing is being configured. Please check back soon or contact support.
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ) : null}
+                ) : null}
 
-              <form onSubmit={handleCheckout} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="text-white">Full Name *</Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="John Doe"
-                    required
-                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-500"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-white">Email Address *</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="john@example.com"
-                    required
-                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-500"
-                  />
-                </div>
-
-                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10 mb-4">
                   <div className="flex items-center gap-2 text-sm text-gray-400">
                     <Lock className="w-4 h-4" />
                     <span>Your payment info is secured with Stripe</span>
@@ -224,7 +533,7 @@ export default function Checkout() {
                 </div>
 
                 {/* NFT Gift Program Disclosure Acceptance */}
-                <div className="bg-[#c8ff00]/5 rounded-lg p-4 border border-[#c8ff00]/20">
+                <div className="bg-[#c8ff00]/5 rounded-lg p-4 border border-[#c8ff00]/20 mb-6">
                   <div className="flex items-start gap-3">
                     <input
                       type="checkbox"
@@ -248,41 +557,33 @@ export default function Checkout() {
                       , including all SEC disclaimers, risk disclosures, and minting conditions.
                     </label>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2 ml-8">
-                    NFTs are gifted after the 90-day pre-launch period when crowdfunding goals are met.
-                  </p>
                 </div>
 
-                <Button
-                  type="submit"
-                  disabled={isProcessing || !stripeConfig?.configured || !nftDisclosureAccepted}
-                  className="w-full h-14 bg-[#c8ff00] text-black hover:bg-[#a8d600] font-black text-lg disabled:opacity-50"
-                >
-                  {isProcessing ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="w-5 h-5 mr-2" />
-                      Pay ${totalPrice.toFixed(2)}
-                    </>
-                  )}
-                </Button>
-
-                <p className="text-xs text-center text-gray-500">
-                  By completing this purchase, you agree to our{" "}
-                  <a href="/terms" className="text-[#c8ff00] hover:underline">Terms of Service</a>,{" "}
-                  <a href="/privacy" className="text-[#c8ff00] hover:underline">Privacy Policy</a>, and{" "}
-                  <a href="/nft-disclosure" className="text-[#c8ff00] hover:underline">NFT Disclosure</a>.
-                </p>
-              </form>
-            </CardContent>
-          </Card>
+                <form onSubmit={handleCheckout}>
+                  <Button
+                    type="submit"
+                    disabled={isProcessing || !stripeConfig?.configured || !nftDisclosureAccepted}
+                    className="w-full bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold py-6 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-5 h-5 mr-2" />
+                        Pay ${finalTotal.toFixed(2)}
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
-
+      
       <Footer />
     </div>
   );

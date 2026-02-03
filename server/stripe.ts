@@ -154,30 +154,76 @@ export async function createPreorderCheckout(params: {
   customerName: string;
   userId?: number;
   origin: string;
-  distributorCode?: string; // For commission attribution from cloned websites
+  distributorCode?: string;
+  shippingAddress?: {
+    addressLine1: string;
+    addressLine2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  shippingMethod?: string;
+  shippingCost?: number;
+  couponCode?: string;
+  discountPercent?: number;
 }): Promise<{ url: string }> {
   const stripe = await getStripe();
 
-  const lineItems = params.items.map(item => ({
-    price_data: {
-      currency: "usd",
-      product_data: {
-        name: item.name,
-        description: item.flavor ? `Flavor: ${item.flavor}` : (item.type === 'package' ? 'Distributor Package' : 'NEON Energy Drink'),
-        images: [`${params.origin}/neon-can.png`],
+  // Calculate subtotal
+  const subtotal = params.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  
+  // Calculate discount if coupon applied
+  const discountAmount = params.discountPercent ? (subtotal * params.discountPercent) / 100 : 0;
+  
+  // Build line items with discounted prices if applicable
+  const lineItems = params.items.map(item => {
+    const itemTotal = item.price * item.quantity;
+    const itemDiscount = params.discountPercent ? (itemTotal * params.discountPercent) / 100 : 0;
+    const discountedPrice = item.price - (itemDiscount / item.quantity);
+    
+    return {
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: item.name,
+          description: item.flavor ? `Flavor: ${item.flavor}` : (item.type === 'package' ? 'Distributor Package' : 'NEON Energy Drink'),
+          images: [`${params.origin}/neon-can.png`],
+        },
+        unit_amount: Math.round(discountedPrice * 100), // Convert to cents
       },
-      unit_amount: Math.round(item.price * 100), // Convert to cents
-    },
-    quantity: item.quantity,
-  }));
+      quantity: item.quantity,
+    };
+  });
 
-  const totalAmount = params.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  // Add shipping as a line item if provided
+  if (params.shippingCost && params.shippingCost > 0) {
+    lineItems.push({
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: `Shipping (${params.shippingMethod || 'Standard'})`,
+          description: 'Shipping and handling',
+          images: [],
+        },
+        unit_amount: Math.round(params.shippingCost * 100),
+      },
+      quantity: 1,
+    });
+  }
+
+  const totalAmount = subtotal - discountAmount + (params.shippingCost || 0);
 
   // Support Affirm for orders over $50 and PayPal for all orders
-  const paymentMethods = ["card", "paypal"];
+  const paymentMethods: ("card" | "paypal" | "affirm")[] = ["card", "paypal"];
   if (totalAmount >= 50) {
     paymentMethods.push("affirm");
   }
+
+  // Build shipping address string for metadata
+  const shippingAddressStr = params.shippingAddress 
+    ? `${params.shippingAddress.addressLine1}${params.shippingAddress.addressLine2 ? ', ' + params.shippingAddress.addressLine2 : ''}, ${params.shippingAddress.city}, ${params.shippingAddress.state} ${params.shippingAddress.postalCode}, ${params.shippingAddress.country}`
+    : '';
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: paymentMethods,
@@ -193,14 +239,24 @@ export async function createPreorderCheckout(params: {
       customer_email: params.customerEmail,
       user_id: params.userId?.toString() || "",
       total_amount: totalAmount.toString(),
+      subtotal: subtotal.toString(),
+      discount_amount: discountAmount.toString(),
+      discount_percent: params.discountPercent?.toString() || "0",
+      coupon_code: params.couponCode || "",
+      shipping_cost: (params.shippingCost || 0).toString(),
+      shipping_method: params.shippingMethod || "",
+      shipping_address: shippingAddressStr,
       items_count: params.items.length.toString(),
       items_json: JSON.stringify(params.items.map(i => ({ name: i.name, qty: i.quantity, price: i.price }))),
-      distributor_code: params.distributorCode || "", // For commission attribution
+      distributor_code: params.distributorCode || "",
     },
-    allow_promotion_codes: true,
-    shipping_address_collection: {
-      allowed_countries: ["US", "CA", "GB", "AU", "DE", "FR", "ES", "IT", "NL", "BE"],
-    },
+    allow_promotion_codes: !params.couponCode, // Disable Stripe promo codes if we already applied one
+    // Only collect shipping address if not already provided
+    ...(params.shippingAddress ? {} : {
+      shipping_address_collection: {
+        allowed_countries: ["US", "CA", "GB", "AU", "DE", "FR", "ES", "IT", "NL", "BE"],
+      },
+    }),
   });
 
   return { url: session.url! };

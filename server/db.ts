@@ -678,6 +678,38 @@ export async function updateCrowdfundingStatus(id: number, status: "pending" | "
   await db.update(crowdfunding).set({ status }).where(eq(crowdfunding.id, id));
 }
 
+// Generate unique coupon code
+function generateCouponCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Exclude confusing chars like 0,O,1,I
+  let code = 'NEON';
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
+// Validate email format strictly
+function isValidEmail(email: string): boolean {
+  // RFC 5322 compliant email regex
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  if (!emailRegex.test(email)) return false;
+  
+  // Additional checks
+  const parts = email.split('@');
+  if (parts.length !== 2) return false;
+  const domain = parts[1];
+  
+  // Must have at least one dot in domain
+  if (!domain.includes('.')) return false;
+  
+  // Domain extension must be at least 2 chars
+  const domainParts = domain.split('.');
+  const tld = domainParts[domainParts.length - 1];
+  if (tld.length < 2) return false;
+  
+  return true;
+}
+
 // Newsletter subscription functions
 export async function subscribeNewsletter(input: { email: string; name: string }) {
   const db = await getDb();
@@ -685,25 +717,44 @@ export async function subscribeNewsletter(input: { email: string; name: string }
     throw new Error("Database not available");
   }
   
+  // Validate email format
+  const normalizedEmail = input.email.toLowerCase().trim();
+  if (!isValidEmail(normalizedEmail)) {
+    throw new Error("Please enter a valid email address");
+  }
+  
   // Check if email already exists
-  const existing = await db.select().from(newsletterSubscriptions).where(eq(newsletterSubscriptions.email, input.email)).limit(1);
+  const existing = await db.select().from(newsletterSubscriptions).where(eq(newsletterSubscriptions.email, normalizedEmail)).limit(1);
   
   if (existing.length > 0) {
-    throw new Error("Email already subscribed");
+    throw new Error("This email is already subscribed");
+  }
+  
+  // Generate unique coupon code
+  let couponCode = generateCouponCode();
+  let attempts = 0;
+  while (attempts < 10) {
+    const existingCoupon = await db.select().from(newsletterSubscriptions).where(eq(newsletterSubscriptions.couponCode, couponCode)).limit(1);
+    if (existingCoupon.length === 0) break;
+    couponCode = generateCouponCode();
+    attempts++;
   }
   
   const result = await db.insert(newsletterSubscriptions).values({
-    email: input.email,
+    email: normalizedEmail,
     name: input.name,
     discountTier: 1, // Base tier for email signup
     referralCount: 0,
+    couponCode,
+    couponUsed: false,
     status: "active",
   });
   
   return {
     id: Number(result[0].insertId),
-    email: input.email,
+    email: normalizedEmail,
     discountTier: 1,
+    couponCode,
   };
 }
 
@@ -730,19 +781,60 @@ export async function addNewsletterReferrals(subscriptionId: number, friendEmail
     throw new Error("Subscription not found");
   }
   
-  // Add each friend as a new subscription
+  // Validate and deduplicate friend emails
+  const validEmails: string[] = [];
+  const seenEmails = new Set<string>();
+  const referrerEmail = referrer[0].email.toLowerCase();
+  
   for (const email of friendEmails) {
+    const normalizedEmail = email.toLowerCase().trim();
+    
+    // Skip if not valid email
+    if (!isValidEmail(normalizedEmail)) {
+      throw new Error(`Invalid email format: ${email}`);
+    }
+    
+    // Skip if same as referrer
+    if (normalizedEmail === referrerEmail) {
+      throw new Error("You cannot refer yourself");
+    }
+    
+    // Skip duplicates in this batch
+    if (seenEmails.has(normalizedEmail)) {
+      continue;
+    }
+    
+    // Check if already exists in database
+    const existing = await db.select().from(newsletterSubscriptions).where(eq(newsletterSubscriptions.email, normalizedEmail)).limit(1);
+    if (existing.length > 0) {
+      throw new Error(`Email ${email} is already subscribed`);
+    }
+    
+    seenEmails.add(normalizedEmail);
+    validEmails.push(normalizedEmail);
+  }
+  
+  if (validEmails.length < 3) {
+    throw new Error("Please provide 3 unique, valid email addresses");
+  }
+  
+  // Add each friend as a new subscription
+  let addedCount = 0;
+  for (const email of validEmails) {
+    const friendCouponCode = generateCouponCode();
     try {
       await db.insert(newsletterSubscriptions).values({
         email,
         referrerId: subscriptionId,
         discountTier: 1,
         referralCount: 0,
+        couponCode: friendCouponCode,
+        couponUsed: false,
         status: "active",
       });
+      addedCount++;
     } catch (error) {
-      // Skip if email already exists
-      console.log(`Email ${email} already subscribed, skipping`);
+      console.log(`Failed to add ${email}:`, error);
     }
   }
   
@@ -750,7 +842,7 @@ export async function addNewsletterReferrals(subscriptionId: number, friendEmail
   await db.update(newsletterSubscriptions)
     .set({ 
       discountTier: 2, // Upgrade to tier 2 (25% off)
-      referralCount: referrer[0].referralCount + friendEmails.length,
+      referralCount: referrer[0].referralCount + addedCount,
     })
     .where(eq(newsletterSubscriptions.id, subscriptionId));
 }
@@ -778,6 +870,68 @@ export async function listNewsletterSubscriptions() {
   }
   
   return await db.select().from(newsletterSubscriptions).orderBy(desc(newsletterSubscriptions.createdAt));
+}
+
+// Validate a coupon code and return discount info
+export async function validateCouponCode(couponCode: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  const normalizedCode = couponCode.toUpperCase().trim();
+  
+  const subscription = await db.select().from(newsletterSubscriptions)
+    .where(eq(newsletterSubscriptions.couponCode, normalizedCode))
+    .limit(1);
+  
+  if (subscription.length === 0) {
+    return { valid: false, error: "Invalid coupon code" };
+  }
+  
+  const sub = subscription[0];
+  
+  if (sub.couponUsed) {
+    return { valid: false, error: "This coupon has already been used" };
+  }
+  
+  // Determine discount percentage based on tier
+  const discountPercent = sub.discountTier === 2 ? 25 : 10;
+  
+  return {
+    valid: true,
+    couponCode: normalizedCode,
+    discountPercent,
+    discountTier: sub.discountTier,
+    subscriberEmail: sub.email,
+  };
+}
+
+// Redeem a coupon code (mark as used)
+export async function redeemCouponCode(couponCode: string, orderId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  const normalizedCode = couponCode.toUpperCase().trim();
+  
+  // First validate the coupon
+  const validation = await validateCouponCode(normalizedCode);
+  if (!validation.valid) {
+    throw new Error(validation.error);
+  }
+  
+  // Mark coupon as used
+  await db.update(newsletterSubscriptions)
+    .set({
+      couponUsed: true,
+      couponUsedAt: new Date(),
+      couponUsedOrderId: orderId,
+    })
+    .where(eq(newsletterSubscriptions.couponCode, normalizedCode));
+  
+  return { success: true, discountPercent: validation.discountPercent };
 }
 
 // Distributor functions

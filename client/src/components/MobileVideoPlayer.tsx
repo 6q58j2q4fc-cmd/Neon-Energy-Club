@@ -150,25 +150,93 @@ export default function MobileVideoPlayer({ videos, autoPlay = false }: MobileVi
     setIsMuted(!isMuted);
   };
 
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
+  const togglePlay = (e?: React.MouseEvent | React.TouchEvent) => {
+    // Prevent event bubbling for better mobile touch handling
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    const video = isExpanded ? expandedVideoRef.current : videoRef.current;
+    if (video) {
+      if (isPlaying) {
+        video.pause();
+        setIsPlaying(false);
+      } else {
+        // For iOS, we need to call play directly on user interaction
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setIsPlaying(true);
+            })
+            .catch((error) => {
+              // Auto-play was prevented, try muted
+              console.log('Playback failed, trying muted:', error);
+              video.muted = true;
+              setIsMuted(true);
+              video.play().then(() => setIsPlaying(true));
+            });
+        } else {
+          setIsPlaying(true);
+        }
+      }
+    } else {
+      setIsPlaying(!isPlaying);
+    }
   };
 
-  const toggleExpand = () => {
+  const toggleExpand = (e?: React.MouseEvent | React.TouchEvent) => {
+    // Prevent event bubbling for better mobile touch handling
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     if (!isExpanded) {
       // Try native fullscreen first on mobile
-      if (isMobile && videoRef.current) {
+      const video = videoRef.current;
+      if (video) {
         try {
-          if (videoRef.current.requestFullscreen) {
-            videoRef.current.requestFullscreen();
+          // iOS Safari specific fullscreen
+          if ((video as any).webkitEnterFullscreen) {
+            (video as any).webkitEnterFullscreen();
             return;
-          } else if ((videoRef.current as any).webkitEnterFullscreen) {
-            (videoRef.current as any).webkitEnterFullscreen();
+          }
+          // Standard Fullscreen API
+          if (video.requestFullscreen) {
+            video.requestFullscreen().catch(() => {
+              // Fallback to expanded mode if fullscreen fails
+              setIsExpanded(true);
+            });
+            return;
+          }
+          // Webkit prefix for older browsers
+          if ((video as any).webkitRequestFullscreen) {
+            (video as any).webkitRequestFullscreen();
+            return;
+          }
+          // MS prefix for IE/Edge
+          if ((video as any).msRequestFullscreen) {
+            (video as any).msRequestFullscreen();
             return;
           }
         } catch (e) {
-          // Fall back to expanded mode
+          console.log('Fullscreen failed, using expanded mode:', e);
         }
+      }
+    } else {
+      // Exit fullscreen
+      try {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else if ((document as any).webkitFullscreenElement) {
+          (document as any).webkitExitFullscreen();
+        } else if ((document as any).msFullscreenElement) {
+          (document as any).msExitFullscreen();
+        }
+      } catch (e) {
+        console.log('Exit fullscreen failed:', e);
       }
     }
     setIsExpanded(!isExpanded);
