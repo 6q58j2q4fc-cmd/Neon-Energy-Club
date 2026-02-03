@@ -4527,3 +4527,14 @@
 - [x] Update backend enroll procedure to save country
 - [x] Display country flag on replicated distributor sites
 - [x] Test country selection dropdown functionality
+
+
+## Vanity Links & Dashboard Fixes (Feb 3)
+
+- [ ] Fix vanity/replicated website links to be publicly accessible
+- [ ] Create site's own login system (not requiring Manus account)
+- [ ] Remove redundant/confusing subdomain links from distributor portals
+- [ ] Only display working links in distributor dashboard
+- [ ] Fix quick action buttons in distributor dashboard to be clickable
+- [ ] Ensure unique referral links for customers vs distributors
+- [ ] Ensure unique distributor ID numbers (no duplicates)

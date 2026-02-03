@@ -958,8 +958,8 @@ export async function enrollDistributor(input: { userId: number; sponsorCode?: s
     sponsorId = sponsor[0].id;
   }
   
-  // Generate unique distributor code
-  const distributorCode = `NEON${input.userId}${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+  // Generate unique distributor code with DIST prefix to differentiate from customer codes
+  const distributorCode = `DIST${input.userId}${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
   
   const result = await db.insert(distributors).values({
     userId: input.userId,
@@ -3718,8 +3718,8 @@ export async function generateCustomerReferralCode(userId: number): Promise<stri
     return existing[0].code;
   }
 
-  // Generate unique code
-  const code = `NEON${userId}${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+  // Generate unique code with CUST prefix to differentiate from distributor codes
+  const code = `CUST${userId}${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
   
   await db.insert(customerReferralCodes).values({
     userId,

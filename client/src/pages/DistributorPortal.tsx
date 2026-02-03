@@ -340,7 +340,11 @@ export default function DistributorPortal() {
               >
                 Home
               </Button>
-              <Button variant="outline" className="border-[#c8ff00]/30 text-[#c8ff00]">
+              <Button 
+                variant="outline" 
+                className="border-[#c8ff00]/30 text-[#c8ff00] cursor-pointer hover:bg-[#c8ff00]/10"
+                onClick={() => toast.info("Notifications coming soon!")}
+              >
                 <Bell className="w-4 h-4" />
               </Button>
               <Button 
@@ -592,19 +596,19 @@ export default function DistributorPortal() {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm text-gray-400">Your Subdomain</label>
+                      <label className="text-sm text-gray-400">Your Personal Website</label>
                       <div className="flex gap-2">
                         <Input 
-                          value={subdomain} 
+                          value={`/d/${distributorProfile?.distributorCode}`} 
                           readOnly 
                           className="bg-black/50 border-gray-700 text-white"
                         />
                         <Button 
-                          onClick={() => copyToClipboard(`https://${subdomain}`, "Subdomain")}
+                          onClick={() => window.open(`/d/${distributorProfile?.distributorCode}`, '_blank')}
                           variant="outline"
                           className="border-[#c8ff00]/30 text-[#c8ff00]"
                         >
-                          <Copy className="w-4 h-4" />
+                          <ExternalLink className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
@@ -761,7 +765,12 @@ export default function DistributorPortal() {
                       <FileText className="w-8 h-8 mx-auto mb-2 text-[#c8ff00]" />
                       <h4 className="font-medium text-white">Product Brochures</h4>
                       <p className="text-sm text-gray-500 mb-3">Download PDF brochures</p>
-                      <Button variant="outline" size="sm" className="border-[#c8ff00]/30 text-[#c8ff00]">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="border-[#c8ff00]/30 text-[#c8ff00] cursor-pointer hover:bg-[#c8ff00]/10"
+                        onClick={() => toast.info("Product brochures coming soon!")}
+                      >
                         <Download className="w-4 h-4 mr-2" />
                         Download
                       </Button>
@@ -770,7 +779,12 @@ export default function DistributorPortal() {
                       <Video className="w-8 h-8 mx-auto mb-2 text-blue-500" />
                       <h4 className="font-medium text-white">Video Library</h4>
                       <p className="text-sm text-gray-500 mb-3">Promotional videos</p>
-                      <Button variant="outline" size="sm" className="border-blue-500/30 text-blue-500">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="border-blue-500/30 text-blue-500 cursor-pointer hover:bg-blue-500/10"
+                        onClick={() => setLocation("/story")}
+                      >
                         <ExternalLink className="w-4 h-4 mr-2" />
                         View
                       </Button>
@@ -779,7 +793,12 @@ export default function DistributorPortal() {
                       <Globe className="w-8 h-8 mx-auto mb-2 text-green-500" />
                       <h4 className="font-medium text-white">Social Media Kit</h4>
                       <p className="text-sm text-gray-500 mb-3">Images & templates</p>
-                      <Button variant="outline" size="sm" className="border-green-500/30 text-green-500">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="border-green-500/30 text-green-500 cursor-pointer hover:bg-green-500/10"
+                        onClick={() => toast.info("Social media kit coming soon!")}
+                      >
                         <Download className="w-4 h-4 mr-2" />
                         Download
                       </Button>
@@ -830,7 +849,12 @@ export default function DistributorPortal() {
                     <div className="p-4 bg-black/50 rounded-lg">
                       <h4 className="font-medium text-white mb-2">Getting Started Guide</h4>
                       <p className="text-sm text-gray-500 mb-3">Learn the basics of your NEON business</p>
-                      <Button variant="outline" size="sm" className="border-[#c8ff00]/30 text-[#c8ff00]">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="border-[#c8ff00]/30 text-[#c8ff00] cursor-pointer hover:bg-[#c8ff00]/10"
+                        onClick={() => toast.info("Training modules coming soon!")}
+                      >
                         Start Learning
                       </Button>
                     </div>
