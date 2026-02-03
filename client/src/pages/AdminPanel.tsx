@@ -106,25 +106,25 @@ export default function AdminPanel() {
     <div className="min-h-screen bg-black text-white">
       <NavigationHeader />
       
-      <div className="container py-8">
-        <div className="flex items-center justify-between mb-8">
+      <div className="container px-4 py-6 sm:py-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2 text-[#c8ff00]">Admin Panel</h1>
-            <p className="text-gray-400">Manage your NEON Energy platform</p>
+            <h1 className="text-2xl sm:text-4xl font-bold mb-1 sm:mb-2 text-[#c8ff00]">Admin Panel</h1>
+            <p className="text-sm sm:text-base text-gray-400">Manage your NEON Energy platform</p>
           </div>
-          <Badge variant="outline" className="text-[#c8ff00] border-[#c8ff00]">
+          <Badge variant="outline" className="text-[#c8ff00] border-[#c8ff00] self-start sm:self-auto text-xs sm:text-sm">
             Admin: {user.name || user.email}
           </Badge>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-[#0a0a0a] border border-[#c8ff00]/30">
-            <TabsTrigger value="dashboard" className="data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black">Dashboard</TabsTrigger>
-            <TabsTrigger value="users" className="data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black">Users</TabsTrigger>
-            <TabsTrigger value="orders" className="data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black">Orders</TabsTrigger>
-            <TabsTrigger value="commissions" className="data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black">Commissions</TabsTrigger>
-            <TabsTrigger value="distributors" className="data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black">Distributors</TabsTrigger>
-            <TabsTrigger value="settings" className="data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black">Settings</TabsTrigger>
+          <TabsList className="flex flex-wrap gap-1 sm:grid sm:grid-cols-6 w-full bg-[#0a0a0a] border border-[#c8ff00]/30 p-1">
+            <TabsTrigger value="dashboard" className="flex-1 min-w-[80px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Dashboard</TabsTrigger>
+            <TabsTrigger value="users" className="flex-1 min-w-[60px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Users</TabsTrigger>
+            <TabsTrigger value="orders" className="flex-1 min-w-[60px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Orders</TabsTrigger>
+            <TabsTrigger value="commissions" className="flex-1 min-w-[90px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Commissions</TabsTrigger>
+            <TabsTrigger value="distributors" className="flex-1 min-w-[90px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Distributors</TabsTrigger>
+            <TabsTrigger value="settings" className="flex-1 min-w-[70px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
@@ -194,7 +194,7 @@ function AdminDashboard() {
       </div>
 
       {/* Overview Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
         <Card className="bg-[#0a0a0a] border-[#c8ff00]/30">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-400">Total Users</CardTitle>
@@ -249,7 +249,7 @@ function AdminDashboard() {
       </div>
 
       {/* Secondary Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
         <Card className="bg-[#0a0a0a] border-[#c8ff00]/30">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-400">Active Distributors</CardTitle>
