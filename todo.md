@@ -4557,3 +4557,21 @@
 - [x] Sync countdown timers across all pages (use centralized LAUNCH_DATE)
 - [x] Fix duplicate links to show only one fully written URL in distributor portal
 - [x] Debug and fix video player on main page (async play/pause, webkit fullscreen for iOS)
+
+
+## Genealogy Tree Fix - Feb 3
+- [ ] Investigate current distributor portal genealogy tree issue
+- [ ] Search git history to find when genealogy tree was added
+- [ ] Restore genealogy tree component and functionality
+- [ ] Test genealogy tree display in distributor portal
+
+## Genealogy Tree Enhancement - Feb 3
+- [ ] Show distributor's own card at root even with no team members
+- [ ] Display clickable empty position cards for left and right legs
+- [ ] Enable enrollment modal when clicking empty positions
+
+## Genealogy Tree Enhancement - Feb 3 (Completed)
+- [x] Show distributor's own card at root even with no team members
+- [x] Display clickable empty position cards for left and right legs
+- [x] Enable enrollment modal when clicking empty positions
+- [x] Write vitest tests for genealogy tree logic

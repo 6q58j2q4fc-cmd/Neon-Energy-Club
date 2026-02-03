@@ -938,23 +938,86 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true, sh
           
           {/* Tree Visualization with Pan/Zoom */}
           <div className="relative bg-black/50 rounded-lg border border-[#c8ff00]/20">
-            {treeData?.tree && treeData.tree.length > 0 ? (
+            {treeData?.distributor ? (
               <InteractiveTreeContainer>
-                <TreeLevel
-                  nodes={treeData.tree}
-                  expandedNodes={expandedNodes}
-                  toggleNode={toggleNode}
-                  selectedNode={selectedNode}
-                  setSelectedNode={setSelectedNode}
-                  showEmptyPositions={showEmptyPositions}
-                  onEnrollPosition={(parentCode, position) => setEnrollmentModal({ parentCode, position })}
-                />
+                {treeData.tree && treeData.tree.length > 0 ? (
+                  <TreeLevel
+                    nodes={treeData.tree}
+                    expandedNodes={expandedNodes}
+                    toggleNode={toggleNode}
+                    selectedNode={selectedNode}
+                    setSelectedNode={setSelectedNode}
+                    showEmptyPositions={showEmptyPositions}
+                    onEnrollPosition={(parentCode, position) => setEnrollmentModal({ parentCode, position })}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center py-8">
+                    <TreeNodeCard
+                      node={{
+                        id: treeData.distributor.id,
+                        distributorCode: treeData.distributor.distributorCode,
+                        username: treeData.distributor.username,
+                        name: treeData.distributor.username,
+                        email: null,
+                        rank: treeData.distributor.rank,
+                        personalSales: treeData.distributor.personalSales,
+                        teamSales: treeData.distributor.teamSales,
+                        leftLegVolume: treeData.distributor.leftLegVolume,
+                        rightLegVolume: treeData.distributor.rightLegVolume,
+                        monthlyPV: treeData.distributor.monthlyPV,
+                        isActive: treeData.distributor.isActive,
+                        placementPosition: null,
+                        depth: 0,
+                        children: [],
+                        childCount: 0
+                      }}
+                      expanded={true}
+                      onToggle={() => {}}
+                      onSelect={() => setSelectedNode({
+                        id: treeData.distributor.id,
+                        distributorCode: treeData.distributor.distributorCode,
+                        username: treeData.distributor.username,
+                        name: treeData.distributor.username,
+                        email: null,
+                        rank: treeData.distributor.rank,
+                        personalSales: treeData.distributor.personalSales,
+                        teamSales: treeData.distributor.teamSales,
+                        leftLegVolume: treeData.distributor.leftLegVolume,
+                        rightLegVolume: treeData.distributor.rightLegVolume,
+                        monthlyPV: treeData.distributor.monthlyPV,
+                        isActive: treeData.distributor.isActive,
+                        placementPosition: null,
+                        depth: 0,
+                        children: [],
+                        childCount: 0
+                      })}
+                      isSelected={false}
+                      level={0}
+                      showEmptyPositions={showEmptyPositions}
+                      onEnrollPosition={(parentCode, position) => setEnrollmentModal({ parentCode, position })}
+                    />
+                    {showEmptyPositions && (
+                      <div className="flex gap-8 mt-8">
+                        <EmptyPositionCard
+                          position="left"
+                          parentCode={treeData.distributor.distributorCode}
+                          onEnroll={() => setEnrollmentModal({ parentCode: treeData.distributor.distributorCode, position: 'left' })}
+                        />
+                        <EmptyPositionCard
+                          position="right"
+                          parentCode={treeData.distributor.distributorCode}
+                          onEnroll={() => setEnrollmentModal({ parentCode: treeData.distributor.distributorCode, position: 'right' })}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
               </InteractiveTreeContainer>
             ) : (
               <div className="flex flex-col items-center justify-center h-64 text-gray-500">
                 <Users className="w-16 h-16 mb-4 opacity-30" />
-                <p>No team members yet</p>
-                <p className="text-sm">Start building your team to see your genealogy tree</p>
+                <p>No distributor data available</p>
+                <p className="text-sm">Please log in as a distributor to view your genealogy tree</p>
               </div>
             )}
             
