@@ -191,6 +191,91 @@ export default function GiveBack() {
               </a>
             </div>
           </div>
+          
+          {/* Conservation Work Gallery */}
+          <div className="mt-20">
+            <h3 className="text-3xl font-black text-center mb-4">
+              <span className="text-green-400">Conservation</span> in Action
+            </h3>
+            <p className="text-white/70 text-center mb-10 max-w-2xl mx-auto">
+              See the real impact of rainforest conservation efforts—protecting wildlife, preserving ecosystems, and restoring habitats.
+            </p>
+            
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Jaguar Protection */}
+              <div className="group relative overflow-hidden rounded-2xl border border-green-500/20 bg-black/40">
+                <img 
+                  src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/axVmkbUINpGPfCak.jpg" 
+                  alt="Jaguar - Protected Species" 
+                  className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h4 className="text-xl font-bold text-white mb-2">Wildlife Protection</h4>
+                  <p className="text-white/70 text-sm">Protecting endangered species like jaguars in their natural habitat</p>
+                </div>
+              </div>
+              
+              {/* Parrot Conservation */}
+              <div className="group relative overflow-hidden rounded-2xl border border-green-500/20 bg-black/40">
+                <img 
+                  src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/UhzQaDsFYePBHZrb.jpg" 
+                  alt="Macaws - Rainforest Birds" 
+                  className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h4 className="text-xl font-bold text-white mb-2">Biodiversity Preservation</h4>
+                  <p className="text-white/70 text-sm">Safeguarding diverse species including colorful macaws and parrots</p>
+                </div>
+              </div>
+              
+              {/* Tree Planting */}
+              <div className="group relative overflow-hidden rounded-2xl border border-green-500/20 bg-black/40">
+                <img 
+                  src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/XAMWWLwVFvxQmEyQ.jpg" 
+                  alt="Tree Planting - Reforestation" 
+                  className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h4 className="text-xl font-bold text-white mb-2">Reforestation Efforts</h4>
+                  <p className="text-white/70 text-sm">Planting new trees to restore degraded rainforest areas</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Second Row */}
+            <div className="grid md:grid-cols-2 gap-6 mt-6">
+              {/* Amazon River Aerial */}
+              <div className="group relative overflow-hidden rounded-2xl border border-green-500/20 bg-black/40">
+                <img 
+                  src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/sKFcrYqaMSSswzEN.jpg" 
+                  alt="Amazon River - Aerial View" 
+                  className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h4 className="text-xl font-bold text-white mb-2">Amazon River Basin</h4>
+                  <p className="text-white/70 text-sm">Protecting the world's largest tropical rainforest and its vital waterways</p>
+                </div>
+              </div>
+              
+              {/* Rainforest Canopy */}
+              <div className="group relative overflow-hidden rounded-2xl border border-green-500/20 bg-black/40">
+                <img 
+                  src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/PlUtbjWhUfWSLAUN.jpg" 
+                  alt="Rainforest Canopy - Aerial" 
+                  className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h4 className="text-xl font-bold text-white mb-2">Rainforest Preservation</h4>
+                  <p className="text-white/70 text-sm">Over 50 million acres of critical rainforest habitat protected worldwide</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

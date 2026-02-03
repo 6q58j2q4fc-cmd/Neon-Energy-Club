@@ -4257,3 +4257,19 @@
 - [x] Verify volume tracking for each sign-up
 - [x] Verify distributor website generation works
 - [x] Verify referral links display correctly
+
+
+## Feb 3, 2026 - Conservation Images & Distributor Testing
+
+### Rainforest Trust Conservation Images
+- [x] Search for Rainforest Trust conservation work images
+- [x] Download high-quality conservation photos
+- [x] Add conservation images to Give Back page
+- [x] Update page layout to showcase conservation work
+
+### Distributor Enrollment Testing
+- [x] Test distributor signup flow end-to-end
+- [x] Verify genealogy tree placement works correctly
+- [x] Test referral link generation
+- [x] Verify distributor website generation
+- [x] Confirm commission tracking is functional
