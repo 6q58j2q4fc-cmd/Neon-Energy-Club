@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   MessageCircle, X, Send, Sparkles, Bot, User,
   GraduationCap, ShoppingCart, HelpCircle, BookOpen,
-  Phone, ChevronDown, Loader2, Copy, Check,
+  Phone, ChevronDown, Loader2,
   Minimize2, Maximize2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -102,11 +102,7 @@ const QUICK_ACTIONS: Record<ChatMode, { text: string; emoji: string }[]> = {
   ],
 };
 
-const PROMO_CODES = [
-  { code: "NEON10", discount: "10% off" },
-  { code: "FIRSTORDER", discount: "15% off first order" },
-  { code: "FRANCHISE25", discount: "$25 off franchise" },
-];
+
 
 export default function UnifiedChatBot() {
   const { user } = useAuth();
@@ -118,7 +114,7 @@ export default function UnifiedChatBot() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -213,11 +209,7 @@ export default function UnifiedChatBot() {
     setTimeout(() => handleSend(), 100);
   };
 
-  const copyPromoCode = (code: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedCode(code);
-    setTimeout(() => setCopiedCode(null), 2000);
-  };
+
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -415,22 +407,29 @@ export default function UnifiedChatBot() {
                 {/* Promo Codes (only in sales/general mode) */}
                 {(mode === "general" || mode === "sales") && (
                   <div className="px-4 py-2 border-t border-white/10 bg-black/30">
-                    <p className="text-xs text-white/50 mb-2">🎁 Promo codes:</p>
+                    <p className="text-xs text-white/50 mb-2">🛒 Quick Order:</p>
                     <div className="flex gap-2 overflow-x-auto pb-1">
-                      {PROMO_CODES.map(promo => (
-                        <button
-                          key={promo.code}
-                          onClick={() => copyPromoCode(promo.code)}
-                          className="flex-shrink-0 px-2 py-1 rounded bg-[#ff0080]/20 border border-[#ff0080]/30 hover:bg-[#ff0080]/30 transition-all text-xs flex items-center gap-1"
-                        >
-                          <span className="text-[#ff0080] font-mono font-bold">{promo.code}</span>
-                          {copiedCode === promo.code ? (
-                            <Check className="w-3 h-3 text-[#c8ff00]" />
-                          ) : (
-                            <Copy className="w-3 h-3 text-white/50" />
-                          )}
-                        </button>
-                      ))}
+                      <a
+                        href="/neon-original"
+                        className="flex-shrink-0 px-3 py-2 rounded bg-[#c8ff00]/20 border border-[#c8ff00]/30 hover:bg-[#c8ff00]/30 transition-all text-xs flex items-center gap-2"
+                      >
+                        <ShoppingCart className="w-3 h-3 text-[#c8ff00]" />
+                        <span className="text-[#c8ff00] font-bold">NEON Original</span>
+                      </a>
+                      <a
+                        href="/neon-pink"
+                        className="flex-shrink-0 px-3 py-2 rounded bg-pink-500/20 border border-pink-500/30 hover:bg-pink-500/30 transition-all text-xs flex items-center gap-2"
+                      >
+                        <ShoppingCart className="w-3 h-3 text-pink-400" />
+                        <span className="text-pink-400 font-bold">NEON Pink</span>
+                      </a>
+                      <a
+                        href="/preorder"
+                        className="flex-shrink-0 px-3 py-2 rounded bg-[#ff0080]/20 border border-[#ff0080]/30 hover:bg-[#ff0080]/30 transition-all text-xs flex items-center gap-2"
+                      >
+                        <ShoppingCart className="w-3 h-3 text-[#ff0080]" />
+                        <span className="text-[#ff0080] font-bold">Pre-Order Now</span>
+                      </a>
                     </div>
                   </div>
                 )}

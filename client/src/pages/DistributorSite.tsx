@@ -474,7 +474,7 @@ export default function DistributorSite() {
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
               { name: "NEON Original", price: "$2.99", desc: "Classic energy formula" },
-              { name: "NEON Organic", price: "$3.49", desc: "100% organic ingredients" },
+              { name: "NEON Pink", price: "$3.49", desc: "Beauty + Energy formula" },
               { name: "NEON Case (24)", price: "$59.99", desc: "Best value pack" },
             ].map((product, index) => (
               <div key={index} className="bg-[#0a0a0a] border border-[#c8ff00]/30 rounded-xl p-6 text-center hover:border-[#c8ff00] transition-colors cursor-pointer" onClick={handleOrderNow}>

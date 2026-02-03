@@ -393,7 +393,7 @@ export default function MobileVideoPlayer({ videos, autoPlay = false }: MobileVi
 
   // Minimized player component
   const MinimizedPlayer = () => (
-    <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden group">
+    <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden group" style={{ touchAction: 'manipulation' }}>
       <video
         ref={videoRef}
         src={currentVideo?.videoUrl}
@@ -401,9 +401,12 @@ export default function MobileVideoPlayer({ videos, autoPlay = false }: MobileVi
         className="w-full h-full object-cover"
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleVideoEnd}
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); togglePlay(); }}
+        onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); togglePlay(); }}
         playsInline
         webkit-playsinline="true"
         muted={isMuted}
+        style={{ touchAction: 'manipulation' }}
       />
       
       {/* Overlay gradient */}
@@ -433,8 +436,10 @@ export default function MobileVideoPlayer({ videos, autoPlay = false }: MobileVi
           <Button
             variant="ghost"
             size="icon"
-            onClick={toggleExpand}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleExpand(); }}
+            onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); toggleExpand(); }}
             className="text-white bg-black/50 hover:bg-black/70 rounded-full w-9 h-9"
+            style={{ touchAction: 'manipulation' }}
           >
             <Maximize2 className="w-4 h-4" />
           </Button>
@@ -452,10 +457,12 @@ export default function MobileVideoPlayer({ videos, autoPlay = false }: MobileVi
       
       {/* Play/Pause overlay button - always visible on mobile */}
       <button
-        onClick={togglePlay}
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); togglePlay(); }}
+        onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); togglePlay(); }}
         className={`absolute inset-0 flex items-center justify-center transition-opacity ${
           isMobile ? "opacity-100" : "opacity-0 group-hover:opacity-100"
         }`}
+        style={{ touchAction: 'manipulation' }}
       >
         <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#c8ff00]/90 flex items-center justify-center shadow-lg shadow-[#c8ff00]/30 hover:scale-110 transition-transform">
           {isPlaying ? (

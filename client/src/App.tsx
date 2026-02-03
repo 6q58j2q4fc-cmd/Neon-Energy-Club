@@ -56,6 +56,9 @@ import OrderTracking from "./pages/OrderTracking";
 import AdminOrders from "./pages/AdminOrders";
 import MyOrders from "./pages/MyOrders";
 import AdminShippingSettings from "./pages/AdminShippingSettings";
+import NeonOriginal from "./pages/NeonOriginal";
+import NeonPink from "./pages/NeonPink";
+import ApplicationForms from "./pages/ApplicationForms";
 // AmbientSoundToggle moved to header as HeaderSoundControl
 import UnifiedChatBot from "./components/UnifiedChatBot";
 import CookieConsent from "./components/CookieConsent";
@@ -84,7 +87,10 @@ function Router() {
         <Route path={"/about"} component={About} />
         <Route path={"/story"} component={About} />
         <Route path={"/products"} component={Products} />
-        <Route path={"/product"} component={Product} />
+        <Route path="/product" component={Product} />
+        <Route path="/neon-original" component={NeonOriginal} />
+        <Route path="/neon-pink" component={NeonPink} />
+        <Route path="/application-forms" component={ApplicationForms} />
         <Route path={"/success"} component={Success} />
         {/* OLD Admin route removed - using AdminPanel instead */}
         <Route path={"/franchise"} component={Franchise} />

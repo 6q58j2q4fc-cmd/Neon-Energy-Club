@@ -32,7 +32,7 @@ const celebrities = [
     feature: "Brand Ambassador & Music Videos",
     views: "78M+",
     image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400",
-    youtubeId: "5z5Mvyp1QHw", // Christina Milian - Dip It Low
+    youtubeId: "7I79wRRNcnY", // Christina Milian - Like Me ft. Snoop Dogg
   },
   {
     name: "Deorro",
@@ -70,14 +70,7 @@ const featuredVideos = [
     year: "2015",
     youtubeId: "RSj0mPJsMy0",
   },
-  {
-    title: "Dip It Low",
-    artist: "Christina Milian",
-    description: "Classic hit from Christina Milian, a longtime NEON brand ambassador.",
-    views: "78M+",
-    year: "2004",
-    youtubeId: "5z5Mvyp1QHw",
-  },
+
 ];
 
 export default function Celebrities() {

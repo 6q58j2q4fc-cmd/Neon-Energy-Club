@@ -26,19 +26,24 @@ export default function About() {
         url="/about"
         keywords="NEON story, energy drink history, NEON founding, clean energy mission, natural energy drink brand"
       />
-      {/* Background Graphics - Tropical */}
-      <div className="jungle-canopy-overlay" />
-      <div className="synthwave-grid-bg" />
-      <div className="floating-neon-orb green w-96 h-96 -top-48 -left-48" style={{ animationDelay: '0s' }} />
-      <div className="floating-neon-orb pink w-80 h-80 top-1/4 -right-40" style={{ animationDelay: '-5s' }} />
-      <div className="floating-neon-orb jungle w-72 h-72 bottom-1/3 -left-36" style={{ animationDelay: '-10s' }} />
-      
-      {/* Cascade Mountain Range Silhouette */}
-      <div className="cascade-mountains" />
-      
-      {/* Decorative Palm Trees */}
-      <img src="/neon-palm-tree.png" alt="" className="palm-tree-left hidden lg:block" />
-      <img src="/neon-palm-tree.png" alt="" className="palm-tree-right hidden lg:block" />
+      {/* Avatar-Style Glowing Jungle Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {/* Base gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#001a0d] via-[#002a15] to-[#001a0d]" />
+        
+        {/* Bioluminescent glow spots */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#00ff88]/10 rounded-full blur-[150px] animate-pulse" style={{ animationDuration: '4s' }} />
+        <div className="absolute top-1/2 right-1/3 w-80 h-80 bg-[#00ffcc]/8 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s' }} />
+        <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-[#88ff00]/10 rounded-full blur-[100px] animate-pulse" style={{ animationDuration: '6s', animationDelay: '2s' }} />
+        <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-[#00ff44]/8 rounded-full blur-[80px] animate-pulse" style={{ animationDuration: '7s', animationDelay: '0.5s' }} />
+        
+        {/* Floating particles effect */}
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 20% 30%, rgba(0,255,136,0.03) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(136,255,0,0.03) 0%, transparent 50%), radial-gradient(circle at 50% 50%, rgba(0,255,200,0.02) 0%, transparent 60%)' }} />
+        
+        {/* Vine/foliage silhouettes at edges */}
+        <div className="absolute top-0 left-0 w-64 h-full opacity-20" style={{ background: 'linear-gradient(to right, rgba(0,100,50,0.5), transparent)' }} />
+        <div className="absolute top-0 right-0 w-64 h-full opacity-20" style={{ background: 'linear-gradient(to left, rgba(0,100,50,0.5), transparent)' }} />
+      </div>
       <HamburgerHeader variant="vice" />
 
       {/* Breadcrumb */}
@@ -139,6 +144,43 @@ export default function About() {
               popular healthy energy drink choices to the mainstream market."
             </p>
             <p className="text-gray-400 mt-4">— Dakota Rea, Founder</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Timeline Section */}
+      <section className="py-20 px-4 relative z-10">
+        <div className="container mx-auto max-w-5xl">
+          <h2 className="text-4xl md:text-5xl font-black text-center mb-16">
+            Our <span className="text-[#c8ff00]">Journey</span>
+          </h2>
+          
+          <div className="relative">
+            {/* Timeline line */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-[#c8ff00] via-[#00ffcc] to-[#c8ff00] rounded-full" />
+            
+            {/* Timeline items */}
+            {[
+              { year: "2013", title: "Founded in Bend, Oregon", desc: "NEON Energy Drink is born in the microbrew mecca of Oregon", side: "left" },
+              { year: "2014", title: "National Expansion", desc: "Expanded to 48 states in our first year on the market", side: "right" },
+              { year: "2015", title: "Celebrity Partnerships", desc: "Featured in music videos by Snoop Dogg, Chris Brown & Christina Milian", side: "left" },
+              { year: "2016", title: "Global Reach", desc: "Expanded to 14 countries across Europe and Asia", side: "right" },
+              { year: "2018", title: "15% Global Exposure", desc: "Brand reached nearly 15% of the world's population", side: "left" },
+              { year: "2020", title: "Asset Repurchase", desc: "Repurchased all assets during COVID-19 pandemic", side: "right" },
+              { year: "2026", title: "Global Relaunch", desc: "Returning bigger and better with our legendary formula", side: "left" },
+            ].map((item, i) => (
+              <div key={i} className={`relative flex items-center mb-12 ${item.side === 'left' ? 'flex-row' : 'flex-row-reverse'}`}>
+                <div className={`w-5/12 ${item.side === 'left' ? 'text-right pr-8' : 'text-left pl-8'}`}>
+                  <div className={`bg-black/60 backdrop-blur-sm border border-[#c8ff00]/30 rounded-xl p-6 hover:border-[#c8ff00]/60 transition-all ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`} style={{ animationDelay: `${i * 0.1}s` }}>
+                    <div className="text-[#c8ff00] font-black text-2xl mb-2">{item.year}</div>
+                    <h4 className="text-white font-bold text-lg mb-2">{item.title}</h4>
+                    <p className="text-white/60 text-sm">{item.desc}</p>
+                  </div>
+                </div>
+                <div className="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 bg-[#c8ff00] rounded-full border-4 border-[#0a1a1a] shadow-[0_0_20px_rgba(200,255,0,0.5)]" />
+                <div className="w-5/12" />
+              </div>
+            ))}
           </div>
         </div>
       </section>

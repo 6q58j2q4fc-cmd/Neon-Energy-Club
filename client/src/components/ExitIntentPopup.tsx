@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Gift, X, Zap, CheckCircle } from "lucide-react";
+import { Gift, Zap, CheckCircle } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -63,13 +63,6 @@ export default function ExitIntentPopup() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="bg-gradient-to-br from-[#0a1a1a] to-[#0d2818] border-[#c8ff00]/30 text-white max-w-md">
-        <button
-          onClick={() => setIsOpen(false)}
-          className="absolute right-4 top-4 text-white/40 hover:text-white transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
         {!isSubmitted ? (
           <>
             <DialogHeader className="text-center pt-4">

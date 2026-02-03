@@ -99,13 +99,13 @@ export default function Footer() {
             <div className="flex flex-wrap justify-center items-center gap-6">
               {/* Rainforest Alliance */}
               <div className="flex items-center gap-2 bg-[#0d2818]/50 px-4 py-2 rounded-lg border border-[#c8ff00]/20">
-                <div className="w-8 h-8 rounded-full bg-[#00a651] flex items-center justify-center">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor">
+                <div className="w-8 h-8 rounded-full bg-[#c8ff00] flex items-center justify-center">
+                  <svg viewBox="0 0 24 24" className="w-5 h-5 text-black" fill="currentColor">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                   </svg>
                 </div>
                 <div>
-                  <p className="text-[#00a651] text-xs font-bold">RAINFOREST ALLIANCE</p>
+                  <p className="text-[#c8ff00] text-xs font-bold">RAINFOREST ALLIANCE</p>
                   <p className="text-white/50 text-[10px]">Certified Supporter</p>
                 </div>
               </div>

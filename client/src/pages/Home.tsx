@@ -643,12 +643,9 @@ export default function Home() {
                         </div>
                       </div>
                       
-                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#c8ff00] transition-colors avatar-text" style={{ textShadow: 'none' }}>
-                        <span className="group-hover:avatar-text transition-all">{ingredient.name}</span>
+                      <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[#c8ff00] transition-colors" style={{ textShadow: 'none' }}>
+                        {ingredient.name}
                       </h3>
-                      <p className="text-white/60 text-sm leading-relaxed max-w-[180px] mx-auto">
-                        {ingredient.benefit}
-                      </p>
                     </div>
                   ))}
                 </div>
