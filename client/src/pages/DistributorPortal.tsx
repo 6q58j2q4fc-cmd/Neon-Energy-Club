@@ -577,32 +577,22 @@ export default function DistributorPortal() {
                   <CardDescription>Share these links to grow your business</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-sm text-gray-400">Affiliate Link</label>
+                      <label className="text-sm text-gray-400">Your Replicated Website</label>
                       <div className="flex gap-2">
                         <Input 
-                          value={affiliateLink} 
+                          value={`${window.location.origin}/d/${distributorProfile?.distributorCode}`} 
                           readOnly 
                           className="bg-black/50 border-gray-700 text-white"
                         />
                         <Button 
-                          onClick={() => copyToClipboard(affiliateLink, "Affiliate link")}
+                          onClick={() => copyToClipboard(`${window.location.origin}/d/${distributorProfile?.distributorCode}`, "Replicated website link")}
                           variant="outline"
                           className="border-[#c8ff00]/30 text-[#c8ff00]"
                         >
                           <Copy className="w-4 h-4" />
                         </Button>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm text-gray-400">Your Personal Website</label>
-                      <div className="flex gap-2">
-                        <Input 
-                          value={`/d/${distributorProfile?.distributorCode}`} 
-                          readOnly 
-                          className="bg-black/50 border-gray-700 text-white"
-                        />
                         <Button 
                           onClick={() => window.open(`/d/${distributorProfile?.distributorCode}`, '_blank')}
                           variant="outline"

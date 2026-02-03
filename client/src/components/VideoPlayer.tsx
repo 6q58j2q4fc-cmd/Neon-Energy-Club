@@ -87,16 +87,32 @@ export function VideoPlayer({
     }
   }, [currentIndex]);
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     const video = videoRef.current;
     if (!video) return;
 
-    if (isPlaying) {
-      video.pause();
-    } else {
-      video.play();
+    try {
+      if (isPlaying) {
+        video.pause();
+        setIsPlaying(false);
+      } else {
+        await video.play();
+        setIsPlaying(true);
+      }
+    } catch (error) {
+      console.error('Video play error:', error);
+      // If autoplay fails, try with muted
+      if (!isPlaying) {
+        video.muted = true;
+        setIsMuted(true);
+        try {
+          await video.play();
+          setIsPlaying(true);
+        } catch (e) {
+          console.error('Muted play also failed:', e);
+        }
+      }
     }
-    setIsPlaying(!isPlaying);
   };
 
   const toggleMute = () => {
@@ -160,19 +176,31 @@ export function VideoPlayer({
   };
 
   const toggleFullscreen = async () => {
-    const container = containerRef.current;
-    if (!container) return;
+    const video = videoRef.current;
+    if (!video) return;
 
-    if (!isFullscreen) {
-      if (container.requestFullscreen) {
-        await container.requestFullscreen();
+    try {
+      if (!isFullscreen) {
+        // Try webkit fullscreen first (iOS)
+        if ((video as any).webkitEnterFullscreen) {
+          (video as any).webkitEnterFullscreen();
+        } else if (video.requestFullscreen) {
+          await video.requestFullscreen();
+        } else if ((video as any).webkitRequestFullscreen) {
+          (video as any).webkitRequestFullscreen();
+        }
+        setIsFullscreen(true);
+      } else {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        } else if ((document as any).webkitExitFullscreen) {
+          (document as any).webkitExitFullscreen();
+        }
+        setIsFullscreen(false);
       }
-    } else {
-      if (document.exitFullscreen) {
-        await document.exitFullscreen();
-      }
+    } catch (error) {
+      console.error('Fullscreen error:', error);
     }
-    setIsFullscreen(!isFullscreen);
   };
 
   const handleMouseMove = () => {
@@ -208,6 +236,8 @@ export function VideoPlayer({
         autoPlay={autoPlay}
         muted={isMuted}
         playsInline
+        webkit-playsinline="true"
+        x-webkit-airplay="allow"
         className="w-full h-full object-contain cursor-pointer"
         onClick={togglePlay}
       />

@@ -4542,3 +4542,18 @@
 
 ## SQL Error Fix - Feb 3
 - [x] Fix SQL query error on enrollment page (fixed missing migration file)
+
+
+## UX Fixes & Countdown Sync (Feb 3)
+
+- [ ] Move chatbot to not block mobile navigation buttons on distributor portal
+- [ ] Sync countdown timers across all pages (homepage, replicated sites, product pages)
+- [ ] Fix duplicate links to show only one fully written URL  
+- [ ] Debug and fix video player on main page
+
+
+## UX Fixes & Countdown Sync - Feb 3
+- [x] Move chatbot to not block mobile navigation buttons (bottom-20 on mobile)
+- [x] Sync countdown timers across all pages (use centralized LAUNCH_DATE)
+- [x] Fix duplicate links to show only one fully written URL in distributor portal
+- [x] Debug and fix video player on main page (async play/pause, webkit fullscreen for iOS)

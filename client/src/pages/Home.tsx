@@ -16,6 +16,7 @@ import { SEO } from "@/components/SEO";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
+import { LAUNCH_DATE } from "@/hooks/useCountdown";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -72,10 +73,9 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll);
     
     const calculateTimeLeft = () => {
-      // Fixed launch date: May 6, 2026 (95 days from Jan 31, 2026)
-      const launchDate = new Date('2026-05-06T00:00:00');
+      // Use centralized launch date from useCountdown hook
       const now = new Date();
-      const difference = launchDate.getTime() - now.getTime();
+      const difference = LAUNCH_DATE.getTime() - now.getTime();
       
       if (difference > 0) {
         setTimeLeft({

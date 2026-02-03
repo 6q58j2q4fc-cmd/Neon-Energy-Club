@@ -6,6 +6,7 @@ import { trpc } from "@/lib/trpc";
 import LeaderboardWidget from "@/components/LeaderboardWidget";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
+import { LAUNCH_DATE } from "@/hooks/useCountdown";
 
 interface DistributorProfile {
   id: number;
@@ -75,10 +76,9 @@ export default function DistributorSite() {
 
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const launchDate = new Date();
-      launchDate.setDate(launchDate.getDate() + 90);
-      
-      const difference = launchDate.getTime() - new Date().getTime();
+      // Use centralized launch date from useCountdown hook
+      const now = new Date();
+      const difference = LAUNCH_DATE.getTime() - now.getTime();
       
       setTimeLeft({
         days: Math.floor(difference / (1000 * 60 * 60 * 24)),

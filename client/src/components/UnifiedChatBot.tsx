@@ -232,7 +232,7 @@ export default function UnifiedChatBot() {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-[#c8ff00] to-[#00ffff] text-black shadow-lg flex items-center justify-center hover:shadow-[0_0_20px_rgba(200,255,0,0.5)] transition-all"
+            className="fixed bottom-20 md:bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-[#c8ff00] to-[#00ffff] text-black shadow-lg flex items-center justify-center hover:shadow-[0_0_20px_rgba(200,255,0,0.5)] transition-all"
             aria-label="Open chat"
           >
             <MessageCircle className="w-6 h-6" />
@@ -249,7 +249,7 @@ export default function UnifiedChatBot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             className={cn(
-              "fixed bottom-6 right-6 z-50 w-[400px] max-w-[calc(100vw-3rem)] bg-[#0a0a0a] border border-[#c8ff00]/30 rounded-2xl shadow-2xl overflow-hidden flex flex-col",
+              "fixed bottom-20 md:bottom-6 right-6 z-50 w-[400px] max-w-[calc(100vw-3rem)] bg-[#0a0a0a] border border-[#c8ff00]/30 rounded-2xl shadow-2xl overflow-hidden flex flex-col",
               isMinimized ? "h-auto" : "h-[600px] max-h-[80vh]"
             )}
           >
