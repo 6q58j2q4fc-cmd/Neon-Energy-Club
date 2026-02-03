@@ -232,6 +232,13 @@
       "when": 1769999157195,
       "tag": "0032_clumsy_captain_cross",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "5",
+      "when": 1770093049280,
+      "tag": "0033_secret_goliath",
+      "breakpoints": true
     }
   ]
 }

@@ -224,6 +224,30 @@ export default function MyOrders() {
                               {order.city}, {order.state} {order.postalCode}
                             </div>
 
+                            {/* Real-time Tracking Progress */}
+                            {order.tracking && order.status !== 'cancelled' && (
+                              <div className="mt-4 p-3 bg-zinc-800/50 rounded-lg">
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-xs text-zinc-400">Tracking Progress</span>
+                                  <span className="text-xs text-[#c8ff00] flex items-center gap-1">
+                                    <span className="w-2 h-2 bg-[#c8ff00] rounded-full animate-pulse" />
+                                    Live
+                                  </span>
+                                </div>
+                                <div className="relative h-2 bg-zinc-700 rounded-full overflow-hidden">
+                                  <div 
+                                    className="absolute left-0 top-0 h-full bg-gradient-to-r from-[#c8ff00] to-[#00ff88] rounded-full transition-all duration-500"
+                                    style={{ width: `${(order.tracking.currentStep / order.tracking.totalSteps) * 100}%` }}
+                                  />
+                                </div>
+                                <div className="flex justify-between mt-2">
+                                  <span className="text-xs text-white font-medium">{order.tracking.statusLabel}</span>
+                                  <span className="text-xs text-zinc-500">Step {order.tracking.currentStep} of {order.tracking.totalSteps}</span>
+                                </div>
+                                <p className="text-xs text-zinc-400 mt-1">{order.tracking.statusDescription}</p>
+                              </div>
+                            )}
+
                             <div className="flex gap-2 pt-2">
                               <Link href={`/track-order?order=${orderNumber}`}>
                                 <Button variant="outline" size="sm" className="border-zinc-700 text-zinc-300 hover:text-white">

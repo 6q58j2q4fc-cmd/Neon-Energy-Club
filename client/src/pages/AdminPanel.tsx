@@ -118,13 +118,14 @@ export default function AdminPanel() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="flex flex-wrap gap-1 sm:grid sm:grid-cols-6 w-full bg-[#0a0a0a] border border-[#c8ff00]/30 p-1">
-            <TabsTrigger value="dashboard" className="flex-1 min-w-[80px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Dashboard</TabsTrigger>
-            <TabsTrigger value="users" className="flex-1 min-w-[60px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Users</TabsTrigger>
-            <TabsTrigger value="orders" className="flex-1 min-w-[60px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Orders</TabsTrigger>
-            <TabsTrigger value="commissions" className="flex-1 min-w-[90px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Commissions</TabsTrigger>
-            <TabsTrigger value="distributors" className="flex-1 min-w-[90px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Distributors</TabsTrigger>
-            <TabsTrigger value="settings" className="flex-1 min-w-[70px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Settings</TabsTrigger>
+          <TabsList className="flex flex-wrap gap-1 sm:grid sm:grid-cols-7 w-full bg-[#0a0a0a] border border-[#c8ff00]/30 p-1">
+            <TabsTrigger value="dashboard" className="flex-1 min-w-[70px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Dashboard</TabsTrigger>
+            <TabsTrigger value="users" className="flex-1 min-w-[50px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Users</TabsTrigger>
+            <TabsTrigger value="orders" className="flex-1 min-w-[50px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Orders</TabsTrigger>
+            <TabsTrigger value="commissions" className="flex-1 min-w-[80px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Commissions</TabsTrigger>
+            <TabsTrigger value="distributors" className="flex-1 min-w-[80px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Distributors</TabsTrigger>
+            <TabsTrigger value="auditor" className="flex-1 min-w-[60px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#ff0080] data-[state=active]:text-white whitespace-nowrap">Auditor</TabsTrigger>
+            <TabsTrigger value="settings" className="flex-1 min-w-[60px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
@@ -149,6 +150,10 @@ export default function AdminPanel() {
 
           <TabsContent value="settings">
             <SystemSettings />
+          </TabsContent>
+
+          <TabsContent value="auditor">
+            <DataAuditor />
           </TabsContent>
         </Tabs>
       </div>
@@ -632,6 +637,57 @@ function OrderManagement() {
     }
   };
 
+  // Export orders to CSV
+  const [isExporting, setIsExporting] = useState(false);
+  const { data: exportData, refetch: fetchExportData } = trpc.admin.exportAllOrders.useQuery(
+    { status: statusFilter !== "all" ? statusFilter : undefined },
+    { enabled: false }
+  );
+
+  const handleExportOrders = async () => {
+    setIsExporting(true);
+    try {
+      const result = await fetchExportData();
+      if (result.data?.orders) {
+        const orders = result.data.orders;
+        // Create CSV content
+        const headers = ['Order Number', 'Customer Name', 'Email', 'Phone', 'Status', 'Quantity', 'Total', 'Address', 'City', 'State', 'Postal Code', 'Country', 'Tracking Number', 'Carrier', 'Created At'];
+        const csvContent = [
+          headers.join(','),
+          ...orders.map(o => [
+            o.orderNumber,
+            `"${o.customerName}"`,
+            o.customerEmail,
+            o.phone,
+            o.status,
+            o.quantity,
+            o.total,
+            `"${o.address}"`,
+            o.city,
+            o.state,
+            o.postalCode,
+            o.country,
+            o.trackingNumber,
+            o.carrier,
+            o.createdAt
+          ].join(','))
+        ].join('\n');
+        
+        // Download CSV
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `neon-orders-${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+        toast.success(`Exported ${orders.length} orders to CSV`);
+      }
+    } catch (error) {
+      toast.error('Failed to export orders');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const orders = ordersData?.orders || [];
   const totalPages = ordersData?.totalPages || 1;
 
@@ -667,9 +723,13 @@ function OrderManagement() {
                 <SelectItem value="cancelled">Cancelled</SelectItem>
               </SelectContent>
             </Select>
-            <Button className="bg-[#c8ff00] text-black hover:bg-[#a8d600]">
+            <Button 
+              className="bg-[#c8ff00] text-black hover:bg-[#a8d600]"
+              onClick={handleExportOrders}
+              disabled={isExporting}
+            >
               <Download className="h-4 w-4 mr-2" />
-              Export
+              {isExporting ? 'Exporting...' : 'Export'}
             </Button>
             <Button 
               variant="destructive" 
@@ -924,12 +984,74 @@ function CommissionManagement() {
 function DistributorManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
+  const [isExporting, setIsExporting] = useState(false);
   
-  const { data: distributorsData, isLoading } = trpc.admin.distributors.useQuery({
+  const { data: distributorsData, isLoading, refetch } = trpc.admin.distributors.useQuery({
     search: searchQuery,
     page,
     limit: 10,
   });
+
+  // Delete all test distributors mutation
+  const deleteAllTestDistributorsMutation = trpc.admin.deleteAllTestDistributors.useMutation({
+    onSuccess: () => {
+      toast.success("All test distributors deleted successfully");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete test distributors: ${error.message}`);
+    },
+  });
+
+  // Export distributors query
+  const { refetch: fetchExportData } = trpc.admin.exportAllDistributors.useQuery(
+    undefined,
+    { enabled: false }
+  );
+
+  const handleExportDistributors = async () => {
+    setIsExporting(true);
+    try {
+      const result = await fetchExportData();
+      if (result.data?.distributors) {
+        const distributors = result.data.distributors;
+        const headers = ['ID', 'Username', 'Distributor Code', 'Rank', 'Active', 'Personal Sales', 'Team Sales', 'Left Leg Volume', 'Right Leg Volume', 'Sponsor ID', 'Created At'];
+        const csvContent = [
+          headers.join(','),
+          ...distributors.map(d => [
+            d.id,
+            `"${d.username}"`,
+            d.distributorCode,
+            d.rank,
+            d.isActive,
+            d.personalSales,
+            d.teamSales,
+            d.leftLegVolume,
+            d.rightLegVolume,
+            d.sponsorId,
+            d.createdAt
+          ].join(','))
+        ].join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `neon-distributors-${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+        toast.success(`Exported ${distributors.length} distributors to CSV`);
+      }
+    } catch (error) {
+      toast.error('Failed to export distributors');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleDeleteAllTestDistributors = () => {
+    if (window.confirm('Are you sure you want to DELETE ALL test/simulated distributors? This will remove inactive distributors with no sales. This cannot be undone.')) {
+      deleteAllTestDistributorsMutation.mutate();
+    }
+  };
 
   const distributors = distributorsData?.distributors || [];
   const totalPages = distributorsData?.totalPages || 1;
@@ -944,10 +1066,25 @@ function DistributorManagement() {
               Manage all distributors ({distributorsData?.total || 0} total)
             </CardDescription>
           </div>
-          <Button className="bg-[#c8ff00] text-black hover:bg-[#a8d600]">
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              className="bg-[#c8ff00] text-black hover:bg-[#a8d600]"
+              onClick={handleExportDistributors}
+              disabled={isExporting}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              {isExporting ? 'Exporting...' : 'Export'}
+            </Button>
+            <Button 
+              variant="destructive" 
+              className="bg-red-600 hover:bg-red-700"
+              onClick={handleDeleteAllTestDistributors}
+              disabled={deleteAllTestDistributorsMutation.isPending}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Test Data
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -1094,3 +1231,268 @@ function SystemSettings() {
 
 // Missing import for CreditCard
 import { CreditCard } from "lucide-react";
+
+
+// Data Auditor Component - LLM-powered data integrity monitoring
+function DataAuditor() {
+  const [isRunningAudit, setIsRunningAudit] = useState(false);
+  const [auditResults, setAuditResults] = useState<any>(null);
+  
+  const { data: siteStats, isLoading: statsLoading, refetch: refetchStats } = trpc.dataAuditor.getSiteStats.useQuery();
+  
+  const runAuditMutation = trpc.dataAuditor.runAudit.useMutation({
+    onSuccess: (data) => {
+      setAuditResults(data);
+      setIsRunningAudit(false);
+      toast.success(`Audit complete: ${data.sitesAudited} sites audited, ${data.issuesFound} issues found, ${data.issuesFixed} auto-fixed`);
+      refetchStats();
+    },
+    onError: (error) => {
+      setIsRunningAudit(false);
+      toast.error(`Audit failed: ${error.message}`);
+    },
+  });
+  
+  const cleanupMutation = trpc.dataAuditor.cleanupTestData.useMutation({
+    onSuccess: () => {
+      toast.success("Test data cleaned up successfully");
+      refetchStats();
+    },
+    onError: (error) => {
+      toast.error(`Cleanup failed: ${error.message}`);
+    },
+  });
+  
+  const handleRunAudit = () => {
+    setIsRunningAudit(true);
+    runAuditMutation.mutate();
+  };
+  
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <Activity className="w-6 h-6 text-[#ff0080]" />
+            Data Integrity Auditor
+          </h2>
+          <p className="text-gray-400">LLM-powered monitoring for replicated websites and MLM data</p>
+        </div>
+        <div className="flex gap-2">
+          <Button 
+            onClick={() => cleanupMutation.mutate()}
+            variant="outline"
+            className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+            disabled={cleanupMutation.isPending}
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Clean Test Data
+          </Button>
+          <Button 
+            onClick={handleRunAudit}
+            className="bg-[#ff0080] text-white hover:bg-[#ff0080]/80"
+            disabled={isRunningAudit}
+          >
+            {isRunningAudit ? (
+              <>
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                Running Audit...
+              </>
+            ) : (
+              <>
+                <Activity className="w-4 h-4 mr-2" />
+                Run Full Audit
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+      
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="bg-[#0a0a0a] border-[#c8ff00]/30">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Total Sites</p>
+                <p className="text-2xl font-bold text-white">{statsLoading ? '...' : siteStats?.totalSites || 0}</p>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-[#c8ff00]/20 flex items-center justify-center">
+                <Users className="w-6 h-6 text-[#c8ff00]" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-[#0a0a0a] border-green-500/30">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Active Sites</p>
+                <p className="text-2xl font-bold text-green-400">{statsLoading ? '...' : siteStats?.activeSites || 0}</p>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-green-400" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-[#0a0a0a] border-yellow-500/30">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Sites with Issues</p>
+                <p className="text-2xl font-bold text-yellow-400">{statsLoading ? '...' : siteStats?.sitesWithIssues || 0}</p>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                <AlertCircle className="w-6 h-6 text-yellow-400" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-[#0a0a0a] border-[#ff0080]/30">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Last Audit</p>
+                <p className="text-lg font-bold text-[#ff0080]">
+                  {siteStats?.lastAuditTime 
+                    ? formatDistanceToNow(new Date(siteStats.lastAuditTime), { addSuffix: true })
+                    : 'Never'}
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-[#ff0080]/20 flex items-center justify-center">
+                <Clock className="w-6 h-6 text-[#ff0080]" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Audit Results */}
+      {auditResults && (
+        <Card className="bg-[#0a0a0a] border-[#c8ff00]/30">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <FileText className="w-5 h-5 text-[#c8ff00]" />
+              Latest Audit Report
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              {format(new Date(auditResults.timestamp), 'PPpp')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="p-4 bg-[#0a0a0a] border border-[#c8ff00]/20 rounded-lg">
+                <p className="text-sm text-gray-400">Sites Audited</p>
+                <p className="text-xl font-bold text-white">{auditResults.sitesAudited}</p>
+              </div>
+              <div className="p-4 bg-[#0a0a0a] border border-yellow-500/20 rounded-lg">
+                <p className="text-sm text-gray-400">Issues Found</p>
+                <p className="text-xl font-bold text-yellow-400">{auditResults.issuesFound}</p>
+              </div>
+              <div className="p-4 bg-[#0a0a0a] border border-green-500/20 rounded-lg">
+                <p className="text-sm text-gray-400">Auto-Fixed</p>
+                <p className="text-xl font-bold text-green-400">{auditResults.issuesFixed}</p>
+              </div>
+              <div className="p-4 bg-[#0a0a0a] border border-red-500/20 rounded-lg">
+                <p className="text-sm text-gray-400">Critical Issues</p>
+                <p className="text-xl font-bold text-red-400">{auditResults.criticalIssues}</p>
+              </div>
+            </div>
+            
+            {/* LLM Analysis */}
+            {auditResults.llmAnalysis && (
+              <div className="p-4 bg-[#0a0a0a] border border-[#ff0080]/30 rounded-lg">
+                <h4 className="text-sm font-semibold text-[#ff0080] mb-2 flex items-center gap-2">
+                  <Activity className="w-4 h-4" />
+                  AI Analysis
+                </h4>
+                <p className="text-sm text-gray-300 whitespace-pre-wrap">{auditResults.llmAnalysis}</p>
+              </div>
+            )}
+            
+            {/* Issue Details */}
+            {auditResults.details && auditResults.details.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold text-white">Issue Details</h4>
+                <div className="max-h-64 overflow-y-auto space-y-2">
+                  {auditResults.details.slice(0, 10).map((site: any, idx: number) => (
+                    <div key={idx} className="p-3 bg-[#0a0a0a] border border-gray-800 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-white">{site.distributorCode}</span>
+                        <Badge className={
+                          site.status === 'healthy' ? 'bg-green-500/20 text-green-400' :
+                          site.status === 'warning' ? 'bg-yellow-500/20 text-yellow-400' :
+                          'bg-red-500/20 text-red-400'
+                        }>
+                          {site.status}
+                        </Badge>
+                      </div>
+                      {site.issues && site.issues.length > 0 && (
+                        <ul className="text-xs text-gray-400 space-y-1">
+                          {site.issues.map((issue: any, iIdx: number) => (
+                            <li key={iIdx} className="flex items-center gap-2">
+                              <span className={
+                                issue.severity === 'critical' ? 'text-red-400' :
+                                issue.severity === 'high' ? 'text-orange-400' :
+                                issue.severity === 'medium' ? 'text-yellow-400' :
+                                'text-gray-400'
+                              }>●</span>
+                              {issue.description}
+                              {issue.autoFixed && <Badge className="bg-green-500/20 text-green-400 text-[10px]">Fixed</Badge>}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+      
+      {/* Replicated Website System Info */}
+      <Card className="bg-[#0a0a0a] border-[#00ffff]/30">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Settings className="w-5 h-5 text-[#00ffff]" />
+            Replicated Website System
+          </CardTitle>
+          <CardDescription className="text-gray-400">
+            Auto-generates personal branded sites for each distributor on signup
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 bg-[#0a0a0a] border border-[#00ffff]/20 rounded-lg">
+              <h4 className="text-sm font-semibold text-[#00ffff] mb-2">Features</h4>
+              <ul className="text-sm text-gray-300 space-y-1">
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> Auto-deploy on signup</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> Profile photo & country flag</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> Unique subdomain/vanity URL</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> Real-time commission tracking</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> Referral attribution</li>
+              </ul>
+            </div>
+            <div className="p-4 bg-[#0a0a0a] border border-[#ff0080]/20 rounded-lg">
+              <h4 className="text-sm font-semibold text-[#ff0080] mb-2">Daily Audit Checks</h4>
+              <ul className="text-sm text-gray-300 space-y-1">
+                <li className="flex items-center gap-2"><Activity className="w-4 h-4 text-[#ff0080]" /> Affiliate link verification</li>
+                <li className="flex items-center gap-2"><Activity className="w-4 h-4 text-[#ff0080]" /> Commission calculation accuracy</li>
+                <li className="flex items-center gap-2"><Activity className="w-4 h-4 text-[#ff0080]" /> Profile data consistency</li>
+                <li className="flex items-center gap-2"><Activity className="w-4 h-4 text-[#ff0080]" /> Subdomain assignment</li>
+                <li className="flex items-center gap-2"><Activity className="w-4 h-4 text-[#ff0080]" /> LLM pattern analysis</li>
+              </ul>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

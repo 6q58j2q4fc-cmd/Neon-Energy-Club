@@ -1348,6 +1348,8 @@ export const userProfiles = mysqlTable("user_profiles", {
   displayName: varchar("displayName", { length: 255 }),
   /** Location (city, state) for landing page */
   location: varchar("location", { length: 255 }),
+  /** Country code (ISO 3166-1 alpha-2) for flag display */
+  country: varchar("country", { length: 2 }),
   /** Bio/tagline for landing page */
   bio: text("bio"),
   /** Instagram handle (without @) */

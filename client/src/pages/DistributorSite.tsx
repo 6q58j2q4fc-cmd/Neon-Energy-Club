@@ -14,6 +14,7 @@ interface DistributorProfile {
   displayName: string;
   profilePhoto: string | null;
   location: string | null;
+  country: string | null;
   bio: string | null;
   rank: string;
   joinDate: string;
@@ -27,6 +28,15 @@ interface DistributorProfile {
   youtube?: string | null;
   linkedin?: string | null;
 }
+
+// Country flag emoji mapping
+const getCountryFlag = (countryCode: string | null): string => {
+  if (!countryCode) return '';
+  const code = countryCode.toUpperCase();
+  // Convert country code to flag emoji
+  const codePoints = code.split('').map(char => 127397 + char.charCodeAt(0));
+  return String.fromCodePoint(...codePoints);
+};
 
 export default function DistributorSite() {
   const [, params] = useRoute("/d/:code");
@@ -206,6 +216,12 @@ export default function DistributorSite() {
               <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#c8ff00] text-black text-xs font-bold rounded-full uppercase">
                 {profile.rank}
               </div>
+              {/* Country Flag */}
+              {profile.country && (
+                <div className="absolute -top-1 -right-1 text-2xl" title={profile.country}>
+                  {getCountryFlag(profile.country)}
+                </div>
+              )}
             </div>
 
             {/* Profile Info */}

@@ -95,10 +95,10 @@ export default function Header() {
               {/* Shopping Cart Button */}
               <button
                 onClick={() => setCartOpen(true)}
-                className="relative w-10 h-10 flex items-center justify-center rounded-lg bg-[#0d2818]/50 border border-[#c8ff00]/20 hover:border-[#c8ff00]/40 hover:bg-[#0d2818]/70 transition-all duration-200"
+                className="relative w-12 h-12 flex items-center justify-center rounded-lg bg-[#0d2818]/70 border-2 border-[#c8ff00]/40 hover:border-[#c8ff00]/60 hover:bg-[#0d2818]/90 transition-all duration-200 shadow-[0_0_10px_rgba(200,255,0,0.2)]"
                 aria-label="Shopping Cart"
               >
-                <ShoppingCart className="w-5 h-5 text-[#c8ff00]" />
+                <ShoppingCart className="w-7 h-7 text-[#c8ff00] stroke-[2.5]" />
                 {totalItems > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#ff0080] text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
                     {totalItems > 9 ? '9+' : totalItems}
@@ -298,10 +298,10 @@ export default function Header() {
               {/* Mobile Shopping Cart Button */}
               <button
                 onClick={() => setCartOpen(true)}
-                className="relative w-10 h-10 flex items-center justify-center rounded-lg bg-[#0d2818]/50 border border-[#c8ff00]/20 hover:border-[#c8ff00]/40 hover:bg-[#0d2818]/70 transition-all duration-200"
+                className="relative w-12 h-12 flex items-center justify-center rounded-lg bg-[#0d2818]/70 border-2 border-[#c8ff00]/40 hover:border-[#c8ff00]/60 hover:bg-[#0d2818]/90 transition-all duration-200 shadow-[0_0_10px_rgba(200,255,0,0.2)]"
                 aria-label="Shopping Cart"
               >
-                <ShoppingCart className="w-5 h-5 text-[#c8ff00]" />
+                <ShoppingCart className="w-7 h-7 text-[#c8ff00] stroke-[2.5]" />
                 {totalItems > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#ff0080] text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
                     {totalItems > 9 ? '9+' : totalItems}
@@ -310,14 +310,14 @@ export default function Header() {
               </button>
               {/* Mobile Menu Button */}
               <button
-                className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#0d2818]/50 border border-[#c8ff00]/20 active:scale-95 transition-all hover:border-[#c8ff00]/40 hover:bg-[#0d2818]/70"
+                className="w-12 h-12 flex items-center justify-center rounded-lg bg-[#0d2818]/70 border-2 border-[#c8ff00]/40 active:scale-95 transition-all hover:border-[#c8ff00]/60 hover:bg-[#0d2818]/90 shadow-[0_0_10px_rgba(200,255,0,0.2)]"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle menu"
               >
                 {mobileMenuOpen ? (
-                  <X className="w-5 h-5 text-[#c8ff00]" />
+                  <X className="w-7 h-7 text-[#c8ff00] stroke-[2.5]" />
                 ) : (
-                  <Menu className="w-5 h-5 text-[#c8ff00]" />
+                  <Menu className="w-7 h-7 text-[#c8ff00] stroke-[2.5]" />
                 )}
               </button>
             </div>

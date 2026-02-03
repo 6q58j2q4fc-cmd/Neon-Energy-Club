@@ -5283,6 +5283,7 @@ export async function getDistributorPublicProfile(code: string) {
     displayName: profile?.displayName || distributor.username || `NEON Distributor ${distributor.distributorCode}`,
     profilePhoto: profile?.profilePhotoUrl || null,
     location: profile?.location || null,
+    country: profile?.country || null,
     bio: profile?.bio || null,
     rank: distributor.rank || 'starter',
     joinDate: distributor.createdAt?.toISOString() || new Date().toISOString(),

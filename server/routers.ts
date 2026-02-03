@@ -7,7 +7,7 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { notifyOwner } from "./_core/notification";
 import { isStripeConfigured, createCrowdfundingCheckout, createFranchiseCheckout } from "./stripe";
 import { getDb } from "./db";
-import { users, preorders, commissions, distributors } from "../drizzle/schema";
+import { users, preorders, commissions, distributors, referralTracking } from "../drizzle/schema";
 import { sql, eq, gte, desc, asc, like, or, and, isNotNull } from "drizzle-orm";
 
 export const appRouter = router({
@@ -246,15 +246,15 @@ export const appRouter = router({
         };
       }),
 
-    // Get orders for current logged-in user
+    // Get orders for current logged-in user with real-time tracking
     getMyOrders: protectedProcedure
       .query(async ({ ctx }) => {
         if (!ctx.user.email) {
-          return { orders: [] };
+          return { orders: [], summary: { total: 0, pending: 0, shipped: 0, delivered: 0 } };
         }
         const db = await getDb();
         if (!db) {
-          return { orders: [] };
+          return { orders: [], summary: { total: 0, pending: 0, shipped: 0, delivered: 0 } };
         }
         const userEmail = ctx.user.email;
         const userOrders = await db
@@ -263,25 +263,78 @@ export const appRouter = router({
           .where(eq(preorders.email, userEmail))
           .orderBy(desc(preorders.createdAt));
         
+        // Calculate summary stats
+        const summary = {
+          total: userOrders.length,
+          pending: userOrders.filter(o => o.status === 'pending' || o.status === 'confirmed').length,
+          shipped: userOrders.filter(o => o.status === 'shipped').length,
+          delivered: userOrders.filter(o => o.status === 'delivered').length,
+        };
+        
+        // Get tracking URLs for shipped orders
+        const { getTrackingUrl } = await import("./shipping");
+        
         return {
-          orders: userOrders.map(order => ({
-            id: order.id,
-            orderNumber: order.nftId || `NEON-${String(order.id).padStart(5, '0')}`,
-            status: order.status || 'pending',
-            quantity: order.quantity,
-            name: order.name,
-            email: order.email,
-            address: order.address,
-            city: order.city,
-            state: order.state,
-            postalCode: order.postalCode,
-            country: order.country,
-            trackingNumber: order.trackingNumber,
-            nftImageUrl: order.nftImageUrl,
-            nftId: order.nftId,
-            createdAt: order.createdAt,
-            updatedAt: order.updatedAt,
-          })),
+          orders: userOrders.map(order => {
+            // Generate tracking URL if available
+            let trackingUrl = null;
+            if (order.trackingNumber && order.carrier) {
+              try {
+                trackingUrl = getTrackingUrl(order.carrier.toLowerCase() as 'ups' | 'fedex' | 'usps', order.trackingNumber);
+              } catch (e) {
+                // Carrier not supported
+              }
+            }
+            
+            // Calculate real-time tracking status
+            const getTrackingStatus = (status: string) => {
+              const statusMap: Record<string, { step: number; label: string; description: string }> = {
+                'pending': { step: 1, label: 'Order Placed', description: 'Your order has been received and is being processed' },
+                'confirmed': { step: 2, label: 'Order Confirmed', description: 'Payment confirmed, preparing for shipment' },
+                'processing': { step: 3, label: 'Processing', description: 'Your order is being prepared for shipping' },
+                'shipped': { step: 4, label: 'Shipped', description: 'Your order is on its way' },
+                'out_for_delivery': { step: 5, label: 'Out for Delivery', description: 'Your package will arrive today' },
+                'delivered': { step: 6, label: 'Delivered', description: 'Your order has been delivered' },
+                'cancelled': { step: 0, label: 'Cancelled', description: 'This order has been cancelled' },
+              };
+              return statusMap[status] || statusMap['pending'];
+            };
+            
+            const trackingStatus = getTrackingStatus(order.status || 'pending');
+            
+            return {
+              id: order.id,
+              orderNumber: order.nftId || `NEON-${String(order.id).padStart(5, '0')}`,
+              status: order.status || 'pending',
+              quantity: order.quantity,
+              name: order.name,
+              email: order.email,
+              address: order.address,
+              city: order.city,
+              state: order.state,
+              postalCode: order.postalCode,
+              country: order.country,
+              trackingNumber: order.trackingNumber,
+              carrier: order.carrier,
+              trackingUrl,
+              estimatedDelivery: order.estimatedDelivery,
+              nftImageUrl: order.nftImageUrl,
+              nftId: order.nftId,
+              nftRarity: order.nftRarity,
+              createdAt: order.createdAt,
+              updatedAt: order.updatedAt,
+              // Real-time tracking info
+              tracking: {
+                currentStep: trackingStatus.step,
+                totalSteps: 6,
+                statusLabel: trackingStatus.label,
+                statusDescription: trackingStatus.description,
+                lastUpdated: order.updatedAt || order.createdAt,
+                isLive: true,
+              },
+            };
+          }),
+          summary,
         };
       }),
 
@@ -4311,6 +4364,134 @@ Provide step-by-step instructions with specific button names and locations. Keep
           totalPages: Math.ceil(total / input.limit),
         };
       }),
+
+    // Delete ALL test/simulated distributors
+    deleteAllTestDistributors: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        // Delete distributors that look like test data (simulated, test, placeholder)
+        const result = await db.delete(distributors)
+          .where(
+            or(
+              like(distributors.username, '%test%'),
+              like(distributors.username, '%Test%'),
+              like(distributors.username, '%simulated%'),
+              like(distributors.username, '%placeholder%'),
+              like(distributors.distributorCode, '%TEST%'),
+              // Delete inactive distributors with no sales
+              and(
+                eq(distributors.isActive, 0),
+                eq(distributors.personalSales, 0),
+                eq(distributors.teamSales, 0)
+              )
+            )
+          );
+        
+        console.log(`[Admin] Deleted all test/simulated distributors`);
+        return { success: true, message: 'All test distributors deleted successfully' };
+      }),
+
+    // Export all distributors for CSV/Excel download
+    exportAllDistributors: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        // Get ALL distributors (no pagination for export)
+        const allDistributors = await db.select()
+          .from(distributors)
+          .orderBy(desc(distributors.createdAt));
+        
+        // Format distributors for export with all fields
+        const exportData = allDistributors.map(d => ({
+          id: d.id,
+          username: d.username || '',
+          distributorCode: d.distributorCode || '',
+          rank: d.rank || 'starter',
+          isActive: d.isActive ? 'Yes' : 'No',
+          personalSales: d.personalSales || 0,
+          teamSales: d.teamSales || 0,
+          totalCommissions: 0,
+          pendingCommissions: 0,
+          leftLegVolume: d.leftLegVolume || 0,
+          rightLegVolume: d.rightLegVolume || 0,
+          personallyEnrolled: 0,
+          sponsorId: d.sponsorId || '',
+          createdAt: d.createdAt?.toISOString() || '',
+        }));
+        
+        return { distributors: exportData, total: exportData.length };
+      }),
+
+    // Export all commissions for CSV/Excel download
+    exportAllCommissions: protectedProcedure
+      .input(z.object({
+        status: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        const whereClause = input.status ? eq(commissions.status, input.status as any) : undefined;
+        
+        // Get ALL commissions (no pagination for export)
+        const allCommissions = await db.select()
+          .from(commissions)
+          .where(whereClause)
+          .orderBy(desc(commissions.createdAt));
+        
+        // Format commissions for export
+        const exportData = allCommissions.map(c => ({
+          id: c.id,
+          distributorId: c.distributorId || '',
+          amount: c.amount || 0,
+          status: c.status || 'pending',
+          commissionType: c.commissionType || 'direct',
+          orderId: c.saleId || '',
+          level: c.level || 1,
+          createdAt: c.createdAt?.toISOString() || '',
+        }));
+        
+        return { commissions: exportData, total: exportData.length };
+      }),
+
+    // Export all users for CSV/Excel download
+    exportAllUsers: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        // Get ALL users (no pagination for export)
+        const allUsers = await db.select()
+          .from(users)
+          .orderBy(desc(users.createdAt));
+        
+        // Format users for export (exclude sensitive data)
+        const exportData = allUsers.map(u => ({
+          id: u.id,
+          name: u.name || '',
+          email: u.email || '',
+          role: u.role || 'user',
+          createdAt: u.createdAt?.toISOString() || '',
+        }));
+        
+        return { users: exportData, total: exportData.length };
+      }),
+
     // Public NFT Gallery - shows all NFTs for community viewing
     getGalleryNfts: publicProcedure
       .input(z.object({
@@ -5571,6 +5752,83 @@ Provide step-by-step instructions with specific button names and locations. Keep
       .query(async ({ ctx, input }) => {
         const { getVendingAnalytics } = await import("./db");
         return await getVendingAnalytics(ctx.user.id, input.machineId, input.period);
+      }),
+  }),
+
+  // System Data Auditor Router
+  dataAuditor: router({
+    // Run daily data integrity audit (admin only)
+    runAudit: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { runDailyDataAudit } = await import("./replicatedWebsiteSystem");
+        return await runDailyDataAudit();
+      }),
+
+    // Get replicated site stats
+    getSiteStats: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { getReplicatedSiteStats } = await import("./replicatedWebsiteSystem");
+        return await getReplicatedSiteStats();
+      }),
+
+    // Audit specific distributor site
+    auditSite: protectedProcedure
+      .input(z.object({ distributorId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { auditReplicatedSite } = await import("./replicatedWebsiteSystem");
+        return await auditReplicatedSite(input.distributorId);
+      }),
+
+    // Verify buyer flow for distributor
+    verifyBuyerFlow: protectedProcedure
+      .input(z.object({ distributorCode: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { verifyBuyerFlow } = await import("./replicatedWebsiteSystem");
+        return await verifyBuyerFlow(input.distributorCode);
+      }),
+
+    // Delete all test/simulated data
+    cleanupTestData: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        // Delete test distributors
+        const testDistributorsDeleted = await db.delete(distributors)
+          .where(
+            or(
+              like(distributors.username, '%test%'),
+              like(distributors.username, '%Test%'),
+              like(distributors.username, '%simulated%'),
+              like(distributors.distributorCode, '%TEST%')
+            )
+          );
+        
+        // Delete test referral tracking
+        await db.delete(referralTracking)
+          .where(
+            or(
+              like(referralTracking.referrerId, '%test%'),
+              like(referralTracking.referrerId, '%simulated%')
+            )
+          );
+        
+        return { success: true, message: "Test data cleaned up successfully" };
       }),
   }),
 
