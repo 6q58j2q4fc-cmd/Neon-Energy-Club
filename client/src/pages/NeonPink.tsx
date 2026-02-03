@@ -70,7 +70,7 @@ export default function NeonPink() {
             <div className="relative flex justify-center">
               <div className="absolute inset-0 bg-pink-500/20 rounded-full blur-[100px]" />
               <img 
-                src="/neon-pink-can.png" 
+                src="/neon-pink-can-rembg.png" 
                 alt="NEON Pink Energy Drink" 
                 className="relative z-10 w-64 md:w-80 h-auto drop-shadow-[0_0_60px_rgba(255,105,180,0.5)] animate-float"
               />

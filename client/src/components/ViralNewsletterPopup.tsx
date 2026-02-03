@@ -156,6 +156,7 @@ export default function ViralNewsletterPopup({ open, onClose }: ViralNewsletterP
         className="sm:max-w-[600px] max-w-[95vw] bg-black border-2 border-[#c8ff00] p-0 overflow-hidden"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={handleDismiss}
+        showCloseButton={false}
       >
         {/* Close Button - Always visible and clickable */}
         <button

@@ -65,7 +65,7 @@ export const products: ProductData[] = [
     tagline: "Electric Pom Passion",
     description: "The first energy drink engineered for women's health. Featuring pomegranate and passion fruit flavors with cancer-fighting antioxidants. A portion of every sale supports Susan G. Komen® in the fight against breast cancer.",
     price: 64.99,
-    image: "/neon-pink-can-clean.png",
+    image: "/neon-pink-can-rembg.png",
     flavor: "pink",
     features: [
       { icon: Heart, text: "Women's Health Formula" },

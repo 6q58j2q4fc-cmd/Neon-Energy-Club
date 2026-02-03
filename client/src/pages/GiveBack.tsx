@@ -364,13 +364,94 @@ export default function GiveBack() {
               {/* NEON Pink Can */}
               <div className="mt-8">
                 <img 
-                  src="/neon-pink-can-nobg.png" 
+                  src="/neon-pink-can-transparent.png" 
                   alt="NEON Pink" 
                   className="w-32 h-auto mx-auto animate-float"
                   style={{ filter: 'drop-shadow(0 0 30px rgba(255,0,128,0.5))', animationDelay: '0.5s' }}
                 />
                 <p className="text-pink-400 font-bold mt-2">NEON Pink™</p>
                 <p className="text-white/60 text-sm">Every can fights breast cancer</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Susan G. Komen Impact Gallery */}
+          <div className="mt-20">
+            <h3 className="text-3xl font-black text-center mb-4">
+              <span className="text-pink-400">Making an Impact</span> Together
+            </h3>
+            <p className="text-white/70 text-center mb-10 max-w-2xl mx-auto">
+              See how Susan G. Komen is transforming lives through research, community support, and awareness events worldwide.
+            </p>
+            
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* More Than Pink Walk */}
+              <div className="group relative overflow-hidden rounded-2xl border border-pink-500/20 bg-black/40">
+                <img 
+                  src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/HNjkRcmzrCcgDlgX.jpg" 
+                  alt="Susan G. Komen More Than Pink Walk" 
+                  className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h4 className="text-xl font-bold text-white mb-2">More Than Pink Walk</h4>
+                  <p className="text-white/70 text-sm">Thousands gather annually to walk, run, and raise funds for breast cancer research and support</p>
+                </div>
+              </div>
+              
+              {/* Community Support */}
+              <div className="group relative overflow-hidden rounded-2xl border border-pink-500/20 bg-black/40">
+                <img 
+                  src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/RQaBqFtPtmWHLNNo.jpg" 
+                  alt="Susan G. Komen Community" 
+                  className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h4 className="text-xl font-bold text-white mb-2">Community & Support</h4>
+                  <p className="text-white/70 text-sm">Building a network of survivors, supporters, and advocates fighting together</p>
+                </div>
+              </div>
+              
+              {/* Research & Innovation */}
+              <div className="group relative overflow-hidden rounded-2xl border border-pink-500/20 bg-black/40">
+                <img 
+                  src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/iMbMbFsgdhOuNASP.jpg" 
+                  alt="Susan G. Komen Research" 
+                  className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h4 className="text-xl font-bold text-white mb-2">Research & Innovation</h4>
+                  <p className="text-white/70 text-sm">Funding groundbreaking research to find cures and improve treatment outcomes</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Impact Statistics */}
+            <div className="mt-12 bg-pink-900/20 border border-pink-500/30 rounded-2xl p-8">
+              <h4 className="text-2xl font-black text-center text-pink-400 mb-8">Susan G. Komen Impact by the Numbers</h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="text-center">
+                  <div className="text-4xl font-black text-white">$3.6B+</div>
+                  <div className="text-pink-400 font-semibold">Total Invested</div>
+                  <div className="text-white/60 text-sm">In research & programs</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-black text-white">40+</div>
+                  <div className="text-pink-400 font-semibold">Years of Impact</div>
+                  <div className="text-white/60 text-sm">Fighting since 1982</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-black text-white">60+</div>
+                  <div className="text-pink-400 font-semibold">Countries Reached</div>
+                  <div className="text-white/60 text-sm">Global presence</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-black text-white">Millions</div>
+                  <div className="text-pink-400 font-semibold">Lives Touched</div>
+                  <div className="text-white/60 text-sm">Survivors & families</div>
+                </div>
               </div>
             </div>
           </div>
