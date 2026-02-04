@@ -246,6 +246,7 @@ export function VideoPlayer({
         poster={currentVideo.poster}
         autoPlay={autoPlay}
         muted={isMuted}
+        loop
         playsInline
         webkit-playsinline="true"
         x-webkit-airplay="allow"

@@ -344,7 +344,7 @@ export default function Home() {
               {isMobile ? (
                 <MobileVideoPlayer
                   videos={mobileVideos}
-                  autoPlay={false}
+                  autoPlay={true}
                 />
               ) : (
                 <VideoPlayer
@@ -724,7 +724,7 @@ export default function Home() {
                 <div className="w-64 h-64 bg-[#c8ff00]/10 rounded-full blur-[60px]" />
               </div>
               <img
-                src="/vending-machine.jpeg"
+                src="/vending-machine.jpg"
                 alt="NEON AI Vending Machine"
                 className="relative z-10 rounded-2xl shadow-2xl product-glow max-h-[500px] mx-auto object-cover"
               />

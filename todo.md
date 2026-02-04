@@ -4694,3 +4694,43 @@
 - [x] Upload WebP images to CDN (main product images uploaded)
 - [x] Update image references with WebP + PNG fallback (OptimizedImage component created)
 - [x] Move original files to static assets folder (WebP versions created alongside originals)
+
+
+## Critical Fixes (Feb 4, 2026) - MUST FIX
+
+### Video Player Autoplay
+- [ ] Make video player autoplay on page load
+- [ ] Add loop attribute for continuous playback
+- [ ] Ensure muted for autoplay compatibility
+
+### Broken Compensation Plan Button on Main Page
+- [ ] Find and fix the broken button area (showing "?" icon)
+- [ ] Make button fully visible and clickable
+- [ ] Link to /compensation page
+
+### Mobile Genealogy Tree - HARDCODED FIX
+- [ ] Create dedicated MobileGenealogyTree component
+- [ ] Hardcode simple tree structure for iOS compatibility
+- [ ] Remove complex canvas/SVG rendering for mobile
+- [ ] Use simple HTML/CSS tree layout
+- [ ] Test on mobile viewport
+
+
+## Critical Fixes (Feb 4, 2026 - Session 2)
+
+### Video Autoplay & Loop
+- [x] Make video autoplay on page load
+- [x] Add loop attribute for continuous playback
+- [x] Apply to both desktop and mobile video players
+
+### Broken Button Fix (Franchise Section)
+- [x] Fix broken button area (showing ? icon) on main page - was vending-machine.jpeg vs .jpg
+- [x] Ensure compensation plan button is clickable
+- [x] Button navigates to /compensation page
+
+### Mobile Genealogy Tree (iOS Fix)
+- [x] Create dedicated MobileGenealogyTree component
+- [x] Hardcode mobile-friendly tree that works on iOS Safari
+- [x] No complex transforms or canvas operations - uses simple flexbox layout
+- [x] Simple vertical card-based layout for mobile
+- [x] Integrate into MyTeam component with device detection

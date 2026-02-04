@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,11 +21,27 @@ import {
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import GenealogyTree from "./GenealogyTree";
+import { MobileGenealogyTree } from "./MobileGenealogyTree";
 import { formatDistanceToNow } from "date-fns";
 
 export default function MyTeam() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeView, setActiveView] = useState<"tree" | "list">("tree");
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+      const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+      const isSmallScreen = window.innerWidth < 768;
+      setIsMobile(isMobileDevice || isSmallScreen);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // Fetch team data
   const { data: teamData, isLoading } = trpc.distributor.team.useQuery();
@@ -134,7 +150,26 @@ export default function MyTeam() {
         </CardHeader>
         <CardContent>
           {activeView === "tree" ? (
-            <GenealogyTree />
+            isMobile ? (
+              <MobileGenealogyTree 
+                rootMember={{
+                  id: stats?.distributor?.distributorCode || "DIST001",
+                  name: "You",
+                  rank: stats?.distributor?.rank || "STARTER",
+                  position: "root",
+                  personalVolume: 0,
+                  teamVolume: 0,
+                  leftChild: null,
+                  rightChild: null
+                }}
+                isLoading={isLoading}
+                onEnrollClick={(position, parentId) => {
+                  console.log(`Enroll at ${position} under ${parentId}`);
+                }}
+              />
+            ) : (
+              <GenealogyTree />
+            )
           ) : (
             <div className="space-y-4">
               {/* Search */}

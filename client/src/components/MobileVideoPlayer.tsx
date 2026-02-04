@@ -479,6 +479,8 @@ export default function MobileVideoPlayer({ videos, autoPlay = false }: MobileVi
         playsInline
         webkit-playsinline="true"
         muted={isMuted}
+        autoPlay={autoPlay}
+        loop
         style={{ touchAction: 'manipulation' }}
       />
       
