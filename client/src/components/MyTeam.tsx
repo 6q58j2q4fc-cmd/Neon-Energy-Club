@@ -22,12 +22,14 @@ import {
 import { trpc } from "@/lib/trpc";
 import GenealogyTree from "./GenealogyTree";
 import { MobileGenealogyTree } from "./MobileGenealogyTree";
+import MobileGenealogyModal from "./MobileGenealogyModal";
 import { formatDistanceToNow } from "date-fns";
 
 export default function MyTeam() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeView, setActiveView] = useState<"tree" | "list">("tree");
   const [isMobile, setIsMobile] = useState(false);
+  const [showMobileModal, setShowMobileModal] = useState(false);
   
   // Detect mobile device
   useEffect(() => {
@@ -154,24 +156,43 @@ export default function MyTeam() {
         <CardContent>
           {activeView === "tree" ? (
             isMobile ? (
-              <MobileGenealogyTree 
-                genealogyData={genealogyData}
-                rootMember={genealogyData ? undefined : {
-                  id: stats?.distributor?.distributorCode || "DIST001",
-                  name: "You",
-                  rank: stats?.distributor?.rank || "STARTER",
-                  position: "root",
-                  personalVolume: stats?.distributor?.personalSales || 0,
-                  teamVolume: stats?.distributor?.teamSales || 0,
-                  leftChild: null,
-                  rightChild: null
-                }}
-                isLoading={isLoading || genealogyLoading}
-                onEnrollClick={(position, parentId) => {
-                  console.log(`Enroll at ${position} under ${parentId}`);
-                  // TODO: Navigate to enrollment page
-                }}
-              />
+              <div className="space-y-4">
+                {/* Open Fullscreen Modal Button */}
+                <Button 
+                  onClick={() => setShowMobileModal(true)}
+                  className="w-full bg-gradient-to-r from-[#c8ff00] to-[#a8df00] text-black font-semibold py-6 text-lg"
+                >
+                  <Users className="w-5 h-5 mr-2" />
+                  Open Interactive Genealogy Tree
+                </Button>
+                
+                {/* Inline Mobile Tree Preview */}
+                <MobileGenealogyTree 
+                  genealogyData={genealogyData}
+                  rootMember={genealogyData ? undefined : {
+                    id: stats?.distributor?.distributorCode || "DIST001",
+                    name: "You",
+                    rank: stats?.distributor?.rank || "STARTER",
+                    position: "root",
+                    personalVolume: stats?.distributor?.personalSales || 0,
+                    teamVolume: stats?.distributor?.teamSales || 0,
+                    leftChild: null,
+                    rightChild: null
+                  }}
+                  isLoading={isLoading || genealogyLoading}
+                  onEnrollClick={(position, parentId) => {
+                    console.log(`Enroll at ${position} under ${parentId}`);
+                  }}
+                />
+                
+                {/* Mobile Genealogy Modal */}
+                <MobileGenealogyModal
+                  isOpen={showMobileModal}
+                  onClose={() => setShowMobileModal(false)}
+                  genealogyData={genealogyData}
+                  distributorCode={stats?.distributor?.distributorCode}
+                />
+              </div>
             ) : (
               <GenealogyTree />
             )

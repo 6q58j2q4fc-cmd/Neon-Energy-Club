@@ -8,6 +8,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { generalLimiter, authLimiter, checkoutLimiter, llmLimiter } from "./rateLimit";
+import { securityHeaders, detectSuspiciousActivity } from "../security";
 import multer from "multer";
 import { storagePut } from "../storage";
 import { sdk } from "./sdk";
@@ -38,6 +39,12 @@ async function startServer() {
   
   // Trust proxy for accurate IP detection behind reverse proxies
   app.set("trust proxy", 1);
+  
+  // Apply security headers to all requests
+  app.use(securityHeaders());
+  
+  // Detect and block suspicious activity
+  app.use(detectSuspiciousActivity());
   
   // Stripe webhook endpoint - MUST be before body parser to get raw body
   app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {

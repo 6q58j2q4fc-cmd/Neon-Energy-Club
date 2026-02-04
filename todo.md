@@ -4761,3 +4761,37 @@
 - [ ] Fix any broken links or navigation issues
 - [ ] Verify commission tracking displays correctly
 - [ ] Test team management features end-to-end
+
+
+## Mobile Genealogy Window, Video Player & Security (Feb 4, 2026)
+
+### Dedicated Mobile Genealogy Window
+- [ ] Create dedicated interactive window/modal for genealogy tree on mobile
+- [ ] Implement controlled environment for tree loading
+- [ ] Ensure proper rendering on all mobile screen sizes
+- [ ] Add loading states and error handling
+
+### Video Player Optimization
+- [ ] Fix video loading smoothness issues
+- [ ] Optimize video player for lag-free playback
+- [ ] Add download video button with icon
+- [ ] Add clearly visible social media share buttons
+- [ ] Implement video preloading for smooth playback
+
+### Interactive Tutorials Restoration
+- [ ] Restore genealogy tree interactive tutorial
+- [ ] Restore vending machine tree tutorial
+- [ ] Ensure all distributor portal pages are fully functional
+- [ ] Verify all menu items lead to real, live content
+
+### Comprehensive Site Security
+- [ ] Research latest security best practices
+- [ ] Implement source code protection
+- [ ] Add Content Security Policy headers
+- [ ] Implement rate limiting and DDoS protection
+- [ ] Add XSS and CSRF protection
+- [ ] Secure all API endpoints
+- [ ] Add input sanitization
+- [ ] Implement secure session management
+- [ ] Add SSL/TLS best practices
+- [ ] Ensure browser compatibility and no security warnings

@@ -5,6 +5,7 @@ import { useLocation, Link } from "wouter";
 import { Zap, MapPin, DollarSign, Clock, TrendingUp, Users, Star, Sparkles, ArrowRight, Gift, Target, Trophy, ChevronDown, Shield, Leaf, Heart, Play } from "lucide-react";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import MobileVideoPlayer from "@/components/MobileVideoPlayer";
+import OptimizedVideoPlayer from "@/components/OptimizedVideoPlayer";
 import SocialProofNotifications from "@/components/SocialProofNotifications";
 import ViralNewsletterPopup, { shouldShowPopup, markPopupShown } from "@/components/ViralNewsletterPopup";
 import Header from "@/components/Header";
@@ -341,19 +342,16 @@ export default function Home() {
             
             {/* Enhanced Video Player - Mobile optimized with share/download */}
             <div className="relative w-full max-w-5xl mx-auto mobile-video-player">
-              {isMobile ? (
-                <MobileVideoPlayer
-                  videos={mobileVideos}
-                  autoPlay={true}
-                />
-              ) : (
-                <VideoPlayer
-                  videos={neonVideos}
-                  className="aspect-video w-full rounded-2xl shadow-2xl shadow-[#c8ff00]/20"
-                  autoPlay={true}
-                  initialMuted={true}
-                />
-              )}
+              <OptimizedVideoPlayer
+                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/WstZuNJKRUXjNalw.mp4"
+                mobileSrc="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/vJGVULoSEhaqOuUR.mp4"
+                poster="/neon-can-new.png"
+                title="NEON Energy - Find Your Energy"
+                autoPlay={true}
+                loop={true}
+                muted={true}
+                className="aspect-video w-full rounded-2xl shadow-2xl shadow-[#c8ff00]/20"
+              />
             </div>
           </div>
         </div>
