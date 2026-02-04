@@ -88,11 +88,18 @@ export default function Footer() {
             <div className="flex flex-col items-center gap-2">
               <p className="text-[#00ffff] text-xs font-semibold tracking-wider">ADVERTISING PARTNER</p>
               <div className="flex items-center gap-3 px-6 py-3 rounded-xl">
-                <img 
-                  src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/YMvLPqhKeOCpKiwL.png" 
-                  alt="Disney Campaign Manager - Meet your new advertising partner" 
-                  className="h-16 sm:h-20 w-auto object-contain"
-                />
+                <picture>
+                  <source 
+                    srcSet="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/uhPXvUlncpzUIRtd.webp" 
+                    type="image/webp" 
+                  />
+                  <img 
+                    src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/YMvLPqhKeOCpKiwL.png" 
+                    alt="Disney Campaign Manager - Meet your new advertising partner" 
+                    className="h-16 sm:h-20 w-auto object-contain"
+                    loading="lazy"
+                  />
+                </picture>
               </div>
               <p className="text-[#c8ff00] text-xs font-bold mt-1">NEON Energy Drink® — Official Advertising Partner of Disney Campaign Manager</p>
             </div>

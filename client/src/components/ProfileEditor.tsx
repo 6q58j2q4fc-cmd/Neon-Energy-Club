@@ -108,7 +108,7 @@ export default function ProfileEditor({ userType, onSave }: ProfileEditorProps) 
   const updateSlug = trpc.profile.updateSlug.useMutation({
     onSuccess: (data) => {
       toast.success("Referral Link Updated", {
-        description: `Your new link is: neonenergyclub.com/${data.slug}`,
+        description: `Your new link is: ${window.location.host}/d/${data.slug}`,
       });
       setCustomSlug(data.slug);
       setIsEditingSlug(false);
@@ -299,7 +299,7 @@ export default function ProfileEditor({ userType, onSave }: ProfileEditorProps) 
   
   // Copy referral link
   const copyReferralLink = () => {
-    const link = `neonenergyclub.com/${customSlug}`;
+    const link = `${window.location.host}/d/${customSlug}`;
     navigator.clipboard.writeText(`https://${link}`);
     toast.success("Link Copied!", {
       description: `Your referral link has been copied to clipboard.`,
@@ -482,7 +482,7 @@ export default function ProfileEditor({ userType, onSave }: ProfileEditorProps) 
             <>
               <div className="flex items-center gap-2 p-4 rounded-lg bg-black/40 border border-[#c8ff00]/30">
                 <Globe className="h-5 w-5 text-[#c8ff00]" />
-                <span className="text-white/60">neonenergyclub.com/</span>
+                <span className="text-white/60">{window.location.host}/d/</span>
                 <span className="text-[#c8ff00] font-bold">{customSlug || "your-link"}</span>
               </div>
               
@@ -542,7 +542,7 @@ export default function ProfileEditor({ userType, onSave }: ProfileEditorProps) 
                 <Label className="text-white/80">New Referral Link</Label>
                 <div className="flex items-center gap-2 mt-2">
                   <div className="flex items-center gap-1 px-3 py-2 rounded-l-lg bg-black/60 border border-r-0 border-white/20">
-                    <span className="text-white/60 text-sm">neonenergyclub.com/</span>
+                    <span className="text-white/60 text-sm">{window.location.host}/d/</span>
                   </div>
                   <div className="relative flex-1">
                     <Input

@@ -15,6 +15,7 @@ import NeonLogo from "./NeonLogo";
 import MobileMenu from "./MobileMenu";
 import { trpc } from "@/lib/trpc";
 import { useCart } from "@/contexts/CartContext";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const navItems = [
   { label: "HOME", path: "/" },
@@ -92,6 +93,8 @@ export default function Header() {
 
             {/* Desktop CTA Buttons */}
             <div className="hidden lg:flex items-center gap-2">
+              {/* Language Switcher */}
+              <LanguageSwitcher />
               {/* Shopping Cart Button */}
               <button
                 onClick={() => setCartOpen(true)}

@@ -19,7 +19,9 @@ import {
   Check,
   ChevronRight,
   Building2,
-  Coins
+  Coins,
+  Download,
+  FileText
 } from "lucide-react";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
@@ -112,6 +114,23 @@ export default function Compensation() {
                 <div className="text-4xl font-black text-[#ff0080]">5 Ways</div>
                 <div className="text-gray-400">To Earn</div>
               </div>
+            </div>
+            <div className="flex flex-wrap justify-center gap-4 mt-8">
+              <Button 
+                onClick={() => window.open('/compensation-plan.pdf', '_blank')}
+                className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold px-6 py-3"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Download Full PDF
+              </Button>
+              <Button 
+                onClick={() => setLocation('/join')}
+                variant="outline"
+                className="border-[#ff0080] text-[#ff0080] hover:bg-[#ff0080]/10 font-bold px-6 py-3"
+              >
+                <Users className="w-5 h-5 mr-2" />
+                Join Now
+              </Button>
             </div>
             <p className="text-gray-500 text-xs italic mt-6">
               *Results may vary. Income examples are not guarantees of earnings. Your success depends on your effort, skill, and market conditions.

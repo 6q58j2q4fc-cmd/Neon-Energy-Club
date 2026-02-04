@@ -15,7 +15,8 @@ import {
   Copy,
   Mail,
   MessageCircle,
-  Check
+  Check,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -71,6 +72,7 @@ export default function MobileVideoPlayer({ videos, autoPlay = false }: MobileVi
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const expandedVideoRef = useRef<HTMLVideoElement>(null);
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -469,6 +471,9 @@ export default function MobileVideoPlayer({ videos, autoPlay = false }: MobileVi
         className="w-full h-full object-cover"
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleVideoEnd}
+        onWaiting={() => setIsBuffering(true)}
+        onCanPlay={() => setIsBuffering(false)}
+        onPlaying={() => setIsBuffering(false)}
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); togglePlay(); }}
         onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); togglePlay(); }}
         playsInline
@@ -477,6 +482,16 @@ export default function MobileVideoPlayer({ videos, autoPlay = false }: MobileVi
         style={{ touchAction: 'manipulation' }}
       />
       
+      {/* Loading Spinner Overlay */}
+      {isBuffering && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-20 pointer-events-none">
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="w-10 h-10 text-[#c8ff00] animate-spin" />
+            <span className="text-white/80 text-xs font-medium">Loading...</span>
+          </div>
+        </div>
+      )}
+
       {/* Overlay gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 opacity-0 group-hover:opacity-100 md:transition-opacity pointer-events-none" />
       

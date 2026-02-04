@@ -43,7 +43,7 @@ export default function DistributorSite() {
   const [, params] = useRoute("/d/:code");
   const distributorCode = params?.code;
   const [, setLocation] = useLocation();
-  const [timeLeft, setTimeLeft] = useState({ days: 90, hours: 0, minutes: 0, seconds: 0 });
+  const [timeLeft, setTimeLeft] = useState({ days: 95, hours: 0, minutes: 0, seconds: 0 });
   const [copied, setCopied] = useState(false);
   const { addItem, openCart } = useCart();
 

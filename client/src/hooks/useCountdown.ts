@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 
-// Centralized launch date - October 1, 2026 at midnight EST
-export const LAUNCH_DATE = new Date("2026-10-01T00:00:00-05:00");
+// Centralized launch date - 95 days from Feb 4, 2026 = May 10, 2026 at midnight EST
+// This is the single source of truth for ALL countdown timers across the site
+export const LAUNCH_DATE = new Date("2026-05-10T00:00:00-05:00");
 
 export interface CountdownTime {
   days: number;

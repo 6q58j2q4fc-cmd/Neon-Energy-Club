@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Play, Pause, Volume2, VolumeX, SkipBack, SkipForward, Maximize2, Minimize2 } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, SkipBack, SkipForward, Maximize2, Minimize2, Loader2 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +32,7 @@ export function VideoPlayer({
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(true);
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentVideo = videos[currentIndex];
@@ -59,14 +60,24 @@ export function VideoPlayer({
       }
     };
 
+    const handleWaiting = () => setIsBuffering(true);
+    const handleCanPlay = () => setIsBuffering(false);
+    const handlePlaying = () => setIsBuffering(false);
+
     video.addEventListener("timeupdate", handleTimeUpdate);
     video.addEventListener("loadedmetadata", handleLoadedMetadata);
     video.addEventListener("ended", handleEnded);
+    video.addEventListener("waiting", handleWaiting);
+    video.addEventListener("canplay", handleCanPlay);
+    video.addEventListener("playing", handlePlaying);
 
     return () => {
       video.removeEventListener("timeupdate", handleTimeUpdate);
       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
       video.removeEventListener("ended", handleEnded);
+      video.removeEventListener("waiting", handleWaiting);
+      video.removeEventListener("canplay", handleCanPlay);
+      video.removeEventListener("playing", handlePlaying);
     };
   }, [currentIndex, videos.length]);
 
@@ -241,6 +252,16 @@ export function VideoPlayer({
         className="w-full h-full object-contain cursor-pointer"
         onClick={togglePlay}
       />
+
+      {/* Loading Spinner Overlay */}
+      {isBuffering && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-10">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="w-12 h-12 text-[#c8ff00] animate-spin" />
+            <span className="text-white/80 text-sm font-medium">Loading video...</span>
+          </div>
+        </div>
+      )}
 
       {/* Video Title Overlay */}
       <div className={cn(

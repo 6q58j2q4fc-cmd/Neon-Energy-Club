@@ -481,11 +481,30 @@ function TreeLevel({
 function InteractiveTreeContainer({ children }: { children: React.ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
+  const [scale, setScale] = useState(0.8); // Start at 80% for better mobile view
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+  const [isMobile, setIsMobile] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  
+  // Detect mobile and set initial scale
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setScale(0.6); // Smaller scale for mobile
+      } else {
+        setScale(0.8);
+      }
+    };
+    checkMobile();
+    setIsLoaded(true);
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
@@ -515,24 +534,44 @@ function InteractiveTreeContainer({ children }: { children: React.ReactNode }) {
   }, []);
   
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    e.preventDefault(); // Prevent default to avoid scroll conflicts
     if (e.touches.length === 1) {
       setIsDragging(true);
       setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
       setStartPosition(position);
+    } else if (e.touches.length === 2) {
+      // Pinch zoom start - calculate initial distance
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const dist = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
+      (containerRef.current as any)._initialPinchDist = dist;
+      (containerRef.current as any)._initialScale = scale;
     }
-  }, [position]);
+  }, [position, scale]);
   
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isDragging || e.touches.length !== 1) return;
-    const dx = e.touches[0].clientX - dragStart.x;
-    const dy = e.touches[0].clientY - dragStart.y;
-    setPosition({
-      x: startPosition.x + dx,
-      y: startPosition.y + dy
-    });
-  }, [isDragging, dragStart, startPosition]);
+    e.preventDefault(); // Prevent default scrolling
+    if (e.touches.length === 1 && isDragging) {
+      const dx = e.touches[0].clientX - dragStart.x;
+      const dy = e.touches[0].clientY - dragStart.y;
+      setPosition({
+        x: startPosition.x + dx,
+        y: startPosition.y + dy
+      });
+    } else if (e.touches.length === 2 && containerRef.current) {
+      // Pinch zoom
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const dist = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
+      const initialDist = (containerRef.current as any)._initialPinchDist || dist;
+      const initialScale = (containerRef.current as any)._initialScale || scale;
+      const newScale = Math.min(Math.max(initialScale * (dist / initialDist), 0.25), 2);
+      setScale(newScale);
+    }
+  }, [isDragging, dragStart, startPosition, scale]);
   
-  const handleTouchEnd = useCallback(() => {
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
     setIsDragging(false);
   }, []);
   
@@ -581,13 +620,24 @@ function InteractiveTreeContainer({ children }: { children: React.ReactNode }) {
       
       {/* Pan/Zoom Instructions */}
       <div className="absolute bottom-2 left-2 z-10 text-[10px] text-gray-500 bg-black/60 px-2 py-1 rounded">
-        Drag to pan • Scroll to zoom
+        {isMobile ? 'Drag to pan • Pinch to zoom' : 'Drag to pan • Scroll to zoom'}
       </div>
+      
+      {/* Loading state for mobile */}
+      {!isLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-20">
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-8 h-8 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+            <span className="text-[#c8ff00] text-sm">Loading tree...</span>
+          </div>
+        </div>
+      )}
       
       {/* Interactive Container */}
       <div
         ref={containerRef}
-        className={`overflow-hidden min-h-[300px] sm:min-h-[500px] ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+        className={`overflow-hidden min-h-[250px] sm:min-h-[400px] md:min-h-[500px] ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+        style={{ touchAction: 'none' }} // Critical for iOS touch handling
         onWheel={handleWheel}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}

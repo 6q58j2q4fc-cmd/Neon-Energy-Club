@@ -94,7 +94,7 @@ export default function CartDrawer() {
                       <div className="flex gap-4">
                         <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-[#c8ff00]/20 to-[#00ffff]/20 flex items-center justify-center flex-shrink-0">
                           {item.image ? (
-                            <img src={item.image} alt={item.name} className="w-16 h-16 object-contain" />
+                            <img src={item.image} alt={item.name} className="w-16 h-16 object-contain" loading="lazy" />
                           ) : (
                             <Zap className="w-8 h-8 text-[#c8ff00]" />
                           )}

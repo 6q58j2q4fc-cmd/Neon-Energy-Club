@@ -4638,3 +4638,39 @@
 - [x] Compress promo video for faster mobile loading (2.1MB to 648KB - 69% reduction)
 - [x] Upload compressed video to CDN
 - [x] Update video references to use compressed version (mobile uses 480p, desktop uses 720p)
+
+
+## Comprehensive Fixes (Feb 4)
+
+### Genealogy Tree Mobile Fix
+- [ ] Permanently fix genealogy tree loading on mobile devices
+- [ ] Ensure touch interactions work on iOS/Android
+- [ ] Add proper mobile viewport handling
+
+### Countdown Timer Standardization
+- [x] Set all countdown timers to 95 days (LAUNCH_DATE = May 10, 2026)
+- [x] Fix distributor replicated websites to use same countdown as main page
+- [x] Create shared countdown configuration (useCountdown.ts)
+
+### Replicated Website Fixes
+- [x] Fix replicated website domains to be valid (now uses dynamic window.location.host)
+- [x] Ensure replicated websites generate real pages (DistributorSite.tsx handles /d/:code routes)
+- [x] Match domains to main website domain structure (all URLs now use /d/ prefix)
+
+### Language Switching Fix
+- [x] Fix country menu to actually change language on all pages (added LanguageSwitcher to Header and MobileMenu)
+- [x] Implement proper i18n/localization system (LanguageContext with translations for 8+ languages)
+- [ ] Ensure language preference persists across pages
+
+### Compensation Plan Button Fix
+- [ ] Fix broken button under compensation plan
+- [ ] Add working navigation/action to the button
+
+### Video Player Enhancement
+- [x] Add video loading spinner for buffering (VideoPlayer and MobileVideoPlayer)
+- [ ] Show spinner while video loads on slower connections
+
+### Image Optimization
+- [x] Create WebP version of Disney Campaign Manager logo (90% size reduction)
+- [x] Add lazy loading for below-the-fold images (LazyImage component exists)
+- [ ] Implement IntersectionObserver for lazy loading

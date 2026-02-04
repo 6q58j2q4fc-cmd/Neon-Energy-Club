@@ -4,6 +4,7 @@ import { X, Zap, MapPin, Users, Trophy, Building2, Store, Home, BookOpen, Star, 
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -126,12 +127,15 @@ export default function MobileMenu({ isOpen, onClose, onNavigate, currentPath = 
                 NEON
               </span>
             </div>
-            <button
-              onClick={onClose}
-              className="w-10 h-10 rounded-lg bg-[#ff0080]/20 border border-[#ff0080]/40 flex items-center justify-center active:scale-95 transition-transform"
-            >
-              <X className="w-5 h-5 text-[#ff0080]" />
-            </button>
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
+              <button
+                onClick={onClose}
+                className="w-10 h-10 rounded-lg bg-[#ff0080]/20 border border-[#ff0080]/40 flex items-center justify-center active:scale-95 transition-transform"
+              >
+                <X className="w-5 h-5 text-[#ff0080]" />
+              </button>
+            </div>
           </div>
 
           {/* User Info - if logged in */}

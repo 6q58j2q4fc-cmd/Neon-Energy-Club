@@ -184,7 +184,7 @@ export default function ProfileCustomization({ userType }: ProfileCustomizationP
 
   // Copy referral link
   const copyReferralLink = () => {
-    const link = `neonenergyclub.com/${stats?.customSlug || customSlug}`;
+    const link = `${window.location.host}/d/${stats?.customSlug || customSlug}`;
     navigator.clipboard.writeText(`https://${link}`);
     toast.success("Link Copied", {
       description: "Your referral link has been copied to clipboard.",
@@ -313,7 +313,7 @@ export default function ProfileCustomization({ userType }: ProfileCustomizationP
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-2">
-            <span className="text-gray-400 text-sm whitespace-nowrap">neonenergyclub.com/</span>
+            <span className="text-gray-400 text-sm whitespace-nowrap">{window.location.host}/d/</span>
             <div className="relative flex-1">
               <Input
                 value={customSlug}
@@ -379,7 +379,7 @@ export default function ProfileCustomization({ userType }: ProfileCustomizationP
             <div className="p-3 rounded-lg bg-[#c8ff00]/10 border border-[#c8ff00]/30">
               <p className="text-sm text-gray-300">
                 <span className="text-[#c8ff00] font-medium">Your active link:</span>{" "}
-                <span className="text-white">https://neonenergyclub.com/{referralLink}</span>
+                <span className="text-white">https://{window.location.host}/d/{referralLink}</span>
               </p>
             </div>
           )}
