@@ -21,6 +21,7 @@ import {
   Target,
   Gift,
   ArrowRight,
+  ArrowLeft,
   Check,
   Copy,
   ExternalLink,
@@ -43,7 +44,8 @@ import {
   Repeat,
   LogOut,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  X
 } from "lucide-react";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
@@ -64,6 +66,13 @@ export default function DistributorPortal() {
   const { user, loading, logout } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<Array<{id: number; title: string; message: string; time: string; read: boolean}>>([
+    { id: 1, title: "Welcome to NEON!", message: "Your distributor account is now active. Start building your team today!", time: "Just now", read: false },
+    { id: 2, title: "New Training Available", message: "Check out our latest training module on social media marketing.", time: "2 hours ago", read: false },
+    { id: 3, title: "Commission Update", message: "Your Fast Start Bonus eligibility has been updated.", time: "1 day ago", read: true },
+  ]);
+  const [previousTab, setPreviousTab] = useState<string | null>(null);
 
   // Handle URL query parameter for tab selection
   useEffect(() => {
@@ -101,10 +110,39 @@ export default function DistributorPortal() {
 
   // Update URL when tab changes
   const handleTabChange = (tabId: string) => {
+    setPreviousTab(activeTab);
     setActiveTab(tabId);
     const newUrl = tabId === 'dashboard' ? '/portal' : `/portal?tab=${tabId}`;
-    window.history.replaceState({}, '', newUrl);
+    window.history.pushState({}, '', newUrl);
   };
+
+  // Handle back button click
+  const handleBackClick = () => {
+    if (previousTab) {
+      setActiveTab(previousTab);
+      setPreviousTab(null);
+      const newUrl = previousTab === 'dashboard' ? '/portal' : `/portal?tab=${previousTab}`;
+      window.history.replaceState({}, '', newUrl);
+    } else if (activeTab !== 'dashboard') {
+      setActiveTab('dashboard');
+      window.history.replaceState({}, '', '/portal');
+    } else {
+      setLocation('/');
+    }
+  };
+
+  // Mark notification as read
+  const markAsRead = (id: number) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+  };
+
+  // Mark all notifications as read
+  const markAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
+
+  // Get unread notification count
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   // Redirect to login if not authenticated
   if (!loading && !user) {
@@ -326,33 +364,121 @@ export default function DistributorPortal() {
               </h2>
               <p className="text-gray-500 text-sm">Welcome back, {user?.name?.split(' ')[0] || 'Distributor'}!</p>
             </div>
-            <div className="flex items-center gap-4">
-                <Button
-                onClick={() => window.history.back()}
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Button
+                onClick={handleBackClick}
                 variant="outline"
+                size="sm"
                 className="border-[#c8ff00]/30 text-[#c8ff00] hover:bg-[#c8ff00]/10"
               >
+                <ArrowLeft className="w-4 h-4 mr-1" />
                 Back
               </Button>
               <Button
                 onClick={() => setLocation("/")}
+                size="sm"
                 className="bg-[#c8ff00] hover:bg-[#d4ff33] text-black font-bold"
               >
                 Home
               </Button>
-              <Button 
-                variant="outline" 
-                className="border-[#c8ff00]/30 text-[#c8ff00] cursor-pointer hover:bg-[#c8ff00]/10"
-                onClick={() => toast.info("Notifications coming soon!")}
-              >
-                <Bell className="w-4 h-4" />
-              </Button>
+              
+              {/* Notification Bell with Dropdown */}
+              <div className="relative">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="border-[#c8ff00]/30 text-[#c8ff00] cursor-pointer hover:bg-[#c8ff00]/10 relative"
+                  onClick={() => setShowNotifications(!showNotifications)}
+                >
+                  <Bell className="w-4 h-4" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                      {unreadCount}
+                    </span>
+                  )}
+                </Button>
+                
+                {/* Notification Dropdown */}
+                {showNotifications && (
+                  <div className="absolute right-0 top-12 w-80 bg-[#0a0a0a] border border-[#c8ff00]/30 rounded-xl shadow-2xl z-50 overflow-hidden">
+                    <div className="p-4 border-b border-[#c8ff00]/20 flex items-center justify-between">
+                      <h3 className="font-bold text-white">Notifications</h3>
+                      <div className="flex items-center gap-2">
+                        {unreadCount > 0 && (
+                          <button 
+                            onClick={markAllAsRead}
+                            className="text-xs text-[#c8ff00] hover:underline"
+                          >
+                            Mark all read
+                          </button>
+                        )}
+                        <button 
+                          onClick={() => setShowNotifications(false)}
+                          className="text-gray-400 hover:text-white"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="max-h-80 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="p-6 text-center text-gray-500">
+                          <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                          <p>No notifications yet</p>
+                        </div>
+                      ) : (
+                        notifications.map((notification) => (
+                          <div 
+                            key={notification.id}
+                            onClick={() => markAsRead(notification.id)}
+                            className={`p-4 border-b border-white/5 cursor-pointer hover:bg-white/5 transition-colors ${
+                              !notification.read ? 'bg-[#c8ff00]/5' : ''
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
+                                !notification.read ? 'bg-[#c8ff00]' : 'bg-gray-600'
+                              }`} />
+                              <div className="flex-1 min-w-0">
+                                <p className={`font-semibold text-sm ${
+                                  !notification.read ? 'text-white' : 'text-gray-400'
+                                }`}>
+                                  {notification.title}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                                  {notification.message}
+                                </p>
+                                <p className="text-xs text-gray-600 mt-2">
+                                  {notification.time}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    <div className="p-3 border-t border-[#c8ff00]/20 bg-black/50">
+                      <button 
+                        onClick={() => {
+                          setShowNotifications(false);
+                          toast.info("Full notification center coming soon!");
+                        }}
+                        className="w-full text-center text-sm text-[#c8ff00] hover:underline"
+                      >
+                        View All Notifications
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
               <Button 
                 onClick={() => setLocation("/shop")}
+                size="sm"
                 className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold"
               >
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Shop
+                <ShoppingCart className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Shop</span>
               </Button>
             </div>
           </div>

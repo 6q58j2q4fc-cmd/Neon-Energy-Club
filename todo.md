@@ -4844,3 +4844,22 @@
 - [x] Complete admin panel with orders management procedures
 - [x] Add shipping rate and label generation procedures
 - [x] Fix TypeScript errors in AdminPanel, AdminOrders, UserManagementTab, ShippingLabelModal
+
+## Distributor Portal Fixes & Enhancements (Feb 4)
+
+- [ ] Fix distributor portal back button not working
+- [ ] Fix notification bell not working in distributor portal
+- [ ] Fix save settings button functionality
+- [ ] Implement replicated website system with unique domains per distributor
+- [ ] Add real-time analytics for replicated websites
+- [ ] Add jungle sounds with auto volume reduction to 35% after 5 seconds
+- [ ] Fix all sound effects and sci-fi female voice
+- [ ] Enhance genealogy tree with real-time growth and zoom/scroll features
+- [ ] Create vending machine genealogy tree section with promotional content
+
+# Completed Feb 4, 2026 - Batch 3
+- [x] Fix distributor portal back button - now tracks previous tab and navigates back properly
+- [x] Fix notification bell - now shows dropdown with notifications, unread count, mark all read
+- [x] Create VendingMachineTree component with network visualization and promotional content
+- [x] Add Smart Vending Network section to Vending page with machine tree
+- [x] Add HeaderSoundControl with auto volume reduction to 35% after 5 seconds

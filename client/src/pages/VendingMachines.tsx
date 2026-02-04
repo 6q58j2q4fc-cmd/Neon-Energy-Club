@@ -28,6 +28,7 @@ import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
 import VendingApplicationForm from "@/components/VendingApplicationForm";
 import VendingCheckout from "@/components/VendingCheckout";
+import VendingMachineTree from "@/components/VendingMachineTree";
 import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
 
@@ -472,6 +473,22 @@ export default function VendingMachines() {
                 ))}
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Smart Vending Network Section */}
+        <section className="py-20 bg-black/30">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+                SMART <span className="neon-text-glow">VENDING NETWORK</span>
+              </h2>
+              <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+                Build your own network of AI-powered vending machines. Track sales, capture leads, 
+                and grow your passive income empire with our revolutionary technology.
+              </p>
+            </div>
+            <VendingMachineTree />
           </div>
         </section>
 

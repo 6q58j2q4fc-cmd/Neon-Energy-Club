@@ -12,27 +12,31 @@ interface HeaderSoundControlProps {
 
 export function HeaderSoundControl({ accentColor = "#c8ff00" }: HeaderSoundControlProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.3);
+  const [volume, setVolume] = useState(1.0); // Start at full volume
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
+  const [hasAutoReduced, setHasAutoReduced] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
+  const volumeReductionTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Create audio element on mount
     audioRef.current = new Audio("/jungle-ambient.mp3");
     audioRef.current.loop = true;
-    audioRef.current.volume = volume;
+    audioRef.current.volume = 1.0; // Start at full volume
 
     // Check localStorage for saved preferences
     const savedVolume = localStorage.getItem("neon-ambient-volume");
     const savedState = localStorage.getItem("neon-ambient-sound");
+    const hasReducedVolume = localStorage.getItem("neon-ambient-reduced");
     
-    if (savedVolume) {
+    if (savedVolume && hasReducedVolume) {
       const vol = parseFloat(savedVolume);
       setVolume(vol);
       if (audioRef.current) {
         audioRef.current.volume = vol;
       }
+      setHasAutoReduced(true);
     }
 
     // Auto-play function - tries to play immediately
@@ -47,6 +51,11 @@ export function HeaderSoundControl({ accentColor = "#c8ff00" }: HeaderSoundContr
         setIsPlaying(true);
         setHasUserInteracted(true);
         localStorage.setItem("neon-ambient-sound", "enabled");
+        
+        // Start volume reduction timer after successful play
+        if (!hasReducedVolume) {
+          startVolumeReduction();
+        }
       } catch (error) {
         // Auto-play was blocked - wait for user interaction
         console.log("Auto-play blocked, waiting for user interaction");
@@ -59,6 +68,11 @@ export function HeaderSoundControl({ accentColor = "#c8ff00" }: HeaderSoundContr
               setIsPlaying(true);
               setHasUserInteracted(true);
               localStorage.setItem("neon-ambient-sound", "enabled");
+              
+              // Start volume reduction timer after successful play
+              if (!hasReducedVolume) {
+                startVolumeReduction();
+              }
             } catch (e) {
               console.error("Audio playback failed:", e);
             }
@@ -74,11 +88,44 @@ export function HeaderSoundControl({ accentColor = "#c8ff00" }: HeaderSoundContr
       }
     };
 
+    // Function to smoothly reduce volume to 35% after 5 seconds
+    const startVolumeReduction = () => {
+      volumeReductionTimerRef.current = setTimeout(() => {
+        if (audioRef.current && !hasAutoReduced) {
+          const startVolume = audioRef.current.volume;
+          const targetVolume = 0.35;
+          const duration = 1500; // 1.5 seconds for smooth transition
+          const steps = 30;
+          const stepTime = duration / steps;
+          const volumeStep = (startVolume - targetVolume) / steps;
+          let currentStep = 0;
+          
+          const reduceInterval = setInterval(() => {
+            currentStep++;
+            if (audioRef.current) {
+              const newVolume = Math.max(targetVolume, startVolume - (volumeStep * currentStep));
+              audioRef.current.volume = newVolume;
+              setVolume(newVolume);
+            }
+            if (currentStep >= steps) {
+              clearInterval(reduceInterval);
+              setHasAutoReduced(true);
+              localStorage.setItem("neon-ambient-reduced", "true");
+              localStorage.setItem("neon-ambient-volume", "0.35");
+            }
+          }, stepTime);
+        }
+      }, 5000); // Wait 5 seconds before reducing
+    };
+
     // Attempt auto-play after a short delay
     const timer = setTimeout(attemptAutoPlay, 500);
 
     return () => {
       clearTimeout(timer);
+      if (volumeReductionTimerRef.current) {
+        clearTimeout(volumeReductionTimerRef.current);
+      }
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
@@ -119,6 +166,8 @@ export function HeaderSoundControl({ accentColor = "#c8ff00" }: HeaderSoundContr
     const width = rect.width;
     const newVolume = Math.max(0, Math.min(1, x / width));
     setVolume(newVolume);
+    setHasAutoReduced(true); // User manually adjusted, don't auto-reduce anymore
+    localStorage.setItem("neon-ambient-reduced", "true");
   };
 
   return (
