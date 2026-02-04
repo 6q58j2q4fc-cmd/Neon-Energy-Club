@@ -4971,3 +4971,13 @@
 - [x] Improved iOS Safari audio handling with multiple interaction event listeners
 - [x] Added larger touch-friendly controls in volume popover (64px button height)
 - [x] Added visual indicators for sound state (pulsing dot, bounce prompt)
+
+
+## Replicated Website Auto-Generation (Feb 4, 2026)
+
+### Auto-Generate Replicated Sites on Signup
+- [x] Verify distributor enrollment automatically creates replicated website entry (provisionReplicatedWebsite called in enroll procedure)
+- [x] Ensure unique distributor code is generated on signup (DIST prefix + userId + random)
+- [x] Verify replicated site URLs use neonenergyclub.com/[CODE] format (updated getBySlug to check distributor codes)
+- [x] Test complete distributor signup flow with replicated site generation (11 tests passing)
+- [x] Verify replicated sites are publicly accessible without login (catch-all route at /:slug)

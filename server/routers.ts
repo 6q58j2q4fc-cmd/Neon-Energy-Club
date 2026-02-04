@@ -3582,22 +3582,60 @@ Provide step-by-step instructions with specific button names and locations. Keep
         };
       }),
 
-    // Get profile by slug (public)
+    // Get profile by slug (public) - also checks distributor codes for neonenergyclub.com/[CODE] URLs
     getBySlug: publicProcedure
       .input(z.object({
         slug: z.string().min(1),
       }))
       .query(async ({ input }) => {
-        const { getUserProfileBySlug, incrementProfilePageViews } = await import("./db");
+        const { getUserProfileBySlug, incrementProfilePageViews, getDistributorPublicProfile } = await import("./db");
         
+        // First try to find by custom slug in userProfiles
         const profile = await getUserProfileBySlug(input.slug);
         
         if (profile) {
           // Increment page views
           await incrementProfilePageViews(input.slug);
+          return profile;
         }
         
-        return profile;
+        // If not found by slug, check if it's a distributor code
+        // This enables neonenergyclub.com/DIST123ABC URLs to work
+        const distributorProfile = await getDistributorPublicProfile(input.slug);
+        
+        if (distributorProfile) {
+          // Return a profile-like object for the PersonalizedLanding page
+          return {
+            id: 0, // No userProfile ID
+            userId: 0,
+            customSlug: input.slug,
+            profilePhotoUrl: distributorProfile.profilePhoto,
+            displayName: distributorProfile.displayName,
+            location: distributorProfile.location,
+            bio: distributorProfile.bio,
+            userType: 'distributor' as const,
+            pageViews: 0,
+            createdAt: new Date(distributorProfile.joinDate),
+            updatedAt: new Date(),
+            instagram: distributorProfile.instagram,
+            tiktok: distributorProfile.tiktok,
+            facebook: distributorProfile.facebook,
+            twitter: distributorProfile.twitter,
+            youtube: distributorProfile.youtube,
+            linkedin: distributorProfile.linkedin,
+            country: distributorProfile.country,
+            user: null,
+            distributor: {
+              id: distributorProfile.id,
+              rank: distributorProfile.rank,
+              distributorCode: distributorProfile.distributorCode,
+            },
+            // Flag to indicate this is a distributor code lookup
+            isDistributorCodeLookup: true,
+          };
+        }
+        
+        return null;
       }),
 
     // Update custom slug

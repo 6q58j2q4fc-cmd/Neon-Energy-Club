@@ -42,8 +42,19 @@ export default function PersonalizedLanding() {
   useEffect(() => {
     if (slug) {
       sessionStorage.setItem('referralCode', slug);
+      
+      // If this is a distributor code lookup, also store for order attribution
+      if (profile?.distributor?.distributorCode) {
+        const referralData = {
+          distributorCode: profile.distributor.distributorCode,
+          expiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
+          visitedAt: new Date().toISOString(),
+        };
+        localStorage.setItem('neon_referral', JSON.stringify(referralData));
+        sessionStorage.setItem('referringDistributor', profile.distributor.distributorCode);
+      }
     }
-  }, [slug]);
+  }, [slug, profile]);
 
   const handleShare = (platform: string) => {
     const url = window.location.href;
