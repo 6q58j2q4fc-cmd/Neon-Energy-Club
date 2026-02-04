@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Mail, Gift, Users, Sparkles, Check, ArrowRight, X } from "lucide-react";
+import { Mail, Gift, Users, Sparkles, Check, ArrowRight, X, MessageCircle, Copy, Share2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
 // Storage keys for popup frequency limiting
@@ -13,6 +13,29 @@ const STORAGE_KEYS = {
   DISMISSED_COUNT: "neon_popup_dismissed_count",
   LAST_SHOWN: "neon_popup_last_shown",
   SESSION_SHOWN: "neon_popup_session_shown",
+  DISCOUNT_USED: "neon_discount_used",
+};
+
+// Pre-written share messages
+const SHARE_MESSAGES = {
+  email: {
+    subject: "🔋 Get 10% OFF NEON Energy Drinks - You'll Love This!",
+    body: `Hey!
+
+I just discovered NEON Energy Drinks and they're AMAZING! 🔋⚡
+
+They're made with 100% natural ingredients, zero sugar, and give you clean energy all day without the crash. I'm hooked!
+
+I wanted to share this with you because if you sign up using my link, you'll get 10% OFF your first order - and I get credit toward free NEON!
+
+Check it out here: {{REFERRAL_LINK}}
+
+Trust me, once you try it you'll never go back to those other energy drinks. Let me know what you think!
+
+Cheers,
+{{USER_NAME}}`,
+  },
+  text: `Hey! 🔋 I found this amazing energy drink called NEON - 100% natural, zero sugar, no crash! Use my link to get 10% OFF your first order: {{REFERRAL_LINK}}`,
 };
 
 // Check if user should see the popup
@@ -75,9 +98,21 @@ export default function ViralNewsletterPopup({ open, onClose }: ViralNewsletterP
   const [name, setName] = useState("");
   const [friendEmails, setFriendEmails] = useState(["", "", ""]);
   const [subscriptionId, setSubscriptionId] = useState<number | null>(null);
+  const [referralLink, setReferralLink] = useState("");
+  const [discountCode, setDiscountCode] = useState("");
+  const [sharesSent, setSharesSent] = useState(0);
 
   const subscribeNewsletter = trpc.newsletter.subscribe.useMutation();
   const addReferrals = trpc.newsletter.addReferrals.useMutation();
+
+  // Generate referral link based on email
+  useEffect(() => {
+    if (email) {
+      const baseUrl = window.location.origin;
+      const encodedEmail = btoa(email).replace(/[^a-zA-Z0-9]/g, '').slice(0, 8);
+      setReferralLink(`${baseUrl}?ref=${encodedEmail}`);
+    }
+  }, [email]);
 
   // Mark popup as shown when it opens
   useEffect(() => {
@@ -97,6 +132,7 @@ export default function ViralNewsletterPopup({ open, onClose }: ViralNewsletterP
     try {
       const result = await subscribeNewsletter.mutateAsync({ email, name });
       setSubscriptionId(result.id);
+      setDiscountCode(result.discountCode || `NEON10-${Date.now().toString(36).toUpperCase()}`);
       markAsSubscribed(); // Mark as subscribed so popup never shows again
       toast.success("🎉 You've unlocked 10% OFF your first order!");
       setStep("friends");
@@ -125,6 +161,7 @@ export default function ViralNewsletterPopup({ open, onClose }: ViralNewsletterP
         subscriptionId: subscriptionId!,
         friendEmails: validEmails,
       });
+      setDiscountCode(`NEON25-${Date.now().toString(36).toUpperCase()}`);
       toast.success("🔥 BONUS UNLOCKED! You've earned 25% OFF your first case!");
       setStep("success");
     } catch (error: any) {
@@ -132,8 +169,48 @@ export default function ViralNewsletterPopup({ open, onClose }: ViralNewsletterP
     }
   };
 
+  // Share via Email with pre-written message
+  const handleShareEmail = () => {
+    const subject = encodeURIComponent(SHARE_MESSAGES.email.subject);
+    const body = encodeURIComponent(
+      SHARE_MESSAGES.email.body
+        .replace(/{{REFERRAL_LINK}}/g, referralLink)
+        .replace(/{{USER_NAME}}/g, name || "Your Friend")
+    );
+    window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+    setSharesSent(prev => prev + 1);
+    toast.success("📧 Email opened! Send to 3 friends to unlock 25% OFF");
+  };
+
+  // Share via Text/SMS with pre-written message
+  const handleShareText = () => {
+    const message = encodeURIComponent(
+      SHARE_MESSAGES.text
+        .replace(/{{REFERRAL_LINK}}/g, referralLink)
+    );
+    // Try SMS first, fallback to WhatsApp
+    const smsUrl = `sms:?body=${message}`;
+    window.open(smsUrl, "_blank");
+    setSharesSent(prev => prev + 1);
+    toast.success("📱 Text message opened! Send to 3 friends to unlock 25% OFF");
+  };
+
+  // Copy pre-written message to clipboard
+  const handleCopyMessage = () => {
+    const message = SHARE_MESSAGES.text
+      .replace(/{{REFERRAL_LINK}}/g, referralLink);
+    navigator.clipboard.writeText(message);
+    toast.success("📋 Message copied! Paste and send to 3 friends");
+  };
+
   const handleSkip = () => {
     setStep("success");
+  };
+
+  const handleAlreadySubscribed = () => {
+    markAsSubscribed();
+    toast.info("Got it! You won't see this popup again.");
+    handleClose();
   };
 
   const handleDismiss = () => {
@@ -147,6 +224,7 @@ export default function ViralNewsletterPopup({ open, onClose }: ViralNewsletterP
     setFriendEmails(["", "", ""]);
     setStep("email");
     setSubscriptionId(null);
+    setSharesSent(0);
     onClose();
   };
 
@@ -224,7 +302,7 @@ export default function ViralNewsletterPopup({ open, onClose }: ViralNewsletterP
                 </Button>
               </form>
 
-              {/* No Thanks Link */}
+              {/* No Thanks & Already Subscribed Links */}
               <div className="text-center space-y-2">
                 <button
                   onClick={handleDismiss}
@@ -232,12 +310,19 @@ export default function ViralNewsletterPopup({ open, onClose }: ViralNewsletterP
                 >
                   No thanks, I'll pay full price
                 </button>
+                <div className="text-gray-600">|</div>
+                <button
+                  onClick={handleAlreadySubscribed}
+                  className="text-gray-500 hover:text-[#c8ff00] text-sm underline underline-offset-2 transition-colors"
+                >
+                  No thanks, I'm already subscribed
+                </button>
                 <p className="text-xs text-gray-600">No spam, ever. Unsubscribe anytime.</p>
               </div>
             </div>
           )}
 
-          {/* Step 2: Friend Referrals */}
+          {/* Step 2: Friend Referrals with Share Options */}
           {step === "friends" && (
             <div className="space-y-5">
               <div className="text-center">
@@ -260,6 +345,55 @@ export default function ViralNewsletterPopup({ open, onClose }: ViralNewsletterP
                 <div className="flex items-center gap-3 text-gray-400">
                   <Users className="w-5 h-5 text-[#c8ff00] flex-shrink-0" />
                   <span className="text-sm sm:text-base">Refer 3 friends → Upgrade to 25% OFF</span>
+                </div>
+              </div>
+
+              {/* Quick Share Buttons with Pre-written Messages */}
+              <div className="space-y-3">
+                <p className="text-white text-sm font-semibold text-center">Share with pre-written message:</p>
+                
+                <div className="grid grid-cols-3 gap-2">
+                  <Button
+                    type="button"
+                    onClick={handleShareEmail}
+                    className="flex flex-col items-center gap-1 h-auto py-3 bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Mail className="w-5 h-5" />
+                    <span className="text-xs">Email</span>
+                  </Button>
+                  
+                  <Button
+                    type="button"
+                    onClick={handleShareText}
+                    className="flex flex-col items-center gap-1 h-auto py-3 bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    <span className="text-xs">Text</span>
+                  </Button>
+                  
+                  <Button
+                    type="button"
+                    onClick={handleCopyMessage}
+                    className="flex flex-col items-center gap-1 h-auto py-3 bg-purple-600 hover:bg-purple-700 text-white"
+                  >
+                    <Copy className="w-5 h-5" />
+                    <span className="text-xs">Copy</span>
+                  </Button>
+                </div>
+
+                {sharesSent > 0 && (
+                  <div className="text-center text-sm text-[#c8ff00]">
+                    ✓ {sharesSent} share{sharesSent > 1 ? 's' : ''} sent! {sharesSent >= 3 ? "You've unlocked 25% OFF!" : `Send ${3 - sharesSent} more to unlock 25% OFF`}
+                  </div>
+                )}
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-700"></div>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-black px-2 text-gray-500">Or enter emails manually</span>
                 </div>
               </div>
 
@@ -320,16 +454,34 @@ export default function ViralNewsletterPopup({ open, onClose }: ViralNewsletterP
                   YOU'RE <span className="text-[#c8ff00] neon-text">ALL SET!</span>
                 </DialogTitle>
                 <DialogDescription className="text-gray-400 text-base sm:text-lg">
-                  Check your email for your exclusive discount code
+                  Use your exclusive discount code at checkout
                 </DialogDescription>
               </div>
 
               <div className="bg-[#c8ff00]/10 border border-[#c8ff00]/30 rounded-lg p-4 sm:p-6">
                 <div className="text-4xl sm:text-5xl font-black text-[#c8ff00] neon-text mb-2">
-                  {friendEmails.filter(e => e.trim()).length >= 3 ? "25%" : "10%"} OFF
+                  {friendEmails.filter(e => e.trim()).length >= 3 || sharesSent >= 3 ? "25%" : "10%"} OFF
                 </div>
-                <div className="text-white font-semibold mb-1">Your First Case</div>
-                <div className="text-gray-400 text-sm">Code sent to {email}</div>
+                <div className="text-white font-semibold mb-1">Your First Order</div>
+                <div className="mt-3 p-3 bg-black/50 rounded-lg border border-[#c8ff00]/50">
+                  <div className="text-xs text-gray-400 mb-1">Your Discount Code:</div>
+                  <div className="text-2xl font-mono font-bold text-[#c8ff00] tracking-wider">
+                    {discountCode}
+                  </div>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(discountCode);
+                      toast.success("Code copied!");
+                    }}
+                    className="mt-2 text-xs text-gray-400 hover:text-[#c8ff00] underline"
+                  >
+                    Click to copy
+                  </button>
+                </div>
+                <div className="text-gray-400 text-sm mt-3">Code also sent to {email}</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  ⚠️ One-time use only. Cannot be combined with other offers.
+                </div>
               </div>
 
               <Button

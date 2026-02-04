@@ -947,7 +947,12 @@ export const appRouter = router({
         // Admin can view subscriber counts in the dashboard instead
         // Only real orders and applications trigger email notifications
         
-        return subscription;
+        return {
+          id: subscription.id,
+          email: subscription.email,
+          discountTier: subscription.discountTier,
+          discountCode: subscription.couponCode,
+        };
       }),
 
     // Add friend referrals
