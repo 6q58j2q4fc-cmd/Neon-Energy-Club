@@ -413,9 +413,9 @@ export default function Home() {
               <div className="space-y-4">
                 <h3 className="text-xl font-bold text-white mb-6">REWARD TIERS</h3>
                 {[
-                  { name: "Early Bird", price: 25, reward: "6-Pack + Exclusive Sticker", popular: false },
-                  { name: "Supporter", price: 50, reward: "12-Pack + T-Shirt + Sticker", popular: true },
-                  { name: "Champion", price: 100, reward: "24-Pack + Hoodie + VIP Access", popular: false },
+                  { name: "Supporter", price: 25, reward: "1 Limited Edition Can + Digital Card", popular: false },
+                  { name: "Energizer", price: 100, reward: "24 Cans + T-Shirt + VIP Status", popular: true },
+                  { name: "VIP Insider", price: 500, reward: "120 Cans + Merch Pack + 20% Lifetime", popular: false },
                 ].map((tier, i) => (
                   <div
                     key={i}

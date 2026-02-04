@@ -55,14 +55,12 @@ const SIMULATED_PRODUCTS = [
   "NEON Starter Bundle", "NEON Family Pack", "NEON Party Pack"
 ];
 
-// Crowdfunding tiers
+// Crowdfunding tiers - matching Crowdfund.tsx page
 const CROWDFUNDING_TIERS = [
-  { tier: "Early Bird", amount: 25 },
-  { tier: "Supporter", amount: 50 },
-  { tier: "Champion", amount: 100 },
-  { tier: "VIP Backer", amount: 250 },
-  { tier: "Founding Member", amount: 500 },
-  { tier: "Executive Backer", amount: 1000 }
+  { tier: "Supporter", amount: 25 },
+  { tier: "Energizer", amount: 100 },
+  { tier: "VIP Insider", amount: 500 },
+  { tier: "Founding Member", amount: 2500 }
 ];
 
 function getTimeAgo(date: Date): string {
