@@ -1990,3 +1990,122 @@ export const maintenanceRequests = mysqlTable("maintenance_requests", {
 
 export type MaintenanceRequest = typeof maintenanceRequests.$inferSelect;
 export type InsertMaintenanceRequest = typeof maintenanceRequests.$inferInsert;
+
+
+/**
+ * Replicated websites table for distributor personalized sites.
+ * Tracks unique subdomains, affiliate links, and site configuration.
+ */
+export const replicatedWebsites = mysqlTable("replicated_websites", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Distributor ID (foreign key) */
+  distributorId: int("distributorId").notNull().unique(),
+  /** Unique subdomain (e.g., john.neonenergy.com) */
+  subdomain: varchar("subdomain", { length: 100 }).notNull().unique(),
+  /** Custom vanity URL slug (e.g., /d/john) */
+  vanitySlug: varchar("vanitySlug", { length: 50 }).unique(),
+  /** Affiliate tracking link */
+  affiliateLink: varchar("affiliateLink", { length: 500 }).notNull(),
+  /** Affiliate tracking code */
+  affiliateCode: varchar("affiliateCode", { length: 50 }).notNull().unique(),
+  /** Site status */
+  status: mysqlEnum("status", ["provisioning", "active", "suspended", "inactive"]).default("provisioning").notNull(),
+  /** Provisioning status details */
+  provisioningStatus: mysqlEnum("provisioningStatus", ["pending", "subdomain_assigned", "tracking_configured", "verified", "failed"]).default("pending").notNull(),
+  /** Last verification timestamp */
+  lastVerifiedAt: timestamp("lastVerifiedAt"),
+  /** Verification error message if any */
+  verificationError: text("verificationError"),
+  /** Custom bio for the site */
+  bio: text("bio"),
+  /** Profile photo URL */
+  profilePhotoUrl: varchar("profilePhotoUrl", { length: 500 }),
+  /** Location (city, state) */
+  location: varchar("location", { length: 255 }),
+  /** Custom headline */
+  headline: varchar("headline", { length: 255 }),
+  /** Social media links (JSON) */
+  socialLinks: text("socialLinks"),
+  /** Site theme/color preference */
+  themeColor: varchar("themeColor", { length: 20 }).default("#c8ff00"),
+  /** Total page views */
+  totalViews: int("totalViews").default(0).notNull(),
+  /** Total unique visitors */
+  uniqueVisitors: int("uniqueVisitors").default(0).notNull(),
+  /** Total signups from this site */
+  totalSignups: int("totalSignups").default(0).notNull(),
+  /** Total sales from this site */
+  totalSales: int("totalSales").default(0).notNull(),
+  /** Revenue generated from this site (in cents) */
+  totalRevenue: int("totalRevenue").default(0).notNull(),
+  /** Creation timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Last update timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ReplicatedWebsite = typeof replicatedWebsites.$inferSelect;
+export type InsertReplicatedWebsite = typeof replicatedWebsites.$inferInsert;
+
+/**
+ * Website analytics events for replicated sites.
+ * Tracks page views, clicks, and conversions.
+ */
+export const websiteAnalytics = mysqlTable("website_analytics", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Replicated website ID */
+  websiteId: int("websiteId").notNull(),
+  /** Event type */
+  eventType: mysqlEnum("eventType", ["page_view", "click", "signup", "purchase", "share"]).notNull(),
+  /** Page URL */
+  pageUrl: varchar("pageUrl", { length: 500 }),
+  /** Referrer URL */
+  referrerUrl: varchar("referrerUrl", { length: 500 }),
+  /** Visitor IP (hashed for privacy) */
+  visitorHash: varchar("visitorHash", { length: 64 }),
+  /** User agent */
+  userAgent: varchar("userAgent", { length: 500 }),
+  /** Country code */
+  country: varchar("country", { length: 2 }),
+  /** Device type */
+  deviceType: mysqlEnum("deviceType", ["desktop", "mobile", "tablet"]).default("desktop"),
+  /** Session ID */
+  sessionId: varchar("sessionId", { length: 64 }),
+  /** Conversion value (if purchase) */
+  conversionValue: int("conversionValue"),
+  /** Event timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type WebsiteAnalytic = typeof websiteAnalytics.$inferSelect;
+export type InsertWebsiteAnalytic = typeof websiteAnalytics.$inferInsert;
+
+/**
+ * Website audit log for tracking provisioning and verification.
+ */
+export const websiteAuditLog = mysqlTable("website_audit_log", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Replicated website ID */
+  websiteId: int("websiteId").notNull(),
+  /** Audit action type */
+  action: mysqlEnum("action", ["created", "subdomain_assigned", "tracking_configured", "verified", "verification_failed", "auto_fixed", "suspended", "reactivated"]).notNull(),
+  /** Previous status */
+  previousStatus: varchar("previousStatus", { length: 50 }),
+  /** New status */
+  newStatus: varchar("newStatus", { length: 50 }),
+  /** Issue type if any */
+  issueType: mysqlEnum("issueType", ["missing_tracking", "data_drift", "subdomain_conflict", "invalid_affiliate_link", "none"]).default("none"),
+  /** Issue severity */
+  issueSeverity: mysqlEnum("issueSeverity", ["low", "medium", "high", "critical"]).default("low"),
+  /** Auto-fix applied */
+  autoFixed: boolean("autoFixed").default(false),
+  /** Details/notes */
+  details: text("details"),
+  /** Performed by (system or admin user ID) */
+  performedBy: varchar("performedBy", { length: 50 }).default("system"),
+  /** Timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type WebsiteAuditLogEntry = typeof websiteAuditLog.$inferSelect;
+export type InsertWebsiteAuditLogEntry = typeof websiteAuditLog.$inferInsert;

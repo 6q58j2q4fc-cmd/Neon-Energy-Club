@@ -96,7 +96,7 @@ export default function Footer() {
                   <img 
                     src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/YMvLPqhKeOCpKiwL.png" 
                     alt="Disney Campaign Manager - Meet your new advertising partner" 
-                    className="h-16 sm:h-20 w-auto object-contain"
+                    className="h-32 sm:h-40 md:h-48 w-auto object-contain"
                     loading="lazy"
                   />
                 </picture>

@@ -60,6 +60,7 @@ import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import NavigationHeader from "@/components/NavigationHeader";
 import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
 import NeonLogo from "@/components/NeonLogo";
+import ProgressTrackerBot from "@/components/ProgressTrackerBot";
 
 export default function DistributorPortal() {
   const [location, setLocation] = useLocation();
@@ -491,6 +492,26 @@ export default function DistributorPortal() {
             <>
               {/* AI Analytics Section */}
               <AnalyticsDashboard />
+              
+              {/* Progress Tracker Bot */}
+              <div className="mb-6">
+                <ProgressTrackerBot 
+                  stats={{
+                    personalVolume: stats.personalVolume || 0,
+                    teamVolume: stats.groupVolume || 0,
+                    leftLegVolume: stats.leftLegVolume || 0,
+                    rightLegVolume: stats.rightLegVolume || 0,
+                    currentRank: stats.rank || 'Starter',
+                    directRecruits: stats.personallyEnrolled || 0,
+                    totalTeamSize: stats.teamSize || 0,
+                    weeklyCommission: stats.weeklyEarnings || 0,
+                    monthlyCommission: stats.monthlyEarnings || 0,
+                    fastStartEligible: true,
+                    fastStartDaysLeft: 30,
+                  }}
+                  distributorName={user?.name || 'Distributor'}
+                />
+              </div>
               
               {/* Original Dashboard Content */}
             <motion.div

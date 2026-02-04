@@ -1,0 +1,61 @@
+CREATE TABLE `replicated_websites` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`distributorId` int NOT NULL,
+	`subdomain` varchar(100) NOT NULL,
+	`vanitySlug` varchar(50),
+	`affiliateLink` varchar(500) NOT NULL,
+	`affiliateCode` varchar(50) NOT NULL,
+	`status` enum('provisioning','active','suspended','inactive') NOT NULL DEFAULT 'provisioning',
+	`provisioningStatus` enum('pending','subdomain_assigned','tracking_configured','verified','failed') NOT NULL DEFAULT 'pending',
+	`lastVerifiedAt` timestamp,
+	`verificationError` text,
+	`bio` text,
+	`profilePhotoUrl` varchar(500),
+	`location` varchar(255),
+	`headline` varchar(255),
+	`socialLinks` text,
+	`themeColor` varchar(20) DEFAULT '#c8ff00',
+	`totalViews` int NOT NULL DEFAULT 0,
+	`uniqueVisitors` int NOT NULL DEFAULT 0,
+	`totalSignups` int NOT NULL DEFAULT 0,
+	`totalSales` int NOT NULL DEFAULT 0,
+	`totalRevenue` int NOT NULL DEFAULT 0,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `replicated_websites_id` PRIMARY KEY(`id`),
+	CONSTRAINT `replicated_websites_distributorId_unique` UNIQUE(`distributorId`),
+	CONSTRAINT `replicated_websites_subdomain_unique` UNIQUE(`subdomain`),
+	CONSTRAINT `replicated_websites_vanitySlug_unique` UNIQUE(`vanitySlug`),
+	CONSTRAINT `replicated_websites_affiliateCode_unique` UNIQUE(`affiliateCode`)
+);
+--> statement-breakpoint
+CREATE TABLE `website_analytics` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`websiteId` int NOT NULL,
+	`eventType` enum('page_view','click','signup','purchase','share') NOT NULL,
+	`pageUrl` varchar(500),
+	`referrerUrl` varchar(500),
+	`visitorHash` varchar(64),
+	`userAgent` varchar(500),
+	`country` varchar(2),
+	`deviceType` enum('desktop','mobile','tablet') DEFAULT 'desktop',
+	`sessionId` varchar(64),
+	`conversionValue` int,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `website_analytics_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `website_audit_log` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`websiteId` int NOT NULL,
+	`action` enum('created','subdomain_assigned','tracking_configured','verified','verification_failed','auto_fixed','suspended','reactivated') NOT NULL,
+	`previousStatus` varchar(50),
+	`newStatus` varchar(50),
+	`issueType` enum('missing_tracking','data_drift','subdomain_conflict','invalid_affiliate_link','none') DEFAULT 'none',
+	`issueSeverity` enum('low','medium','high','critical') DEFAULT 'low',
+	`autoFixed` boolean DEFAULT false,
+	`details` text,
+	`performedBy` varchar(50) DEFAULT 'system',
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `website_audit_log_id` PRIMARY KEY(`id`)
+);

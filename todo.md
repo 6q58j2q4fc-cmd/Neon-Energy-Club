@@ -4863,3 +4863,12 @@
 - [x] Create VendingMachineTree component with network visualization and promotional content
 - [x] Add Smart Vending Network section to Vending page with machine tree
 - [x] Add HeaderSoundControl with auto volume reduction to 35% after 5 seconds
+
+# New Tasks - Feb 4, 2026 - Progress Tracker & Replicated Sites
+- [ ] Create ProgressTrackerBot component with rank advancement guidance
+- [ ] Add notifications for next steps to earn commissions
+- [ ] Fix replicated website provisioning - ensure affiliate links are generated
+- [ ] Fix replicated website provisioning - ensure subdomains are assigned
+- [ ] Add automated post-provisioning verification for new distributor sites
+- [ ] Implement atomic transactions during site creation
+- [ ] Add pre-check validation before site generation
