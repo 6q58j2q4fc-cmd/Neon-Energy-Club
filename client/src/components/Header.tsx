@@ -226,7 +226,7 @@ export default function Header() {
                       
                       {/* Customer Login */}
                       <DropdownMenuItem 
-                        onClick={() => window.location.href = getLoginUrl()}
+                        onClick={() => window.location.href = '/login'}
                         className="text-white hover:text-[#c8ff00] hover:bg-[#c8ff00]/10 cursor-pointer py-3"
                       >
                         <Heart className="w-4 h-4 mr-2 text-[#c8ff00]" />
@@ -238,7 +238,7 @@ export default function Header() {
                       
                       {/* Distributor Login */}
                       <DropdownMenuItem 
-                        onClick={() => window.location.href = getLoginUrl()}
+                        onClick={() => window.location.href = '/login'}
                         className="text-white hover:text-[#00ffff] hover:bg-[#00ffff]/10 cursor-pointer py-3"
                       >
                         <Users className="w-4 h-4 mr-2 text-[#00ffff]" />
@@ -250,7 +250,7 @@ export default function Header() {
                       
                       {/* Franchise Owner Login */}
                       <DropdownMenuItem 
-                        onClick={() => window.location.href = getLoginUrl()}
+                        onClick={() => window.location.href = '/login'}
                         className="text-white hover:text-[#ff0080] hover:bg-[#ff0080]/10 cursor-pointer py-3"
                       >
                         <Building2 className="w-4 h-4 mr-2 text-[#ff0080]" />

@@ -81,7 +81,7 @@ export default function MobileMenu({ isOpen, onClose, onNavigate, currentPath = 
 
   const handleLogin = () => {
     onClose();
-    window.location.href = getLoginUrl();
+    window.location.href = '/login';
   };
 
   const handleLogout = () => {

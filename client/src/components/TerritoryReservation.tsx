@@ -79,7 +79,7 @@ export default function TerritoryReservation({
 
   const handleReserve = async () => {
     if (!user) {
-      window.location.href = getLoginUrl();
+      window.location.href = '/login';
       return;
     }
 

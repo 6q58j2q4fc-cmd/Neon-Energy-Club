@@ -223,7 +223,7 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
   };
 
   const handleLogin = () => {
-    window.location.href = getLoginUrl();
+    window.location.href = '/login';
   };
 
   // Filter search results - combine products and pages

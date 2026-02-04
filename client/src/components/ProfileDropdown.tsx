@@ -94,7 +94,7 @@ export default function ProfileDropdown({ accentColor = "#c8ff00" }: ProfileDrop
   };
 
   const handleLogin = () => {
-    window.location.href = getLoginUrl();
+    window.location.href = '/login';
   };
 
   // Determine user type badges

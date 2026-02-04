@@ -4931,3 +4931,18 @@
 - [x] Added autoFixWebsiteIssues API endpoint
 - [x] Added getWebsiteProvisioningStatus API endpoint
 - [x] Added provisionWebsiteForDistributor API endpoint
+
+# Authentication Fix - Feb 4, 2026
+- [ ] Fix customer referral link going to Manus login page
+- [ ] Implement native username/password authentication system
+- [ ] Remove Manus OAuth dependency for all user types
+- [ ] Update all login/logout flows across the site
+
+# Native Auth Fix - Feb 4, 2026
+- [x] Update Header.tsx to use native /login page
+- [x] Update MobileMenu.tsx to use native /login page
+- [x] Update HamburgerHeader.tsx to use native /login page
+- [x] Update ProfileDropdown.tsx to use native /login page
+- [x] Update DashboardLayout.tsx to use native /login page
+- [x] Update TerritoryReservation.tsx to use native /login page
+- [x] Update main.tsx unauthorized handler to use native /login page
