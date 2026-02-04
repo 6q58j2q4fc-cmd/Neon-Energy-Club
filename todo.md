@@ -4893,3 +4893,9 @@
 - [x] Fix video player fullscreen button not working on main screen
 - [x] Fix new visitor popup with refer-3-friends functionality and pre-written share messages
 - [x] Fix crowdfunding reward tiers on homepage to match See All Reward Tiers page prices
+
+# New Tasks - Feb 4, 2026 - Compensation Plan & Forms
+- [x] Create enhanced compensation plan PDF with colored graphics and diagrams
+- [x] Show reduced CV for first orders vs full CV on recurring orders
+- [x] Create downloadable distributor application forms
+- [x] Add download functionality to distributor portal

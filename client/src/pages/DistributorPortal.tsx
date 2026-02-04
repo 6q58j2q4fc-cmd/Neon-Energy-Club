@@ -10,6 +10,8 @@ import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { getLoginUrl } from "@/const";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
+import DistributorApplicationForms from "@/components/DistributorApplicationForms";
+import CompensationPlanDownloadButtons, { openCompensationPlanInNewTab } from "@/components/CompensationPlanPDF";
 import { 
   Zap, 
   Users, 
@@ -940,6 +942,39 @@ export default function DistributorPortal() {
                         Download
                       </Button>
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Downloadable Forms */}
+              <DistributorApplicationForms />
+
+              {/* Compensation Plan */}
+              <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="w-5 h-5 text-[#c8ff00]" />
+                    Compensation Plan
+                  </CardTitle>
+                  <CardDescription>View and download the full compensation plan with CV structure</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-4">
+                    <Button 
+                      onClick={openCompensationPlanInNewTab}
+                      className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold"
+                    >
+                      <FileText className="w-5 h-5 mr-2" />
+                      View Compensation Plan
+                    </Button>
+                    <Button 
+                      onClick={() => setLocation('/compensation')}
+                      variant="outline"
+                      className="border-[#ff0080] text-[#ff0080] hover:bg-[#ff0080]/10 font-bold"
+                    >
+                      <ExternalLink className="w-5 h-5 mr-2" />
+                      Full Details Page
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
