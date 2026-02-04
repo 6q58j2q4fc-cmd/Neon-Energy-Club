@@ -1,0 +1,30 @@
+{
+  "query": "-- Insert distributor record for Dakota Rea\nINSERT INTO distributors (\n  userId,\n  distributorCode,\n  sponsorId,\n  placementParentId,\n  placementPosition,\n  rank,\n  personalSales,\n  teamSales,\n  leftLegVolume,\n  rightLegVolume,\n  totalEarnings,\n  availableBalance,\n  monthlyPV,\n  monthlyAutoshipPV,\n  activeDownlineCount,\n  isActive,\n  status,\n  country,\n  createdAt,\n  updatedAt\n) \nSELECT \n  id as userId,\n  'DIST00001' as distributorCode,\n  NULL as sponsorId,\n  NULL as placementParentId,\n  NULL as placementPosition,\n  'starter' as rank,\n  0 as personalSales,\n  0 as teamSales,\n  0 as leftLegVolume,\n  0 as rightLegVolume,\n  0 as totalEarnings,\n  0 as availableBalance,\n  0 as monthlyPV,\n  0 as monthlyAutoshipPV,\n  0 as activeDownlineCount,\n  1 as isActive,\n  'active' as status,\n  'US' as country,\n  NOW() as createdAt,\n  NOW() as updatedAt\nFROM users \nWHERE name = 'Dakota Rea' \nLIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute -- Insert distributor record for Dakota Rea\nINSERT INTO distributors (\n  userId,\n  distributorCode,\n  sponsorId,\n  placementParentId,\n  placementPosition,\n  rank,\n  personalSales,\n  teamSales,\n  leftLegVolume,\n  rightLegVolume,\n  totalEarnings,\n  availableBalance,\n  monthlyPV,\n  monthlyAutoshipPV,\n  activeDownlineCount,\n  isActive,\n  status,\n  country,\n  createdAt,\n  updatedAt\n) \nSELECT \n  id as userId,\n  'DIST00001' as distributorCode,\n  NULL as sponsorId,\n  NULL as placementParentId,\n  NULL as placementPosition,\n  'starter' as rank,\n  0 as personalSales,\n  0 as teamSales,\n  0 as leftLegVolume,\n  0 as rightLegVolume,\n  0 as totalEarnings,\n  0 as availableBalance,\n  0 as monthlyPV,\n  0 as monthlyAutoshipPV,\n  0 as activeDownlineCount,\n  1 as isActive,\n  'active' as status,\n  'US' as country,\n  NOW() as createdAt,\n  NOW() as updatedAt\nFROM users \nWHERE name = 'Dakota Rea' \nLIMIT 1;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1064 (42000) at line 2: You have an error in your SQL syntax; check the manual that corresponds to your TiDB version for the right syntax to use line 7 column 7 near \"rank,",
+    "  personalSales,",
+    "  teamSales,",
+    "  leftLegVolume,",
+    "  rightLegVolume,",
+    "  totalEarnings,",
+    "  availableBalance,",
+    "  monthlyPV,",
+    "  monthlyAutoshipPV,",
+    "  activeDownlineCount,",
+    "  isActive,",
+    "  status,",
+    "  country,",
+    "  createdAt,",
+    "  updatedAt",
+    ") ",
+    "SELECT ",
+    "  id as userId,",
+    "  'DIST00001' as distributorCode,",
+    "  NULL as sponsorId,",
+    "  NULL as placementParentId,",
+    "  NULL as placementPosition,",
+    "  'st"
+  ]
+}

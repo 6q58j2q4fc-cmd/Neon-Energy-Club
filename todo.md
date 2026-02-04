@@ -4575,3 +4575,14 @@
 - [x] Display clickable empty position cards for left and right legs
 - [x] Enable enrollment modal when clicking empty positions
 - [x] Write vitest tests for genealogy tree logic
+
+## Dakota Rea Distributor Enrollment - Feb 3
+- [ ] Enroll Dakota Rea as distributor with code DIST00001
+- [ ] Fix distributor portal to show all tabs and options
+- [ ] Verify genealogy tree displays correctly for enrolled distributor
+
+## Dakota Rea Enrollment & Portal Verification - COMPLETED
+- [x] Verified Dakota Rea is enrolled as distributor DIST1DLVY0G
+- [x] Confirmed all distributor portal tabs are visible and functional
+- [x] Verified genealogy tree displays distributor's own card with empty position slots
+- [x] Tested tree controls (zoom, pan, expand/collapse, show/hide empty spots)

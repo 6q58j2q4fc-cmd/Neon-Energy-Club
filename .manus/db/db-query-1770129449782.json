@@ -1,0 +1,28 @@
+{
+  "query": "SELECT id, name, email, openId FROM users ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT id, name, email, openId FROM users ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "1650938",
+      "name": "I.S.",
+      "email": "swinbvrne@gmail.com",
+      "openId": "4VZqvYg9dUnU7AEadQ6xVs"
+    },
+    {
+      "id": "510004",
+      "name": "Dakota Rea",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "openId": "ZVD7RcFJMYovKDnnuKq7o4"
+    },
+    {
+      "id": "1",
+      "name": "Dakota Rea",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "openId": "KM4owryiZuvTGq7hhYe5tH"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\topenId\n1650938\tI.S.\tswinbvrne@gmail.com\t4VZqvYg9dUnU7AEadQ6xVs\n510004\tDakota Rea\tb4429bc6tn@privaterelay.appleid.com\tZVD7RcFJMYovKDnnuKq7o4\n1\tDakota Rea\tb4429bc6tn@privaterelay.appleid.com\tKM4owryiZuvTGq7hhYe5tH\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}
