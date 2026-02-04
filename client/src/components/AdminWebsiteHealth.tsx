@@ -37,7 +37,7 @@ export function AdminWebsiteHealth() {
 
   const autoFix = trpc.admin.autoFixWebsiteIssues.useMutation({
     onSuccess: (data) => {
-      toast.success(`Auto-fix complete: ${data.fixed} issues fixed`);
+      toast.success(`Auto-fix complete: ${data.issuesFixed} issues fixed`);
       refetch();
     },
     onError: (error) => {
