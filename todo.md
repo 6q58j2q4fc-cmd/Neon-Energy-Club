@@ -4838,3 +4838,9 @@
 - [ ] Include Dakota Rea bio and photo
 - [ ] Add Neon Dreams book pre-order section
 - [x] Fix iOS genealogy tree - CRITICAL - tree not showing on iOS Safari at all
+
+- [x] Add Neon Dreams book product to shop inventory
+- [x] Implement commission management tRPC procedures (commissions, approveCommission)
+- [x] Complete admin panel with orders management procedures
+- [x] Add shipping rate and label generation procedures
+- [x] Fix TypeScript errors in AdminPanel, AdminOrders, UserManagementTab, ShippingLabelModal

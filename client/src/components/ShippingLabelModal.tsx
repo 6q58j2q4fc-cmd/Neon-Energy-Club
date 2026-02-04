@@ -82,13 +82,22 @@ export function ShippingLabelModal({
   };
 
   // Group rates by carrier
-  const groupedRates: Record<ShippingCarrier, ShippingRate[]> = ratesData?.rates.reduce((acc: Record<ShippingCarrier, ShippingRate[]>, rate: ShippingRate) => {
-    if (!acc[rate.carrier]) {
-      acc[rate.carrier] = [];
+  const groupedRates: Record<ShippingCarrier, ShippingRate[]> = (ratesData?.rates || []).reduce((acc: Record<ShippingCarrier, ShippingRate[]>, rate: any) => {
+    const carrier = rate.carrier?.toLowerCase() as ShippingCarrier;
+    if (carrier && ['ups', 'fedex', 'usps'].includes(carrier)) {
+      if (!acc[carrier]) {
+        acc[carrier] = [];
+      }
+      acc[carrier].push({
+        carrier,
+        service: rate.service,
+        rate: rate.price || rate.rate || 0,
+        currency: 'USD',
+        estimatedDays: parseInt(rate.estimatedDays) || 3
+      });
     }
-    acc[rate.carrier].push(rate);
     return acc;
-  }, { ups: [], fedex: [], usps: [] } as Record<ShippingCarrier, ShippingRate[]>) || { ups: [], fedex: [], usps: [] };
+  }, { ups: [], fedex: [], usps: [] } as Record<ShippingCarrier, ShippingRate[]>);
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -135,18 +144,13 @@ export function ShippingLabelModal({
         ) : (
           <div className="space-y-6">
             {/* Destination Info */}
-            {ratesData?.order && (
-              <Card className="bg-zinc-800/50 border-zinc-700">
-                <CardContent className="pt-4">
-                  <h4 className="text-sm font-medium text-zinc-400 mb-2">Ship To:</h4>
-                  <p className="text-white">{ratesData.order.name}</p>
-                  <p className="text-zinc-400 text-sm">{ratesData.order.address}</p>
-                  <p className="text-zinc-400 text-sm">
-                    {ratesData.order.city}, {ratesData.order.state} {ratesData.order.postalCode}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+            <Card className="bg-zinc-800/50 border-zinc-700">
+              <CardContent className="pt-4">
+                <h4 className="text-sm font-medium text-zinc-400 mb-2">Ship To:</h4>
+                <p className="text-white">Order #{orderNumber}</p>
+                <p className="text-zinc-400 text-sm">Shipping rates available below</p>
+              </CardContent>
+            </Card>
 
             {/* Shipping Options by Carrier */}
             <div className="space-y-4">

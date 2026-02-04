@@ -43,19 +43,24 @@ import {
 } from "lucide-react";
 import { ShippingLabelModal } from "@/components/ShippingLabelModal";
 
-type OrderStatus = "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled";
+type OrderStatus = "pending" | "paid" | "shipped" | "delivered" | "cancelled";
 
 interface Order {
   id: number;
   orderNumber: string;
   customerName: string;
   customerEmail: string;
-  status: OrderStatus;
-  total: number;
-  createdAt: string;
+  status: string;
+  totalAmount: string;
+  createdAt: Date;
   trackingNumber: string | null;
   nftImageUrl: string | null;
-  shippingAddress: string | null;
+  shippingAddress: string;
+  userId: number | null;
+  distributorId: number | null;
+  packageId: number;
+  paymentStatus: string;
+  updatedAt: Date;
 }
 
 export default function AdminOrders() {
@@ -69,7 +74,7 @@ export default function AdminOrders() {
   const [newStatus, setNewStatus] = useState<OrderStatus>("pending");
   const [newTrackingNumber, setNewTrackingNumber] = useState("");
   const [bulkModalOpen, setBulkModalOpen] = useState(false);
-  const [bulkStatus, setBulkStatus] = useState<OrderStatus>("processing");
+  const [bulkStatus, setBulkStatus] = useState<OrderStatus>("paid");
   const [shippingModalOpen, setShippingModalOpen] = useState(false);
   const [shippingOrderId, setShippingOrderId] = useState<number | null>(null);
   const [shippingOrderNumber, setShippingOrderNumber] = useState("");
@@ -77,10 +82,10 @@ export default function AdminOrders() {
   const ordersPerPage = 20;
 
   // Fetch orders
-  const { data: ordersData, isLoading, refetch } = trpc.admin.getOrders.useQuery({
+  const { data: ordersData, isLoading, refetch } = trpc.admin.orders.useQuery({
     page,
     limit: ordersPerPage,
-    status: statusFilter === "all" ? undefined : statusFilter,
+    status: statusFilter as any,
     search: searchQuery || undefined
   });
 
@@ -93,14 +98,19 @@ export default function AdminOrders() {
     }
   });
 
-  // Bulk update mutation
-  const bulkUpdateMutation = trpc.admin.bulkUpdateOrders.useMutation({
-    onSuccess: () => {
+  // Bulk update mutation - placeholder
+  const bulkUpdateMutation = {
+    mutate: async ({ orderIds, status }: { orderIds: number[], status: string }) => {
+      // Update each order individually
+      for (const orderId of orderIds) {
+        await updateOrderMutation.mutateAsync({ orderId, status: status as any });
+      }
       refetch();
       setBulkModalOpen(false);
       setSelectedOrders([]);
-    }
-  });
+    },
+    isPending: false
+  };
 
   if (loading) {
     return (
@@ -129,15 +139,14 @@ export default function AdminOrders() {
     );
   }
 
-  const orders = ordersData?.orders || [];
-  const totalOrders = ordersData?.total || 0;
+  const orders = (ordersData?.orders || []) as unknown as Order[];
+  const totalOrders = ordersData?.pagination?.total || 0;
   const totalPages = Math.ceil(totalOrders / ordersPerPage);
 
-  const getStatusColor = (status: OrderStatus) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "pending": return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-      case "confirmed": return "bg-blue-500/20 text-blue-400 border-blue-500/30";
-      case "processing": return "bg-purple-500/20 text-purple-400 border-purple-500/30";
+      case "paid": return "bg-blue-500/20 text-blue-400 border-blue-500/30";
       case "shipped": return "bg-cyan-500/20 text-cyan-400 border-cyan-500/30";
       case "delivered": return "bg-green-500/20 text-green-400 border-green-500/30";
       case "cancelled": return "bg-red-500/20 text-red-400 border-red-500/30";
@@ -145,11 +154,10 @@ export default function AdminOrders() {
     }
   };
 
-  const getStatusIcon = (status: OrderStatus) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case "pending": return <Clock className="w-4 h-4" />;
-      case "confirmed": return <CheckCircle className="w-4 h-4" />;
-      case "processing": return <RefreshCw className="w-4 h-4" />;
+      case "paid": return <CheckCircle className="w-4 h-4" />;
       case "shipped": return <Truck className="w-4 h-4" />;
       case "delivered": return <Package className="w-4 h-4" />;
       case "cancelled": return <XCircle className="w-4 h-4" />;
@@ -161,7 +169,7 @@ export default function AdminOrders() {
     if (selectedOrders.length === orders.length) {
       setSelectedOrders([]);
     } else {
-      setSelectedOrders(orders.map((o: Order) => o.id));
+      setSelectedOrders(orders.map((o) => o.id));
     }
   };
 
@@ -175,7 +183,7 @@ export default function AdminOrders() {
 
   const handleEditOrder = (order: Order) => {
     setSelectedOrder(order);
-    setNewStatus(order.status);
+    setNewStatus(order.status as OrderStatus);
     setNewTrackingNumber(order.trackingNumber || "");
     setEditModalOpen(true);
   };
@@ -184,23 +192,22 @@ export default function AdminOrders() {
     if (!selectedOrder) return;
     updateOrderMutation.mutate({
       orderId: selectedOrder.id,
-      status: newStatus,
-      trackingNumber: newTrackingNumber || undefined
+      status: newStatus as "pending" | "paid" | "shipped" | "delivered" | "cancelled"
     });
   };
 
   const handleBulkUpdate = () => {
     bulkUpdateMutation.mutate({
       orderIds: selectedOrders,
-      status: bulkStatus
+      status: bulkStatus as string
     });
   };
 
   // Export mutation to get all orders
-  const exportMutation = trpc.admin.exportAllOrders.useQuery({
-    status: statusFilter === "all" ? undefined : statusFilter,
-    search: searchQuery || undefined
-  }, { enabled: false });
+  const exportMutation = trpc.admin.exportAllOrders.useQuery(
+    undefined,
+    { enabled: false }
+  );
 
   const exportOrders = async () => {
     const result = await exportMutation.refetch();
@@ -504,7 +511,7 @@ export default function AdminOrders() {
                           </Badge>
                         </td>
                         <td className="py-3 px-4">
-                          <span className="text-white font-medium">${order.total.toFixed(2)}</span>
+                          <span className="text-white font-medium">${parseFloat(order.totalAmount || '0').toFixed(2)}</span>
                         </td>
                         <td className="py-3 px-4">
                           {order.trackingNumber ? (

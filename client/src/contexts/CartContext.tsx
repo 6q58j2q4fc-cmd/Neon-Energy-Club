@@ -5,7 +5,7 @@ export interface CartItem {
   name: string;
   price: number;
   quantity: number;
-  type?: "product" | "package";
+  type?: "product" | "package" | "book";
   flavor?: "original" | "organic" | "pink" | "mixed";
   image?: string;
   distributorCode?: string;

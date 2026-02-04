@@ -211,15 +211,15 @@ export default function MyTeam() {
                   rank={distributorInfo?.rank || "STARTER"}
                   personalVolume={distributorInfo?.personalVolume || 0}
                   teamVolume={distributorInfo?.groupVolume || 0}
-                  leftChild={genealogyData?.leftChild ? {
-                    name: genealogyData.leftChild.name,
-                    code: genealogyData.leftChild.distributorCode,
-                    rank: genealogyData.leftChild.rank
+                  leftChild={(genealogyData as any)?.leftChild ? {
+                    name: (genealogyData as any).leftChild.name,
+                    code: (genealogyData as any).leftChild.distributorCode,
+                    rank: (genealogyData as any).leftChild.rank
                   } : null}
-                  rightChild={genealogyData?.rightChild ? {
-                    name: genealogyData.rightChild.name,
-                    code: genealogyData.rightChild.distributorCode,
-                    rank: genealogyData.rightChild.rank
+                  rightChild={(genealogyData as any)?.rightChild ? {
+                    name: (genealogyData as any).rightChild.name,
+                    code: (genealogyData as any).rightChild.distributorCode,
+                    rank: (genealogyData as any).rightChild.rank
                   } : null}
                   onEnrollLeft={() => {
                     console.log("Enroll left");

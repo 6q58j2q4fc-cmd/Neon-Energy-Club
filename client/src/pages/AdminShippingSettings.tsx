@@ -98,7 +98,7 @@ export default function AdminShippingSettings() {
   const handleTestConnection = async (carrier: string) => {
     setIsTesting(carrier);
     try {
-      const result = await testConnection.mutateAsync({ carrier: carrier as 'ups' | 'fedex' | 'usps' });
+      const result = await testConnection.mutateAsync({ carrier: carrier, credentials: formData });
       setTestResults(prev => ({ ...prev, [carrier]: result }));
     } catch (error) {
       setTestResults(prev => ({ 

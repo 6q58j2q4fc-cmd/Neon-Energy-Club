@@ -20,7 +20,8 @@ import {
   Users,
   TrendingUp,
   Award,
-  Sparkles
+  Sparkles,
+  BookOpen
 } from "lucide-react";
 import { toast } from "sonner";
 import HamburgerHeader from "@/components/HamburgerHeader";
@@ -136,6 +137,54 @@ const customerPackages = [
   }
 ];
 
+// Book Products
+const bookProducts = [
+  {
+    id: "neon-dreams-book",
+    name: "NEON DREAMS: The Book",
+    price: 24.99,
+    icon: Sparkles,
+    description: "The untold story behind the energy revolution",
+    details: [
+      "Hardcover edition",
+      "300+ pages",
+      "Exclusive photos",
+      "Signed by Dakota Rea"
+    ],
+    releaseDate: "Summer 2026"
+  },
+  {
+    id: "neon-dreams-audiobook",
+    name: "NEON DREAMS: Audiobook",
+    price: 19.99,
+    icon: Star,
+    description: "Listen to the NEON story on the go",
+    details: [
+      "8+ hours of content",
+      "Narrated by Dakota Rea",
+      "Instant digital download",
+      "Bonus interviews"
+    ],
+    releaseDate: "Summer 2026"
+  },
+  {
+    id: "neon-dreams-bundle",
+    name: "NEON DREAMS: Complete Bundle",
+    price: 39.99,
+    originalPrice: 44.98,
+    icon: Crown,
+    description: "Get both the book and audiobook",
+    details: [
+      "Hardcover book",
+      "Digital audiobook",
+      "Exclusive bonus chapter",
+      "Limited edition bookmark"
+    ],
+    releaseDate: "Summer 2026",
+    savings: "Save $5"
+  }
+];
+
 // Auto-ship discount
 const AUTO_SHIP_DISCOUNT = 0.1; // 10% off
 
@@ -181,6 +230,19 @@ export default function Shop() {
       image: "/neon-can.png"
     });
     toast.success(`Added ${pkg.name} to cart! ${autoShip ? "(Auto-Ship enabled - 15% OFF)" : ""}`);
+  };
+
+  const handleBookPurchase = (book: typeof bookProducts[0]) => {
+    addItem({
+      id: book.id,
+      name: book.name,
+      price: book.price,
+      type: "book",
+      image: "/neon-dreams-book.png"
+    });
+    toast.success(`Added ${book.name} to cart!`, {
+      description: "Pre-order now - Expected release Summer 2026"
+    });
   };
 
   return (
@@ -232,7 +294,7 @@ export default function Shop() {
       <section className="py-16 px-4 bg-gradient-to-b from-[#0a1a1a] to-[#0d2818]">
         <div className="container mx-auto max-w-7xl">
           <Tabs defaultValue="distributor" className="w-full">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-12 bg-black/50 border border-[#c8ff00]/30">
+            <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 mb-12 bg-black/50 border border-[#c8ff00]/30">
               <TabsTrigger 
                 value="distributor" 
                 className="data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black font-bold"
@@ -246,6 +308,13 @@ export default function Shop() {
               >
                 <ShoppingCart className="w-4 h-4 mr-2" />
                 Customer Orders
+              </TabsTrigger>
+              <TabsTrigger 
+                value="books"
+                className="data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black font-bold"
+              >
+                <BookOpen className="w-4 h-4 mr-2" />
+                Books
               </TabsTrigger>
             </TabsList>
 
@@ -499,6 +568,121 @@ export default function Shop() {
                   </div>
                 </motion.div>
               )}
+            </TabsContent>
+
+            {/* Books Tab */}
+            <TabsContent value="books">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold mb-4">NEON DREAMS</h2>
+                <p className="text-gray-400 max-w-2xl mx-auto">
+                  The untold story behind the energy revolution. Pre-order Dakota Rea's book 
+                  and discover the journey that built NEON Energy.
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                {bookProducts.map((book, index) => (
+                  <motion.div
+                    key={book.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                  >
+                    <Card className={`relative bg-gradient-to-b from-[#1a0a2e] to-[#0a0a0a] border-2 ${'savings' in book ? 'border-[#c8ff00] neon-border' : 'border-purple-500/30'} overflow-hidden h-full flex flex-col`}>
+                      {'savings' in book && (
+                        <div className="absolute top-0 right-0 bg-[#c8ff00] text-black px-4 py-1 text-sm font-bold">
+                          BEST VALUE
+                        </div>
+                      )}
+                      
+                      <CardHeader className="text-center pb-2">
+                        <div className="w-32 h-44 mx-auto mb-4 bg-gradient-to-br from-[#0a0a0a] to-[#1a1a2e] rounded-lg shadow-[0_0_30px_rgba(200,255,0,0.2)] border border-[#c8ff00]/50 p-3 flex flex-col justify-between">
+                          <div>
+                            <div className="text-[#c8ff00] text-[8px] font-bold tracking-widest mb-1">PRE-ORDER</div>
+                            <h4 className="text-lg font-black text-white leading-tight">NEON</h4>
+                            <h4 className="text-lg font-black text-[#c8ff00] leading-tight">DREAMS</h4>
+                          </div>
+                          <div>
+                            <div className="w-full h-px bg-gradient-to-r from-transparent via-[#c8ff00] to-transparent my-2"></div>
+                            <p className="text-white/60 text-[8px]">The NEON Story</p>
+                            <p className="text-[#c8ff00] text-[10px] font-semibold">by Dakota Rea</p>
+                          </div>
+                        </div>
+                        <CardTitle className="text-xl text-white">{book.name}</CardTitle>
+                        <CardDescription className="text-gray-400">{book.description}</CardDescription>
+                      </CardHeader>
+
+                      <CardContent className="flex-1 flex flex-col">
+                        <div className="mb-4 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <span className="text-4xl font-black text-white">${book.price.toFixed(2)}</span>
+                            {'originalPrice' in book && (
+                              <span className="text-lg text-gray-500 line-through">${(book as any).originalPrice.toFixed(2)}</span>
+                            )}
+                          </div>
+                          {'savings' in book && (
+                            <Badge className="mt-2 bg-green-500/20 text-green-400 border-green-500/30">
+                              {(book as any).savings}
+                            </Badge>
+                          )}
+                        </div>
+
+                        <ul className="space-y-2 mb-6 flex-1">
+                          {book.details.map((detail, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm text-gray-300">
+                              <Check className="w-4 h-4 text-[#c8ff00] mt-0.5 flex-shrink-0" />
+                              {detail}
+                            </li>
+                          ))}
+                        </ul>
+
+                        <div className="text-center text-xs text-gray-500 mb-4">
+                          Expected Release: {book.releaseDate}
+                        </div>
+
+                        <Button 
+                          onClick={() => handleBookPurchase(book)}
+                          className={`w-full font-bold ${'savings' in book ? 'bg-[#c8ff00] text-black hover:bg-[#a8d600]' : 'bg-purple-600 hover:bg-purple-700 text-white'}`}
+                        >
+                          <BookOpen className="w-4 h-4 mr-2" />
+                          Pre-Order Now
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Book Info Section */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="mt-12 bg-gradient-to-r from-purple-900/20 to-[#c8ff00]/10 border border-purple-500/30 rounded-2xl p-8 max-w-4xl mx-auto"
+              >
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold mb-4 text-white">About the Book</h3>
+                  <p className="text-gray-300 leading-relaxed mb-6">
+                    Go behind the scenes of NEON Energy Drink's incredible journey. From a small startup in Bend, Oregon 
+                    to a global phenomenon reaching 15% of the world's population. Dakota Rea shares the triumphs, 
+                    challenges, and lessons learned building one of the fastest-growing beverage brands in history.
+                  </p>
+                  <div className="grid md:grid-cols-3 gap-6 text-center">
+                    <div>
+                      <div className="text-3xl font-bold text-[#c8ff00]">300+</div>
+                      <div className="text-gray-400 text-sm">Pages of insights</div>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-[#c8ff00]">50+</div>
+                      <div className="text-gray-400 text-sm">Exclusive photos</div>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-[#c8ff00]">8+</div>
+                      <div className="text-gray-400 text-sm">Hours of audiobook</div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
             </TabsContent>
           </Tabs>
         </div>

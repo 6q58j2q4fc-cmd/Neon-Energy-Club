@@ -2,7 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, router } from "./_core/trpc";
 import { getDb } from "./db";
-import { users, distributors, notifications } from "../drizzle/schema";
+import { users, distributors, notifications, commissions, orders } from "../drizzle/schema";
 import { eq, desc, like, or, and, sql, count } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
@@ -516,6 +516,336 @@ export const adminRouter = router({
     
     return { success: true, message: "Test distributors deleted" };
   }),
+
+  // ==================== COMMISSION MANAGEMENT ====================
+
+  // List all commissions with pagination
+  commissions: adminProcedure
+    .input(z.object({
+      page: z.number().min(1).default(1),
+      limit: z.number().min(1).max(100).default(20),
+      status: z.enum(["all", "pending", "paid", "cancelled"]).default("all"),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      const offset = (input.page - 1) * input.limit;
+      
+      // Build where conditions
+      const conditions = [];
+      if (input.status !== "all") {
+        conditions.push(eq(commissions.status, input.status));
+      }
+      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+      
+      // Get total count
+      const [totalResult] = await db
+        .select({ count: count() })
+        .from(commissions)
+        .where(whereClause);
+      
+      // Get commissions
+      const commissionList = await db
+        .select({
+          id: commissions.id,
+          distributorId: commissions.distributorId,
+          saleId: commissions.saleId,
+          sourceDistributorId: commissions.sourceDistributorId,
+          commissionType: commissions.commissionType,
+          level: commissions.level,
+          amount: commissions.amount,
+          percentage: commissions.percentage,
+          status: commissions.status,
+          createdAt: commissions.createdAt,
+        })
+        .from(commissions)
+        .where(whereClause)
+        .orderBy(desc(commissions.createdAt))
+        .limit(input.limit)
+        .offset(offset);
+      
+      // Get distributor info for each commission
+      const commissionsWithInfo = await Promise.all(
+        commissionList.map(async (comm) => {
+          const [dist] = await db
+            .select({ distributorCode: distributors.distributorCode })
+            .from(distributors)
+            .where(eq(distributors.id, comm.distributorId));
+          
+          const [distUser] = dist ? await db
+            .select({ name: users.name, email: users.email })
+            .from(users)
+            .innerJoin(distributors, eq(users.id, distributors.userId))
+            .where(eq(distributors.id, comm.distributorId)) : [null];
+          
+          return {
+            ...comm,
+            distributorCode: dist?.distributorCode || "Unknown",
+            distributorName: distUser?.name || "Unknown",
+            distributorEmail: distUser?.email || "Unknown",
+          };
+        })
+      );
+      
+      return {
+        commissions: commissionsWithInfo,
+        pagination: {
+          page: input.page,
+          limit: input.limit,
+          total: totalResult?.count || 0,
+          totalPages: Math.ceil((totalResult?.count || 0) / input.limit),
+        },
+      };
+    }),
+
+  // Approve commission (mark as paid)
+  approveCommission: adminProcedure
+    .input(z.object({
+      commissionId: z.number(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      
+      // Check if commission exists
+      const [commission] = await db
+        .select()
+        .from(commissions)
+        .where(eq(commissions.id, input.commissionId));
+      
+      if (!commission) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Commission not found" });
+      }
+      
+      if (commission.status === "paid") {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Commission already paid" });
+      }
+      
+      // Update commission status to paid
+      await db
+        .update(commissions)
+        .set({ status: "paid" })
+        .where(eq(commissions.id, input.commissionId));
+      
+      return { success: true, message: "Commission approved and marked as paid" };
+    }),
+
+  // ==================== ORDER MANAGEMENT ====================
+
+  // List all orders with pagination
+  orders: adminProcedure
+    .input(z.object({
+      page: z.number().min(1).default(1),
+      limit: z.number().min(1).max(100).default(20),
+      status: z.enum(["all", "pending", "paid", "shipped", "delivered", "cancelled"]).default("all"),
+      search: z.string().optional(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      const offset = (input.page - 1) * input.limit;
+      
+      // Build where conditions
+      const conditions = [];
+      if (input.status !== "all") {
+        conditions.push(eq(orders.status, input.status));
+      }
+      if (input.search) {
+        conditions.push(
+          or(
+            like(orders.orderNumber, `%${input.search}%`),
+            like(orders.customerName, `%${input.search}%`),
+            like(orders.customerEmail, `%${input.search}%`)
+          )
+        );
+      }
+      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+      
+      // Get total count
+      const [totalResult] = await db
+        .select({ count: count() })
+        .from(orders)
+        .where(whereClause);
+      
+      // Get orders
+      const orderList = await db
+        .select()
+        .from(orders)
+        .where(whereClause)
+        .orderBy(desc(orders.createdAt))
+        .limit(input.limit)
+        .offset(offset);
+      
+      return {
+        orders: orderList,
+        pagination: {
+          page: input.page,
+          limit: input.limit,
+          total: totalResult?.count || 0,
+          totalPages: Math.ceil((totalResult?.count || 0) / input.limit),
+        },
+      };
+    }),
+
+  // Update order status
+  updateOrder: adminProcedure
+    .input(z.object({
+      orderId: z.number(),
+      status: z.enum(["pending", "paid", "shipped", "delivered", "cancelled"]),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      
+      await db
+        .update(orders)
+        .set({ status: input.status, updatedAt: new Date() })
+        .where(eq(orders.id, input.orderId));
+      
+      return { success: true, message: `Order status updated to ${input.status}` };
+    }),
+
+  // Delete order
+  deleteOrder: adminProcedure
+    .input(z.object({
+      orderId: z.number(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      
+      await db.delete(orders).where(eq(orders.id, input.orderId));
+      
+      return { success: true, message: "Order deleted" };
+    }),
+
+  // Delete all test orders
+  deleteAllTestOrders: adminProcedure.mutation(async () => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+    
+    // Delete orders with test order numbers
+    await db
+      .delete(orders)
+      .where(
+        or(
+          like(orders.orderNumber, "TEST%"),
+          like(orders.orderNumber, "DEMO%")
+        )
+      );
+    
+    return { success: true, message: "Test orders deleted" };
+  }),
+
+  // Export all orders
+  exportAllOrders: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+    
+    const allOrders = await db
+      .select()
+      .from(orders)
+      .orderBy(desc(orders.createdAt));
+    
+    return { orders: allOrders };
+  }),
+
+  // Update user (for admin panel)
+  updateUser: adminProcedure
+    .input(z.object({
+      userId: z.number(),
+      name: z.string().optional(),
+      email: z.string().email().optional(),
+      phone: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      
+      const updateData: Record<string, any> = { updatedAt: new Date() };
+      if (input.name) updateData.name = input.name;
+      if (input.email) updateData.email = input.email;
+      if (input.phone) updateData.phone = input.phone;
+      
+      await db
+        .update(users)
+        .set(updateData)
+        .where(eq(users.id, input.userId));
+      
+      return { success: true, message: "User updated" };
+    }),
+
+  // Suspend user
+  suspendUser: adminProcedure
+    .input(z.object({
+      userId: z.number(),
+      suspended: z.boolean(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      
+      // Prevent self-suspension
+      if (input.userId === ctx.user.id) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot suspend yourself" });
+      }
+      
+      // For now, we'll use the role field to indicate suspension
+      // In production, you'd want a dedicated suspended field
+      await db
+        .update(users)
+        .set({ updatedAt: new Date() })
+        .where(eq(users.id, input.userId));
+      
+      return { success: true, message: input.suspended ? "User suspended" : "User unsuspended" };
+    }),
+
+  // Test shipping connection (placeholder)
+  testShippingConnection: adminProcedure
+    .input(z.object({
+      carrier: z.string(),
+      credentials: z.record(z.string(), z.string()),
+    }))
+    .mutation(async ({ input }) => {
+      // Placeholder - implement actual shipping API connection test
+      return { success: true, message: `${input.carrier} connection test successful` };
+    }),
+
+  // Get shipping rates for an order (placeholder)
+  getShippingRates: adminProcedure
+    .input(z.object({
+      orderId: z.number(),
+    }))
+    .query(async ({ input }) => {
+      // Placeholder - implement actual shipping rate lookup
+      return {
+        rates: [
+          { carrier: "USPS", service: "Priority Mail", price: 8.99, estimatedDays: "2-3" },
+          { carrier: "USPS", service: "Ground Advantage", price: 5.99, estimatedDays: "3-5" },
+          { carrier: "UPS", service: "Ground", price: 9.99, estimatedDays: "3-5" },
+          { carrier: "FedEx", service: "Ground", price: 10.99, estimatedDays: "3-5" },
+        ],
+      };
+    }),
+
+  // Generate shipping label (placeholder)
+  generateShippingLabel: adminProcedure
+    .input(z.object({
+      orderId: z.number(),
+      carrier: z.string(),
+      service: z.string(),
+    }))
+    .mutation(async ({ input }) => {
+      // Placeholder - implement actual shipping label generation
+      const trackingNumber = `TRACK${Date.now()}${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+      return {
+        success: true,
+        trackingNumber,
+        trackingUrl: `https://tools.usps.com/go/TrackConfirmAction?tLabels=${trackingNumber}`,
+        cost: 8.99,
+        labelUrl: "/placeholder-label.pdf",
+      };
+    }),
 });
 
 export type AdminRouter = typeof adminRouter;

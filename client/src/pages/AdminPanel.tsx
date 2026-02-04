@@ -163,22 +163,21 @@ export default function AdminPanel() {
 
 // Admin Dashboard with Real Data
 function AdminDashboard() {
-  const { data: stats, isLoading, refetch } = trpc.admin.stats.useQuery(undefined, {
+  const { data: stats, isLoading, refetch } = trpc.admin.getDashboardStats.useQuery(undefined, {
     refetchInterval: 30000, // Refresh every 30 seconds
   });
-  const { data: recentActivity } = trpc.admin.recentActivity.useQuery(undefined, {
-    refetchInterval: 10000,
-  });
 
-  const dashboardStats = stats || {
-    totalUsers: 0,
+  const dashboardStats = {
+    totalUsers: stats?.totalUsers || 0,
+    totalDistributors: stats?.totalDistributors || 0,
+    recentSignups: stats?.recentSignups || 0,
     totalOrders: 0,
     totalRevenue: 0,
     totalCommissions: 0,
-    newUsersToday: 0,
+    newUsersToday: stats?.recentSignups || 0,
     ordersToday: 0,
     revenueToday: 0,
-    activeDistributors: 0,
+    activeDistributors: stats?.totalDistributors || 0,
     pendingOrders: 0,
     pendingCommissions: 0,
   };
@@ -294,37 +293,11 @@ function AdminDashboard() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {recentActivity && recentActivity.length > 0 ? (
-              recentActivity.map((activity: any, i: number) => (
-                <div key={i} className="flex items-center justify-between border-b border-[#c8ff00]/10 pb-3 last:border-0">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-full ${
-                      activity.type === 'order' ? 'bg-green-500/20' :
-                      activity.type === 'user' ? 'bg-blue-500/20' :
-                      activity.type === 'commission' ? 'bg-yellow-500/20' :
-                      'bg-gray-500/20'
-                    }`}>
-                      {activity.type === 'order' ? <ShoppingCart className="h-4 w-4 text-green-500" /> :
-                       activity.type === 'user' ? <Users className="h-4 w-4 text-blue-500" /> :
-                       activity.type === 'commission' ? <DollarSign className="h-4 w-4 text-yellow-500" /> :
-                       <Activity className="h-4 w-4 text-gray-500" />}
-                    </div>
-                    <div>
-                      <p className="font-medium text-white">{activity.title}</p>
-                      <p className="text-sm text-gray-400">{activity.description}</p>
-                    </div>
-                  </div>
-                  <span className="text-sm text-gray-500">
-                    {activity.createdAt ? formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true }) : 'Just now'}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-400">
-                <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No recent activity</p>
-              </div>
-            )}
+            <div className="text-center py-8 text-gray-400">
+              <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>Recent activity will appear here</p>
+              <p className="text-sm mt-2">New orders, signups, and commissions</p>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -341,10 +314,9 @@ function UserManagement() {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   
-  const { data: usersData, isLoading, refetch } = trpc.admin.users.useQuery({
+  const { data: usersData, isLoading, refetch } = trpc.admin.listUsers.useQuery({
     search: searchQuery,
-    role: roleFilter !== "all" ? roleFilter : undefined,
-    status: statusFilter !== "all" ? statusFilter : undefined,
+    role: roleFilter !== "all" ? roleFilter as any : undefined,
     page,
     limit: 10,
   });
@@ -368,7 +340,7 @@ function UserManagement() {
   });
 
   const users = usersData?.users || [];
-  const totalPages = usersData?.totalPages || 1;
+  const totalPages = usersData?.pagination?.totalPages || 1;
   
   return (
     <Card className="bg-[#0a0a0a] border-[#c8ff00]/30">
@@ -377,7 +349,7 @@ function UserManagement() {
           <div>
             <CardTitle className="text-white">User Management</CardTitle>
             <CardDescription className="text-gray-400">
-              Manage all platform users ({usersData?.total || 0} total)
+              Manage all platform users ({usersData?.pagination?.total || 0} total)
             </CardDescription>
           </div>
           <Button className="bg-[#c8ff00] text-black hover:bg-[#a8d600]">
@@ -473,7 +445,7 @@ function UserManagement() {
                       size="sm"
                       onClick={() => suspendUserMutation.mutate({ 
                         userId: user.id, 
-                        suspend: user.status !== 'suspended' 
+                        suspended: user.status !== 'suspended' 
                       })}
                       className="text-gray-400 hover:text-white"
                     >
@@ -587,11 +559,11 @@ function UserManagement() {
 
 // Order Management with Real Data
 function OrderManagement() {
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "paid" | "shipped" | "delivered" | "cancelled">("all");
   const [page, setPage] = useState(1);
   
   const { data: ordersData, isLoading, refetch } = trpc.admin.orders.useQuery({
-    status: statusFilter !== "all" ? statusFilter : undefined,
+    status: statusFilter,
     page,
     limit: 10,
   });
@@ -640,7 +612,7 @@ function OrderManagement() {
   // Export orders to CSV
   const [isExporting, setIsExporting] = useState(false);
   const { data: exportData, refetch: fetchExportData } = trpc.admin.exportAllOrders.useQuery(
-    { status: statusFilter !== "all" ? statusFilter : undefined },
+    undefined,
     { enabled: false }
   );
 
@@ -651,24 +623,17 @@ function OrderManagement() {
       if (result.data?.orders) {
         const orders = result.data.orders;
         // Create CSV content
-        const headers = ['Order Number', 'Customer Name', 'Email', 'Phone', 'Status', 'Quantity', 'Total', 'Address', 'City', 'State', 'Postal Code', 'Country', 'Tracking Number', 'Carrier', 'Created At'];
+        const headers = ['Order Number', 'Customer Name', 'Email', 'Status', 'Total', 'Shipping Address', 'Payment Status', 'Created At'];
         const csvContent = [
           headers.join(','),
-          ...orders.map(o => [
+          ...orders.map((o: any) => [
             o.orderNumber,
             `"${o.customerName}"`,
             o.customerEmail,
-            o.phone,
             o.status,
-            o.quantity,
-            o.total,
-            `"${o.address}"`,
-            o.city,
-            o.state,
-            o.postalCode,
-            o.country,
-            o.trackingNumber,
-            o.carrier,
+            o.totalAmount,
+            `"${o.shippingAddress}"`,
+            o.paymentStatus,
             o.createdAt
           ].join(','))
         ].join('\n');
@@ -689,7 +654,7 @@ function OrderManagement() {
   };
 
   const orders = ordersData?.orders || [];
-  const totalPages = ordersData?.totalPages || 1;
+  const totalPages = ordersData?.pagination?.totalPages || 1;
 
   const statusColors: Record<string, string> = {
     pending: 'bg-yellow-500/20 text-yellow-400',
@@ -706,18 +671,18 @@ function OrderManagement() {
           <div>
             <CardTitle className="text-white">Order Management</CardTitle>
             <CardDescription className="text-gray-400">
-              Track and manage all orders ({ordersData?.total || 0} total)
+              Track and manage all orders ({ordersData?.pagination?.total || 0} total)
             </CardDescription>
           </div>
           <div className="flex gap-2">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as "all" | "pending" | "paid" | "shipped" | "delivered" | "cancelled")}>
               <SelectTrigger className="w-[150px] bg-black border-[#c8ff00]/30 text-white">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="processing">Processing</SelectItem>
+                <SelectItem value="paid">Paid</SelectItem>
                 <SelectItem value="shipped">Shipped</SelectItem>
                 <SelectItem value="delivered">Delivered</SelectItem>
                 <SelectItem value="cancelled">Cancelled</SelectItem>
@@ -769,14 +734,14 @@ function OrderManagement() {
                   <span className="font-medium text-white">${order.total?.toFixed(2) || '0.00'}</span>
                   <Select 
                     value={order.status}
-                    onValueChange={(status) => updateOrderMutation.mutate({ orderId: order.id, status })}
+                    onValueChange={(status) => updateOrderMutation.mutate({ orderId: order.id, status: status as "pending" | "paid" | "shipped" | "delivered" | "cancelled" })}
                   >
                     <SelectTrigger className="w-[130px] bg-black border-[#c8ff00]/30 text-white">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="processing">Processing</SelectItem>
+                      <SelectItem value="paid">Paid</SelectItem>
                       <SelectItem value="shipped">Shipped</SelectItem>
                       <SelectItem value="delivered">Delivered</SelectItem>
                       <SelectItem value="cancelled">Cancelled</SelectItem>
@@ -835,11 +800,11 @@ function OrderManagement() {
 
 // Commission Management with Real Data
 function CommissionManagement() {
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "paid" | "cancelled">("all");
   const [page, setPage] = useState(1);
   
   const { data: commissionsData, isLoading, refetch } = trpc.admin.commissions.useQuery({
-    status: statusFilter !== "all" ? statusFilter : undefined,
+    status: statusFilter !== "all" ? statusFilter : "all",
     page,
     limit: 10,
   });
@@ -859,7 +824,7 @@ function CommissionManagement() {
   });
 
   const commissions = commissionsData?.commissions || [];
-  const totalPages = commissionsData?.totalPages || 1;
+  const totalPages = commissionsData?.pagination?.totalPages || 1;
   
   return (
     <Card className="bg-[#0a0a0a] border-[#c8ff00]/30">
@@ -868,20 +833,19 @@ function CommissionManagement() {
           <div>
             <CardTitle className="text-white">Commission Management</CardTitle>
             <CardDescription className="text-gray-400">
-              Manage distributor commissions ({commissionsData?.total || 0} total)
+              Manage distributor commissions ({commissionsData?.pagination?.total || 0} total)
             </CardDescription>
           </div>
           <div className="flex gap-2">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as "all" | "pending" | "paid" | "cancelled")}>
               <SelectTrigger className="w-[150px] bg-black border-[#c8ff00]/30 text-white">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
                 <SelectItem value="paid">Paid</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
               </SelectContent>
             </Select>
             <Button className="bg-[#c8ff00] text-black hover:bg-[#a8d600]">
@@ -1020,7 +984,7 @@ function DistributorManagement() {
           headers.join(','),
           ...distributors.map(d => [
             d.id,
-            `"${d.username}"`,
+            `"${d.userName}"`,
             d.distributorCode,
             d.rank,
             d.isActive,

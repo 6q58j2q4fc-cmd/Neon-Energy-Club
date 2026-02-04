@@ -36,7 +36,7 @@ export function UserManagementTab() {
   
   const { data: users, isLoading } = trpc.admin.listUsers.useQuery({
     limit: 100,
-    offset: 0,
+    page: 1,
     role: roleFilter === "all" ? undefined : roleFilter as any,
     search: searchQuery || undefined
   });
@@ -55,8 +55,8 @@ export function UserManagementTab() {
   });
 
   const resetPasswordMutation = trpc.admin.resetUserPassword.useMutation({
-    onSuccess: (data) => {
-      toast.success(`Password reset. Temporary password: ${data.temporaryPassword}`);
+    onSuccess: (data: any) => {
+      toast.success(`Password reset successfully`);
       setResetPasswordDialogOpen(false);
       setNewPassword("");
     },
@@ -107,19 +107,19 @@ export function UserManagementTab() {
         </Card>
         <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
           <CardContent className="p-4 text-center">
-            <div className="text-3xl font-bold text-blue-500">{stats?.distributors || 0}</div>
+            <div className="text-3xl font-bold text-blue-500">{stats?.totalDistributors || 0}</div>
             <div className="text-gray-500">Distributors</div>
           </CardContent>
         </Card>
         <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
           <CardContent className="p-4 text-center">
-            <div className="text-3xl font-bold text-purple-500">{stats?.franchisees || 0}</div>
+            <div className="text-3xl font-bold text-purple-500">{stats?.usersByType?.franchisee || 0}</div>
             <div className="text-gray-500">Franchisees</div>
           </CardContent>
         </Card>
         <Card className="bg-[#0a0a0a] border-[#c8ff00]/20">
           <CardContent className="p-4 text-center">
-            <div className="text-3xl font-bold text-green-500">{stats?.customers || 0}</div>
+            <div className="text-3xl font-bold text-green-500">{stats?.usersByType?.customer || 0}</div>
             <div className="text-gray-500">Customers</div>
           </CardContent>
         </Card>
@@ -273,7 +273,7 @@ export function UserManagementTab() {
                                     if (selectedUser) {
                                       updateRoleMutation.mutate({
                                         userId: selectedUser.id,
-                                        userType: value as any
+                                        role: value as "user" | "admin"
                                       });
                                     }
                                   }}
@@ -330,7 +330,7 @@ export function UserManagementTab() {
                                   if (selectedUser) {
                                     resetPasswordMutation.mutate({
                                       userId: selectedUser.id,
-                                      newPassword: newPassword || undefined
+                                      newPassword: newPassword || 'TempPass123!'
                                     });
                                   }
                                 }}
