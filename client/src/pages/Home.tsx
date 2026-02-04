@@ -28,16 +28,16 @@ export default function Home() {
   const [showNewsletter, setShowNewsletter] = useState(false);
   // Video playlist for the promo section
   const neonVideos = [
-    { src: "/neon-promo.mp4", title: "NEON Energy - Feel The Power", poster: "/neon-can-new.png" },
-    { src: "/neon-promo.mp4", title: "NEON Energy - Natural Ingredients", poster: "/neon-can-new.png" },
-    { src: "/neon-promo.mp4", title: "NEON Energy - Join The Movement", poster: "/neon-can-new.png" },
+    { src: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/WstZuNJKRUXjNalw.mp4", title: "NEON Energy - Feel The Power", poster: "/neon-can-new.png" },
+    { src: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/WstZuNJKRUXjNalw.mp4", title: "NEON Energy - Natural Ingredients", poster: "/neon-can-new.png" },
+    { src: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/WstZuNJKRUXjNalw.mp4", title: "NEON Energy - Join The Movement", poster: "/neon-can-new.png" },
   ];
   
   // Mobile video playlist with proper format for MobileVideoPlayer
   const mobileVideos = [
-    { id: "promo-1", title: "NEON Energy - Feel The Power", thumbnail: "/neon-can-new.png", videoUrl: "/neon-promo.mp4", duration: "0:30" },
-    { id: "promo-2", title: "NEON Energy - Natural Ingredients", thumbnail: "/neon-can-new.png", videoUrl: "/neon-promo.mp4", duration: "0:30" },
-    { id: "promo-3", title: "NEON Energy - Join The Movement", thumbnail: "/neon-can-new.png", videoUrl: "/neon-promo.mp4", duration: "0:30" },
+    { id: "promo-1", title: "NEON Energy - Feel The Power", thumbnail: "/neon-can-new.png", videoUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/vJGVULoSEhaqOuUR.mp4", duration: "0:10" },
+    { id: "promo-2", title: "NEON Energy - Natural Ingredients", thumbnail: "/neon-can-new.png", videoUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/vJGVULoSEhaqOuUR.mp4", duration: "0:10" },
+    { id: "promo-3", title: "NEON Energy - Join The Movement", thumbnail: "/neon-can-new.png", videoUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/vJGVULoSEhaqOuUR.mp4", duration: "0:10" },
   ];
   
   const [isMobile, setIsMobile] = useState(false);
@@ -880,7 +880,7 @@ export default function Home() {
               {/* Disney Campaign Manager Partnership */}
               <div className="flex flex-col items-center gap-2">
                 <p className="text-[#00ffff] text-xs font-semibold tracking-wider">ADVERTISING PARTNER</p>
-                <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-xl border border-[#00ffff]/30">
+                <div className="flex items-center gap-3 px-6 py-3 rounded-xl">
                   <img 
                     src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/YMvLPqhKeOCpKiwL.png" 
                     alt="Disney Campaign Manager - Meet your new advertising partner" 

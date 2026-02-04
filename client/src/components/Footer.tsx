@@ -87,7 +87,7 @@ export default function Footer() {
             {/* Disney Campaign Manager Partnership */}
             <div className="flex flex-col items-center gap-2">
               <p className="text-[#00ffff] text-xs font-semibold tracking-wider">ADVERTISING PARTNER</p>
-              <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-xl border border-[#00ffff]/30">
+              <div className="flex items-center gap-3 px-6 py-3 rounded-xl">
                 <img 
                   src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/YMvLPqhKeOCpKiwL.png" 
                   alt="Disney Campaign Manager - Meet your new advertising partner" 
