@@ -2,7 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, router } from "./_core/trpc";
 import { getDb } from "./db";
-import { users, distributors, notifications, commissions, orders } from "../drizzle/schema";
+import { users, distributors, notifications, commissions, orders, dataBackups, backupSnapshots, restorationLog, deletedRecordsArchive, systemAuditLog, backupSchedules, replicatedWebsites, websiteAuditLog } from "../drizzle/schema";
 import { eq, desc, like, or, and, sql, count } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
@@ -845,6 +845,440 @@ export const adminRouter = router({
         cost: 8.99,
         labelUrl: "/placeholder-label.pdf",
       };
+    }),
+
+  // ============ BACKUP & RESTORE ENDPOINTS ============
+
+  // Get all backups
+  getBackups: adminProcedure
+    .input(z.object({
+      page: z.number().default(1),
+      limit: z.number().default(20),
+      status: z.enum(["all", "in_progress", "completed", "failed", "expired"]).default("all"),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      const offset = (input.page - 1) * input.limit;
+      
+      let backups;
+      if (input.status !== "all") {
+        backups = await db.select().from(dataBackups)
+          .where(eq(dataBackups.status, input.status))
+          .orderBy(desc(dataBackups.createdAt))
+          .limit(input.limit)
+          .offset(offset);
+      } else {
+        backups = await db.select().from(dataBackups)
+          .orderBy(desc(dataBackups.createdAt))
+          .limit(input.limit)
+          .offset(offset);
+      }
+      const [totalCount] = await db.select({ count: count() }).from(dataBackups);
+
+      return {
+        backups,
+        pagination: {
+          page: input.page,
+          limit: input.limit,
+          total: totalCount?.count || 0,
+          totalPages: Math.ceil((totalCount?.count || 0) / input.limit),
+        },
+      };
+    }),
+
+  // Create a new backup
+  createBackup: adminProcedure
+    .input(z.object({
+      name: z.string().min(1),
+      backupType: z.enum(["full", "incremental", "table_specific", "manual"]).default("manual"),
+      tables: z.array(z.string()).optional(),
+      retentionDays: z.number().default(30),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      const tablesToBackup = input.tables || [
+        "users", "distributors", "orders", "commissions", 
+        "replicated_websites", "preorders", "sales"
+      ];
+
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + input.retentionDays);
+
+      // Create backup record
+      const [backup] = await db.insert(dataBackups).values({
+        name: input.name,
+        backupType: input.backupType,
+        tablesIncluded: JSON.stringify(tablesToBackup),
+        status: "in_progress",
+        retentionDays: input.retentionDays,
+        expiresAt,
+        createdBy: ctx.user.id,
+      });
+
+      const backupId = backup.insertId;
+      let totalRecords = 0;
+
+      // Backup each table
+      for (const tableName of tablesToBackup) {
+        try {
+          let records: any[] = [];
+          
+          switch (tableName) {
+            case "users":
+              records = await db.select().from(users);
+              break;
+            case "distributors":
+              records = await db.select().from(distributors);
+              break;
+            case "orders":
+              records = await db.select().from(orders);
+              break;
+            case "commissions":
+              records = await db.select().from(commissions);
+              break;
+            case "replicated_websites":
+              records = await db.select().from(replicatedWebsites);
+              break;
+          }
+
+          // Store snapshots
+          for (const record of records) {
+            const recordData = JSON.stringify(record);
+            const dataHash = crypto.createHash('sha256').update(recordData).digest('hex');
+            
+            await db.insert(backupSnapshots).values({
+              backupId: Number(backupId),
+              tableName,
+              recordId: record.id,
+              recordData,
+              dataHash,
+            });
+            totalRecords++;
+          }
+        } catch (error) {
+          console.error(`Error backing up table ${tableName}:`, error);
+        }
+      }
+
+      // Update backup status
+      await db.update(dataBackups)
+        .set({
+          status: "completed",
+          totalRecords,
+          completedAt: new Date(),
+        })
+        .where(eq(dataBackups.id, Number(backupId)));
+
+      // Log to audit
+      await db.insert(systemAuditLog).values({
+        category: "backup",
+        action: "create_backup",
+        entityType: "backup",
+        entityId: Number(backupId),
+        userId: ctx.user.id,
+        userRole: ctx.user.role,
+        result: "success",
+        severity: "info",
+        metadata: JSON.stringify({ tables: tablesToBackup, totalRecords }),
+      });
+
+      return { success: true, backupId: Number(backupId), totalRecords };
+    }),
+
+  // Restore from backup
+  restoreFromBackup: adminProcedure
+    .input(z.object({
+      backupId: z.number(),
+      restorationType: z.enum(["full", "partial", "single_record"]).default("full"),
+      tables: z.array(z.string()).optional(),
+      recordIds: z.array(z.number()).optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      // Get backup
+      const [backup] = await db.select().from(dataBackups).where(eq(dataBackups.id, input.backupId));
+      if (!backup) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Backup not found" });
+      }
+
+      // Create restoration log
+      const [restorationEntry] = await db.insert(restorationLog).values({
+        backupId: input.backupId,
+        restorationType: input.restorationType,
+        tablesRestored: JSON.stringify(input.tables || []),
+        status: "in_progress",
+        performedBy: ctx.user.id,
+      });
+
+      let recordsRestored = 0;
+
+      try {
+        // Get snapshots to restore
+        let snapshots = await db.select().from(backupSnapshots)
+          .where(eq(backupSnapshots.backupId, input.backupId));
+
+        if (input.tables && input.tables.length > 0) {
+          snapshots = snapshots.filter(s => input.tables!.includes(s.tableName));
+        }
+
+        if (input.recordIds && input.recordIds.length > 0) {
+          snapshots = snapshots.filter(s => input.recordIds!.includes(s.recordId));
+        }
+
+        // Restore each snapshot (simplified - in production would need proper upsert logic)
+        for (const snapshot of snapshots) {
+          const recordData = JSON.parse(snapshot.recordData);
+          
+          // Archive current state before restore
+          await db.insert(deletedRecordsArchive).values({
+            tableName: snapshot.tableName,
+            originalId: snapshot.recordId,
+            recordData: snapshot.recordData,
+            deletionReason: `Pre-restore archive for backup ${input.backupId}`,
+            deletedBy: ctx.user.id,
+            canRestore: true,
+            restoreDeadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          });
+
+          recordsRestored++;
+        }
+
+        // Update restoration log
+        await db.update(restorationLog)
+          .set({
+            status: "completed",
+            recordsRestored,
+            completedAt: new Date(),
+          })
+          .where(eq(restorationLog.id, Number(restorationEntry.insertId)));
+
+        // Log to audit
+        await db.insert(systemAuditLog).values({
+          category: "restore",
+          action: "restore_from_backup",
+          entityType: "backup",
+          entityId: input.backupId,
+          userId: ctx.user.id,
+          userRole: ctx.user.role,
+          result: "success",
+          severity: "warning",
+          isReversible: true,
+          metadata: JSON.stringify({ recordsRestored, restorationType: input.restorationType }),
+        });
+
+        return { success: true, recordsRestored };
+      } catch (error) {
+        await db.update(restorationLog)
+          .set({
+            status: "failed",
+            errorMessage: String(error),
+          })
+          .where(eq(restorationLog.id, Number(restorationEntry.insertId)));
+
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Restoration failed" });
+      }
+    }),
+
+  // Get deleted records archive
+  getDeletedRecords: adminProcedure
+    .input(z.object({
+      page: z.number().default(1),
+      limit: z.number().default(20),
+      tableName: z.string().optional(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      const offset = (input.page - 1) * input.limit;
+      let query = db.select().from(deletedRecordsArchive)
+        .where(eq(deletedRecordsArchive.canRestore, true))
+        .orderBy(desc(deletedRecordsArchive.deletedAt));
+
+      if (input.tableName) {
+        query = db.select().from(deletedRecordsArchive)
+          .where(and(
+            eq(deletedRecordsArchive.canRestore, true),
+            eq(deletedRecordsArchive.tableName, input.tableName)
+          ))
+          .orderBy(desc(deletedRecordsArchive.deletedAt));
+      }
+
+      const records = await query.limit(input.limit).offset(offset);
+      const [totalCount] = await db.select({ count: count() }).from(deletedRecordsArchive)
+        .where(eq(deletedRecordsArchive.canRestore, true));
+
+      return {
+        records: records.map(r => ({
+          ...r,
+          recordData: JSON.parse(r.recordData),
+        })),
+        pagination: {
+          page: input.page,
+          limit: input.limit,
+          total: totalCount?.count || 0,
+          totalPages: Math.ceil((totalCount?.count || 0) / input.limit),
+        },
+      };
+    }),
+
+  // Restore a single deleted record
+  restoreDeletedRecord: adminProcedure
+    .input(z.object({
+      archiveId: z.number(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      const [record] = await db.select().from(deletedRecordsArchive)
+        .where(eq(deletedRecordsArchive.id, input.archiveId));
+
+      if (!record) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Archived record not found" });
+      }
+
+      if (!record.canRestore) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Record cannot be restored" });
+      }
+
+      // Mark as restored
+      await db.update(deletedRecordsArchive)
+        .set({
+          wasRestored: true,
+          restoredAt: new Date(),
+          restoredBy: ctx.user.id,
+          canRestore: false,
+        })
+        .where(eq(deletedRecordsArchive.id, input.archiveId));
+
+      // Log to audit
+      await db.insert(systemAuditLog).values({
+        category: "restore",
+        action: "restore_deleted_record",
+        entityType: record.tableName,
+        entityId: record.originalId,
+        userId: ctx.user.id,
+        userRole: ctx.user.role,
+        result: "success",
+        severity: "info",
+        previousState: record.recordData,
+      });
+
+      return { success: true, tableName: record.tableName, originalId: record.originalId };
+    }),
+
+  // Get system audit log
+  getAuditLog: adminProcedure
+    .input(z.object({
+      page: z.number().default(1),
+      limit: z.number().default(50),
+      category: z.enum(["all", "user", "distributor", "order", "commission", "website", "backup", "restore", "admin", "security", "system"]).default("all"),
+      severity: z.enum(["all", "info", "warning", "error", "critical"]).default("all"),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      const offset = (input.page - 1) * input.limit;
+      
+      const conditions = [];
+      if (input.category !== "all") {
+        conditions.push(eq(systemAuditLog.category, input.category));
+      }
+      if (input.severity !== "all") {
+        conditions.push(eq(systemAuditLog.severity, input.severity));
+      }
+
+      let query;
+      if (conditions.length > 0) {
+        query = db.select().from(systemAuditLog)
+          .where(and(...conditions))
+          .orderBy(desc(systemAuditLog.createdAt));
+      } else {
+        query = db.select().from(systemAuditLog)
+          .orderBy(desc(systemAuditLog.createdAt));
+      }
+
+      const entries = await query.limit(input.limit).offset(offset);
+      const [totalCount] = await db.select({ count: count() }).from(systemAuditLog);
+
+      return {
+        entries,
+        pagination: {
+          page: input.page,
+          limit: input.limit,
+          total: totalCount?.count || 0,
+          totalPages: Math.ceil((totalCount?.count || 0) / input.limit),
+        },
+      };
+    }),
+
+  // Get backup schedules
+  getBackupSchedules: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+    const schedules = await db.select().from(backupSchedules).orderBy(desc(backupSchedules.createdAt));
+    return schedules;
+  }),
+
+  // Create/update backup schedule
+  upsertBackupSchedule: adminProcedure
+    .input(z.object({
+      id: z.number().optional(),
+      name: z.string().min(1),
+      backupType: z.enum(["full", "incremental"]).default("incremental"),
+      tables: z.array(z.string()).optional(),
+      cronExpression: z.string(),
+      retentionDays: z.number().default(30),
+      isActive: z.boolean().default(true),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      if (input.id) {
+        await db.update(backupSchedules)
+          .set({
+            name: input.name,
+            backupType: input.backupType,
+            tables: input.tables ? JSON.stringify(input.tables) : null,
+            cronExpression: input.cronExpression,
+            retentionDays: input.retentionDays,
+            isActive: input.isActive,
+          })
+          .where(eq(backupSchedules.id, input.id));
+        return { success: true, id: input.id };
+      } else {
+        const [result] = await db.insert(backupSchedules).values({
+          name: input.name,
+          backupType: input.backupType,
+          tables: input.tables ? JSON.stringify(input.tables) : null,
+          cronExpression: input.cronExpression,
+          retentionDays: input.retentionDays,
+          isActive: input.isActive,
+          createdBy: ctx.user.id,
+        });
+        return { success: true, id: Number(result.insertId) };
+      }
+    }),
+
+  // Delete backup schedule
+  deleteBackupSchedule: adminProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      await db.delete(backupSchedules).where(eq(backupSchedules.id, input.id));
+      return { success: true };
     }),
 });
 

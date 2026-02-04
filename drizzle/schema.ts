@@ -2109,3 +2109,209 @@ export const websiteAuditLog = mysqlTable("website_audit_log", {
 
 export type WebsiteAuditLogEntry = typeof websiteAuditLog.$inferSelect;
 export type InsertWebsiteAuditLogEntry = typeof websiteAuditLog.$inferInsert;
+
+
+/**
+ * Data backups table for system-wide backup management.
+ * Stores backup metadata and allows restoration of deleted data.
+ */
+export const dataBackups = mysqlTable("data_backups", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Backup name/description */
+  name: varchar("name", { length: 255 }).notNull(),
+  /** Backup type */
+  backupType: mysqlEnum("backupType", ["full", "incremental", "table_specific", "manual"]).default("manual").notNull(),
+  /** Tables included in backup (JSON array) */
+  tablesIncluded: text("tablesIncluded").notNull(),
+  /** Total records backed up */
+  totalRecords: int("totalRecords").default(0).notNull(),
+  /** Backup file path/URL in S3 */
+  backupFileUrl: varchar("backupFileUrl", { length: 500 }),
+  /** Backup file size in bytes */
+  fileSizeBytes: int("fileSizeBytes").default(0).notNull(),
+  /** Backup status */
+  status: mysqlEnum("status", ["in_progress", "completed", "failed", "expired"]).default("in_progress").notNull(),
+  /** Error message if failed */
+  errorMessage: text("errorMessage"),
+  /** Retention period in days */
+  retentionDays: int("retentionDays").default(30).notNull(),
+  /** Expiration date */
+  expiresAt: timestamp("expiresAt"),
+  /** Created by admin user ID */
+  createdBy: int("createdBy"),
+  /** Backup creation timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Backup completion timestamp */
+  completedAt: timestamp("completedAt"),
+});
+
+export type DataBackup = typeof dataBackups.$inferSelect;
+export type InsertDataBackup = typeof dataBackups.$inferInsert;
+
+/**
+ * Backup data snapshots table.
+ * Stores actual data snapshots for restoration.
+ */
+export const backupSnapshots = mysqlTable("backup_snapshots", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Parent backup ID */
+  backupId: int("backupId").notNull(),
+  /** Table name */
+  tableName: varchar("tableName", { length: 100 }).notNull(),
+  /** Record ID from original table */
+  recordId: int("recordId").notNull(),
+  /** Full record data as JSON */
+  recordData: text("recordData").notNull(),
+  /** Record hash for integrity check */
+  dataHash: varchar("dataHash", { length: 64 }).notNull(),
+  /** Snapshot timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type BackupSnapshot = typeof backupSnapshots.$inferSelect;
+export type InsertBackupSnapshot = typeof backupSnapshots.$inferInsert;
+
+/**
+ * Data restoration log table.
+ * Tracks all restoration operations.
+ */
+export const restorationLog = mysqlTable("restoration_log", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Backup ID used for restoration */
+  backupId: int("backupId").notNull(),
+  /** Restoration type */
+  restorationType: mysqlEnum("restorationType", ["full", "partial", "single_record"]).notNull(),
+  /** Tables restored (JSON array) */
+  tablesRestored: text("tablesRestored"),
+  /** Records restored count */
+  recordsRestored: int("recordsRestored").default(0).notNull(),
+  /** Restoration status */
+  status: mysqlEnum("status", ["in_progress", "completed", "failed", "rolled_back"]).default("in_progress").notNull(),
+  /** Error message if failed */
+  errorMessage: text("errorMessage"),
+  /** Performed by admin user ID */
+  performedBy: int("performedBy").notNull(),
+  /** Restoration started timestamp */
+  startedAt: timestamp("startedAt").defaultNow().notNull(),
+  /** Restoration completed timestamp */
+  completedAt: timestamp("completedAt"),
+});
+
+export type RestorationLogEntry = typeof restorationLog.$inferSelect;
+export type InsertRestorationLogEntry = typeof restorationLog.$inferInsert;
+
+/**
+ * Deleted records archive table.
+ * Automatically stores deleted records for potential restoration.
+ */
+export const deletedRecordsArchive = mysqlTable("deleted_records_archive", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Original table name */
+  tableName: varchar("tableName", { length: 100 }).notNull(),
+  /** Original record ID */
+  originalId: int("originalId").notNull(),
+  /** Full record data as JSON */
+  recordData: text("recordData").notNull(),
+  /** Deletion reason */
+  deletionReason: varchar("deletionReason", { length: 255 }),
+  /** Deleted by user ID (null if system) */
+  deletedBy: int("deletedBy"),
+  /** Whether record can be restored */
+  canRestore: boolean("canRestore").default(true).notNull(),
+  /** Restoration deadline */
+  restoreDeadline: timestamp("restoreDeadline"),
+  /** Whether record was restored */
+  wasRestored: boolean("wasRestored").default(false).notNull(),
+  /** Restored timestamp */
+  restoredAt: timestamp("restoredAt"),
+  /** Restored by user ID */
+  restoredBy: int("restoredBy"),
+  /** Deletion timestamp */
+  deletedAt: timestamp("deletedAt").defaultNow().notNull(),
+});
+
+export type DeletedRecordArchive = typeof deletedRecordsArchive.$inferSelect;
+export type InsertDeletedRecordArchive = typeof deletedRecordsArchive.$inferInsert;
+
+/**
+ * Comprehensive system audit log table.
+ * Tracks all significant system actions for compliance and debugging.
+ */
+export const systemAuditLog = mysqlTable("system_audit_log", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Action category */
+  category: mysqlEnum("category", [
+    "user", "distributor", "order", "commission", "website", 
+    "backup", "restore", "admin", "security", "system"
+  ]).notNull(),
+  /** Specific action type */
+  action: varchar("action", { length: 100 }).notNull(),
+  /** Affected entity type */
+  entityType: varchar("entityType", { length: 50 }).notNull(),
+  /** Affected entity ID */
+  entityId: int("entityId"),
+  /** User ID who performed action (null if system) */
+  userId: int("userId"),
+  /** User role at time of action */
+  userRole: varchar("userRole", { length: 50 }),
+  /** IP address */
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  /** User agent */
+  userAgent: varchar("userAgent", { length: 500 }),
+  /** Previous state (JSON) */
+  previousState: text("previousState"),
+  /** New state (JSON) */
+  newState: text("newState"),
+  /** Additional metadata (JSON) */
+  metadata: text("metadata"),
+  /** Action result */
+  result: mysqlEnum("result", ["success", "failure", "partial"]).default("success").notNull(),
+  /** Error message if failed */
+  errorMessage: text("errorMessage"),
+  /** Severity level */
+  severity: mysqlEnum("severity", ["info", "warning", "error", "critical"]).default("info").notNull(),
+  /** Whether this action is reversible */
+  isReversible: boolean("isReversible").default(false).notNull(),
+  /** Related audit log entries (JSON array of IDs) */
+  relatedEntries: text("relatedEntries"),
+  /** Action timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SystemAuditLogEntry = typeof systemAuditLog.$inferSelect;
+export type InsertSystemAuditLogEntry = typeof systemAuditLog.$inferInsert;
+
+/**
+ * Scheduled backup configuration table.
+ * Stores automated backup schedules.
+ */
+export const backupSchedules = mysqlTable("backup_schedules", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Schedule name */
+  name: varchar("name", { length: 100 }).notNull(),
+  /** Backup type */
+  backupType: mysqlEnum("backupType", ["full", "incremental"]).default("incremental").notNull(),
+  /** Tables to backup (JSON array, empty = all) */
+  tables: text("tables"),
+  /** Cron expression for schedule */
+  cronExpression: varchar("cronExpression", { length: 100 }).notNull(),
+  /** Retention period in days */
+  retentionDays: int("retentionDays").default(30).notNull(),
+  /** Whether schedule is active */
+  isActive: boolean("isActive").default(true).notNull(),
+  /** Last run timestamp */
+  lastRunAt: timestamp("lastRunAt"),
+  /** Next scheduled run */
+  nextRunAt: timestamp("nextRunAt"),
+  /** Last run status */
+  lastRunStatus: mysqlEnum("lastRunStatus", ["success", "failed", "never_run"]).default("never_run"),
+  /** Created by admin ID */
+  createdBy: int("createdBy"),
+  /** Created timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Updated timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BackupSchedule = typeof backupSchedules.$inferSelect;
+export type InsertBackupSchedule = typeof backupSchedules.$inferInsert;

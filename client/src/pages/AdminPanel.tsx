@@ -46,6 +46,8 @@ import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
 import NavigationHeader from "@/components/NavigationHeader";
+import AdminBackupRestore from "@/components/AdminBackupRestore";
+import { Database } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 
 export default function AdminPanel() {
@@ -126,6 +128,7 @@ export default function AdminPanel() {
             <TabsTrigger value="distributors" className="flex-1 min-w-[80px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Distributors</TabsTrigger>
             <TabsTrigger value="auditor" className="flex-1 min-w-[60px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#ff0080] data-[state=active]:text-white whitespace-nowrap">Auditor</TabsTrigger>
             <TabsTrigger value="settings" className="flex-1 min-w-[60px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black whitespace-nowrap">Settings</TabsTrigger>
+            <TabsTrigger value="backup" className="flex-1 min-w-[60px] text-xs sm:text-sm px-2 py-1.5 data-[state=active]:bg-[#00ff88] data-[state=active]:text-black whitespace-nowrap">Backup</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
@@ -150,6 +153,10 @@ export default function AdminPanel() {
 
           <TabsContent value="settings">
             <SystemSettings />
+          </TabsContent>
+
+          <TabsContent value="backup">
+            <AdminBackupRestore />
           </TabsContent>
 
           <TabsContent value="auditor">

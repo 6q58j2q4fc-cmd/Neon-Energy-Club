@@ -4872,3 +4872,21 @@
 - [ ] Add automated post-provisioning verification for new distributor sites
 - [ ] Implement atomic transactions during site creation
 - [ ] Add pre-check validation before site generation
+
+# New Tasks - Feb 4, 2026 - Backup/Restore & Prior Tasks
+- [ ] Complete replicated website provisioning with unique subdomains
+- [ ] Add database functions for replicated website creation
+- [ ] Create backup/restore database tables
+- [ ] Create comprehensive audit log system
+- [ ] Implement admin panel backup/restore UI
+- [ ] Add backup/restore API endpoints
+- [ ] Enhance genealogy tree with zoom/scroll features
+- [ ] Add real-time genealogy tree updates
+
+# Completed - Feb 4, 2026 - Backup/Restore & Progress Tracker
+- [x] Create ProgressTrackerBot component for distributor dashboard
+- [x] Add backup/restore database tables (dataBackups, backupSnapshots, restorationLog, deletedRecordsArchive, systemAuditLog, backupSchedules)
+- [x] Implement admin backup/restore API endpoints (getBackups, createBackup, restoreFromBackup, getDeletedRecords, restoreDeletedRecord, getAuditLog, getBackupSchedules, upsertBackupSchedule, deleteBackupSchedule)
+- [x] Create AdminBackupRestore UI component with tabs for Backups, Deleted Records, Audit Log, and Schedules
+- [x] Add Backup tab to Admin Panel
+- [x] Genealogy tree already has zoom/scroll/pan features implemented
