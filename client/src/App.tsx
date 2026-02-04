@@ -62,6 +62,7 @@ import AdminShippingSettings from "./pages/AdminShippingSettings";
 import NeonOriginal from "./pages/NeonOriginal";
 import NeonPink from "./pages/NeonPink";
 import ApplicationForms from "./pages/ApplicationForms";
+import Search from "./pages/Search";
 // AmbientSoundToggle moved to header as HeaderSoundControl
 import UnifiedChatBot from "./components/UnifiedChatBot";
 import CookieConsent from "./components/CookieConsent";
@@ -94,6 +95,7 @@ function Router() {
         <Route path="/neon-original" component={NeonOriginal} />
         <Route path="/neon-pink" component={NeonPink} />
         <Route path="/application-forms" component={ApplicationForms} />
+        <Route path="/search" component={Search} />
         <Route path="/success" component={Success} />
         {/* Authentication routes */}
         <Route path="/login" component={Login} />

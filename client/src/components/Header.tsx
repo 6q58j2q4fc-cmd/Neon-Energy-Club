@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ShoppingCart, User, Users, Building2, Heart, MapPin, Settings, LogOut, Crown, Gift, BarChart3, Package } from "lucide-react";
+import { Menu, X, ShoppingCart, User, Users, Building2, Heart, MapPin, Settings, LogOut, Crown, Gift, BarChart3, Package, Search } from "lucide-react";
+import { HeaderSoundControl } from "./HeaderSoundControl";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -93,6 +94,16 @@ export default function Header() {
 
             {/* Desktop CTA Buttons */}
             <div className="hidden lg:flex items-center gap-2">
+              {/* Volume Control */}
+              <HeaderSoundControl />
+              {/* Search Button */}
+              <button
+                onClick={() => setLocation("/search")}
+                className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/20 hover:bg-white/10 hover:border-white/30 transition-all duration-200"
+                aria-label="Search"
+              >
+                <Search className="w-5 h-5 text-white/70" />
+              </button>
               {/* Language Switcher */}
               <LanguageSwitcher />
               {/* Shopping Cart Button */}

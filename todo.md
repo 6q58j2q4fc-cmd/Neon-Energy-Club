@@ -4946,3 +4946,21 @@
 - [x] Update DashboardLayout.tsx to use native /login page
 - [x] Update TerritoryReservation.tsx to use native /login page
 - [x] Update main.tsx unauthorized handler to use native /login page
+
+# Custom Domain & Header Fixes - Feb 4, 2026
+- [ ] Prepare website for neonenergyclub.com custom domain
+- [ ] Provide DNS records for domain configuration
+- [ ] Fix jungle sounds not playing
+- [ ] Add volume control to header
+- [ ] Add search button to header
+
+## Custom Domain & Header Fixes (Feb 4)
+
+### Custom Domain Configuration
+- [x] Prepare website for neonenergyclub.com custom domain
+- [x] Document DNS records needed for domain pointing
+
+### Header Fixes
+- [x] Fix jungle sounds audio playback (moved to CDN)
+- [x] Add volume control to top menu bar
+- [x] Add search button to header
