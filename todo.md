@@ -4890,3 +4890,4 @@
 - [x] Create AdminBackupRestore UI component with tabs for Backups, Deleted Records, Audit Log, and Schedules
 - [x] Add Backup tab to Admin Panel
 - [x] Genealogy tree already has zoom/scroll/pan features implemented
+- [x] Fix video player fullscreen button not working on main screen

@@ -131,13 +131,68 @@ export default function OptimizedVideoPlayer({
   }, [isMuted]);
 
   const toggleFullscreen = useCallback(() => {
-    if (containerRef.current) {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
-        containerRef.current.requestFullscreen().catch(() => {
-          toast.error("Fullscreen not supported");
-        });
+    const video = videoRef.current;
+    const container = containerRef.current;
+    
+    // Check if already in fullscreen
+    const isCurrentlyFullscreen = document.fullscreenElement || 
+      (document as any).webkitFullscreenElement || 
+      (document as any).mozFullScreenElement ||
+      (document as any).msFullscreenElement;
+    
+    if (isCurrentlyFullscreen) {
+      // Exit fullscreen
+      try {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if ((document as any).webkitExitFullscreen) {
+          (document as any).webkitExitFullscreen();
+        } else if ((document as any).mozCancelFullScreen) {
+          (document as any).mozCancelFullScreen();
+        } else if ((document as any).msExitFullscreen) {
+          (document as any).msExitFullscreen();
+        }
+      } catch (e) {
+        console.log('Exit fullscreen failed:', e);
+      }
+      return;
+    }
+    
+    // Enter fullscreen - try iOS video-specific method first
+    if (video) {
+      try {
+        // iOS Safari specific - works on iPhone/iPad
+        if ((video as any).webkitEnterFullscreen) {
+          (video as any).webkitEnterFullscreen();
+          return;
+        }
+        // iOS Safari alternative
+        if ((video as any).webkitSupportsFullscreen && (video as any).webkitEnterFullScreen) {
+          (video as any).webkitEnterFullScreen();
+          return;
+        }
+      } catch (e) {
+        console.log('iOS fullscreen failed, trying standard:', e);
+      }
+    }
+    
+    // Standard fullscreen API for container (works on desktop and Android)
+    if (container) {
+      try {
+        if (container.requestFullscreen) {
+          container.requestFullscreen();
+        } else if ((container as any).webkitRequestFullscreen) {
+          (container as any).webkitRequestFullscreen();
+        } else if ((container as any).mozRequestFullScreen) {
+          (container as any).mozRequestFullScreen();
+        } else if ((container as any).msRequestFullscreen) {
+          (container as any).msRequestFullscreen();
+        } else {
+          toast.error("Fullscreen not supported on this device");
+        }
+      } catch (e) {
+        console.log('Container fullscreen failed:', e);
+        toast.error("Fullscreen not supported");
       }
     }
   }, []);
