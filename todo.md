@@ -4899,3 +4899,16 @@
 - [x] Show reduced CV for first orders vs full CV on recurring orders
 - [x] Create downloadable distributor application forms
 - [x] Add download functionality to distributor portal
+
+# New Tasks - Feb 4, 2026 - Replicated Websites & Genealogy
+- [ ] Fix replicated website links with unique neonenergyclub.com/[CODE] format
+- [ ] Ensure replicated links track commissions and sales properly
+- [ ] Make replicated websites SEO optimized and indexed
+- [ ] Fix genealogy tree to show interactive view on desktop
+- [ ] Fix genealogy tree to show static view on mobile
+
+# Completed - Feb 4, 2026 - Replicated Website & Genealogy
+- [x] Update replicated website URLs to use neonenergyclub.com/[CODE] format (without /d/)
+- [x] Fix QR code URL to use correct format
+- [x] Verify genealogy tree shows desktop view on desktop and mobile view on mobile
+- [x] Add toggle button to switch between desktop/mobile tree views for testing

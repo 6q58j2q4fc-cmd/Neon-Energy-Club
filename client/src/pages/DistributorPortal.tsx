@@ -253,11 +253,16 @@ export default function DistributorPortal() {
     date: c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "Recently"
   }));
 
-  // Use neonenergyclub.com domain for referral links
+  // Use neonenergyclub.com domain for referral links - format: neonenergyclub.com/[CODE]
   const referralDomain = "https://neonenergyclub.com";
   const affiliateLink = distributorProfile?.distributorCode 
     ? `${referralDomain}/${distributorProfile.distributorCode}`
     : `${referralDomain}/${user?.id || 'demo'}`;
+  
+  // Preview link uses the current domain for testing
+  const previewLink = distributorProfile?.distributorCode
+    ? `${window.location.origin}/d/${distributorProfile.distributorCode}`
+    : `${window.location.origin}/d/demo`;
 
   const subdomain = distributorProfile?.subdomain 
     ? `${distributorProfile.subdomain}.neon.energy`
@@ -743,7 +748,7 @@ export default function DistributorPortal() {
                           <Copy className="w-4 h-4" />
                         </Button>
                         <Button 
-                          onClick={() => window.open(`/d/${distributorProfile?.distributorCode}`, '_blank')}
+                          onClick={() => window.open(`${window.location.origin}/d/${distributorProfile?.distributorCode}`, '_blank')}
                           variant="outline"
                           className="border-[#c8ff00]/30 text-[#c8ff00]"
                         >
@@ -1125,18 +1130,18 @@ export default function DistributorPortal() {
                     </div>
                     <div className="flex flex-col md:flex-row gap-3">
                       <div className="flex-1 bg-black rounded-lg p-4 border border-[#c8ff00]/50 font-mono text-lg text-[#c8ff00] break-all">
-                        https://neonenergyclub.com/d/{distributorProfile?.distributorCode}
+                        https://neonenergyclub.com/{distributorProfile?.distributorCode}
                       </div>
                       <div className="flex gap-2">
                         <Button
-                          onClick={() => copyToClipboard(`https://neonenergyclub.com/d/${distributorProfile?.distributorCode}`, "Website URL")}
+                          onClick={() => copyToClipboard(`https://neonenergyclub.com/${distributorProfile?.distributorCode}`, "Website URL")}
                           className="bg-[#c8ff00] text-black hover:bg-[#a8d600] font-bold px-6"
                         >
                           <Copy className="w-4 h-4 mr-2" />
                           Copy
                         </Button>
                         <Button
-                          onClick={() => window.open(`/d/${distributorProfile?.distributorCode}`, '_blank')}
+                          onClick={() => window.open(`${window.location.origin}/d/${distributorProfile?.distributorCode}`, '_blank')}
                           variant="outline"
                           className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10 font-bold px-6"
                         >
@@ -1151,7 +1156,7 @@ export default function DistributorPortal() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                     <Button
                       onClick={() => {
-                        const url = encodeURIComponent(`https://neonenergyclub.com/d/${distributorProfile?.distributorCode}`);
+                        const url = encodeURIComponent(`https://neonenergyclub.com/${distributorProfile?.distributorCode}`);
                         window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
                       }}
                       className="bg-blue-600 hover:bg-blue-700 text-white"
@@ -1160,7 +1165,7 @@ export default function DistributorPortal() {
                     </Button>
                     <Button
                       onClick={() => {
-                        const url = encodeURIComponent(`https://neonenergyclub.com/d/${distributorProfile?.distributorCode}`);
+                        const url = encodeURIComponent(`https://neonenergyclub.com/${distributorProfile?.distributorCode}`);
                         const text = encodeURIComponent("Check out NEON Energy Drink! Use my link:");
                         window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
                       }}
@@ -1170,7 +1175,7 @@ export default function DistributorPortal() {
                     </Button>
                     <Button
                       onClick={() => {
-                        const url = `https://neonenergyclub.com/d/${distributorProfile?.distributorCode}`;
+                        const url = `https://neonenergyclub.com/${distributorProfile?.distributorCode}`;
                         navigator.clipboard.writeText(`Check out NEON Energy Drink! ${url}`);
                         toast.success("Message copied! Paste it in WhatsApp");
                       }}
@@ -1180,7 +1185,7 @@ export default function DistributorPortal() {
                     </Button>
                     <Button
                       onClick={() => {
-                        const url = `https://neonenergyclub.com/d/${distributorProfile?.distributorCode}`;
+                        const url = `https://neonenergyclub.com/${distributorProfile?.distributorCode}`;
                         const subject = encodeURIComponent("Check out NEON Energy Drink!");
                         const body = encodeURIComponent(`Hey! I wanted to share this amazing energy drink with you. Check it out here: ${url}`);
                         window.open(`mailto:?subject=${subject}&body=${body}`);
@@ -1249,7 +1254,7 @@ export default function DistributorPortal() {
               
               {/* QR Code Section */}
               <QRCodeGenerator
-                url={`https://neonenergyclub.com/d/${distributorProfile?.distributorCode}`}
+                url={`https://neonenergyclub.com/${distributorProfile?.distributorCode}`}
                 distributorCode={distributorProfile?.distributorCode || ''}
                 displayName={user?.name || undefined}
                 size={200}
