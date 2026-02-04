@@ -231,7 +231,7 @@ function EmptyPositionCard({
         onClick={onEnroll}
       >
         <div 
-          className="p-3 rounded-lg border-2 border-dashed min-w-[160px] bg-black/30 border-[#c8ff00]/30 hover:border-[#c8ff00] hover:bg-[#c8ff00]/10 transition-all"
+          className="p-2 sm:p-3 rounded-lg border-2 border-dashed min-w-[120px] sm:min-w-[160px] bg-black/30 border-[#c8ff00]/30 hover:border-[#c8ff00] hover:bg-[#c8ff00]/10 transition-all"
         >
           {/* Position indicator */}
           <div className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-black rounded text-[10px] text-gray-400 border border-gray-700">
@@ -239,11 +239,11 @@ function EmptyPositionCard({
           </div>
           
           {/* Empty state */}
-          <div className="text-center py-4">
-            <div className="w-12 h-12 mx-auto rounded-full bg-[#c8ff00]/10 border-2 border-dashed border-[#c8ff00]/30 flex items-center justify-center mb-2 group-hover:border-[#c8ff00] group-hover:bg-[#c8ff00]/20 transition-all">
-              <Users className="w-6 h-6 text-[#c8ff00]/50 group-hover:text-[#c8ff00]" />
+          <div className="text-center py-2 sm:py-4">
+            <div className="w-8 h-8 sm:w-12 sm:h-12 mx-auto rounded-full bg-[#c8ff00]/10 border-2 border-dashed border-[#c8ff00]/30 flex items-center justify-center mb-2 group-hover:border-[#c8ff00] group-hover:bg-[#c8ff00]/20 transition-all">
+              <Users className="w-4 h-4 sm:w-6 sm:h-6 text-[#c8ff00]/50 group-hover:text-[#c8ff00]" />
             </div>
-            <div className="text-sm font-medium text-gray-400 group-hover:text-[#c8ff00]">
+            <div className="text-xs sm:text-sm font-medium text-gray-400 group-hover:text-[#c8ff00]">
               Available Position
             </div>
             <div className="text-[10px] text-gray-500 mt-1">
@@ -296,7 +296,7 @@ function TreeNodeCard({
         onClick={onSelect}
       >
         <div 
-          className={`p-3 rounded-lg border-2 min-w-[160px] ${isSelected ? 'ring-2 ring-offset-2 ring-offset-black ring-[#c8ff00]' : ''}`}
+          className={`p-2 sm:p-3 rounded-lg border-2 min-w-[120px] sm:min-w-[160px] ${isSelected ? 'ring-2 ring-offset-2 ring-offset-black ring-[#c8ff00]' : ''}`}
           style={{ 
             backgroundColor: colors.bg, 
             borderColor: colors.border 
@@ -380,7 +380,7 @@ function TreeLevel({
   
   return (
     <div className="flex flex-col items-center">
-      <div className="flex gap-4 flex-wrap justify-center">
+      <div className="flex gap-2 sm:gap-4 flex-wrap justify-center">
         {nodes.map((node) => {
           const isExpanded = expandedNodes.has(node.id);
           const hasChildren = node.children && node.children.length > 0;
@@ -587,7 +587,7 @@ function InteractiveTreeContainer({ children }: { children: React.ReactNode }) {
       {/* Interactive Container */}
       <div
         ref={containerRef}
-        className={`overflow-hidden min-h-[500px] ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+        className={`overflow-hidden min-h-[300px] sm:min-h-[500px] ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
         onWheel={handleWheel}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}

@@ -4586,3 +4586,43 @@
 - [x] Confirmed all distributor portal tabs are visible and functional
 - [x] Verified genealogy tree displays distributor's own card with empty position slots
 - [x] Tested tree controls (zoom, pan, expand/collapse, show/hide empty spots)
+
+## Genealogy Tree Display Fix - URGENT
+- [ ] Investigate why genealogy tree doesn't show when clicking My Team button
+- [ ] Fix the rendering issue permanently
+- [ ] Ensure distributor's own card always displays
+- [ ] Ensure empty position cards always display
+- [ ] Test My Team button multiple times to verify fix is permanent
+
+## Mobile Responsiveness & Footer Icons Fix - Feb 3
+- [ ] Make genealogy tree mobile-responsive for iOS/iPhone
+- [ ] Change Rainforest Alliance icon to Rainforest Trust logo
+- [ ] Replace Disney icon with Disney Campaign Manager image
+- [ ] Fix video player for mobile browsers
+- [ ] Ensure full cross-browser and mobile compatibility
+
+
+## Mobile Responsiveness & Footer Updates (Feb 4)
+
+### Genealogy Tree Mobile Optimization
+- [x] Verify genealogy tree has touch handling for iOS/iPhone
+- [x] Confirm responsive sizing with sm: breakpoints
+- [x] Verify mobile-friendly container heights
+- [x] Confirm touch events for panning work properly
+
+### Footer Icon Updates
+- [x] Replace Disney® text with Disney Campaign Manager image
+- [x] Update "AS SEEN ON" to "ADVERTISING PARTNER" label
+- [x] Replace Rainforest Alliance with Rainforest Trust
+- [x] Update certification label from "Certified Supporter" to "Conservation Partner"
+- [x] Update both Footer.tsx component and Home.tsx inline footer
+
+### Video Player Mobile Fixes
+- [x] Verify video player works on desktop
+- [x] Confirm MobileVideoPlayer component has proper iOS attributes (playsInline, webkit-playsinline)
+- [x] Verify touch handling for play/pause controls
+
+### Cross-Browser Compatibility
+- [x] Ensure webkit prefixes for iOS Safari compatibility
+- [x] Verify touch event handlers are properly implemented
+- [x] Confirm responsive breakpoints work across browsers

@@ -84,29 +84,31 @@ export default function Footer() {
         {/* Partner Logos & Certifications */}
         <div className="border-t border-[#c8ff00]/10 pt-6 mb-6">
           <div className="flex flex-col items-center gap-6">
-            {/* Disney Partnership */}
+            {/* Disney Campaign Manager Partnership */}
             <div className="flex flex-col items-center gap-2">
-              <p className="text-[#00ffff] text-xs font-semibold tracking-wider">AS SEEN ON</p>
-              <div className="flex items-center gap-3 bg-gradient-to-r from-[#1a1a2e]/80 to-[#16213e]/80 px-6 py-3 rounded-xl border border-[#00ffff]/30">
-                <span className="text-2xl font-black bg-gradient-to-r from-[#00ffff] via-[#c8ff00] to-[#ff0080] bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">
-                  Disney®
-                </span>
+              <p className="text-[#00ffff] text-xs font-semibold tracking-wider">ADVERTISING PARTNER</p>
+              <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-xl border border-[#00ffff]/30">
+                <img 
+                  src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/YMvLPqhKeOCpKiwL.png" 
+                  alt="Disney Campaign Manager - Meet your new advertising partner" 
+                  className="h-16 sm:h-20 w-auto object-contain"
+                />
               </div>
               <p className="text-[#c8ff00] text-xs font-bold mt-1">NEON Energy Drink® — Official Advertising Partner of Disney Campaign Manager</p>
             </div>
             
             {/* Certifications Row */}
             <div className="flex flex-wrap justify-center items-center gap-6">
-              {/* Rainforest Alliance */}
+              {/* Rainforest Trust */}
               <div className="flex items-center gap-2 bg-[#0d2818]/50 px-4 py-2 rounded-lg border border-[#c8ff00]/20">
-                <div className="w-8 h-8 rounded-full bg-[#c8ff00] flex items-center justify-center">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 text-black" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                <div className="w-8 h-8 rounded-full bg-[#00a651] flex items-center justify-center">
+                  <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
                   </svg>
                 </div>
                 <div>
-                  <p className="text-[#c8ff00] text-xs font-bold">RAINFOREST ALLIANCE</p>
-                  <p className="text-white/50 text-[10px]">Certified Supporter</p>
+                  <p className="text-[#00a651] text-xs font-bold">RAINFOREST TRUST</p>
+                  <p className="text-white/50 text-[10px]">Conservation Partner</p>
                 </div>
               </div>
               
