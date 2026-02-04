@@ -282,19 +282,10 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
               </div>
             </button>
 
-            {/* Right side controls */}
-            <div className="flex items-center gap-2">
-              {/* Language Switcher */}
-              <LanguageSwitcher />
-
-              {/* Search Button */}
-              <button
-                onClick={() => setSearchOpen(true)}
-                className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/20 hover:bg-white/10 hover:border-white/30 transition-all duration-200"
-                aria-label="Search"
-              >
-                <Search className="w-6 h-6" strokeWidth={2.5} style={{ color: accentColor[variant] }} />
-              </button>
+            {/* Right side controls - optimized for mobile */}
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* Jungle Sound Control - Always visible, priority on mobile */}
+              <HeaderSoundControl accentColor={accentColor[variant]} />
 
               {/* Shopping Cart Button */}
               <button
@@ -310,16 +301,29 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
                 )}
               </button>
 
-              {/* Jungle Sound Control */}
-              <HeaderSoundControl accentColor={accentColor[variant]} />
+              {/* Search Button - hidden on small screens */}
+              <button
+                onClick={() => setSearchOpen(true)}
+                className="hidden sm:flex w-10 h-10 items-center justify-center rounded-xl bg-white/5 border border-white/20 hover:bg-white/10 hover:border-white/30 transition-all duration-200"
+                aria-label="Search"
+              >
+                <Search className="w-6 h-6" strokeWidth={2.5} style={{ color: accentColor[variant] }} />
+              </button>
 
-              {/* Notification Bell */}
-              <div className="relative z-[9999] pointer-events-auto">
+              {/* Language Switcher - hidden on mobile */}
+              <div className="hidden md:block">
+                <LanguageSwitcher />
+              </div>
+
+              {/* Notification Bell - hidden on small screens */}
+              <div className="hidden sm:block relative z-[9999] pointer-events-auto">
                 <NotificationBell />
               </div>
 
-              {/* User Account Button with Full Portal Access */}
-              <ProfileDropdown accentColor={accentColor[variant]} />
+              {/* User Account Button - hidden on mobile, accessible via menu */}
+              <div className="hidden sm:block">
+                <ProfileDropdown accentColor={accentColor[variant]} />
+              </div>
 
               {/* Hamburger Menu Button */}
               <button

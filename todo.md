@@ -4964,3 +4964,10 @@
 - [x] Fix jungle sounds audio playback (moved to CDN)
 - [x] Add volume control to top menu bar
 - [x] Add search button to header
+
+### Jungle Sounds Fix (Feb 4)
+- [x] Fix jungle sounds to auto-play on page load (improved iOS Safari handling)
+- [x] Ensure volume button appears on mobile iOS header (48x48 touch target, always visible)
+- [x] Improved iOS Safari audio handling with multiple interaction event listeners
+- [x] Added larger touch-friendly controls in volume popover (64px button height)
+- [x] Added visual indicators for sound state (pulsing dot, bounce prompt)
