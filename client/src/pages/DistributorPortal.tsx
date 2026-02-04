@@ -1160,7 +1160,7 @@ export default function DistributorPortal() {
         <div className="flex justify-around items-center">
           {[
             { id: "dashboard", icon: BarChart3, label: "Home" },
-            { id: "team", icon: Users, label: "Team" },
+            { id: "my-team", icon: Users, label: "Team" },
             { id: "commissions", icon: DollarSign, label: "Earnings" },
             { id: "marketing", icon: Share2, label: "Share" },
           ].map((item) => (

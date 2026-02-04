@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Users, 
   Search, 
@@ -21,24 +20,29 @@ import {
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import GenealogyTree from "./GenealogyTree";
-import { MobileGenealogyTree } from "./MobileGenealogyTree";
-import IOSGenealogyTree from "./IOSGenealogyTree";
-import MobileGenealogyModal from "./MobileGenealogyModal";
+import StaticMobileTree from "./StaticMobileTree";
 import { formatDistanceToNow } from "date-fns";
 
 export default function MyTeam() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeView, setActiveView] = useState<"tree" | "list">("tree");
   const [isMobile, setIsMobile] = useState(false);
-  const [showMobileModal, setShowMobileModal] = useState(false);
+  const [forceShowMobile, setForceShowMobile] = useState(false);
   
-  // Detect mobile device
+  // Detect mobile device - check on mount and resize
   useEffect(() => {
     const checkMobile = () => {
-      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
-      const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+      // Check screen width
       const isSmallScreen = window.innerWidth < 768;
-      setIsMobile(isMobileDevice || isSmallScreen);
+      // Check user agent for mobile devices
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isMobileUA = /iphone|ipad|ipod|android|mobile|webos|blackberry|opera mini|iemobile/i.test(userAgent);
+      // Check for touch capability
+      const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      
+      const result = isSmallScreen || isMobileUA || (hasTouch && isSmallScreen);
+      console.log('Mobile detection:', { isSmallScreen, isMobileUA, hasTouch, result, width: window.innerWidth });
+      setIsMobile(result);
     };
     
     checkMobile();
@@ -50,7 +54,7 @@ export default function MyTeam() {
   const { data: teamData, isLoading } = trpc.distributor.team.useQuery();
   const { data: stats } = trpc.distributor.stats.useQuery();
   
-  // Fetch genealogy data for mobile tree
+  // Fetch genealogy data
   const { data: genealogyData, isLoading: genealogyLoading } = trpc.distributor.genealogy.useQuery({ depth: 5 });
   
   // Filter team members based on search
@@ -59,10 +63,37 @@ export default function MyTeam() {
     member.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Get distributor info from stats
+  const statsData = stats as any;
+  const distributorInfo = statsData?.distributor || {};
+
+  // Determine whether to show mobile tree
+  const showMobileTree = isMobile || forceShowMobile;
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "256px",
+        flexDirection: "column",
+        gap: "16px"
+      }}>
+        <div style={{
+          width: "48px",
+          height: "48px",
+          border: "4px solid #333",
+          borderTopColor: "#c8ff00",
+          borderRadius: "50%",
+          animation: "spin 1s linear infinite"
+        }} />
+        <p style={{ color: "#888" }}>Loading team data...</p>
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }
@@ -77,7 +108,7 @@ export default function MyTeam() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.teamSize || 0}</div>
+            <div className="text-2xl font-bold">{statsData?.teamSize || 0}</div>
             <p className="text-xs text-muted-foreground">
               +{(stats as any)?.newMembersThisMonth || 0} this month
             </p>
@@ -92,7 +123,7 @@ export default function MyTeam() {
           <CardContent>
             <div className="text-2xl font-bold">{(stats as any)?.activeMembers || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {(((stats as any)?.activeMembers || 0) / (stats?.teamSize || 1) * 100).toFixed(0)}% of team
+              {(((stats as any)?.activeMembers || 0) / (statsData?.teamSize || 1) * 100).toFixed(0)}% of team
             </p>
           </CardContent>
         </Card>
@@ -127,12 +158,12 @@ export default function MyTeam() {
       {/* View Switcher */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
               <CardTitle>My Team</CardTitle>
               <CardDescription>View and manage your team structure</CardDescription>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Button
                 variant={activeView === "tree" ? "default" : "outline"}
                 size="sm"
@@ -156,41 +187,54 @@ export default function MyTeam() {
         </CardHeader>
         <CardContent>
           {activeView === "tree" ? (
-            isMobile ? (
-              <div className="space-y-4">
-                {/* Open Fullscreen Modal Button */}
-                <Button 
-                  onClick={() => setShowMobileModal(true)}
-                  className="w-full bg-gradient-to-r from-[#c8ff00] to-[#a8df00] text-black font-semibold py-6 text-lg"
+            <>
+              {/* Toggle for testing mobile view on desktop */}
+              <div className="mb-4 flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setForceShowMobile(!forceShowMobile)}
+                  className="text-xs"
                 >
-                  <Users className="w-5 h-5 mr-2" />
-                  Open Interactive Genealogy Tree
+                  {forceShowMobile ? "Show Desktop Tree" : "Show Mobile Tree"}
                 </Button>
-                
-                {/* iOS-Compatible Genealogy Tree */}
-                <IOSGenealogyTree 
-                  genealogyData={genealogyData}
-                  distributorCode={stats?.distributor?.distributorCode || "DIST001"}
-                  distributorRank={stats?.distributor?.rank || "STARTER"}
-                  personalVolume={stats?.distributor?.personalSales || 0}
-                  teamVolume={stats?.distributor?.teamSales || 0}
-                  isLoading={isLoading || genealogyLoading}
-                  onEnrollClick={(position, parentId) => {
-                    console.log(`Enroll at ${position} under ${parentId}`);
+                <span className="text-xs text-gray-500">
+                  {showMobileTree ? "(Mobile View)" : "(Desktop View)"}
+                </span>
+              </div>
+              
+              {showMobileTree ? (
+                /* MOBILE: Use simple static tree with inline styles - guaranteed to work on iOS */
+                <StaticMobileTree 
+                  distributorCode={distributorInfo?.distributorCode || "DIST001"}
+                  distributorName={distributorInfo?.name || "You"}
+                  rank={distributorInfo?.rank || "STARTER"}
+                  personalVolume={distributorInfo?.personalVolume || 0}
+                  teamVolume={distributorInfo?.groupVolume || 0}
+                  leftChild={genealogyData?.leftChild ? {
+                    name: genealogyData.leftChild.name,
+                    code: genealogyData.leftChild.distributorCode,
+                    rank: genealogyData.leftChild.rank
+                  } : null}
+                  rightChild={genealogyData?.rightChild ? {
+                    name: genealogyData.rightChild.name,
+                    code: genealogyData.rightChild.distributorCode,
+                    rank: genealogyData.rightChild.rank
+                  } : null}
+                  onEnrollLeft={() => {
+                    console.log("Enroll left");
+                    window.location.href = `/join?position=left&sponsor=${distributorInfo?.distributorCode}`;
+                  }}
+                  onEnrollRight={() => {
+                    console.log("Enroll right");
+                    window.location.href = `/join?position=right&sponsor=${distributorInfo?.distributorCode}`;
                   }}
                 />
-                
-                {/* Mobile Genealogy Modal */}
-                <MobileGenealogyModal
-                  isOpen={showMobileModal}
-                  onClose={() => setShowMobileModal(false)}
-                  genealogyData={genealogyData}
-                  distributorCode={stats?.distributor?.distributorCode}
-                />
-              </div>
-            ) : (
-              <GenealogyTree />
-            )
+              ) : (
+                /* DESKTOP: Use full genealogy tree */
+                <GenealogyTree />
+              )}
+            </>
           ) : (
             <div className="space-y-4">
               {/* Search */}

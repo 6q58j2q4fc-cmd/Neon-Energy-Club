@@ -4837,3 +4837,4 @@
 - [ ] Add founder section to About page
 - [ ] Include Dakota Rea bio and photo
 - [ ] Add Neon Dreams book pre-order section
+- [x] Fix iOS genealogy tree - CRITICAL - tree not showing on iOS Safari at all
