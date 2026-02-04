@@ -1,4 +1,4 @@
-import { COOKIE_NAME } from "@shared/const";
+
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { getSessionCookieOptions } from "./_core/cookies";
@@ -8,6 +8,18 @@ import { notifyOwner } from "./_core/notification";
 import { isStripeConfigured, createCrowdfundingCheckout, createFranchiseCheckout } from "./stripe";
 import { getDb } from "./db";
 import { users, preorders, commissions, distributors, referralTracking } from "../drizzle/schema";
+import { 
+  registerNativeUser, 
+  authenticateNativeUser, 
+  requestPasswordReset, 
+  resetPassword, 
+  verifyEmail,
+  changePassword,
+  isUsernameAvailable,
+  isEmailAvailable 
+} from "./nativeAuth";
+import { sdk } from "./_core/sdk";
+import { ONE_YEAR_MS, COOKIE_NAME } from "@shared/const";
 import { sql, eq, gte, desc, asc, like, or, and, isNotNull } from "drizzle-orm";
 
 export const appRouter = router({
@@ -21,6 +33,150 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    
+    // Native authentication - Register
+    register: publicProcedure
+      .input(z.object({
+        username: z.string().min(3, "Username must be at least 3 characters").max(50).regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
+        email: z.string().email("Valid email is required"),
+        password: z.string().min(8, "Password must be at least 8 characters"),
+        confirmPassword: z.string(),
+        name: z.string().min(1, "Name is required"),
+        userType: z.enum(["customer", "distributor", "franchisee"]),
+        phone: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        if (input.password !== input.confirmPassword) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Passwords do not match" });
+        }
+        
+        const result = await registerNativeUser({
+          username: input.username,
+          email: input.email,
+          password: input.password,
+          name: input.name,
+          userType: input.userType,
+          phone: input.phone,
+        });
+        
+        if (!result.success) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: result.error || "Registration failed" });
+        }
+        
+        return { success: true, message: "Registration successful! Please check your email to verify your account." };
+      }),
+    
+    // Native authentication - Login
+    login: publicProcedure
+      .input(z.object({
+        usernameOrEmail: z.string().min(1, "Username or email is required"),
+        password: z.string().min(1, "Password is required"),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const result = await authenticateNativeUser(input.usernameOrEmail, input.password);
+        
+        if (!result.success || !result.user) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: result.error || "Invalid credentials" });
+        }
+        
+        // Create session token
+        const token = await sdk.createSessionToken(result.user.openId, {
+          name: result.user.name || "",
+          expiresInMs: ONE_YEAR_MS,
+        });
+        
+        // Set session cookie
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
+        
+        return { 
+          success: true, 
+          user: {
+            id: result.user.id,
+            name: result.user.name,
+            email: result.user.email,
+            userType: result.user.userType,
+            role: result.user.role,
+          }
+        };
+      }),
+    
+    // Check username availability
+    checkUsername: publicProcedure
+      .input(z.object({ username: z.string() }))
+      .query(async ({ input }) => {
+        const available = await isUsernameAvailable(input.username);
+        return { available };
+      }),
+    
+    // Check email availability
+    checkEmail: publicProcedure
+      .input(z.object({ email: z.string().email() }))
+      .query(async ({ input }) => {
+        const available = await isEmailAvailable(input.email);
+        return { available };
+      }),
+    
+    // Request password reset
+    requestPasswordReset: publicProcedure
+      .input(z.object({ email: z.string().email() }))
+      .mutation(async ({ input }) => {
+        await requestPasswordReset(input.email);
+        // Always return success to prevent email enumeration
+        return { success: true, message: "If an account exists with this email, you will receive a password reset link." };
+      }),
+    
+    // Reset password with token
+    resetPassword: publicProcedure
+      .input(z.object({
+        token: z.string(),
+        newPassword: z.string().min(8),
+        confirmPassword: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        if (input.newPassword !== input.confirmPassword) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Passwords do not match" });
+        }
+        
+        const result = await resetPassword(input.token, input.newPassword);
+        if (!result.success) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: result.error || "Password reset failed" });
+        }
+        
+        return { success: true, message: "Password has been reset successfully." };
+      }),
+    
+    // Verify email
+    verifyEmail: publicProcedure
+      .input(z.object({ token: z.string() }))
+      .mutation(async ({ input }) => {
+        const result = await verifyEmail(input.token);
+        if (!result.success) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: result.error || "Email verification failed" });
+        }
+        
+        return { success: true, message: "Email verified successfully!" };
+      }),
+    
+    // Change password (authenticated)
+    changePassword: protectedProcedure
+      .input(z.object({
+        currentPassword: z.string(),
+        newPassword: z.string().min(8),
+        confirmPassword: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (input.newPassword !== input.confirmPassword) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Passwords do not match" });
+        }
+        
+        const result = await changePassword(ctx.user.id, input.currentPassword, input.newPassword);
+        if (!result.success) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: result.error || "Password change failed" });
+        }
+        
+        return { success: true, message: "Password changed successfully." };
+      }),
     // Check if user needs MFA verification (for distributors/vending owners)
     checkMfaRequired: protectedProcedure
       .query(async ({ ctx }) => {

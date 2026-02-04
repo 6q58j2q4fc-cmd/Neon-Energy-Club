@@ -4734,3 +4734,30 @@
 - [x] No complex transforms or canvas operations - uses simple flexbox layout
 - [x] Simple vertical card-based layout for mobile
 - [x] Integrate into MyTeam component with device detection
+
+
+## Mobile Genealogy Tree & Native Auth System (Feb 4, 2026)
+
+### Mobile Genealogy Tree Enhancements
+- [x] Connect mobile genealogy tree to real team member data from API
+- [x] Fetch actual downline data from distributor.genealogy endpoint
+- [x] Display real team member names, ranks, and volumes
+- [x] Add pinch-to-zoom gesture support for mobile tree
+- [x] Implement touch-based zoom in/out functionality
+
+### Native Username/Password Authentication System
+- [x] Design database schema for native authentication (users table with password hash)
+- [x] Add user_type field to distinguish admin/customer/distributor/franchisee
+- [x] Create password hashing utility using bcrypt
+- [x] Build registration API endpoint with email verification
+- [x] Build login API endpoint with JWT token generation
+- [x] Create registration page UI for all user types
+- [x] Create login page UI with role selection
+- [x] Add password reset functionality
+- [x] Integrate native auth with existing OAuth system
+
+### Distributor Portal Fixes
+- [ ] Ensure all distributor portal features are fully functional
+- [ ] Fix any broken links or navigation issues
+- [ ] Verify commission tracking displays correctly
+- [ ] Test team management features end-to-end

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Users, UserPlus, ChevronDown, ChevronUp, Award, Star, Crown, Gem, Trophy, Zap, Target, Rocket, Shield, Medal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -26,8 +26,29 @@ interface TeamMember {
   isPlaceholder?: boolean;
 }
 
+// Convert API genealogy data to TeamMember format
+function convertGenealogyToTeamMember(data: any, position: "left" | "right" | "root" = "root"): TeamMember | null {
+  if (!data) return null;
+  
+  // Find left and right children from the children array
+  const leftChild = data.children?.find((c: any) => c.placementPosition === "left");
+  const rightChild = data.children?.find((c: any) => c.placementPosition === "right");
+  
+  return {
+    id: data.distributorCode || data.id?.toString() || "UNKNOWN",
+    name: data.name || data.username || "Team Member",
+    rank: (data.rank || "starter").toUpperCase(),
+    position,
+    personalVolume: data.personalSales || data.monthlyPV || 0,
+    teamVolume: data.teamSales || (data.leftLegVolume || 0) + (data.rightLegVolume || 0),
+    leftChild: leftChild ? convertGenealogyToTeamMember(leftChild, "left") : null,
+    rightChild: rightChild ? convertGenealogyToTeamMember(rightChild, "right") : null,
+  };
+}
+
 interface MobileGenealogyTreeProps {
-  rootMember: TeamMember | null;
+  rootMember?: TeamMember | null;
+  genealogyData?: any; // Raw data from API
   onEnrollClick?: (position: "left" | "right", parentId: string) => void;
   isLoading?: boolean;
 }
@@ -317,10 +338,45 @@ function LoadingSkeleton() {
 // Main component
 export function MobileGenealogyTree({ 
   rootMember, 
+  genealogyData,
   onEnrollClick,
   isLoading = false
 }: MobileGenealogyTreeProps) {
   const [expanded, setExpanded] = useState(true);
+  const [scale, setScale] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const lastTouchDistance = useRef<number | null>(null);
+  
+  // Convert genealogyData to rootMember format if provided
+  const effectiveRootMember = rootMember || (genealogyData ? convertGenealogyToTeamMember({
+    ...genealogyData,
+    children: genealogyData.tree || genealogyData.children || []
+  }) : null);
+  
+  // Pinch-to-zoom handlers
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      lastTouchDistance.current = Math.sqrt(dx * dx + dy * dy);
+    }
+  }, []);
+  
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 2 && lastTouchDistance.current !== null) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const delta = distance / lastTouchDistance.current;
+      
+      setScale(prev => Math.min(Math.max(prev * delta, 0.5), 2));
+      lastTouchDistance.current = distance;
+    }
+  }, []);
+  
+  const handleTouchEnd = useCallback(() => {
+    lastTouchDistance.current = null;
+  }, []);
   
   if (isLoading) {
     return (
@@ -337,7 +393,7 @@ export function MobileGenealogyTree({
     );
   }
   
-  if (!rootMember) {
+  if (!effectiveRootMember) {
     return (
       <div className="w-full min-h-[300px] flex flex-col items-center justify-center p-6">
         <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
@@ -355,13 +411,33 @@ export function MobileGenealogyTree({
     <div className="w-full min-h-[300px] flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-white/10 sticky top-0 bg-black/80 backdrop-blur-sm z-10">
-        <h3 className="text-lg font-bold text-white flex items-center gap-2">
-          <Users className="w-5 h-5 text-[#c8ff00]" />
-          My Team Tree
-        </h3>
-        <p className="text-sm text-white/50 mt-1">
-          Tap on members to view their downline
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <Users className="w-5 h-5 text-[#c8ff00]" />
+              My Team Tree
+            </h3>
+            <p className="text-sm text-white/50 mt-1">
+              Pinch to zoom • Tap to expand
+            </p>
+          </div>
+          {/* Zoom controls */}
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setScale(s => Math.max(s - 0.2, 0.5))}
+              className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 active:bg-white/20"
+            >
+              −
+            </button>
+            <span className="text-xs text-white/50 w-12 text-center">{Math.round(scale * 100)}%</span>
+            <button 
+              onClick={() => setScale(s => Math.min(s + 0.2, 2))}
+              className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 active:bg-white/20"
+            >
+              +
+            </button>
+          </div>
+        </div>
       </div>
       
       {/* Rank Legend */}
@@ -384,16 +460,24 @@ export function MobileGenealogyTree({
         </div>
       </div>
       
-      {/* Tree Content */}
-      <div className="flex-1 p-4 overflow-y-auto">
-        <MemberCard 
-          member={rootMember}
-          depth={0}
-          onEnrollClick={onEnrollClick}
-          expanded={expanded}
-          onToggleExpand={() => setExpanded(!expanded)}
-        />
-      </div>
+      {/* Tree Content with pinch-to-zoom */}
+      <div 
+        ref={containerRef}
+        className="flex-1 p-4 overflow-auto touch-pan-x touch-pan-y"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div style={{ transform: `scale(${scale})`, transformOrigin: 'top center', transition: 'transform 0.1s ease-out' }}>
+            <MemberCard 
+              member={effectiveRootMember}
+              depth={0}
+              onEnrollClick={onEnrollClick}
+              expanded={expanded}
+              onToggleExpand={() => setExpanded(!expanded)}
+            />
+          </div>
+        </div>
       
       {/* Quick Actions */}
       <div className="p-4 border-t border-white/10 bg-black/60">
@@ -401,7 +485,7 @@ export function MobileGenealogyTree({
           <Button
             variant="outline"
             className="border-[#c8ff00]/30 text-[#c8ff00] text-sm"
-            onClick={() => onEnrollClick?.("left", rootMember.id)}
+            onClick={() => onEnrollClick?.("left", effectiveRootMember.id)}
           >
             <UserPlus className="w-4 h-4 mr-2" />
             Add Left
@@ -409,7 +493,7 @@ export function MobileGenealogyTree({
           <Button
             variant="outline"
             className="border-[#9d4edd]/30 text-[#9d4edd] text-sm"
-            onClick={() => onEnrollClick?.("right", rootMember.id)}
+            onClick={() => onEnrollClick?.("right", effectiveRootMember.id)}
           >
             <UserPlus className="w-4 h-4 mr-2" />
             Add Right

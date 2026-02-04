@@ -253,6 +253,13 @@
       "when": 1770097212937,
       "tag": "0035_secret_phil_sheldon",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "5",
+      "when": 1770186515328,
+      "tag": "0036_strong_lady_bullseye",
+      "breakpoints": true
     }
   ]
 }

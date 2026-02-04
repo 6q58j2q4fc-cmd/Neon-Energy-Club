@@ -48,6 +48,9 @@ import OrderHistory from "./pages/OrderHistory";
 import GenealogyTutorial from "./pages/GenealogyTutorial";
 import VendingDashboard from "./pages/VendingDashboard";
 import MfaSettings from "./pages/MfaSettings";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
 import MfaVerify from "./pages/MfaVerify";
 import MfaRecovery from "./pages/MfaRecovery";
 import NotificationPreferences from "./pages/NotificationPreferences";
@@ -91,7 +94,11 @@ function Router() {
         <Route path="/neon-original" component={NeonOriginal} />
         <Route path="/neon-pink" component={NeonPink} />
         <Route path="/application-forms" component={ApplicationForms} />
-        <Route path={"/success"} component={Success} />
+        <Route path="/success" component={Success} />
+        {/* Authentication routes */}
+        <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        <Route path="/forgot-password" component={ForgotPassword} />
         {/* OLD Admin route removed - using AdminPanel instead */}
         <Route path={"/franchise"} component={Franchise} />
         <Route path={"/celebrities"} component={Celebrities} />

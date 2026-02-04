@@ -47,6 +47,9 @@ export default function MyTeam() {
   const { data: teamData, isLoading } = trpc.distributor.team.useQuery();
   const { data: stats } = trpc.distributor.stats.useQuery();
   
+  // Fetch genealogy data for mobile tree
+  const { data: genealogyData, isLoading: genealogyLoading } = trpc.distributor.genealogy.useQuery({ depth: 5 });
+  
   // Filter team members based on search
   const filteredTeam = teamData?.filter((member: any) =>
     member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -152,19 +155,21 @@ export default function MyTeam() {
           {activeView === "tree" ? (
             isMobile ? (
               <MobileGenealogyTree 
-                rootMember={{
+                genealogyData={genealogyData}
+                rootMember={genealogyData ? undefined : {
                   id: stats?.distributor?.distributorCode || "DIST001",
                   name: "You",
                   rank: stats?.distributor?.rank || "STARTER",
                   position: "root",
-                  personalVolume: 0,
-                  teamVolume: 0,
+                  personalVolume: stats?.distributor?.personalSales || 0,
+                  teamVolume: stats?.distributor?.teamSales || 0,
                   leftChild: null,
                   rightChild: null
                 }}
-                isLoading={isLoading}
+                isLoading={isLoading || genealogyLoading}
                 onEnrollClick={(position, parentId) => {
                   console.log(`Enroll at ${position} under ${parentId}`);
+                  // TODO: Navigate to enrollment page
                 }}
               />
             ) : (

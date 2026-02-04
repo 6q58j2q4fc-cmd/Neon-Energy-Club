@@ -13,6 +13,16 @@ export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
   /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
+  /** Username for native authentication (optional, unique if set) */
+  username: varchar("username", { length: 50 }),
+  /** Password hash for native authentication (bcrypt) */
+  passwordHash: varchar("passwordHash", { length: 255 }),
+  /** User type for role-based access */
+  userType: mysqlEnum("userType", ["customer", "distributor", "franchisee", "admin"]).default("customer").notNull(),
+  /** Password reset token */
+  passwordResetToken: varchar("passwordResetToken", { length: 64 }),
+  /** Password reset token expiry */
+  passwordResetExpiry: timestamp("passwordResetExpiry"),
   name: text("name"),
   email: varchar("email", { length: 320 }),
   /** Phone number for contact and shipping */
