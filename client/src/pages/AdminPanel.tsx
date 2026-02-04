@@ -355,7 +355,7 @@ function UserManagement() {
       refetch();
       setEditDialogOpen(false);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(error.message || "Failed to update user");
     },
   });
@@ -609,7 +609,7 @@ function OrderManagement() {
       toast.success("Order deleted successfully");
       refetch();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(`Failed to delete order: ${error.message}`);
     },
   });
@@ -620,7 +620,7 @@ function OrderManagement() {
       toast.success("All test orders deleted successfully");
       refetch();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(`Failed to delete test orders: ${error.message}`);
     },
   });
@@ -998,7 +998,7 @@ function DistributorManagement() {
       toast.success("All test distributors deleted successfully");
       refetch();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(`Failed to delete test distributors: ${error.message}`);
     },
   });
@@ -1247,7 +1247,7 @@ function DataAuditor() {
       toast.success(`Audit complete: ${data.sitesAudited} sites audited, ${data.issuesFound} issues found, ${data.issuesFixed} auto-fixed`);
       refetchStats();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       setIsRunningAudit(false);
       toast.error(`Audit failed: ${error.message}`);
     },
@@ -1258,7 +1258,7 @@ function DataAuditor() {
       toast.success("Test data cleaned up successfully");
       refetchStats();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(`Cleanup failed: ${error.message}`);
     },
   });

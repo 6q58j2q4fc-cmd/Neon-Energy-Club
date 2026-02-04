@@ -145,6 +145,88 @@ export default function About() {
             </p>
             <p className="text-gray-400 mt-4">— Dakota Rea, Founder</p>
           </div>
+
+          {/* Founder Section - Dakota Rea */}
+          <div id="founder" className={`space-y-6 hover-lift glass-card-vice rounded-xl p-8 ${isVisible ? 'animate-fade-in-up stagger-6' : 'opacity-0'}`}>
+            <div className="flex flex-col md:flex-row gap-8 items-center">
+              {/* Founder Image */}
+              <div className="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-4 border-[#c8ff00] shadow-[0_0_30px_rgba(200,255,0,0.3)] flex-shrink-0">
+                <div className="w-full h-full bg-gradient-to-br from-[#c8ff00]/20 to-[#00ffcc]/20 flex items-center justify-center">
+                  <span className="text-6xl md:text-8xl font-black text-[#c8ff00]">DR</span>
+                </div>
+              </div>
+              
+              {/* Founder Info */}
+              <div className="flex-1 text-center md:text-left">
+                <h3 className="text-3xl md:text-4xl font-bold gradient-text-vice font-vice mb-2">Dakota Rea</h3>
+                <p className="text-[#c8ff00] font-semibold text-lg mb-4">Founder & CEO, NEON Energy Drink</p>
+                <p className="text-lg text-gray-300 leading-relaxed mb-4">
+                  A Harvard Business School alumnus with a vision to revolutionize the energy beverage industry. 
+                  Dakota founded NEON in 2013 with a mission to bring healthy, clean energy drinks to the mainstream market. 
+                  His innovative approach and relentless drive have made NEON one of the fastest-growing beverage brands in history.
+                </p>
+                <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                  <span className="px-3 py-1 bg-[#c8ff00]/20 text-[#c8ff00] rounded-full text-sm">Harvard MBA</span>
+                  <span className="px-3 py-1 bg-[#00ffcc]/20 text-[#00ffcc] rounded-full text-sm">Serial Entrepreneur</span>
+                  <span className="px-3 py-1 bg-[#ff0080]/20 text-[#ff0080] rounded-full text-sm">Beverage Innovator</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Neon Dreams Book Pre-Order */}
+          <div id="book" className={`space-y-6 hover-lift rounded-xl overflow-hidden ${isVisible ? 'animate-fade-in-up stagger-7' : 'opacity-0'}`}>
+            <div className="bg-gradient-to-r from-[#1a0a2e] via-[#2a1040] to-[#1a0a2e] p-8 border border-[#c8ff00]/30">
+              <div className="flex flex-col md:flex-row gap-8 items-center">
+                {/* Book Cover */}
+                <div className="w-48 md:w-56 flex-shrink-0">
+                  <div className="aspect-[2/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a2e] rounded-lg shadow-[0_0_40px_rgba(200,255,0,0.2)] border border-[#c8ff00]/50 p-4 flex flex-col justify-between">
+                    <div>
+                      <div className="text-[#c8ff00] text-xs font-bold tracking-widest mb-2">COMING SOON</div>
+                      <h4 className="text-3xl font-black text-white leading-tight">NEON</h4>
+                      <h4 className="text-3xl font-black text-[#c8ff00] leading-tight">DREAMS</h4>
+                    </div>
+                    <div>
+                      <div className="w-full h-px bg-gradient-to-r from-transparent via-[#c8ff00] to-transparent my-4"></div>
+                      <p className="text-white/60 text-xs">The NEON Story</p>
+                      <p className="text-[#c8ff00] text-sm font-semibold">by Dakota Rea</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Book Info */}
+                <div className="flex-1 text-center md:text-left">
+                  <div className="inline-block px-3 py-1 bg-[#ff0080]/20 text-[#ff0080] rounded-full text-sm font-semibold mb-4">
+                    📚 PRE-ORDER NOW
+                  </div>
+                  <h3 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                    <span className="text-[#c8ff00]">NEON DREAMS</span>
+                  </h3>
+                  <p className="text-xl text-white/80 mb-4">The Untold Story Behind the Energy Revolution</p>
+                  <p className="text-gray-300 leading-relaxed mb-6">
+                    Go behind the scenes of NEON Energy Drink's incredible journey. From a small startup in Bend, Oregon 
+                    to a global phenomenon reaching 15% of the world's population. Dakota Rea shares the triumphs, 
+                    challenges, and lessons learned building one of the fastest-growing beverage brands in history.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                    <button 
+                      onClick={() => window.open('/shop?product=neon-dreams-book', '_blank')}
+                      className="bg-[#c8ff00] text-black px-8 py-3 rounded-lg font-bold text-lg hover:bg-[#a8d600] transition-all shadow-[0_0_20px_rgba(200,255,0,0.3)] hover:shadow-[0_0_30px_rgba(200,255,0,0.5)]"
+                    >
+                      Pre-Order Now - $24.99
+                    </button>
+                    <button 
+                      onClick={() => window.open('/shop?product=neon-dreams-audiobook', '_blank')}
+                      className="bg-transparent border-2 border-[#c8ff00] text-[#c8ff00] px-8 py-3 rounded-lg font-bold text-lg hover:bg-[#c8ff00]/10 transition-all"
+                    >
+                      Audiobook - $19.99
+                    </button>
+                  </div>
+                  <p className="text-white/50 text-sm mt-4">Expected Release: Summer 2026</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

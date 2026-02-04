@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { getLoginUrl } from "@/const";
+import { UserManagementTab } from "@/components/UserManagementTab";
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { useLocation } from "wouter";
@@ -45,7 +46,10 @@ import {
   CreditCard,
   Bell,
   Database,
-  Link2
+  Link2,
+  Shield,
+  Key,
+  UserCog
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -225,6 +229,7 @@ export default function AdminDashboard() {
             { id: "orders", icon: ShoppingCart, label: "Orders" },
             { id: "customers", icon: Users, label: "Customers" },
             { id: "distributors", icon: UserCheck, label: "Distributors" },
+            { id: "usermanagement", icon: Shield, label: "User Management" },
             { id: "territories", icon: MapPin, label: "Territories" },
             { id: "subscribers", icon: Mail, label: "Subscribers" },
             { id: "blog", icon: FileText, label: "Blog Posts" },
@@ -1185,6 +1190,11 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
             </div>
+          )}
+
+          {/* User Management Tab */}
+          {activeTab === "usermanagement" && (
+            <UserManagementTab />
           )}
 
           {/* Settings Tab */}

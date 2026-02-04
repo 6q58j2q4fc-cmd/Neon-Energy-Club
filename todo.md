@@ -4795,3 +4795,45 @@
 - [ ] Implement secure session management
 - [ ] Add SSL/TLS best practices
 - [ ] Ensure browser compatibility and no security warnings
+
+
+## Admin Panel, Social Login, Tutorials & Notifications (Feb 4, 2026)
+
+### Admin User Management Panel
+- [ ] Create admin dashboard page at /admin
+- [ ] Add user list with search and filter functionality
+- [ ] Implement role management (change user roles)
+- [ ] Add password reset functionality for admin
+- [ ] Add user activation/deactivation controls
+- [ ] Implement user activity logs
+
+### Social Login Integration
+- [ ] Add Google OAuth login button
+- [ ] Add Facebook OAuth login button
+- [ ] Link social accounts to existing users
+- [ ] Handle first-time social login registration
+
+### Vending Machine Tutorial Page
+- [ ] Create /vending-tutorial route
+- [ ] Build interactive vending machine tutorial component
+- [ ] Add step-by-step guide for franchise owners
+- [ ] Include ROI calculator and territory info
+
+### Real-Time Notifications for Distributors
+- [ ] Create notification preferences settings page
+- [ ] Implement new team member join notifications
+- [ ] Add commission earned notifications
+- [ ] Create notification bell icon with unread count
+- [ ] Add email digest option (daily/weekly)
+
+
+## Genealogy Tree & About Page (Feb 4, 2026)
+### Genealogy Tree Fix
+- [ ] Diagnose why genealogy tree is not visible on My Team page
+- [ ] Fix the tree rendering/loading issue
+- [ ] Ensure tree displays properly on mobile and desktop
+
+### Dakota Rea Founder Section
+- [ ] Add founder section to About page
+- [ ] Include Dakota Rea bio and photo
+- [ ] Add Neon Dreams book pre-order section

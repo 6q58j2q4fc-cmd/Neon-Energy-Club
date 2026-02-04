@@ -22,6 +22,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import GenealogyTree from "./GenealogyTree";
 import { MobileGenealogyTree } from "./MobileGenealogyTree";
+import IOSGenealogyTree from "./IOSGenealogyTree";
 import MobileGenealogyModal from "./MobileGenealogyModal";
 import { formatDistanceToNow } from "date-fns";
 
@@ -166,19 +167,13 @@ export default function MyTeam() {
                   Open Interactive Genealogy Tree
                 </Button>
                 
-                {/* Inline Mobile Tree Preview */}
-                <MobileGenealogyTree 
+                {/* iOS-Compatible Genealogy Tree */}
+                <IOSGenealogyTree 
                   genealogyData={genealogyData}
-                  rootMember={genealogyData ? undefined : {
-                    id: stats?.distributor?.distributorCode || "DIST001",
-                    name: "You",
-                    rank: stats?.distributor?.rank || "STARTER",
-                    position: "root",
-                    personalVolume: stats?.distributor?.personalSales || 0,
-                    teamVolume: stats?.distributor?.teamSales || 0,
-                    leftChild: null,
-                    rightChild: null
-                  }}
+                  distributorCode={stats?.distributor?.distributorCode || "DIST001"}
+                  distributorRank={stats?.distributor?.rank || "STARTER"}
+                  personalVolume={stats?.distributor?.personalSales || 0}
+                  teamVolume={stats?.distributor?.teamSales || 0}
                   isLoading={isLoading || genealogyLoading}
                   onEnrollClick={(position, parentId) => {
                     console.log(`Enroll at ${position} under ${parentId}`);
