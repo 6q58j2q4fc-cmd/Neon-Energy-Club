@@ -4912,3 +4912,22 @@
 - [x] Fix QR code URL to use correct format
 - [x] Verify genealogy tree shows desktop view on desktop and mobile view on mobile
 - [x] Add toggle button to switch between desktop/mobile tree views for testing
+
+# Site Auditor Issues - Feb 4, 2026
+- [ ] Fix missing_tracking issue - ensure affiliate links are generated during enrollment
+- [ ] Fix data_drift issue - ensure subdomains are assigned during enrollment
+- [ ] Implement pre-launch validation for new replicated websites
+- [ ] Add automated affiliate link and subdomain generation
+- [ ] Add data synchronization checks and auto-fix functionality
+- [ ] Test all functions on every page
+
+# Completed - Feb 4, 2026 - Site Auditor Fixes
+- [x] Created websiteProvisioning.ts service with pre-launch validation
+- [x] Added automated affiliate link generation during enrollment
+- [x] Added automated subdomain assignment during enrollment
+- [x] Created data synchronization checks and auto-fix functionality
+- [x] Added Website Health Monitor tab to Admin Panel
+- [x] Added runWebsiteHealthCheck API endpoint
+- [x] Added autoFixWebsiteIssues API endpoint
+- [x] Added getWebsiteProvisioningStatus API endpoint
+- [x] Added provisionWebsiteForDistributor API endpoint

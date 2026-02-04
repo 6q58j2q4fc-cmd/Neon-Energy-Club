@@ -1043,6 +1043,7 @@ export const appRouter = router({
       )
       .mutation(async ({ input, ctx }) => {
         const { enrollDistributor, createDistributorProfile, createEmailVerification, updateDistributorCountry } = await import("./db");
+        const { provisionReplicatedWebsite } = await import("./websiteProvisioning");
         const { sendEmailVerification } = await import("./emailNotifications");
         
         const distributor = await enrollDistributor({
@@ -1058,6 +1059,21 @@ export const appRouter = router({
         // Automatically create personalized profile for new distributor
         if (distributor) {
           await createDistributorProfile(ctx.user.id, ctx.user.name || "NEON Distributor");
+          
+          // Automatically provision replicated website with affiliate tracking
+          try {
+            const websiteResult = await provisionReplicatedWebsite(
+              distributor.id,
+              distributor.distributorCode,
+              ctx.user.name || undefined
+            );
+            if (!websiteResult.success) {
+              console.warn("[Distributor] Failed to provision website:", websiteResult.errors);
+            }
+          } catch (websiteError) {
+            console.warn("[Distributor] Website provisioning error:", websiteError);
+            // Don't fail enrollment if website provisioning fails
+          }
           
           // Create email verification token and send verification email
           if (ctx.user.email) {

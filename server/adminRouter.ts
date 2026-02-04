@@ -1280,6 +1280,153 @@ export const adminRouter = router({
       await db.delete(backupSchedules).where(eq(backupSchedules.id, input.id));
       return { success: true };
     }),
+
+  // Website health check - runs validation on all replicated websites
+  runWebsiteHealthCheck: adminProcedure.mutation(async ({ ctx }) => {
+    const { runFullSyncCheck } = await import("./websiteProvisioning");
+    const result = await runFullSyncCheck();
+    
+    // Log the health check
+    const db = await getDb();
+    if (db) {
+      await db.insert(systemAuditLog).values({
+        category: "website",
+        action: "health_check",
+        entityType: "system",
+        entityId: 0,
+        userId: ctx.user.id,
+        userRole: ctx.user.role,
+        result: result.issuesFound > 0 ? "partial" : "success",
+        severity: result.issuesFound > 0 ? "warning" : "info",
+        metadata: JSON.stringify(result),
+      });
+    }
+    
+    return result;
+  }),
+
+  // Auto-fix website issues
+  autoFixWebsiteIssues: adminProcedure.mutation(async ({ ctx }) => {
+    const { runFullSyncCheck } = await import("./websiteProvisioning");
+    // Run sync check which also fixes issues
+    const result = await runFullSyncCheck();
+    
+    // Log the auto-fix
+    const db = await getDb();
+    if (db) {
+      await db.insert(systemAuditLog).values({
+        category: "website",
+        action: "auto_fix",
+        entityType: "system",
+        entityId: 0,
+        userId: ctx.user.id,
+        userRole: ctx.user.role,
+        result: "success",
+        severity: "warning",
+        metadata: JSON.stringify(result),
+      });
+    }
+    
+    return result;
+  }),
+
+  // Get website provisioning status for all distributors
+  getWebsiteProvisioningStatus: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+    // Get all distributors with their website status
+    const distributorList = await db.select({
+      id: distributors.id,
+      distributorCode: distributors.distributorCode,
+      userId: distributors.userId,
+      rank: distributors.rank,
+      createdAt: distributors.createdAt,
+    }).from(distributors).orderBy(desc(distributors.createdAt));
+
+    // Get all replicated websites
+    const websites = await db.select().from(replicatedWebsites);
+    const websiteMap = new Map(websites.map(w => [w.distributorId, w]));
+
+    // Build status report
+    const statusReport = distributorList.map(d => {
+      const website = websiteMap.get(d.id);
+      return {
+        distributorId: d.id,
+        distributorCode: d.distributorCode,
+        userId: d.userId,
+        rank: d.rank,
+        createdAt: d.createdAt,
+        hasWebsite: !!website,
+        websiteStatus: website?.status || "not_provisioned",
+        subdomain: website?.subdomain || null,
+        affiliateLink: website?.affiliateLink || null,
+        isActive: website?.status === "active",
+        lastValidated: website?.lastVerifiedAt || null,
+        issues: !website ? ["missing_website"] : 
+          (!website.affiliateLink ? ["missing_affiliate_link"] : []).concat(
+            !website.subdomain ? ["missing_subdomain"] : []
+          ),
+      };
+    });
+
+    const totalDistributors = statusReport.length;
+    const withWebsites = statusReport.filter(s => s.hasWebsite).length;
+    const withIssues = statusReport.filter(s => s.issues.length > 0).length;
+
+    return {
+      summary: {
+        totalDistributors,
+        withWebsites,
+        withoutWebsites: totalDistributors - withWebsites,
+        withIssues,
+        healthScore: totalDistributors > 0 ? Math.round(((totalDistributors - withIssues) / totalDistributors) * 100) : 100,
+      },
+      distributors: statusReport,
+    };
+  }),
+
+  // Provision website for a specific distributor
+  provisionWebsiteForDistributor: adminProcedure
+    .input(z.object({ distributorId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      // Get distributor
+      const [distributor] = await db.select().from(distributors)
+        .where(eq(distributors.id, input.distributorId));
+      
+      if (!distributor) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Distributor not found" });
+      }
+
+      // Get user name
+      const [user] = await db.select().from(users).where(eq(users.id, distributor.userId));
+
+      // Provision website
+      const { provisionReplicatedWebsite } = await import("./websiteProvisioning");
+      const result = await provisionReplicatedWebsite(
+        distributor.id,
+        distributor.distributorCode,
+        user?.name || undefined
+      );
+
+      // Log the action
+      await db.insert(systemAuditLog).values({
+        category: "website",
+        action: "manual_provision",
+        entityType: "distributor",
+        entityId: input.distributorId,
+        userId: ctx.user.id,
+        userRole: ctx.user.role,
+        result: result.success ? "success" : "failure",
+        severity: result.success ? "info" : "error",
+        metadata: JSON.stringify(result),
+      });
+
+      return result;
+    }),
 });
 
 export type AdminRouter = typeof adminRouter;
