@@ -48,6 +48,8 @@ import OrderHistory from "./pages/OrderHistory";
 import GenealogyTutorial from "./pages/GenealogyTutorial";
 import VendingDashboard from "./pages/VendingDashboard";
 import MfaSettings from "./pages/MfaSettings";
+import PoliciesAndProcedures from "./pages/PoliciesAndProcedures";
+import TermsAndConditions from "./pages/TermsAndConditions";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -141,6 +143,8 @@ function Router() {
         <Route path="/track-order" component={OrderTracking} />
         <Route path="/my-orders" component={MyOrders} />
         <Route path="/policies" component={Policies} />
+        <Route path="/policies-and-procedures" component={PoliciesAndProcedures} />
+        <Route path="/terms-and-conditions" component={TermsAndConditions} />
         <Route path="/profile" component={Profile} />
           <Route path="/pre-order" component={PreOrder} />
           <Route path="/admin" component={AdminPanel} />

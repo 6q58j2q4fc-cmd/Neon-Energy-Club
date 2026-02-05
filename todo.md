@@ -5063,3 +5063,20 @@
 - [x] Updated database schema with new distributor columns
 - [x] Distributor enrollment buttons now show full application form
 - [x] Replicated website URLs work when custom domain is configured in Settings → Domains
+
+
+## Create MLM Legal Documents (Feb 5, 2026)
+- [ ] Create comprehensive Policies and Procedures document for NEON MLM
+- [ ] Create comprehensive Terms and Conditions document for NEON MLM
+- [ ] Create dedicated pages to display these documents
+- [ ] Update links in distributor application form to point to real documents
+- [ ] Test that all links work correctly
+
+## Legal Documents (Feb 5, 2026)
+
+- [x] Create MLM-standard Policies and Procedures document
+- [x] Create MLM-standard Terms and Conditions document
+- [x] Add /policies-and-procedures route and page
+- [x] Add /terms-and-conditions route and page
+- [x] Update distributor application form links to point to actual legal documents
+- [x] Test both legal document pages display correctly

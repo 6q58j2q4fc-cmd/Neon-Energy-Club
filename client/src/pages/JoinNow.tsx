@@ -502,7 +502,7 @@ function DistributorSignupForm({ user }: { user: any }) {
                       />
                       <label htmlFor="agreedToTerms" className="text-sm text-gray-300 cursor-pointer">
                         <span className="text-white font-semibold">I have read and agree to NEON Corporation's </span>
-                        <a href="/terms" target="_blank" className="text-[#c8ff00] underline hover:text-[#a8d600]">
+                        <a href="/terms-and-conditions" target="_blank" className="text-[#c8ff00] underline hover:text-[#a8d600]">
                           Terms and Conditions
                         </a>
                         <span className="text-white font-semibold"> *</span>
