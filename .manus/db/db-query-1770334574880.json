@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS commission_transactions (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  distributorId INT NOT NULL,\n  commissionType ENUM('retail','binary','fast_start','rank_bonus','matching') NOT NULL,\n  amount INT NOT NULL,\n  sourceOrderId INT,\n  sourceDistributorId INT,\n  calculationDetails TEXT,\n  payoutCycle DATE,\n  status ENUM('pending','paid','cancelled') DEFAULT 'pending' NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  paidAt TIMESTAMP NULL,\n  INDEX idx_distributorId (distributorId),\n  INDEX idx_payoutCycle (payoutCycle),\n  INDEX idx_status (status)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute CREATE TABLE IF NOT EXISTS commission_transactions (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  distributorId INT NOT NULL,\n  commissionType ENUM('retail','binary','fast_start','rank_bonus','matching') NOT NULL,\n  amount INT NOT NULL,\n  sourceOrderId INT,\n  sourceDistributorId INT,\n  calculationDetails TEXT,\n  payoutCycle DATE,\n  status ENUM('pending','paid','cancelled') DEFAULT 'pending' NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  paidAt TIMESTAMP NULL,\n  INDEX idx_distributorId (distributorId),\n  INDEX idx_payoutCycle (payoutCycle),\n  INDEX idx_status (status)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 305
+}

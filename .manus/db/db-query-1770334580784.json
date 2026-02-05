@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS leg_volumes (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  distributorId INT NOT NULL,\n  periodStart DATE NOT NULL,\n  periodEnd DATE NOT NULL,\n  leftLegVolume INT DEFAULT 0 NOT NULL,\n  rightLegVolume INT DEFAULT 0 NOT NULL,\n  leftLegPv INT DEFAULT 0 NOT NULL,\n  rightLegPv INT DEFAULT 0 NOT NULL,\n  carryForwardLeft INT DEFAULT 0 NOT NULL,\n  carryForwardRight INT DEFAULT 0 NOT NULL,\n  binaryCommissionPaid INT DEFAULT 0 NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  INDEX idx_distributorId (distributorId),\n  INDEX idx_periodStart (periodStart)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute CREATE TABLE IF NOT EXISTS leg_volumes (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  distributorId INT NOT NULL,\n  periodStart DATE NOT NULL,\n  periodEnd DATE NOT NULL,\n  leftLegVolume INT DEFAULT 0 NOT NULL,\n  rightLegVolume INT DEFAULT 0 NOT NULL,\n  leftLegPv INT DEFAULT 0 NOT NULL,\n  rightLegPv INT DEFAULT 0 NOT NULL,\n  carryForwardLeft INT DEFAULT 0 NOT NULL,\n  carryForwardRight INT DEFAULT 0 NOT NULL,\n  binaryCommissionPaid INT DEFAULT 0 NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  INDEX idx_distributorId (distributorId),\n  INDEX idx_periodStart (periodStart)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 221
+}

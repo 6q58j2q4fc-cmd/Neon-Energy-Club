@@ -1,0 +1,396 @@
+/**
+ * Binary Tree Service
+ * 
+ * Handles all binary tree operations including:
+ * - Placement logic (finding optimal position in tree)
+ * - Tree traversal (upline/downline queries)
+ * - Volume calculations (leg volumes, team volume)
+ * - Spillover management
+ */
+
+import { db } from "./db";
+import { eq, and, or, sql } from "drizzle-orm";
+import { binaryTreePositions, distributors } from "../drizzle/schema";
+
+export type PlacementPosition = 'left' | 'right';
+
+export interface TreePosition {
+  id: number;
+  distributorId: number;
+  parentId: number | null;
+  sponsorId: number;
+  position: PlacementPosition;
+  depthLevel: number;
+  createdAt: string;
+}
+
+export interface PlacementResult {
+  parentId: number;
+  position: PlacementPosition;
+  depthLevel: number;
+}
+
+/**
+ * Find the optimal placement position for a new distributor in the binary tree
+ * 
+ * Algorithm:
+ * 1. Check if sponsor has empty direct positions (left or right)
+ * 2. If both filled, find next available position in sponsor's downline
+ * 3. Prefer weaker leg to balance the tree
+ * 
+ * @param sponsorId - The distributor who recruited the new member
+ * @returns PlacementResult with parentId, position, and depth level
+ */
+export async function findOptimalPlacement(sponsorId: number): Promise<PlacementResult> {
+  // Get sponsor's tree position
+  const sponsorPosition = await db
+    .select()
+    .from(binaryTreePositions)
+    .where(eq(binaryTreePositions.distributorId, sponsorId))
+    .limit(1);
+
+  if (sponsorPosition.length === 0) {
+    // Sponsor is not in tree yet (shouldn't happen, but handle gracefully)
+    throw new Error(`Sponsor ${sponsorId} not found in binary tree`);
+  }
+
+  const sponsor = sponsorPosition[0];
+
+  // Check if sponsor has direct children
+  const directChildren = await db
+    .select()
+    .from(binaryTreePositions)
+    .where(eq(binaryTreePositions.parentId, sponsorId));
+
+  const hasLeft = directChildren.some(child => child.position === 'left');
+  const hasRight = directChildren.some(child => child.position === 'right');
+
+  // If sponsor has empty direct positions, place there
+  if (!hasLeft) {
+    return {
+      parentId: sponsorId,
+      position: 'left',
+      depthLevel: sponsor.depthLevel + 1
+    };
+  }
+
+  if (!hasRight) {
+    return {
+      parentId: sponsorId,
+      position: 'right',
+      depthLevel: sponsor.depthLevel + 1
+    };
+  }
+
+  // Both direct positions filled, find next available position via spillover
+  // Strategy: Place in weaker leg to balance the tree
+  const placement = await findSpilloverPosition(sponsorId);
+  return placement;
+}
+
+/**
+ * Find spillover position when sponsor's direct positions are full
+ * Uses breadth-first search to find next available position
+ * Prefers weaker leg to balance tree volume
+ */
+async function findSpilloverPosition(sponsorId: number): Promise<PlacementResult> {
+  // Get leg volumes to determine weaker leg
+  const legVolumes = await calculateLegVolumes(sponsorId);
+  const weakerLeg: PlacementPosition = legVolumes.leftLegVolume <= legVolumes.rightLegVolume ? 'left' : 'right';
+
+  // Start BFS from sponsor's weaker leg
+  const queue: number[] = [];
+  
+  // Get direct children
+  const directChildren = await db
+    .select()
+    .from(binaryTreePositions)
+    .where(eq(binaryTreePositions.parentId, sponsorId));
+
+  // Add weaker leg child to queue first
+  const weakerLegChild = directChildren.find(child => child.position === weakerLeg);
+  const strongerLegChild = directChildren.find(child => child.position !== weakerLeg);
+
+  if (weakerLegChild) queue.push(weakerLegChild.distributorId);
+  if (strongerLegChild) queue.push(strongerLegChild.distributorId);
+
+  // BFS to find first available position
+  while (queue.length > 0) {
+    const currentId = queue.shift()!;
+    
+    // Check if current node has empty positions
+    const children = await db
+      .select()
+      .from(binaryTreePositions)
+      .where(eq(binaryTreePositions.parentId, currentId));
+
+    const hasLeft = children.some(child => child.position === 'left');
+    const hasRight = children.some(child => child.position === 'right');
+
+    const currentPosition = await db
+      .select()
+      .from(binaryTreePositions)
+      .where(eq(binaryTreePositions.distributorId, currentId))
+      .limit(1);
+
+    if (currentPosition.length === 0) continue;
+
+    // Return first available position
+    if (!hasLeft) {
+      return {
+        parentId: currentId,
+        position: 'left',
+        depthLevel: currentPosition[0].depthLevel + 1
+      };
+    }
+
+    if (!hasRight) {
+      return {
+        parentId: currentId,
+        position: 'right',
+        depthLevel: currentPosition[0].depthLevel + 1
+      };
+    }
+
+    // Add children to queue
+    for (const child of children) {
+      queue.push(child.distributorId);
+    }
+  }
+
+  // Fallback (should never reach here)
+  throw new Error('Unable to find spillover position');
+}
+
+/**
+ * Place a new distributor in the binary tree
+ * 
+ * @param distributorId - The new distributor to place
+ * @param sponsorId - Who recruited them
+ * @returns The created tree position
+ */
+export async function placeDistributorInTree(
+  distributorId: number,
+  sponsorId: number
+): Promise<TreePosition> {
+  // Check if distributor already has a position
+  const existing = await db
+    .select()
+    .from(binaryTreePositions)
+    .where(eq(binaryTreePositions.distributorId, distributorId))
+    .limit(1);
+
+  if (existing.length > 0) {
+    throw new Error(`Distributor ${distributorId} already has a tree position`);
+  }
+
+  // Find optimal placement
+  const placement = await findOptimalPlacement(sponsorId);
+
+  // Insert into tree
+  const result = await db.insert(binaryTreePositions).values({
+    distributorId,
+    parentId: placement.parentId,
+    sponsorId,
+    position: placement.position,
+    depthLevel: placement.depthLevel,
+  });
+
+  // Fetch and return the created position
+  const created = await db
+    .select()
+    .from(binaryTreePositions)
+    .where(eq(binaryTreePositions.distributorId, distributorId))
+    .limit(1);
+
+  return created[0] as TreePosition;
+}
+
+/**
+ * Get all distributors in a specific leg (left or right)
+ * 
+ * @param distributorId - The root distributor
+ * @param leg - Which leg to query ('left' or 'right')
+ * @returns Array of distributor IDs in that leg
+ */
+export async function getDistributorsInLeg(
+  distributorId: number,
+  leg: PlacementPosition
+): Promise<number[]> {
+  const result: number[] = [];
+
+  // Get the direct child in specified leg
+  const directChild = await db
+    .select()
+    .from(binaryTreePositions)
+    .where(
+      and(
+        eq(binaryTreePositions.parentId, distributorId),
+        eq(binaryTreePositions.position, leg)
+      )
+    )
+    .limit(1);
+
+  if (directChild.length === 0) {
+    return result; // No one in this leg
+  }
+
+  // Recursively get all descendants
+  const queue = [directChild[0].distributorId];
+  result.push(directChild[0].distributorId);
+
+  while (queue.length > 0) {
+    const currentId = queue.shift()!;
+    
+    const children = await db
+      .select()
+      .from(binaryTreePositions)
+      .where(eq(binaryTreePositions.parentId, currentId));
+
+    for (const child of children) {
+      result.push(child.distributorId);
+      queue.push(child.distributorId);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Calculate leg volumes for a distributor
+ * 
+ * @param distributorId - The distributor to calculate volumes for
+ * @returns Object with leftLegVolume and rightLegVolume
+ */
+export async function calculateLegVolumes(distributorId: number): Promise<{
+  leftLegVolume: number;
+  rightLegVolume: number;
+  leftLegPv: number;
+  rightLegPv: number;
+}> {
+  // Get all distributors in left leg
+  const leftLegDistributors = await getDistributorsInLeg(distributorId, 'left');
+  
+  // Get all distributors in right leg
+  const rightLegDistributors = await getDistributorsInLeg(distributorId, 'right');
+
+  // Calculate volumes
+  let leftLegVolume = 0;
+  let leftLegPv = 0;
+  let rightLegVolume = 0;
+  let rightLegPv = 0;
+
+  if (leftLegDistributors.length > 0) {
+    const leftDistributors = await db
+      .select()
+      .from(distributors)
+      .where(sql`id IN (${leftLegDistributors.join(',')})`);
+
+    leftLegVolume = leftDistributors.reduce((sum, d) => sum + (d.personalSales || 0), 0);
+    leftLegPv = leftDistributors.reduce((sum, d) => sum + (d.monthlyPv || 0), 0);
+  }
+
+  if (rightLegDistributors.length > 0) {
+    const rightDistributors = await db
+      .select()
+      .from(distributors)
+      .where(sql`id IN (${rightLegDistributors.join(',')})`);
+
+    rightLegVolume = rightDistributors.reduce((sum, d) => sum + (d.personalSales || 0), 0);
+    rightLegPv = rightDistributors.reduce((sum, d) => sum + (d.monthlyPv || 0), 0);
+  }
+
+  return {
+    leftLegVolume,
+    rightLegVolume,
+    leftLegPv,
+    rightLegPv
+  };
+}
+
+/**
+ * Get complete upline chain for a distributor
+ * 
+ * @param distributorId - The distributor to get upline for
+ * @returns Array of distributor IDs from immediate parent to root
+ */
+export async function getUpline(distributorId: number): Promise<number[]> {
+  const upline: number[] = [];
+  
+  let currentId: number | null = distributorId;
+  
+  while (currentId !== null) {
+    const position = await db
+      .select()
+      .from(binaryTreePositions)
+      .where(eq(binaryTreePositions.distributorId, currentId))
+      .limit(1);
+
+    if (position.length === 0 || position[0].parentId === null) {
+      break;
+    }
+
+    upline.push(position[0].parentId);
+    currentId = position[0].parentId;
+  }
+
+  return upline;
+}
+
+/**
+ * Get all downline distributors (entire team)
+ * 
+ * @param distributorId - The root distributor
+ * @returns Array of all distributor IDs in downline
+ */
+export async function getAllDownline(distributorId: number): Promise<number[]> {
+  const leftLeg = await getDistributorsInLeg(distributorId, 'left');
+  const rightLeg = await getDistributorsInLeg(distributorId, 'right');
+  
+  return [...leftLeg, ...rightLeg];
+}
+
+/**
+ * Get team statistics for a distributor
+ */
+export async function getTeamStats(distributorId: number): Promise<{
+  totalTeamSize: number;
+  leftLegSize: number;
+  rightLegSize: number;
+  maxDepth: number;
+  activeDistributors: number;
+}> {
+  const leftLeg = await getDistributorsInLeg(distributorId, 'left');
+  const rightLeg = await getDistributorsInLeg(distributorId, 'right');
+  const allDownline = [...leftLeg, ...rightLeg];
+
+  // Get max depth
+  let maxDepth = 0;
+  if (allDownline.length > 0) {
+    const positions = await db
+      .select()
+      .from(binaryTreePositions)
+      .where(sql`distributorId IN (${allDownline.join(',')})`);
+
+    maxDepth = Math.max(...positions.map(p => p.depthLevel));
+  }
+
+  // Get active count
+  let activeDistributors = 0;
+  if (allDownline.length > 0) {
+    const distributorRecords = await db
+      .select()
+      .from(distributors)
+      .where(sql`id IN (${allDownline.join(',')})`);
+
+    activeDistributors = distributorRecords.filter(d => d.isActive === 1).length;
+  }
+
+  return {
+    totalTeamSize: allDownline.length,
+    leftLegSize: leftLeg.length,
+    rightLegSize: rightLeg.length,
+    maxDepth,
+    activeDistributors
+  };
+}

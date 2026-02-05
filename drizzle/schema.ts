@@ -1,4 +1,4 @@
-import { mysqlTable, mysqlSchema, AnyMySqlColumn, index, int, varchar, mysqlEnum, timestamp, text, decimal, tinyint, boolean } from "drizzle-orm/mysql-core"
+import { mysqlTable, int, varchar, text, timestamp, mysqlEnum, decimal, index, tinyint, boolean, date } from "drizzle-orm/mysql-core"
 import { sql } from "drizzle-orm"
 
 export const affiliateLinks = mysqlTable("affiliate_links", {
@@ -1213,3 +1213,59 @@ export const websiteAuditLog = mysqlTable("website_audit_log", {
 	performedBy: varchar({ length: 50 }).default('system'),
 	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
 });
+
+// Binary Tree and Genealogy Tables
+export const binaryTreePositions = mysqlTable("binary_tree_positions", {
+	id: int().autoincrement().notNull(),
+	distributorId: int().notNull(),
+	parentId: int(), // Who they're placed under in the tree
+	sponsorId: int().notNull(), // Who recruited them
+	position: mysqlEnum(['left','right']).notNull(),
+	depthLevel: int().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("binary_tree_positions_distributorId_unique").on(table.distributorId),
+	index("binary_tree_positions_parentId_idx").on(table.parentId),
+	index("binary_tree_positions_sponsorId_idx").on(table.sponsorId),
+]);
+
+export const commissionTransactions = mysqlTable("commission_transactions", {
+	id: int().autoincrement().notNull(),
+	distributorId: int().notNull(),
+	commissionType: mysqlEnum(['retail','binary','fast_start','rank_bonus','matching']).notNull(),
+	amount: int().notNull(), // in cents
+	sourceOrderId: int(),
+	sourceDistributorId: int(), // for matching bonus
+	calculationDetails: text(), // JSON with breakdown
+	payoutCycle: date(), // which week/month this belongs to
+	status: mysqlEnum(['pending','paid','cancelled']).default('pending').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	paidAt: timestamp({ mode: 'string' }),
+},
+(table) => [
+	index("commission_transactions_distributorId_idx").on(table.distributorId),
+	index("commission_transactions_payoutCycle_idx").on(table.payoutCycle),
+	index("commission_transactions_status_idx").on(table.status),
+]);
+
+export const legVolumes = mysqlTable("leg_volumes", {
+	id: int().autoincrement().notNull(),
+	distributorId: int().notNull(),
+	periodStart: date().notNull(),
+	periodEnd: date().notNull(),
+	leftLegVolume: int().default(0).notNull(), // in cents
+	rightLegVolume: int().default(0).notNull(), // in cents
+	leftLegPv: int().default(0).notNull(),
+	rightLegPv: int().default(0).notNull(),
+	carryForwardLeft: int().default(0).notNull(), // in cents
+	carryForwardRight: int().default(0).notNull(), // in cents
+	binaryCommissionPaid: int().default(0).notNull(), // in cents
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("leg_volumes_distributorId_idx").on(table.distributorId),
+	index("leg_volumes_periodStart_idx").on(table.periodStart),
+]);
+
+
