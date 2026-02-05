@@ -13,7 +13,7 @@ export function AmbientSoundToggle() {
 
   useEffect(() => {
     // Create audio element on mount
-    audioRef.current = new Audio("/jungle-ambient.mp3");
+    audioRef.current = new Audio("https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/RuVzsuSkJvAbHtJf.mp3");
     audioRef.current.loop = true;
     audioRef.current.volume = volume;
 

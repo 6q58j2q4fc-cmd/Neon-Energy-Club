@@ -63,7 +63,7 @@ import NeonOriginal from "./pages/NeonOriginal";
 import NeonPink from "./pages/NeonPink";
 import ApplicationForms from "./pages/ApplicationForms";
 import Search from "./pages/Search";
-// AmbientSoundToggle moved to header as HeaderSoundControl
+import AmbientSoundToggle from "./components/AmbientSoundToggle";
 import UnifiedChatBot from "./components/UnifiedChatBot";
 import CookieConsent from "./components/CookieConsent";
 import CartDrawer from "./components/CartDrawer";
@@ -183,7 +183,7 @@ function App() {
             <AvatarJungleAtmosphere intensity="low" />
             <Router />
             <CartDrawer />
-            {/* VoiceMuteButton removed - sound control now in header only */}
+            <AmbientSoundToggle />
             <UnifiedChatBot />
             <CookieConsent />
           </TooltipProvider>

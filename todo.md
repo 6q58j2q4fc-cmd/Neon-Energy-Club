@@ -5035,3 +5035,11 @@
 - [x] Added NFT icon/badge to tier packages on Home page (Supporter, Energizer, VIP Insider)
 - [x] Added NFT icon/badge to tier packages on Crowdfund page (all 4 tiers)
 - [x] Added NFT icon/badge to products on Products page (NEON Original, NEON Pink)
+
+
+## URGENT - Restore Original Jungle Sounds (Feb 5, 2026)
+- [x] Searched git history - found original in commit 533eda0
+- [x] Restored original jungle-ambient.mp3 file (1.7MB) from git history
+- [x] Restored AmbientSoundToggle component to App.tsx
+- [x] Floating volume control now appears in bottom-left corner
+- [x] Jungle sounds auto-play on page load (with browser interaction unlock for iOS)
