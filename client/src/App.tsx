@@ -18,6 +18,7 @@ import FAQ from "./pages/FAQ";
 import JoinNow from "./pages/JoinNow";
 import DistributorDashboard from "./pages/DistributorDashboard";
 import TaxInformation from "./pages/distributor/TaxInformation";
+import DistributorData from "./pages/admin/DistributorData";
 import DistributorSite from "./pages/DistributorSite";
 import Shop from "./pages/Shop";
 import Checkout from "./pages/Checkout";
@@ -112,6 +113,7 @@ function Router() {
         <Route path={"/join"} component={JoinNow} />
         <Route path={"/distributor/dashboard"} component={DistributorDashboard} />
         <Route path={"/distributor/tax-information"} component={TaxInformation} />
+        <Route path={"/admin/distributor-data"} component={DistributorData} />
         <Route path={"/d/:code"} component={DistributorSite} />
         <Route path={"/r/:slug"} component={PersonalizedLanding} />
         <Route path={"/shop"} component={Shop} />

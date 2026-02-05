@@ -116,7 +116,13 @@ export default function SelectPackage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {packages?.map((pkg) => {
             const isSelected = selectedPackageId === pkg.id;
-            const benefits = pkg.benefits ? JSON.parse(pkg.benefits) : [];
+            const benefits: string[] = [
+              `${pkg.productQuantity} cases of NEON Energy Drink`,
+              `${pkg.businessVolume} BV (Business Volume)`,
+              ...(pkg.marketingMaterialsIncluded ? ["Marketing materials included"] : []),
+              `${pkg.trainingAccessLevel.charAt(0).toUpperCase() + pkg.trainingAccessLevel.slice(1)} training access`,
+              ...(pkg.fastStartBonusEligible ? ["Fast Start Bonus eligible"] : []),
+            ];
             
             return (
               <Card

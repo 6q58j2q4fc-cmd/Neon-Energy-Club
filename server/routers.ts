@@ -1298,6 +1298,74 @@ export const appRouter = router({
         return await trackReferralClick(input.distributorCode, {});
       }),
 
+    // Get enrollment packages
+    getEnrollmentPackages: publicProcedure
+      .query(async () => {
+        const { getDb } = await import("./db");
+        const { enrollmentPackages } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Database not available",
+          });
+        }
+
+        return await db
+          .select()
+          .from(enrollmentPackages)
+          .where(eq(enrollmentPackages.isActive, true));
+      }),
+
+    // Select enrollment package
+    selectEnrollmentPackage: protectedProcedure
+      .input(
+        z.object({
+          packageId: z.number(),
+          autoshipEnabled: z.boolean(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const { getDistributorByUserId } = await import("./db");
+        const { getDb } = await import("./db");
+        const { distributors } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+
+        // Get distributor record
+        const distributor = await getDistributorByUserId(ctx.user.id);
+        if (!distributor) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Distributor record not found",
+          });
+        }
+
+        // Update distributor with package selection
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Database not available",
+          });
+        }
+
+        await db
+          .update(distributors)
+          .set({
+            enrollmentPackageId: input.packageId,
+            autoshipEnabled: input.autoshipEnabled,
+            commissionEligible: input.autoshipEnabled,
+          })
+          .where(eq(distributors.id, distributor.id));
+
+        return {
+          success: true,
+          message: "Package selected successfully",
+        };
+      }),
+
     // Get genealogy tree
     genealogy: protectedProcedure
       .input(z.object({ depth: z.number().int().min(1).max(10).default(5) }).optional())

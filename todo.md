@@ -5185,3 +5185,21 @@
 - [ ] Add search and filter functionality
 - [ ] Add export to CSV functionality
 - [ ] Ensure proper role-based access control (admin only)
+
+## Backend Integration & Admin Panel (Feb 5, 2026)
+
+- [x] Add getEnrollmentPackages procedure to server/routers.ts
+- [x] Add selectEnrollmentPackage procedure to server/routers.ts
+- [x] Create admin data viewer page at /admin/distributor-data
+- [x] Add secure tax information display with masking
+- [x] Add tabs for distributors vs customers in admin panel
+- [x] Fix TypeScript errors in SelectPackage component
+- [x] Fix autoshipActive/autoshipEnabled field naming
+- [x] Add enrollmentPackageId field to distributors table
+- [x] Update database schema and run migrations
+- [ ] Update Home page to use t() translation function
+- [ ] Update Products page to use t() translation function
+- [ ] Update About page to use t() translation function
+- [ ] Test complete enrollment flow with backend procedures
+- [ ] Test admin data viewer with sample data
+- [ ] Test language selector on updated pages

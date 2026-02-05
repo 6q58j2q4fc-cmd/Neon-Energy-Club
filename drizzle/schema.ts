@@ -275,8 +275,10 @@ export const distributors = mysqlTable("distributors", {
   bankRoutingNumber: varchar("bankRoutingNumber", { length: 255 }),
   /** Bank account number (encrypted) */
   bankAccountNumber: varchar("bankAccountNumber", { length: 255 }),
-  /** Enrollment package selected */
+  /** Enrollment package selected (legacy enum) */
   enrollmentPackage: mysqlEnum("enrollmentPackage", ["starter", "pro", "elite"]),
+  /** Enrollment package ID (foreign key to enrollmentPackages table) */
+  enrollmentPackageId: int("enrollmentPackageId"),
   /** Autoship enabled for commission eligibility */
   autoshipEnabled: boolean("autoshipEnabled").default(false).notNull(),
   /** Autoship package ID */
