@@ -247,10 +247,54 @@ export const distributors = mysqlTable("distributors", {
   dateOfBirth: varchar("dateOfBirth", { length: 20 }),
   /** Last 4 digits of SSN/Tax ID (for tax reporting) */
   taxIdLast4: varchar("taxIdLast4", { length: 4 }),
+  /** Full SSN or EIN (encrypted) - for IRS 1099 reporting */
+  taxId: varchar("taxId", { length: 255 }),
+  /** Tax ID type: SSN (individual) or EIN (business) */
+  taxIdType: mysqlEnum("taxIdType", ["ssn", "ein"]),
+  /** Business entity type if enrolled as business */
+  entityType: mysqlEnum("entityType", ["individual", "sole_proprietor", "llc", "s_corp", "c_corp", "partnership"]),
+  /** Registered business name (if applicable) */
+  businessName: varchar("businessName", { length: 255 }),
+  /** Business registration number/EIN */
+  businessRegistrationNumber: varchar("businessRegistrationNumber", { length: 50 }),
+  /** Business registration state */
+  businessRegistrationState: varchar("businessRegistrationState", { length: 50 }),
+  /** Emergency contact name */
+  emergencyContactName: varchar("emergencyContactName", { length: 255 }),
+  /** Emergency contact phone */
+  emergencyContactPhone: varchar("emergencyContactPhone", { length: 50 }),
+  /** Emergency contact relationship */
+  emergencyContactRelationship: varchar("emergencyContactRelationship", { length: 100 }),
+  /** Bank name for commission payments */
+  bankName: varchar("bankName", { length: 255 }),
+  /** Bank account type (checking/savings) */
+  bankAccountType: mysqlEnum("bankAccountType", ["checking", "savings"]),
+  /** Last 4 digits of bank account (for display) */
+  bankAccountLast4: varchar("bankAccountLast4", { length: 4 }),
+  /** Bank routing number (encrypted) */
+  bankRoutingNumber: varchar("bankRoutingNumber", { length: 255 }),
+  /** Bank account number (encrypted) */
+  bankAccountNumber: varchar("bankAccountNumber", { length: 255 }),
+  /** Enrollment package selected */
+  enrollmentPackage: mysqlEnum("enrollmentPackage", ["starter", "pro", "elite"]),
+  /** Autoship enabled for commission eligibility */
+  autoshipEnabled: boolean("autoshipEnabled").default(false).notNull(),
+  /** Autoship package ID */
+  autoshipPackageId: int("autoshipPackageId"),
+  /** Next autoship date */
+  nextAutoshipDate: timestamp("nextAutoshipDate"),
+  /** Tax information completed */
+  taxInfoCompleted: boolean("taxInfoCompleted").default(false).notNull(),
+  /** Tax information completed date */
+  taxInfoCompletedAt: timestamp("taxInfoCompletedAt"),
   /** Timestamp when user agreed to Policies and Procedures */
   agreedToPoliciesAt: timestamp("agreedToPoliciesAt"),
   /** Timestamp when user agreed to Terms and Conditions */
   agreedToTermsAt: timestamp("agreedToTermsAt"),
+  /** W-9 form submitted */
+  w9Submitted: boolean("w9Submitted").default(false).notNull(),
+  /** W-9 submission date */
+  w9SubmittedAt: timestamp("w9SubmittedAt"),
   /** Enrollment timestamp */
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   /** Last update timestamp */
@@ -259,6 +303,45 @@ export const distributors = mysqlTable("distributors", {
 
 export type Distributor = typeof distributors.$inferSelect;
 export type InsertDistributor = typeof distributors.$inferInsert;
+
+/**
+ * Enrollment packages table for distributor sign-up options.
+ * Defines different starter packages with pricing and benefits.
+ */
+export const enrollmentPackages = mysqlTable("enrollmentPackages", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Package name (Starter, Pro, Elite) */
+  name: varchar("name", { length: 100 }).notNull(),
+  /** Package slug for URLs */
+  slug: varchar("slug", { length: 100 }).notNull().unique(),
+  /** Package description */
+  description: text("description"),
+  /** Price in cents */
+  price: int("price").notNull(),
+  /** Business Volume (BV) included */
+  businessVolume: int("businessVolume").default(0).notNull(),
+  /** Product quantity included */
+  productQuantity: int("productQuantity").default(0).notNull(),
+  /** Product details (JSON) */
+  productDetails: text("productDetails"),
+  /** Marketing materials included */
+  marketingMaterialsIncluded: boolean("marketingMaterialsIncluded").default(false).notNull(),
+  /** Training access level */
+  trainingAccessLevel: mysqlEnum("trainingAccessLevel", ["basic", "advanced", "premium"]).default("basic").notNull(),
+  /** Fast start bonus eligible */
+  fastStartBonusEligible: boolean("fastStartBonusEligible").default(false).notNull(),
+  /** Package is active and available for purchase */
+  isActive: boolean("isActive").default(true).notNull(),
+  /** Display order */
+  displayOrder: int("displayOrder").default(0).notNull(),
+  /** Created timestamp */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** Updated timestamp */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EnrollmentPackage = typeof enrollmentPackages.$inferSelect;
+export type InsertEnrollmentPackage = typeof enrollmentPackages.$inferInsert;
 
 /**
  * Sales table for tracking all transactions.

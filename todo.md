@@ -5103,3 +5103,48 @@
 - [x] Verify distributor replicated websites work immediately after enrollment
 - [x] Create comprehensive test suite for distributor enrollment
 - [x] All tests passing (8/8)
+
+## MLM-Standard Enrollment & Tax Compliance (Feb 5, 2026)
+
+### Database Schema Updates
+- [x] Add tax information fields to distributors table (SSN/EIN, entity type, business name)
+- [x] Create enrollment packages table (starter, pro, elite with pricing and benefits)
+- [x] Add autoship subscription tracking fields
+- [x] Add business entity fields (entity type, business name, registration details)
+- [x] Add emergency contact fields
+- [x] Add banking information fields (encrypted)
+
+### Tax Information Collection
+- [x] Create secure tax information form in distributor payments section
+- [x] Add IRS compliance explanation and data protection notice
+- [x] Implement SSN/EIN encryption for secure storage (AES-256-GCM)
+- [x] Add validation for SSN format (XXX-XX-XXXX) and EIN format (XX-XXXXXXX)
+- [x] Create encryption utility module with encrypt/decrypt functions
+- [x] Add masking functions for displaying sensitive data
+- [x] Create backend procedure for tax information submission
+- [x] Add route to tax information page in App.tsx
+
+### Admin Panel Enhancements
+- [ ] Create dedicated admin section for distributor data management
+- [ ] Add secure view for tax information (masked by default, reveal on click)
+- [ ] Organize distributor and customer data in separate tabs
+- [ ] Add export functionality for tax reporting
+
+### Enhanced Distributor Enrollment Form
+- [ ] Add "Enroll as Business" option with entity type selection
+- [ ] Add business name and registration fields
+- [ ] Include all MLM-standard fields (emergency contact, banking info, etc.)
+- [ ] Add sponsor verification and upline display
+
+### Package Selection & Autoship
+- [ ] Create package selection page (Starter, Pro, Elite)
+- [ ] Display package benefits, pricing, and product inclusions
+- [ ] Add autoship checkbox (default checked) with commission eligibility warning
+- [ ] Show discount removal warning when autoship unchecked
+- [ ] Integrate with Stripe for package payment processing
+
+### Compliance & Security
+- [ ] Encrypt sensitive tax information (SSN/EIN)
+- [ ] Add audit logging for tax information access
+- [ ] Implement role-based access control for admin panel
+- [ ] Add data retention and privacy policy compliance

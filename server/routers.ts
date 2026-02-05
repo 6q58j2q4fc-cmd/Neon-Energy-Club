@@ -1208,6 +1208,72 @@ export const appRouter = router({
         return await checkSubdomainAvailable(input.subdomain);
       }),
 
+    // Submit tax information (SSN/EIN) for IRS 1099 reporting
+    submitTaxInformation: protectedProcedure
+      .input(
+        z.object({
+          taxIdType: z.enum(["ssn", "ein"]),
+          taxId: z.string().length(9), // 9 digits without formatting
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const { getDistributorByUserId } = await import("./db");
+        const { encrypt, formatSSN, formatEIN } = await import("./encryption");
+        const { getDb } = await import("./db");
+        const { distributors } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+
+        // Get distributor record
+        const distributor = await getDistributorByUserId(ctx.user.id);
+        if (!distributor) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Distributor record not found",
+          });
+        }
+
+        // Check if tax info already submitted
+        if (distributor.taxInfoCompleted) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Tax information has already been submitted. Contact support to update.",
+          });
+        }
+
+        // Encrypt the full tax ID
+        const encryptedTaxId = encrypt(input.taxId);
+
+        // Store last 4 digits for display
+        const taxIdLast4 = input.taxId.slice(-4);
+
+        // Update distributor record
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Database not available",
+          });
+        }
+
+        await db
+          .update(distributors)
+          .set({
+            taxId: encryptedTaxId,
+            taxIdType: input.taxIdType,
+            taxIdLast4,
+            taxInfoCompleted: true,
+            taxInfoCompletedAt: new Date(),
+            w9Submitted: true,
+            w9SubmittedAt: new Date(),
+          })
+          .where(eq(distributors.id, distributor.id));
+
+        return {
+          success: true,
+          message: "Tax information submitted successfully",
+        };
+      }),
+
     // Get public distributor profile by code (for cloned pages)
     getPublicProfile: publicProcedure
       .input(z.object({ code: z.string() }))

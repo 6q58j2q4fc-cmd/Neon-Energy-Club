@@ -281,6 +281,13 @@
       "when": 1770313175643,
       "tag": "0039_supreme_proudstar",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "5",
+      "when": 1770318369526,
+      "tag": "0040_wandering_eternity",
+      "breakpoints": true
     }
   ]
 }
