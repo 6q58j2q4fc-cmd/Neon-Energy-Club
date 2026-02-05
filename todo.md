@@ -5148,3 +5148,40 @@
 - [ ] Add audit logging for tax information access
 - [ ] Implement role-based access control for admin panel
 - [ ] Add data retention and privacy policy compliance
+
+## Language Selector Fix & Enhanced Enrollment (Feb 5, 2026)
+
+### Language Selector Issues
+- [ ] Investigate current language selector implementation
+- [ ] Fix language selector to change all page text in real-time
+- [ ] Ensure language changes persist across all pages
+- [ ] Test language switching on all pages without exceptions
+- [ ] Publish language selector functionality live
+
+### Enhanced Distributor Enrollment Form
+- [ ] Add business entity type selection (Individual, LLC, Corporation, Partnership, S-Corp, C-Corp)
+- [ ] Add business name field (conditional on entity type)
+- [ ] Add business registration number and state fields
+- [ ] Add emergency contact fields (name, phone, relationship)
+- [ ] Add all MLM-standard fields (matching Herbalife/Amway standards)
+- [ ] Update enrollment flow to redirect to package selection after form submission
+- [ ] Add form validation for all new fields
+
+### Package Selection Page
+- [ ] Create /distributor/select-package page
+- [ ] Display three enrollment packages (Starter $99, Pro $299, Elite $599)
+- [ ] Show package benefits, BV, and training access for each tier
+- [ ] Add autoship checkbox (default checked)
+- [ ] Add commission eligibility warning when autoship is unchecked
+- [ ] Integrate with Stripe for package payment processing
+- [ ] Redirect to payment confirmation after package selection
+
+### Admin Data Viewer
+- [ ] Create /admin/distributor-data page
+- [ ] Add tabs for Distributors vs Customers
+- [ ] Display distributor list with key information
+- [ ] Add secure, masked display of tax information (***-**-6789)
+- [ ] Add "Reveal" button to decrypt and show full tax ID (admin only)
+- [ ] Add search and filter functionality
+- [ ] Add export to CSV functionality
+- [ ] Ensure proper role-based access control (admin only)
