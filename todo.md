@@ -5263,3 +5263,32 @@
 - [ ] Update Products.tsx to use t() translation function
 - [ ] Update About.tsx to use t() translation function
 - [ ] Test language selector on all updated pages
+
+## Critical Replicated Website & MLM System Fixes (Feb 5, 2026)
+
+### Replicated Website Routing
+- [ ] Investigate why distributor links show "Page Not Found" error
+- [ ] Fix PersonalizedLanding component to properly load distributor data
+- [ ] Ensure getBySlug procedure correctly queries distributor codes
+- [ ] Test replicated website routing with actual distributor codes
+- [ ] Verify custom domain (neonenergyclub.com) routes to distributor sites
+
+### Compensation Plan & Commission Tracking Integration
+- [ ] Integrate compensation plan with real-time commission calculations
+- [ ] Ensure MLM tree analytics reflect accurate distributor/customer growth
+- [ ] Fix team analytics to show real-time data in distributor portals
+- [ ] Implement 100% accurate commission tracking system
+- [ ] Add automated integrity checks for MLM tree structure
+
+### Profile Photo Storage & Display
+- [ ] Fix profile photo upload to store in permanent S3 location
+- [ ] Ensure photos appear on replicated websites
+- [ ] Display photos in "Edit My Profile" section
+- [ ] Show photos in "Edit My Replicated Website" section
+- [ ] Display photos throughout distributor portal
+
+### System Security & Monitoring
+- [ ] Implement LLM-based monitoring for distributor website uptime
+- [ ] Add automated checks to prevent website hacking/downtime
+- [ ] Create integrity validation for all MLM features
+- [ ] Add real-time alerts for system issues

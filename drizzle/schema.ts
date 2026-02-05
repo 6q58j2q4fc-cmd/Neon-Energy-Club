@@ -1,2432 +1,1215 @@
-import { decimal, int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean } from "drizzle-orm/mysql-core";
+import { mysqlTable, mysqlSchema, AnyMySqlColumn, index, int, varchar, mysqlEnum, timestamp, text, decimal, tinyint, boolean } from "drizzle-orm/mysql-core"
+import { sql } from "drizzle-orm"
 
-/**
- * Core user table backing auth flow.
- * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
- */
-export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
-  id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
-  openId: varchar("openId", { length: 64 }).notNull().unique(),
-  /** Username for native authentication (optional, unique if set) */
-  username: varchar("username", { length: 50 }),
-  /** Password hash for native authentication (bcrypt) */
-  passwordHash: varchar("passwordHash", { length: 255 }),
-  /** User type for role-based access */
-  userType: mysqlEnum("userType", ["customer", "distributor", "franchisee", "admin"]).default("customer").notNull(),
-  /** Password reset token */
-  passwordResetToken: varchar("passwordResetToken", { length: 64 }),
-  /** Password reset token expiry */
-  passwordResetExpiry: timestamp("passwordResetExpiry"),
-  name: text("name"),
-  email: varchar("email", { length: 320 }),
-  /** Phone number for contact and shipping */
-  phone: varchar("phone", { length: 50 }),
-  /** Shipping address line 1 */
-  addressLine1: text("addressLine1"),
-  /** Shipping address line 2 (apt, suite, etc.) */
-  addressLine2: text("addressLine2"),
-  /** City for shipping */
-  city: varchar("city", { length: 100 }),
-  /** State/Province for shipping */
-  state: varchar("state", { length: 100 }),
-  /** Postal/ZIP code for shipping */
-  postalCode: varchar("postalCode", { length: 20 }),
-  /** Country for shipping */
-  country: varchar("country", { length: 100 }),
-  loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
-  /** Whether the user's email has been verified */
-  emailVerified: boolean("emailVerified").default(false).notNull(),
-  /** Token for email verification */
-  emailVerificationToken: varchar("emailVerificationToken", { length: 64 }),
-  /** Expiration time for email verification token */
-  emailVerificationExpiry: timestamp("emailVerificationExpiry"),
-  /** Whether the user's phone has been verified */
-  phoneVerified: boolean("phoneVerified").default(false).notNull(),
-  /** 6-digit OTP code for SMS verification */
-  smsVerificationCode: varchar("smsVerificationCode", { length: 6 }),
-  /** Expiration time for SMS verification code (10 minutes) */
-  smsVerificationExpiry: timestamp("smsVerificationExpiry"),
-  /** Number of SMS verification attempts (rate limiting) */
-  smsVerificationAttempts: int("smsVerificationAttempts").default(0).notNull(),
-  /** Last SMS sent timestamp (rate limiting) */
-  lastSmsSentAt: timestamp("lastSmsSentAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-  lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
-});
-
-export type User = typeof users.$inferSelect;
-export type InsertUser = typeof users.$inferInsert;
-
-/**
- * Pre-orders table for NEON energy drink relaunch.
- * Stores customer information and order details.
- */
-export const preorders = mysqlTable("preorders", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Customer full name */
-  name: varchar("name", { length: 255 }).notNull(),
-  /** Customer email address */
-  email: varchar("email", { length: 320 }).notNull(),
-  /** Customer phone number (optional) */
-  phone: varchar("phone", { length: 50 }),
-  /** Number of cases to pre-order (each case contains 24 cans) */
-  quantity: int("quantity").notNull(),
-  /** Delivery address */
-  address: text("address").notNull(),
-  /** City */
-  city: varchar("city", { length: 100 }).notNull(),
-  /** State/Province */
-  state: varchar("state", { length: 100 }).notNull(),
-  /** Postal/ZIP code */
-  postalCode: varchar("postalCode", { length: 20 }).notNull(),
-  /** Country */
-  country: varchar("country", { length: 100 }).notNull().default("USA"),
-  /** Order status */
-  status: mysqlEnum("status", ["pending", "confirmed", "shipped", "delivered", "cancelled"]).default("pending").notNull(),
-  /** Shipping tracking number */
-  trackingNumber: varchar("trackingNumber", { length: 100 }),
-  /** Shipping carrier (UPS, FedEx, USPS, DHL) */
-  carrier: varchar("carrier", { length: 50 }),
-  /** Estimated delivery date */
-  estimatedDelivery: timestamp("estimatedDelivery"),
-  /** Additional notes from customer */
-  notes: text("notes"),
-  /** Unique NFT ID for this order (e.g., NEON-NFT-00001) */
-  nftId: varchar("nftId", { length: 50 }),
-  /** URL to the generated NFT artwork image */
-  nftImageUrl: text("nftImageUrl"),
-  /** NFT mint status */
-  nftMintStatus: mysqlEnum("nftMintStatus", ["pending", "ready", "minted"]).default("pending"),
-  /** NFT rarity tier (Common, Uncommon, Rare, Epic, Legendary, Mythic) */
-  nftRarity: varchar("nftRarity", { length: 50 }),
-  /** NFT theme/environment description */
-  nftTheme: text("nftTheme"),
-  /** Order creation timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Last update timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type Preorder = typeof preorders.$inferSelect;
-export type InsertPreorder = typeof preorders.$inferInsert;
-
-/**
- * Crowdfunding contributions table.
- * Tracks user contributions to the NEON relaunch campaign.
- */
-export const crowdfunding = mysqlTable("crowdfunding", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Contributor name */
-  name: varchar("name", { length: 255 }).notNull(),
-  /** Contributor email */
-  email: varchar("email", { length: 320 }).notNull(),
-  /** Contribution amount in USD */
-  amount: int("amount").notNull(),
-  /** Reward tier selected */
-  rewardTier: varchar("rewardTier", { length: 100 }),
-  /** Payment status */
-  status: mysqlEnum("status", ["pending", "completed", "refunded"]).default("pending").notNull(),
-  /** Additional message from contributor */
-  message: text("message"),
-  /** Contribution timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type Crowdfunding = typeof crowdfunding.$inferSelect;
-export type InsertCrowdfunding = typeof crowdfunding.$inferInsert;
-
-/**
- * Territory licensing applications table.
- * Stores franchise territory licensing requests for vending machines.
- */
-export const territoryLicenses = mysqlTable("territory_licenses", {
-  id: int("id").autoincrement().primaryKey(),
-  /** User ID (foreign key to users table) */
-  userId: int("userId"),
-  /** Applicant name */
-  name: varchar("name", { length: 255 }).notNull(),
-  /** Applicant email */
-  email: varchar("email", { length: 320 }).notNull(),
-  /** Applicant phone */
-  phone: varchar("phone", { length: 50 }),
-  /** Territory description (e.g., "Los Angeles County, CA") */
-  territory: text("territory").notNull(),
-  /** Territory coordinates (GeoJSON or similar) */
-  coordinates: text("coordinates"),
-  /** Territory size in square miles */
-  squareMiles: int("squareMiles").notNull(),
-  /** License term in months */
-  termMonths: int("termMonths").notNull(),
-  /** Price per square mile per month */
-  pricePerSqMile: int("pricePerSqMile").notNull(),
-  /** Total licensing cost */
-  totalCost: int("totalCost").notNull(),
-  /** Deposit amount paid */
-  depositAmount: int("depositAmount"),
-  /** Financing selected */
-  financing: mysqlEnum("financing", ["full", "deposit", "monthly"]).default("full").notNull(),
-  /** Application status */
-  status: mysqlEnum("status", ["pending", "approved", "rejected", "active"]).default("pending").notNull(),
-  /** Additional notes */
-  notes: text("notes"),
-  /** Application timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Last update timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type TerritoryLicense = typeof territoryLicenses.$inferSelect;
-export type InsertTerritoryLicense = typeof territoryLicenses.$inferInsert;
-/**
- * Distributors table for micro-franchising system.
- * Tracks distributor accounts, ranks, and sponsor relationships.
- */
-export const distributors = mysqlTable("distributors", {
-  id: int("id").autoincrement().primaryKey(),
-  /** User ID (foreign key to users table) */
-  userId: int("userId").notNull().unique(),
-  /** Sponsor/upline distributor ID */
-  sponsorId: int("sponsorId"),
-  /** Placement position in binary tree (left or right) */
-  placementPosition: mysqlEnum("placementPosition", ["left", "right"]),
-  /** Unique distributor code for affiliate links */
-  distributorCode: varchar("distributorCode", { length: 50 }).notNull().unique(),
-  /** Custom username for login */
-  username: varchar("username", { length: 50 }).unique(),
-  /** Unique subdomain for affiliate site (e.g., john.neonenergy.com) */
-  subdomain: varchar("subdomain", { length: 50 }).unique(),
-  /** Current rank/level */
-  rank: mysqlEnum("rank", ["starter", "bronze", "silver", "gold", "platinum", "diamond", "crown_diamond", "royal_diamond"]).default("starter").notNull(),
-  /** Total personal sales volume (PV) */
-  personalSales: int("personalSales").default(0).notNull(),
-  /** Total team sales volume (GV) */
-  teamSales: int("teamSales").default(0).notNull(),
-  /** Left leg volume for binary tree */
-  leftLegVolume: int("leftLegVolume").default(0).notNull(),
-  /** Right leg volume for binary tree */
-  rightLegVolume: int("rightLegVolume").default(0).notNull(),
-  /** Total earnings */
-  totalEarnings: int("totalEarnings").default(0).notNull(),
-  /** Available balance for withdrawal */
-  availableBalance: int("availableBalance").default(0).notNull(),
-  /** Monthly personal volume (resets monthly) */
-  monthlyPV: int("monthlyPV").default(0).notNull(),
-  /** Monthly autoship volume */
-  monthlyAutoshipPV: int("monthlyAutoshipPV").default(0).notNull(),
-  /** Number of personally enrolled active distributors */
-  activeDownlineCount: int("activeDownlineCount").default(0).notNull(),
-  /** Is this distributor currently active (met monthly requirements) */
-  isActive: int("isActive").default(0).notNull(),
-  /** Last activity qualification date */
-  lastQualificationDate: timestamp("lastQualificationDate"),
-  /** Fast start bonus eligible until */
-  fastStartEligibleUntil: timestamp("fastStartEligibleUntil"),
-  /** Account status */
-  status: mysqlEnum("status", ["active", "inactive", "suspended"]).default("active").notNull(),
-  /** First name */
-  firstName: varchar("firstName", { length: 100 }),
-  /** Last name */
-  lastName: varchar("lastName", { length: 100 }),
-  /** Email address */
-  email: varchar("email", { length: 255 }),
-  /** Country code (ISO 3166-1 alpha-2) for flag display */
-  country: varchar("country", { length: 2 }),
-  /** Phone number */
-  phone: varchar("phone", { length: 50 }),
-  /** Street address */
-  address: text("address"),
-  /** City */
-  city: varchar("city", { length: 100 }),
-  /** State/Province */
-  state: varchar("state", { length: 100 }),
-  /** ZIP/Postal code */
-  zipCode: varchar("zipCode", { length: 20 }),
-  /** Date of birth */
-  dateOfBirth: varchar("dateOfBirth", { length: 20 }),
-  /** Last 4 digits of SSN/Tax ID (for tax reporting) */
-  ssnLast4: varchar("ssnLast4", { length: 4 }),
-  /** Full SSN or EIN (encrypted) - for IRS 1099 reporting */
-  taxId: varchar("taxId", { length: 255 }),
-  /** Tax ID type: SSN (individual) or EIN (business) */
-  taxIdType: mysqlEnum("taxIdType", ["ssn", "ein"]),
-  /** Business entity type if enrolled as business */
-  businessEntityType: mysqlEnum("businessEntityType", ["individual", "llc", "corporation", "partnership"]),
-  /** Registered business name (if applicable) */
-  businessName: varchar("businessName", { length: 255 }),
-  /** Business EIN/Tax ID */
-  businessEin: varchar("businessEin", { length: 50 }),
-  /** Business street address */
-  businessAddress: text("businessAddress"),
-  /** Business city */
-  businessCity: varchar("businessCity", { length: 100 }),
-  /** Business state */
-  businessState: varchar("businessState", { length: 100 }),
-  /** Business ZIP code */
-  businessZipCode: varchar("businessZipCode", { length: 20 }),
-  /** Emergency contact name */
-  emergencyContactName: varchar("emergencyContactName", { length: 255 }),
-  /** Emergency contact phone */
-  emergencyContactPhone: varchar("emergencyContactPhone", { length: 50 }),
-  /** Emergency contact relationship */
-  emergencyContactRelationship: varchar("emergencyContactRelationship", { length: 100 }),
-  /** Bank name for commission payments */
-  bankName: varchar("bankName", { length: 255 }),
-  /** Bank account type (checking/savings) */
-  bankAccountType: mysqlEnum("bankAccountType", ["checking", "savings"]),
-  /** Last 4 digits of bank account (for display) */
-  bankAccountLast4: varchar("bankAccountLast4", { length: 4 }),
-  /** Bank routing number (encrypted) */
-  bankRoutingNumber: varchar("bankRoutingNumber", { length: 255 }),
-  /** Bank account number (encrypted) */
-  bankAccountNumber: varchar("bankAccountNumber", { length: 255 }),
-  /** Enrollment package selected (legacy enum) */
-  enrollmentPackage: mysqlEnum("enrollmentPackage", ["starter", "pro", "elite"]),
-  /** Enrollment package ID (foreign key to enrollmentPackages table) */
-  enrollmentPackageId: int("enrollmentPackageId"),
-  /** Autoship enabled for commission eligibility */
-  autoshipEnabled: boolean("autoshipEnabled").default(false).notNull(),
-  /** Autoship package ID */
-  autoshipPackageId: int("autoshipPackageId"),
-  /** Next autoship date */
-  nextAutoshipDate: timestamp("nextAutoshipDate"),
-  /** Tax information completed */
-  taxInfoCompleted: boolean("taxInfoCompleted").default(false).notNull(),
-  /** Tax information completed date */
-  taxInfoCompletedAt: timestamp("taxInfoCompletedAt"),
-  /** Timestamp when user agreed to Policies and Procedures */
-  agreedToPoliciesAt: timestamp("agreedToPoliciesAt"),
-  /** Timestamp when user agreed to Terms and Conditions */
-  agreedToTermsAt: timestamp("agreedToTermsAt"),
-  /** W-9 form submitted */
-  w9Submitted: boolean("w9Submitted").default(false).notNull(),
-  /** W-9 submission date */
-  w9SubmittedAt: timestamp("w9SubmittedAt"),
-  /** Enrollment timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Last update timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type Distributor = typeof distributors.$inferSelect;
-export type InsertDistributor = typeof distributors.$inferInsert;
-
-/**
- * Enrollment packages table for distributor sign-up options.
- * Defines different starter packages with pricing and benefits.
- */
-export const enrollmentPackages = mysqlTable("enrollmentPackages", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Package name (Starter, Pro, Elite) */
-  name: varchar("name", { length: 100 }).notNull(),
-  /** Package slug for URLs */
-  slug: varchar("slug", { length: 100 }).notNull().unique(),
-  /** Package description */
-  description: text("description"),
-  /** Price in cents */
-  price: int("price").notNull(),
-  /** Business Volume (BV) included */
-  businessVolume: int("businessVolume").default(0).notNull(),
-  /** Product quantity included */
-  productQuantity: int("productQuantity").default(0).notNull(),
-  /** Product details (JSON) */
-  productDetails: text("productDetails"),
-  /** Marketing materials included */
-  marketingMaterialsIncluded: boolean("marketingMaterialsIncluded").default(false).notNull(),
-  /** Training access level */
-  trainingAccessLevel: mysqlEnum("trainingAccessLevel", ["basic", "advanced", "premium"]).default("basic").notNull(),
-  /** Fast start bonus eligible */
-  fastStartBonusEligible: boolean("fastStartBonusEligible").default(false).notNull(),
-  /** Package is active and available for purchase */
-  isActive: boolean("isActive").default(true).notNull(),
-  /** Display order */
-  displayOrder: int("displayOrder").default(0).notNull(),
-  /** Created timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Updated timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type EnrollmentPackage = typeof enrollmentPackages.$inferSelect;
-export type InsertEnrollmentPackage = typeof enrollmentPackages.$inferInsert;
-
-/**
- * Sales table for tracking all transactions.
- * Records both retail and distributor purchases.
- */
-export const sales = mysqlTable("sales", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Distributor ID who made the sale */
-  distributorId: int("distributorId"),
-  /** Customer user ID (if registered) */
-  customerId: int("customerId"),
-  /** Customer email */
-  customerEmail: varchar("customerEmail", { length: 320 }).notNull(),
-  /** Order total in cents */
-  orderTotal: int("orderTotal").notNull(),
-  /** Commission volume (BV - Business Volume) */
-  commissionVolume: int("commissionVolume").notNull(),
-  /** Sale type */
-  saleType: mysqlEnum("saleType", ["retail", "distributor", "autoship"]).default("retail").notNull(),
-  /** Payment status */
-  paymentStatus: mysqlEnum("paymentStatus", ["pending", "completed", "refunded"]).default("pending").notNull(),
-  /** Order details (JSON) */
-  orderDetails: text("orderDetails"),
-  /** Sale timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type Sale = typeof sales.$inferSelect;
-export type InsertSale = typeof sales.$inferInsert;
-
-/**
- * Commissions table for tracking earned commissions.
- * Records all commission payouts across the genealogy tree.
- */
-export const commissions = mysqlTable("commissions", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Distributor ID earning the commission */
-  distributorId: int("distributorId").notNull(),
-  /** Sale ID that generated this commission */
-  saleId: int("saleId").notNull(),
-  /** Source distributor ID (who made the sale) */
-  sourceDistributorId: int("sourceDistributorId"),
-  /** Commission type */
-  commissionType: mysqlEnum("commissionType", ["direct", "team", "rank_bonus", "leadership"]).notNull(),
-  /** Commission level (1 = direct, 2+ = downline levels) */
-  level: int("level").notNull(),
-  /** Commission amount in cents */
-  amount: int("amount").notNull(),
-  /** Commission percentage applied */
-  percentage: int("percentage").notNull(),
-  /** Payout status */
-  status: mysqlEnum("status", ["pending", "paid", "cancelled"]).default("pending").notNull(),
-  /** Commission earned timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type Commission = typeof commissions.$inferSelect;
-export type InsertCommission = typeof commissions.$inferInsert;
-
-/**
- * Newsletter subscriptions with viral referral tracking.
- * Tracks email signups and friend referrals for discount tiers.
- */
-export const newsletterSubscriptions = mysqlTable("newsletter_subscriptions", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Subscriber email */
-  email: varchar("email", { length: 320 }).notNull().unique(),
-  /** Subscriber name */
-  name: varchar("name", { length: 255 }),
-  /** Referrer subscription ID (who referred this person) */
-  referrerId: int("referrerId"),
-  /** Discount tier earned (0 = base, 1 = email signup, 2 = 3 friends) */
-  discountTier: int("discountTier").default(1).notNull(),
-  /** Total referrals made */
-  referralCount: int("referralCount").default(0).notNull(),
-  /** Unique coupon code for this subscriber */
-  couponCode: varchar("couponCode", { length: 20 }).unique(),
-  /** Whether the coupon has been used */
-  couponUsed: boolean("couponUsed").default(false).notNull(),
-  /** Timestamp when coupon was used */
-  couponUsedAt: timestamp("couponUsedAt"),
-  /** Order ID where coupon was used */
-  couponUsedOrderId: int("couponUsedOrderId"),
-  /** Subscription status */
-  status: mysqlEnum("status", ["active", "unsubscribed"]).default("active").notNull(),
-  /** Subscription timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type NewsletterSubscription = typeof newsletterSubscriptions.$inferSelect;
-export type InsertNewsletterSubscription = typeof newsletterSubscriptions.$inferInsert;
-
-/**
- * Affiliate links table for tracking custom distributor URLs.
- * Stores generated affiliate links and click/conversion tracking.
- */
 export const affiliateLinks = mysqlTable("affiliate_links", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Distributor ID who owns this link */
-  distributorId: int("distributorId").notNull(),
-  /** Unique link code */
-  linkCode: varchar("linkCode", { length: 50 }).notNull().unique(),
-  /** Campaign name/description */
-  campaignName: varchar("campaignName", { length: 255 }),
-  /** Target URL path */
-  targetPath: varchar("targetPath", { length: 500 }).default("/").notNull(),
-  /** Total clicks */
-  clicks: int("clicks").default(0).notNull(),
-  /** Total conversions */
-  conversions: int("conversions").default(0).notNull(),
-  /** Link status */
-  status: mysqlEnum("status", ["active", "inactive"]).default("active").notNull(),
-  /** Creation timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
+	id: int().autoincrement().notNull(),
+	distributorId: int().notNull(),
+	linkCode: varchar({ length: 50 }).notNull(),
+	campaignName: varchar({ length: 255 }),
+	targetPath: varchar({ length: 500 }).default('/').notNull(),
+	clicks: int().default(0).notNull(),
+	conversions: int().default(0).notNull(),
+	status: mysqlEnum(['active','inactive']).default('active').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("affiliate_links_linkCode_unique").on(table.linkCode),
+]);
 
-export type AffiliateLink = typeof affiliateLinks.$inferSelect;
-export type InsertAffiliateLink = typeof affiliateLinks.$inferInsert;
-
-/**
- * Product packages table - defines available purchase packages
- */
-export const packages = mysqlTable("packages", {
-  id: int("id").autoincrement().primaryKey(),
-  name: varchar("name", { length: 100 }).notNull(),
-  type: mysqlEnum("type", ["distributor", "customer"]).notNull(),
-  tier: mysqlEnum("tier", ["starter", "pro", "elite", "single", "12pack", "24pack"]).notNull(),
-  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
-  pv: int("pv").notNull(), // Personal Volume for commission calculation
-  description: text("description"),
-  contents: text("contents"), // JSON string of what's included
-  active: int("active").default(1).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type Package = typeof packages.$inferSelect;
-export type InsertPackage = typeof packages.$inferInsert;
-
-/**
- * Orders table - tracks all product purchases
- */
-export const orders = mysqlTable("orders", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId"),
-  distributorId: int("distributorId"), // Referring distributor for commission tracking
-  packageId: int("packageId").notNull(),
-  orderNumber: varchar("orderNumber", { length: 50 }).notNull().unique(),
-  customerName: varchar("customerName", { length: 255 }).notNull(),
-  customerEmail: varchar("customerEmail", { length: 320 }).notNull(),
-  shippingAddress: text("shippingAddress").notNull(),
-  totalAmount: decimal("totalAmount", { precision: 10, scale: 2 }).notNull(),
-  pv: int("pv").notNull(),
-  status: mysqlEnum("status", ["pending", "paid", "shipped", "delivered", "cancelled"]).default("pending").notNull(),
-  stripePaymentId: varchar("stripePaymentId", { length: 255 }),
-  isAutoShip: int("isAutoShip").default(0).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type Order = typeof orders.$inferSelect;
-export type InsertOrder = typeof orders.$inferInsert;
-
-/**
- * Auto-ship subscriptions table
- */
 export const autoShipSubscriptions = mysqlTable("autoShipSubscriptions", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  packageId: int("packageId").notNull(),
-  status: mysqlEnum("status", ["active", "paused", "cancelled"]).default("active").notNull(),
-  frequency: mysqlEnum("frequency", ["weekly", "biweekly", "monthly"]).default("monthly").notNull(),
-  nextShipDate: timestamp("nextShipDate").notNull(),
-  lastShipDate: timestamp("lastShipDate"),
-  shippingAddress: text("shippingAddress").notNull(),
-  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	packageId: int().notNull(),
+	status: mysqlEnum(['active','paused','cancelled']).default('active').notNull(),
+	frequency: mysqlEnum(['weekly','biweekly','monthly']).default('monthly').notNull(),
+	nextShipDate: timestamp({ mode: 'string' }).notNull(),
+	lastShipDate: timestamp({ mode: 'string' }),
+	shippingAddress: text().notNull(),
+	stripeSubscriptionId: varchar({ length: 255 }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 });
 
-export type AutoShipSubscription = typeof autoShipSubscriptions.$inferSelect;
-export type InsertAutoShipSubscription = typeof autoShipSubscriptions.$inferInsert;
-
-/**
- * Blog posts table for automated content generation.
- * Stores AI-generated blog posts about NEON energy drink.
- */
-export const blogPosts = mysqlTable("blog_posts", {
-  id: int("id").autoincrement().primaryKey(),
-  /** URL-friendly slug */
-  slug: varchar("slug", { length: 255 }).notNull().unique(),
-  /** Post title */
-  title: varchar("title", { length: 500 }).notNull(),
-  /** Short excerpt/summary */
-  excerpt: text("excerpt"),
-  /** Full post content in markdown */
-  content: text("content").notNull(),
-  /** Featured image URL */
-  featuredImage: varchar("featuredImage", { length: 500 }),
-  /** Post category */
-  category: mysqlEnum("category", [
-    "product",
-    "health",
-    "business",
-    "franchise",
-    "distributor",
-    "news",
-    "lifestyle"
-  ]).default("product").notNull(),
-  /** SEO meta title */
-  metaTitle: varchar("metaTitle", { length: 255 }),
-  /** SEO meta description */
-  metaDescription: text("metaDescription"),
-  /** SEO keywords */
-  keywords: text("keywords"),
-  /** Post status */
-  status: mysqlEnum("status", ["draft", "published", "archived"]).default("draft").notNull(),
-  /** Author name */
-  author: varchar("author", { length: 255 }).default("NEON Team"),
-  /** View count */
-  views: int("views").default(0),
-  /** Published date */
-  publishedAt: timestamp("publishedAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type BlogPost = typeof blogPosts.$inferSelect;
-export type InsertBlogPost = typeof blogPosts.$inferInsert;
-
-
-/**
- * Claimed territories table for tracking which territories are already licensed.
- * Used to show availability on the territory map selector.
- */
-export const claimedTerritories = mysqlTable("claimed_territories", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Territory license ID (foreign key) */
-  territoryLicenseId: int("territoryLicenseId").notNull(),
-  /** Center latitude */
-  centerLat: decimal("centerLat", { precision: 10, scale: 7 }).notNull(),
-  /** Center longitude */
-  centerLng: decimal("centerLng", { precision: 10, scale: 7 }).notNull(),
-  /** Radius in miles */
-  radiusMiles: int("radiusMiles").notNull(),
-  /** Territory name/description */
-  territoryName: varchar("territoryName", { length: 255 }).notNull(),
-  /** Zip code (if applicable) */
-  zipCode: varchar("zipCode", { length: 20 }),
-  /** City */
-  city: varchar("city", { length: 100 }),
-  /** State */
-  state: varchar("state", { length: 50 }),
-  /** Status */
-  status: mysqlEnum("status", ["pending", "active", "expired"]).default("pending").notNull(),
-  /** Claim timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Expiration timestamp */
-  expiresAt: timestamp("expiresAt"),
-  /** Renewal date */
-  renewalDate: timestamp("renewalDate"),
-  /** License expiration date */
-  expirationDate: timestamp("expirationDate"),
-});
-
-export type ClaimedTerritory = typeof claimedTerritories.$inferSelect;
-export type InsertClaimedTerritory = typeof claimedTerritories.$inferInsert;
-
-/**
- * Territory applications table for multi-step application workflow.
- * Stores application progress and all applicant details.
- */
-export const territoryApplications = mysqlTable("territory_applications", {
-  id: int("id").autoincrement().primaryKey(),
-  /** User ID (if logged in) */
-  userId: int("userId"),
-  /** Application step (1-4) */
-  currentStep: int("currentStep").default(1).notNull(),
-  
-  // Step 1: Territory Selection
-  /** Center latitude */
-  centerLat: decimal("centerLat", { precision: 10, scale: 7 }),
-  /** Center longitude */
-  centerLng: decimal("centerLng", { precision: 10, scale: 7 }),
-  /** Radius in miles */
-  radiusMiles: int("radiusMiles"),
-  /** Territory name/description */
-  territoryName: varchar("territoryName", { length: 255 }),
-  /** Estimated population */
-  estimatedPopulation: int("estimatedPopulation"),
-  /** License term in months */
-  termMonths: int("termMonths"),
-  /** Total cost */
-  totalCost: int("totalCost"),
-  
-  // Step 2: Personal Details
-  /** Applicant first name */
-  firstName: varchar("firstName", { length: 100 }),
-  /** Applicant last name */
-  lastName: varchar("lastName", { length: 100 }),
-  /** Email address */
-  email: varchar("email", { length: 320 }),
-  /** Phone number */
-  phone: varchar("phone", { length: 50 }),
-  /** Date of birth */
-  dateOfBirth: varchar("dateOfBirth", { length: 20 }),
-  /** Street address */
-  streetAddress: varchar("streetAddress", { length: 255 }),
-  /** City */
-  city: varchar("city", { length: 100 }),
-  /** State */
-  state: varchar("state", { length: 50 }),
-  /** Zip code */
-  zipCode: varchar("zipCode", { length: 20 }),
-  
-  // Step 3: Business Information
-  /** Business name (if applicable) */
-  businessName: varchar("businessName", { length: 255 }),
-  /** Business type */
-  businessType: mysqlEnum("businessType", ["individual", "llc", "corporation", "partnership"]),
-  /** Tax ID / EIN */
-  taxId: varchar("taxId", { length: 50 }),
-  /** Years in business */
-  yearsInBusiness: int("yearsInBusiness"),
-  /** Investment capital available */
-  investmentCapital: int("investmentCapital"),
-  /** Previous franchise experience */
-  franchiseExperience: text("franchiseExperience"),
-  /** Why interested in NEON */
-  whyInterested: text("whyInterested"),
-  
-  // Step 4: Review & Submit
-  /** Agreed to terms */
-  agreedToTerms: int("agreedToTerms").default(0).notNull(),
-  /** Signature (typed name) */
-  signature: varchar("signature", { length: 255 }),
-  /** Submitted timestamp */
-  submittedAt: timestamp("submittedAt"),
-  
-  /** Application status */
-  status: mysqlEnum("status", ["draft", "submitted", "under_review", "approved", "rejected"]).default("draft").notNull(),
-  /** Admin notes */
-  adminNotes: text("adminNotes"),
-  /** Creation timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Last update timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type TerritoryApplication = typeof territoryApplications.$inferSelect;
-export type InsertTerritoryApplication = typeof territoryApplications.$inferInsert;
-
-
-/**
- * NEON Relaunch NFTs table.
- * Each order gets a unique limited edition NFT with rarity based on order number.
- * Lower order numbers = more rare and valuable.
- */
-export const neonNfts = mysqlTable("neon_nfts", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Order ID this NFT is tied to */
-  orderId: int("orderId"),
-  /** Pre-order ID (for pre-orders) */
-  preorderId: int("preorderId"),
-  /** Crowdfunding contribution ID */
-  crowdfundingId: int("crowdfundingId"),
-  /** User ID who owns this NFT */
-  userId: int("userId"),
-  /** Unique NFT token ID (sequential, determines rarity) */
-  tokenId: int("tokenId").notNull().unique(),
-  /** NFT name (e.g., "NEON Genesis #1") */
-  name: varchar("name", { length: 255 }).notNull(),
-  /** NFT description */
-  description: text("description"),
-  /** Generated NFT image URL */
-  imageUrl: varchar("imageUrl", { length: 500 }),
-  /** Rarity tier based on token ID */
-  rarity: mysqlEnum("rarity", ["legendary", "epic", "rare", "uncommon", "common"]).notNull(),
-  /** Rarity rank (1 = most rare) */
-  rarityRank: int("rarityRank").notNull(),
-  /** Estimated value in USD */
-  estimatedValue: decimal("estimatedValue", { precision: 10, scale: 2 }),
-  /** Owner email */
-  ownerEmail: varchar("ownerEmail", { length: 320 }),
-  /** Owner name */
-  ownerName: varchar("ownerName", { length: 255 }),
-  /** Package/tier that earned this NFT */
-  packageType: varchar("packageType", { length: 100 }),
-  /** Blockchain transaction hash (for future minting) */
-  txHash: varchar("txHash", { length: 100 }),
-  /** Blockchain status */
-  blockchainStatus: mysqlEnum("blockchainStatus", ["pending", "minted", "transferred"]).default("pending").notNull(),
-  /** Mint timestamp */
-  mintedAt: timestamp("mintedAt"),
-  /** Creation timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type NeonNft = typeof neonNfts.$inferSelect;
-export type InsertNeonNft = typeof neonNfts.$inferInsert;
-
-
-/**
- * SMS Opt-in table for tracking user SMS preferences and referral codes.
- * Links subscribers to their unique referral codes for tracking conversions.
- */
-export const smsOptIns = mysqlTable("sms_opt_ins", {
-  id: int("id").autoincrement().primaryKey(),
-  /** User ID (if registered) */
-  userId: int("userId"),
-  /** Phone number */
-  phone: varchar("phone", { length: 50 }).notNull(),
-  /** Email address */
-  email: varchar("email", { length: 320 }),
-  /** Subscriber's name */
-  name: varchar("name", { length: 255 }),
-  /** Unique subscriber ID for tracking */
-  subscriberId: varchar("subscriberId", { length: 50 }).notNull().unique(),
-  /** Unique referral code for this subscriber */
-  referralCode: varchar("referralCode", { length: 50 }).notNull().unique(),
-  /** Referred by subscriber ID */
-  referredBy: varchar("referredBy", { length: 50 }),
-  /** SMS opt-in status */
-  optedIn: int("optedIn").default(1).notNull(),
-  /** Opt-in timestamp */
-  optInDate: timestamp("optInDate").defaultNow(),
-  /** Opt-out timestamp */
-  optOutDate: timestamp("optOutDate"),
-  /** Preferences - order updates */
-  prefOrderUpdates: int("prefOrderUpdates").default(1).notNull(),
-  /** Preferences - promotions */
-  prefPromotions: int("prefPromotions").default(1).notNull(),
-  /** Preferences - referral alerts */
-  prefReferralAlerts: int("prefReferralAlerts").default(1).notNull(),
-  /** Preferences - territory updates */
-  prefTerritoryUpdates: int("prefTerritoryUpdates").default(1).notNull(),
-  /** Total referrals made */
-  totalReferrals: int("totalReferrals").default(0).notNull(),
-  /** Referrals converted to customers */
-  customersReferred: int("customersReferred").default(0).notNull(),
-  /** Referrals converted to distributors */
-  distributorsReferred: int("distributorsReferred").default(0).notNull(),
-  /** Creation timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Last update timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type SMSOptIn = typeof smsOptIns.$inferSelect;
-export type InsertSMSOptIn = typeof smsOptIns.$inferInsert;
-
-/**
- * Referral tracking table for detailed referral analytics.
- * Tracks each referral from source to conversion.
- */
-export const referralTracking = mysqlTable("referral_tracking", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Referrer's subscriber ID */
-  referrerId: varchar("referrerId", { length: 50 }).notNull(),
-  /** Referrer's name */
-  referrerName: varchar("referrerName", { length: 255 }),
-  /** Referral code used */
-  referralCode: varchar("referralCode", { length: 50 }).notNull(),
-  /** Referred person's phone (if SMS) */
-  referredPhone: varchar("referredPhone", { length: 50 }),
-  /** Referred person's email */
-  referredEmail: varchar("referredEmail", { length: 320 }),
-  /** Referred person's name */
-  referredName: varchar("referredName", { length: 255 }),
-  /** Source of referral */
-  source: mysqlEnum("source", ["sms", "email", "social", "direct", "whatsapp", "twitter", "facebook"]).default("direct").notNull(),
-  /** Referral status */
-  status: mysqlEnum("status", ["pending", "clicked", "signed_up", "customer", "distributor"]).default("pending").notNull(),
-  /** Converted to customer */
-  convertedToCustomer: int("convertedToCustomer").default(0).notNull(),
-  /** Converted to distributor */
-  convertedToDistributor: int("convertedToDistributor").default(0).notNull(),
-  /** Customer order ID (if converted) */
-  customerOrderId: int("customerOrderId"),
-  /** Distributor ID (if converted) */
-  distributorId: int("distributorId"),
-  /** Referral bonus paid */
-  bonusPaid: int("bonusPaid").default(0).notNull(),
-  /** Bonus amount in cents */
-  bonusAmount: int("bonusAmount").default(0).notNull(),
-  /** Click timestamp */
-  clickedAt: timestamp("clickedAt"),
-  /** Signup timestamp */
-  signedUpAt: timestamp("signedUpAt"),
-  /** Conversion timestamp */
-  convertedAt: timestamp("convertedAt"),
-  /** Creation timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type ReferralTracking = typeof referralTracking.$inferSelect;
-export type InsertReferralTracking = typeof referralTracking.$inferInsert;
-
-/**
- * SMS message log for tracking all sent messages.
- * Used for analytics and compliance.
- */
-export const smsMessageLog = mysqlTable("sms_message_log", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Recipient phone number */
-  phone: varchar("phone", { length: 50 }).notNull(),
-  /** Recipient name */
-  recipientName: varchar("recipientName", { length: 255 }),
-  /** Message type */
-  messageType: mysqlEnum("messageType", [
-    "order_confirmation",
-    "shipping_update",
-    "delivery_confirmation",
-    "territory_submitted",
-    "territory_approved",
-    "territory_rejected",
-    "referral_invite",
-    "welcome",
-    "nft_minted",
-    "crowdfund_contribution",
-    "promotional"
-  ]).notNull(),
-  /** Message content */
-  messageContent: text("messageContent").notNull(),
-  /** Message ID from SMS provider */
-  messageId: varchar("messageId", { length: 100 }),
-  /** Delivery status */
-  status: mysqlEnum("status", ["pending", "sent", "delivered", "failed"]).default("pending").notNull(),
-  /** Error message if failed */
-  errorMessage: text("errorMessage"),
-  /** Sent timestamp */
-  sentAt: timestamp("sentAt").defaultNow().notNull(),
-  /** Delivered timestamp */
-  deliveredAt: timestamp("deliveredAt"),
-});
-
-export type SMSMessageLog = typeof smsMessageLog.$inferSelect;
-export type InsertSMSMessageLog = typeof smsMessageLog.$inferInsert;
-
-
-/**
- * Investor inquiries table.
- * Stores potential investor contact information and investment preferences.
- */
-export const investorInquiries = mysqlTable("investor_inquiries", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Investor full name */
-  name: varchar("name", { length: 255 }).notNull(),
-  /** Investor email */
-  email: varchar("email", { length: 320 }).notNull(),
-  /** Investor phone number */
-  phone: varchar("phone", { length: 50 }),
-  /** Company name (if applicable) */
-  company: varchar("company", { length: 255 }),
-  /** Investment range interest */
-  investmentRange: mysqlEnum("investmentRange", [
-    "under_10k",
-    "10k_50k",
-    "50k_100k",
-    "100k_500k",
-    "500k_1m",
-    "over_1m"
-  ]).notNull(),
-  /** Accredited investor status */
-  accreditedStatus: mysqlEnum("accreditedStatus", ["yes", "no", "unsure"]).notNull(),
-  /** Type of investment interest */
-  investmentType: mysqlEnum("investmentType", [
-    "equity",
-    "convertible_note",
-    "revenue_share",
-    "franchise",
-    "other"
-  ]).notNull(),
-  /** How they heard about NEON */
-  referralSource: varchar("referralSource", { length: 255 }),
-  /** Additional message/questions */
-  message: text("message"),
-  /** Inquiry status */
-  status: mysqlEnum("status", ["new", "contacted", "in_discussion", "committed", "declined"]).default("new").notNull(),
-  /** Admin notes */
-  adminNotes: text("adminNotes"),
-  /** Inquiry timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Last update timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type InvestorInquiry = typeof investorInquiries.$inferSelect;
-export type InsertInvestorInquiry = typeof investorInquiries.$inferInsert;
-
-
-/**
- * Distributor Autoship table for recurring monthly orders.
- * Allows distributors to maintain their PV requirements automatically.
- */
-export const distributorAutoships = mysqlTable("distributor_autoships", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Distributor ID */
-  distributorId: int("distributorId").notNull(),
-  /** User ID for shipping info */
-  userId: int("userId").notNull(),
-  /** Autoship name/description */
-  name: varchar("name", { length: 255 }).default("Monthly Autoship"),
-  /** Status of the autoship */
-  status: mysqlEnum("status", ["active", "paused", "cancelled"]).default("active").notNull(),
-  /** Day of month to process (1-28) */
-  processDay: int("processDay").default(1).notNull(),
-  /** Total PV for this autoship */
-  totalPV: int("totalPV").default(0).notNull(),
-  /** Total price in cents */
-  totalPrice: int("totalPrice").default(0).notNull(),
-  /** Payment method ID (Stripe) */
-  paymentMethodId: varchar("paymentMethodId", { length: 255 }),
-  /** Stripe customer ID */
-  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
-  /** Shipping address line 1 */
-  shippingAddress1: text("shippingAddress1"),
-  /** Shipping address line 2 */
-  shippingAddress2: text("shippingAddress2"),
-  /** Shipping city */
-  shippingCity: varchar("shippingCity", { length: 100 }),
-  /** Shipping state */
-  shippingState: varchar("shippingState", { length: 100 }),
-  /** Shipping postal code */
-  shippingPostalCode: varchar("shippingPostalCode", { length: 20 }),
-  /** Shipping country */
-  shippingCountry: varchar("shippingCountry", { length: 100 }).default("USA"),
-  /** Next processing date */
-  nextProcessDate: timestamp("nextProcessDate"),
-  /** Last processed date */
-  lastProcessedDate: timestamp("lastProcessedDate"),
-  /** Number of successful orders */
-  successfulOrders: int("successfulOrders").default(0),
-  /** Number of failed attempts */
-  failedAttempts: int("failedAttempts").default(0),
-  /** Last failure reason */
-  lastFailureReason: text("lastFailureReason"),
-  /** Email reminder sent for upcoming autoship */
-  reminderSent: int("reminderSent").default(0),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type DistributorAutoship = typeof distributorAutoships.$inferSelect;
-export type InsertDistributorAutoship = typeof distributorAutoships.$inferInsert;
-
-/**
- * Autoship items table for products in each autoship.
- */
 export const autoshipItems = mysqlTable("autoship_items", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Autoship ID */
-  autoshipId: int("autoshipId").notNull(),
-  /** Product SKU */
-  productSku: varchar("productSku", { length: 100 }).notNull(),
-  /** Product name */
-  productName: varchar("productName", { length: 255 }).notNull(),
-  /** Quantity */
-  quantity: int("quantity").default(1).notNull(),
-  /** PV per unit */
-  pvPerUnit: int("pvPerUnit").default(0).notNull(),
-  /** Price per unit in cents */
-  pricePerUnit: int("pricePerUnit").default(0).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
+	id: int().autoincrement().notNull(),
+	autoshipId: int().notNull(),
+	productSku: varchar({ length: 100 }).notNull(),
+	productName: varchar({ length: 255 }).notNull(),
+	quantity: int().default(1).notNull(),
+	pvPerUnit: int().default(0).notNull(),
+	pricePerUnit: int().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
 });
 
-export type AutoshipItem = typeof autoshipItems.$inferSelect;
-export type InsertAutoshipItem = typeof autoshipItems.$inferInsert;
-
-/**
- * Autoship order history table.
- */
 export const autoshipOrders = mysqlTable("autoship_orders", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Autoship ID */
-  autoshipId: int("autoshipId").notNull(),
-  /** Distributor ID */
-  distributorId: int("distributorId").notNull(),
-  /** Order status */
-  status: mysqlEnum("status", ["pending", "processing", "completed", "failed", "refunded"]).default("pending").notNull(),
-  /** Total PV credited */
-  totalPV: int("totalPV").default(0).notNull(),
-  /** Total amount in cents */
-  totalAmount: int("totalAmount").default(0).notNull(),
-  /** Stripe payment intent ID */
-  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
-  /** Tracking number */
-  trackingNumber: varchar("trackingNumber", { length: 100 }),
-  /** Carrier */
-  carrier: varchar("carrier", { length: 50 }),
-  /** Failure reason if failed */
-  failureReason: text("failureReason"),
-  /** Processing date */
-  processedAt: timestamp("processedAt"),
-  /** Shipped date */
-  shippedAt: timestamp("shippedAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
+	id: int().autoincrement().notNull(),
+	autoshipId: int().notNull(),
+	distributorId: int().notNull(),
+	status: mysqlEnum(['pending','processing','completed','failed','refunded']).default('pending').notNull(),
+	totalPv: int().default(0).notNull(),
+	totalAmount: int().default(0).notNull(),
+	stripePaymentIntentId: varchar({ length: 255 }),
+	trackingNumber: varchar({ length: 100 }),
+	carrier: varchar({ length: 50 }),
+	failureReason: text(),
+	processedAt: timestamp({ mode: 'string' }),
+	shippedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
 });
 
-export type AutoshipOrder = typeof autoshipOrders.$inferSelect;
-export type InsertAutoshipOrder = typeof autoshipOrders.$inferInsert;
-
-/**
- * Payout settings table for distributor payout preferences.
- */
-export const payoutSettings = mysqlTable("payout_settings", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Distributor ID */
-  distributorId: int("distributorId").notNull().unique(),
-  /** Preferred payout method */
-  payoutMethod: mysqlEnum("payoutMethod", ["stripe_connect", "paypal", "bank_transfer", "check"]).default("stripe_connect").notNull(),
-  /** Stripe Connect account ID */
-  stripeConnectAccountId: varchar("stripeConnectAccountId", { length: 255 }),
-  /** Stripe Connect onboarding status */
-  stripeConnectStatus: mysqlEnum("stripeConnectStatus", ["pending", "onboarding", "active", "restricted", "disabled"]).default("pending"),
-  /** PayPal email */
-  paypalEmail: varchar("paypalEmail", { length: 320 }),
-  /** Bank account holder name */
-  bankAccountName: varchar("bankAccountName", { length: 255 }),
-  /** Bank routing number (encrypted) */
-  bankRoutingNumber: varchar("bankRoutingNumber", { length: 255 }),
-  /** Bank account number (last 4 only) */
-  bankAccountLast4: varchar("bankAccountLast4", { length: 4 }),
-  /** Bank account type */
-  bankAccountType: mysqlEnum("bankAccountType", ["checking", "savings"]).default("checking"),
-  /** Mailing address for checks */
-  checkMailingAddress: text("checkMailingAddress"),
-  /** Minimum payout threshold in cents (default $50) */
-  minimumPayout: int("minimumPayout").default(5000).notNull(),
-  /** Payout frequency */
-  payoutFrequency: mysqlEnum("payoutFrequency", ["weekly", "biweekly", "monthly"]).default("weekly").notNull(),
-  /** Tax form submitted (W-9 for US) */
-  taxFormSubmitted: int("taxFormSubmitted").default(0),
-  /** Tax ID (SSN last 4 or EIN) */
-  taxIdLast4: varchar("taxIdLast4", { length: 4 }),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type PayoutSetting = typeof payoutSettings.$inferSelect;
-export type InsertPayoutSetting = typeof payoutSettings.$inferInsert;
-
-/**
- * Payout requests table for tracking commission payouts.
- */
-export const payoutRequests = mysqlTable("payout_requests", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Distributor ID */
-  distributorId: int("distributorId").notNull(),
-  /** Request amount in cents */
-  amount: int("amount").notNull(),
-  /** Processing fee in cents */
-  processingFee: int("processingFee").default(0),
-  /** Net amount after fees */
-  netAmount: int("netAmount").notNull(),
-  /** Payout method used */
-  payoutMethod: mysqlEnum("payoutMethod", ["stripe_connect", "paypal", "bank_transfer", "check"]).notNull(),
-  /** Request status */
-  status: mysqlEnum("status", ["pending", "approved", "processing", "completed", "failed", "cancelled"]).default("pending").notNull(),
-  /** Stripe transfer ID */
-  stripeTransferId: varchar("stripeTransferId", { length: 255 }),
-  /** PayPal payout batch ID */
-  paypalPayoutId: varchar("paypalPayoutId", { length: 255 }),
-  /** Check number if paid by check */
-  checkNumber: varchar("checkNumber", { length: 50 }),
-  /** Admin who approved */
-  approvedBy: int("approvedBy"),
-  /** Approval date */
-  approvedAt: timestamp("approvedAt"),
-  /** Processing date */
-  processedAt: timestamp("processedAt"),
-  /** Completion date */
-  completedAt: timestamp("completedAt"),
-  /** Failure reason */
-  failureReason: text("failureReason"),
-  /** Notes */
-  notes: text("notes"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type PayoutRequest = typeof payoutRequests.$inferSelect;
-export type InsertPayoutRequest = typeof payoutRequests.$inferInsert;
-
-/**
- * Payout history table for completed payouts.
- */
-export const payoutHistory = mysqlTable("payout_history", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Payout request ID */
-  payoutRequestId: int("payoutRequestId").notNull(),
-  /** Distributor ID */
-  distributorId: int("distributorId").notNull(),
-  /** Amount paid in cents */
-  amount: int("amount").notNull(),
-  /** Payout method */
-  payoutMethod: varchar("payoutMethod", { length: 50 }).notNull(),
-  /** Transaction reference */
-  transactionRef: varchar("transactionRef", { length: 255 }),
-  /** Period start date */
-  periodStart: timestamp("periodStart"),
-  /** Period end date */
-  periodEnd: timestamp("periodEnd"),
-  /** Commissions included (JSON array of commission IDs) */
-  commissionsIncluded: text("commissionsIncluded"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type PayoutHistoryRecord = typeof payoutHistory.$inferSelect;
-export type InsertPayoutHistoryRecord = typeof payoutHistory.$inferInsert;
-
-
-/**
- * Rank history table for tracking distributor rank progressions.
- * Records each rank change with timestamps for milestone tracking.
- */
-export const rankHistory = mysqlTable("rank_history", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Reference to distributor */
-  distributorId: int("distributorId").notNull(),
-  /** Previous rank before change */
-  previousRank: varchar("previousRank", { length: 50 }).notNull(),
-  /** New rank after change */
-  newRank: varchar("newRank", { length: 50 }).notNull(),
-  /** Personal PV at time of rank change */
-  personalPVAtChange: int("personalPVAtChange").default(0),
-  /** Team PV at time of rank change */
-  teamPVAtChange: int("teamPVAtChange").default(0),
-  /** Whether notification was sent */
-  notificationSent: boolean("notificationSent").default(false),
-  /** When the rank change occurred */
-  achievedAt: timestamp("achievedAt").defaultNow().notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type RankHistoryRecord = typeof rankHistory.$inferSelect;
-export type InsertRankHistoryRecord = typeof rankHistory.$inferInsert;
-
-/**
- * In-app notifications table for user alerts.
- */
-export const notifications = mysqlTable("notifications", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Reference to user */
-  userId: int("userId").notNull(),
-  /** Notification type (rank_advancement, commission_paid, etc.) */
-  type: varchar("type", { length: 50 }).notNull(),
-  /** Notification title */
-  title: varchar("title", { length: 255 }).notNull(),
-  /** Notification message */
-  message: text("message").notNull(),
-  /** Additional data as JSON */
-  data: text("data"),
-  /** Whether notification has been read */
-  isRead: boolean("isRead").default(false),
-  /** When notification was read */
-  readAt: timestamp("readAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type Notification = typeof notifications.$inferSelect;
-export type InsertNotification = typeof notifications.$inferInsert;
-
-
-/**
- * Customer referral tracking for 3-for-Free program.
- * Customers earn a free case when 3 referred friends make purchases.
- */
-export const customerReferrals = mysqlTable("customer_referrals", {
-  id: int("id").autoincrement().primaryKey(),
-  /** The customer who made the referral */
-  referrerId: int("referrerId").notNull(),
-  /** The referred customer (who made a purchase) */
-  referredId: int("referredId").notNull(),
-  /** Referral code used */
-  referralCode: varchar("referralCode", { length: 50 }).notNull(),
-  /** Whether the referred customer made a qualifying purchase */
-  purchaseCompleted: boolean("purchaseCompleted").default(false),
-  /** Order ID of the qualifying purchase */
-  orderId: int("orderId"),
-  /** Purchase amount */
-  purchaseAmount: decimal("purchaseAmount", { precision: 10, scale: 2 }),
-  /** When the referral was created */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** When the purchase was completed */
-  purchaseCompletedAt: timestamp("purchaseCompletedAt"),
-});
-export type CustomerReferral = typeof customerReferrals.$inferSelect;
-export type InsertCustomerReferral = typeof customerReferrals.$inferInsert;
-
-/**
- * Customer rewards for the 3-for-Free program.
- * Tracks earned free cases and redemption status.
- */
-export const customerRewards = mysqlTable("customer_rewards", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Customer who earned the reward */
-  userId: int("userId").notNull(),
-  /** Type of reward (free_case, discount, etc.) */
-  rewardType: varchar("rewardType", { length: 50 }).notNull(),
-  /** Description of the reward */
-  description: varchar("description", { length: 255 }).notNull(),
-  /** Value of the reward (e.g., $42 for a free case) */
-  value: decimal("value", { precision: 10, scale: 2 }).notNull(),
-  /** Number of referrals that triggered this reward */
-  referralCount: int("referralCount").default(3),
-  /** Status: pending, available, redeemed, expired */
-  status: mysqlEnum("status", ["pending", "available", "redeemed", "expired"]).default("available").notNull(),
-  /** Redemption code for the reward */
-  redemptionCode: varchar("redemptionCode", { length: 50 }),
-  /** When the reward was redeemed */
-  redeemedAt: timestamp("redeemedAt"),
-  /** Order ID if redeemed on an order */
-  redeemedOrderId: int("redeemedOrderId"),
-  /** Expiration date for the reward */
-  expiresAt: timestamp("expiresAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-export type CustomerReward = typeof customerRewards.$inferSelect;
-export type InsertCustomerReward = typeof customerRewards.$inferInsert;
-
-/**
- * Distributor NEON Reward Points for 3-for-Free autoship program.
- * Distributors who sell 3 autoships per month earn points toward a free case.
- */
-export const distributorRewardPoints = mysqlTable("distributor_reward_points", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Distributor who earned the points */
-  distributorId: int("distributorId").notNull(),
-  /** Points earned (1 point per qualifying autoship sale) */
-  points: int("points").default(0).notNull(),
-  /** Source of points (autoship_sale, bonus, etc.) */
-  source: varchar("source", { length: 50 }).notNull(),
-  /** Description of how points were earned */
-  description: varchar("description", { length: 255 }),
-  /** Related order or autoship ID */
-  relatedId: int("relatedId"),
-  /** Month/year for tracking (YYYY-MM format) */
-  periodMonth: varchar("periodMonth", { length: 7 }).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-export type DistributorRewardPoint = typeof distributorRewardPoints.$inferSelect;
-export type InsertDistributorRewardPoint = typeof distributorRewardPoints.$inferInsert;
-
-/**
- * Distributor free case rewards earned through the 3-for-Free program.
- */
-export const distributorFreeRewards = mysqlTable("distributor_free_rewards", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Distributor who earned the reward */
-  distributorId: int("distributorId").notNull(),
-  /** Points redeemed for this reward */
-  pointsRedeemed: int("pointsRedeemed").default(3).notNull(),
-  /** Month the reward was earned (YYYY-MM) */
-  earnedMonth: varchar("earnedMonth", { length: 7 }).notNull(),
-  /** Status: pending, shipped, delivered */
-  status: mysqlEnum("status", ["pending", "shipped", "delivered"]).default("pending").notNull(),
-  /** Shipping tracking number */
-  trackingNumber: varchar("trackingNumber", { length: 100 }),
-  /** When the reward was shipped */
-  shippedAt: timestamp("shippedAt"),
-  /** When the reward was delivered */
-  deliveredAt: timestamp("deliveredAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-export type DistributorFreeReward = typeof distributorFreeRewards.$inferSelect;
-export type InsertDistributorFreeReward = typeof distributorFreeRewards.$inferInsert;
-
-/**
- * Customer referral codes for tracking.
- */
-export const customerReferralCodes = mysqlTable("customer_referral_codes", {
-  id: int("id").autoincrement().primaryKey(),
-  /** User who owns this referral code */
-  userId: int("userId").notNull(),
-  /** Unique referral code */
-  code: varchar("code", { length: 50 }).notNull().unique(),
-  /** Number of times this code has been used */
-  usageCount: int("usageCount").default(0).notNull(),
-  /** Total successful referrals (purchases completed) */
-  successfulReferrals: int("successfulReferrals").default(0).notNull(),
-  /** Whether the code is active */
-  isActive: boolean("isActive").default(true).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-export type CustomerReferralCode = typeof customerReferralCodes.$inferSelect;
-export type InsertCustomerReferralCode = typeof customerReferralCodes.$inferInsert;
-
-
-/**
- * Reward redemptions tracking table.
- * Tracks shipping info and fulfillment status for redeemed rewards.
- */
-export const rewardRedemptions = mysqlTable("reward_redemptions", {
-  id: int("id").autoincrement().primaryKey(),
-  /** ID of the reward being redeemed */
-  rewardId: int("rewardId").notNull(),
-  /** Type of reward: customer or distributor */
-  rewardType: mysqlEnum("rewardType", ["customer", "distributor"]).notNull(),
-  /** Recipient name */
-  name: varchar("name", { length: 255 }).notNull(),
-  /** Recipient email */
-  email: varchar("email", { length: 320 }).notNull(),
-  /** Recipient phone */
-  phone: varchar("phone", { length: 50 }),
-  /** Shipping address line 1 */
-  addressLine1: text("addressLine1").notNull(),
-  /** Shipping address line 2 */
-  addressLine2: text("addressLine2"),
-  /** City */
-  city: varchar("city", { length: 100 }).notNull(),
-  /** State */
-  state: varchar("state", { length: 100 }).notNull(),
-  /** Postal code */
-  postalCode: varchar("postalCode", { length: 20 }).notNull(),
-  /** Country */
-  country: varchar("country", { length: 100 }).notNull(),
-  /** Fulfillment status */
-  status: mysqlEnum("status", ["pending", "processing", "shipped", "delivered"]).default("pending").notNull(),
-  /** Tracking number */
-  trackingNumber: varchar("trackingNumber", { length: 100 }),
-  /** When the order was shipped */
-  shippedAt: timestamp("shippedAt"),
-  /** When the order was delivered */
-  deliveredAt: timestamp("deliveredAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-export type RewardRedemption = typeof rewardRedemptions.$inferSelect;
-export type InsertRewardRedemption = typeof rewardRedemptions.$inferInsert;
-
-/**
- * Vending machine applications table.
- * Tracks applications from people interested in owning NEON vending machines.
- */
-export const vendingApplications = mysqlTable("vending_applications", {
-  id: int("id").autoincrement().primaryKey(),
-  firstName: varchar("firstName", { length: 100 }).notNull(),
-  lastName: varchar("lastName", { length: 100 }).notNull(),
-  email: varchar("email", { length: 320 }).notNull(),
-  phone: varchar("phone", { length: 50 }).notNull(),
-  businessName: varchar("businessName", { length: 255 }),
-  businessType: varchar("businessType", { length: 100 }).notNull(),
-  yearsInBusiness: varchar("yearsInBusiness", { length: 50 }),
-  city: varchar("city", { length: 100 }).notNull(),
-  state: varchar("state", { length: 100 }).notNull(),
-  zipCode: varchar("zipCode", { length: 20 }).notNull(),
-  proposedLocations: text("proposedLocations"),
-  numberOfMachines: varchar("numberOfMachines", { length: 50 }).notNull(),
-  investmentBudget: varchar("investmentBudget", { length: 50 }),
-  timeline: varchar("timeline", { length: 50 }),
-  experience: text("experience"),
-  questions: text("questions"),
-  status: mysqlEnum("status", ["pending", "under_review", "approved", "rejected"]).default("pending").notNull(),
-  adminNotes: text("adminNotes"),
-  submittedAt: timestamp("submittedAt").defaultNow().notNull(),
-  reviewedAt: timestamp("reviewedAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-export type VendingApplication = typeof vendingApplications.$inferSelect;
-export type InsertVendingApplication = typeof vendingApplications.$inferInsert;
-
-/**
- * Franchise applications table.
- * Tracks applications from people interested in franchise territory ownership.
- */
-export const franchiseApplications = mysqlTable("franchise_applications", {
-  id: int("id").autoincrement().primaryKey(),
-  firstName: varchar("firstName", { length: 100 }).notNull(),
-  lastName: varchar("lastName", { length: 100 }).notNull(),
-  email: varchar("email", { length: 320 }).notNull(),
-  phone: varchar("phone", { length: 50 }).notNull(),
-  territoryCity: varchar("territoryCity", { length: 100 }).notNull(),
-  territoryState: varchar("territoryState", { length: 100 }).notNull(),
-  territorySize: varchar("territorySize", { length: 50 }).notNull(),
-  exclusivityType: varchar("exclusivityType", { length: 50 }).notNull(),
-  investmentCapital: varchar("investmentCapital", { length: 50 }).notNull(),
-  financingNeeded: varchar("financingNeeded", { length: 50 }),
-  netWorth: varchar("netWorth", { length: 50 }),
-  businessExperience: varchar("businessExperience", { length: 100 }).notNull(),
-  distributionExperience: text("distributionExperience"),
-  teamSize: varchar("teamSize", { length: 50 }),
-  motivation: text("motivation").notNull(),
-  timeline: varchar("timeline", { length: 50 }).notNull(),
-  questions: text("questions"),
-  status: mysqlEnum("status", ["pending", "under_review", "approved", "rejected"]).default("pending").notNull(),
-  adminNotes: text("adminNotes"),
-  submittedAt: timestamp("submittedAt").defaultNow().notNull(),
-  reviewedAt: timestamp("reviewedAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-export type FranchiseApplication = typeof franchiseApplications.$inferSelect;
-export type InsertFranchiseApplication = typeof franchiseApplications.$inferInsert;
-
-/**
- * Push notification subscriptions table.
- * Stores browser push notification subscriptions for distributors.
- */
-export const pushSubscriptions = mysqlTable("push_subscriptions", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  endpoint: text("endpoint").notNull(),
-  p256dh: text("p256dh").notNull(),
-  auth: text("auth").notNull(),
-  userAgent: text("userAgent"),
-  isActive: boolean("isActive").default(true).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-export type PushSubscription = typeof pushSubscriptions.$inferSelect;
-export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert;
-
-/**
- * User profiles for personalized landing pages.
- * Stores custom referral slugs, profile photos, display names, and locations.
- * Used by both distributors and customers for their personalized website clones.
- */
-export const userProfiles = mysqlTable("user_profiles", {
-  id: int("id").autoincrement().primaryKey(),
-  /** User ID (foreign key to users table) */
-  userId: int("userId").notNull().unique(),
-  /** Custom referral slug for personalized URL (e.g., neonenergyclub.com/john-smith) */
-  customSlug: varchar("customSlug", { length: 100 }).unique(),
-  /** Profile photo URL (stored in S3) */
-  profilePhotoUrl: text("profilePhotoUrl"),
-  /** Custom display name for landing page */
-  displayName: varchar("displayName", { length: 255 }),
-  /** Location (city, state) for landing page */
-  location: varchar("location", { length: 255 }),
-  /** Country code (ISO 3166-1 alpha-2) for flag display */
-  country: varchar("country", { length: 2 }),
-  /** Bio/tagline for landing page */
-  bio: text("bio"),
-  /** Instagram handle (without @) */
-  instagram: varchar("instagram", { length: 100 }),
-  /** TikTok handle (without @) */
-  tiktok: varchar("tiktok", { length: 100 }),
-  /** Facebook profile URL or username */
-  facebook: varchar("facebook", { length: 255 }),
-  /** Twitter/X handle (without @) */
-  twitter: varchar("twitter", { length: 100 }),
-  /** YouTube channel URL or handle */
-  youtube: varchar("youtube", { length: 255 }),
-  /** LinkedIn profile URL */
-  linkedin: varchar("linkedin", { length: 255 }),
-  /** User type: distributor or customer */
-  userType: mysqlEnum("userType", ["distributor", "customer"]).notNull(),
-  /** Whether the personalized page is published */
-  isPublished: boolean("isPublished").default(true).notNull(),
-  /** Total visits to personalized page */
-  pageViews: int("pageViews").default(0).notNull(),
-  /** Total signups through personalized page */
-  signupsGenerated: int("signupsGenerated").default(0).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-export type UserProfile = typeof userProfiles.$inferSelect;
-export type InsertUserProfile = typeof userProfiles.$inferInsert;
-
-
-
-/**
- * Scheduled meetings/calls table.
- * Stores consultation call bookings for franchise and vending opportunities.
- */
-export const scheduledMeetings = mysqlTable("scheduled_meetings", {
-  id: int("id").autoincrement().primaryKey(),
-  /** User ID (if logged in) */
-  userId: int("userId"),
-  /** Applicant name */
-  name: varchar("name", { length: 255 }).notNull(),
-  /** Applicant email */
-  email: varchar("email", { length: 320 }).notNull(),
-  /** Applicant phone */
-  phone: varchar("phone", { length: 50 }),
-  /** Meeting type: franchise, vending, general */
-  meetingType: mysqlEnum("meetingType", ["franchise", "vending", "general"]).notNull(),
-  /** Scheduled date and time (UTC) */
-  scheduledAt: timestamp("scheduledAt").notNull(),
-  /** Duration in minutes */
-  durationMinutes: int("durationMinutes").default(30).notNull(),
-  /** Timezone of the user */
-  timezone: varchar("timezone", { length: 100 }).default("America/New_York").notNull(),
-  /** Meeting status */
-  status: mysqlEnum("status", ["scheduled", "confirmed", "completed", "cancelled", "no_show"]).default("scheduled").notNull(),
-  /** Additional notes from applicant */
-  notes: text("notes"),
-  /** Admin notes */
-  adminNotes: text("adminNotes"),
-  /** Meeting link (Zoom, Google Meet, etc.) */
-  meetingLink: text("meetingLink"),
-  /** Reminder sent flag */
-  reminderSent: boolean("reminderSent").default(false).notNull(),
-  /** Created timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Updated timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-export type ScheduledMeeting = typeof scheduledMeetings.$inferSelect;
-export type InsertScheduledMeeting = typeof scheduledMeetings.$inferInsert;
-
-/**
- * Available time slots for scheduling.
- * Admin-managed slots for when calls can be booked.
- */
 export const availableTimeSlots = mysqlTable("available_time_slots", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Day of week (0=Sunday, 6=Saturday) */
-  dayOfWeek: int("dayOfWeek").notNull(),
-  /** Start time (HH:MM format in 24h) */
-  startTime: varchar("startTime", { length: 5 }).notNull(),
-  /** End time (HH:MM format in 24h) */
-  endTime: varchar("endTime", { length: 5 }).notNull(),
-  /** Is this slot active */
-  isActive: boolean("isActive").default(true).notNull(),
-  /** Created timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-export type AvailableTimeSlot = typeof availableTimeSlots.$inferSelect;
-export type InsertAvailableTimeSlot = typeof availableTimeSlots.$inferInsert;
-
-
-/**
- * Vending machine orders table.
- * Tracks purchases and payment plans for vending machines.
- */
-export const vendingMachineOrders = mysqlTable("vending_machine_orders", {
-  id: int("id").autoincrement().primaryKey(),
-  /** User ID (foreign key to users table) */
-  userId: int("userId"),
-  /** Customer name */
-  name: varchar("name", { length: 255 }).notNull(),
-  /** Customer email */
-  email: varchar("email", { length: 320 }).notNull(),
-  /** Customer phone */
-  phone: varchar("phone", { length: 50 }),
-  /** Machine model/type */
-  machineModel: varchar("machineModel", { length: 100 }).notNull(),
-  /** Quantity of machines */
-  quantity: int("quantity").default(1).notNull(),
-  /** Total price in cents */
-  totalPriceCents: int("totalPriceCents").notNull(),
-  /** Deposit amount in cents */
-  depositAmountCents: int("depositAmountCents").notNull(),
-  /** Payment type: full, deposit, payment_plan */
-  paymentType: mysqlEnum("paymentType", ["full", "deposit", "payment_plan"]).notNull(),
-  /** Payment plan months (3, 6, 12, 24) */
-  paymentPlanMonths: int("paymentPlanMonths"),
-  /** Monthly payment amount in cents (for payment plans) */
-  monthlyPaymentCents: int("monthlyPaymentCents"),
-  /** Amount paid so far in cents */
-  amountPaidCents: int("amountPaidCents").default(0).notNull(),
-  /** Remaining balance in cents */
-  remainingBalanceCents: int("remainingBalanceCents").notNull(),
-  /** Number of payments made */
-  paymentsMade: int("paymentsMade").default(0).notNull(),
-  /** Next payment due date */
-  nextPaymentDue: timestamp("nextPaymentDue"),
-  /** Stripe customer ID */
-  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
-  /** Stripe subscription ID (for payment plans) */
-  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }),
-  /** Stripe payment intent ID (for one-time payments) */
-  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
-  /** Order status */
-  status: mysqlEnum("status", ["pending", "deposit_paid", "in_production", "ready_for_delivery", "delivered", "cancelled", "refunded"]).default("pending").notNull(),
-  /** Delivery address */
-  deliveryAddress: text("deliveryAddress"),
-  /** City */
-  deliveryCity: varchar("deliveryCity", { length: 100 }),
-  /** State */
-  deliveryState: varchar("deliveryState", { length: 100 }),
-  /** Zip code */
-  deliveryZip: varchar("deliveryZip", { length: 20 }),
-  /** Estimated delivery date */
-  estimatedDelivery: timestamp("estimatedDelivery"),
-  /** Installation date */
-  installationDate: timestamp("installationDate"),
-  /** Notes */
-  notes: text("notes"),
-  /** Admin notes */
-  adminNotes: text("adminNotes"),
-  /** Created timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Updated timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+	id: int().autoincrement().notNull(),
+	dayOfWeek: int().notNull(),
+	startTime: varchar({ length: 5 }).notNull(),
+	endTime: varchar({ length: 5 }).notNull(),
+	isActive: tinyint().default(1).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
 });
 
-export type VendingMachineOrder = typeof vendingMachineOrders.$inferSelect;
-export type InsertVendingMachineOrder = typeof vendingMachineOrders.$inferInsert;
-
-/**
- * Vending machine payment history table.
- * Tracks individual payments for vending machine orders.
- */
-export const vendingPaymentHistory = mysqlTable("vending_payment_history", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Order ID (foreign key to vending_machine_orders) */
-  orderId: int("orderId").notNull(),
-  /** Amount in cents */
-  amountCents: int("amountCents").notNull(),
-  /** Payment type: deposit, monthly, final */
-  paymentType: mysqlEnum("paymentType", ["deposit", "monthly", "final", "full"]).notNull(),
-  /** Payment number (1, 2, 3, etc. for payment plans) */
-  paymentNumber: int("paymentNumber"),
-  /** Stripe payment intent ID */
-  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
-  /** Payment status */
-  status: mysqlEnum("status", ["pending", "succeeded", "failed", "refunded"]).default("pending").notNull(),
-  /** Payment date */
-  paidAt: timestamp("paidAt"),
-  /** Created timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type VendingPaymentHistory = typeof vendingPaymentHistory.$inferSelect;
-export type InsertVendingPaymentHistory = typeof vendingPaymentHistory.$inferInsert;
-
-
-/**
- * Vending machine network table.
- * Tracks vending machines and their referral relationships for the micro-franchise compensation plan.
- */
-export const vendingNetwork = mysqlTable("vending_network", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Unique machine identifier */
-  machineId: varchar("machineId", { length: 50 }).notNull().unique(),
-  /** Owner user ID */
-  ownerId: int("ownerId").notNull(),
-  /** Referrer user ID (who referred this machine owner) */
-  referrerId: int("referrerId"),
-  /** Machine location description */
-  location: varchar("location", { length: 255 }).notNull(),
-  /** Machine status */
-  status: mysqlEnum("status", ["active", "inactive", "maintenance"]).default("active").notNull(),
-  /** Monthly revenue in cents */
-  monthlyRevenue: int("monthlyRevenue").default(0).notNull(),
-  /** Total lifetime sales in cents */
-  totalSales: int("totalSales").default(0).notNull(),
-  /** Commission volume (CV) for network calculations */
-  commissionVolume: int("commissionVolume").default(0).notNull(),
-  /** Level in the network tree (0 = direct, 1 = first level, etc.) */
-  networkLevel: int("networkLevel").default(0).notNull(),
-  /** Installation date */
-  installedAt: timestamp("installedAt"),
-  /** Created timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Updated timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type VendingNetwork = typeof vendingNetwork.$inferSelect;
-export type InsertVendingNetwork = typeof vendingNetwork.$inferInsert;
-
-/**
- * Vending commission table.
- * Tracks commissions earned from vending machine referrals and network volume.
- */
-export const vendingCommissions = mysqlTable("vending_commissions", {
-  id: int("id").autoincrement().primaryKey(),
-  /** User ID who earned the commission */
-  userId: int("userId").notNull(),
-  /** Source machine ID (if direct referral commission) */
-  sourceMachineId: int("sourceMachineId"),
-  /** Commission type */
-  commissionType: mysqlEnum("commissionType", ["direct_referral", "network_cv", "bonus"]).notNull(),
-  /** Commission amount in cents */
-  amountCents: int("amountCents").notNull(),
-  /** Commission volume that generated this commission */
-  cvAmount: int("cvAmount").default(0).notNull(),
-  /** Commission percentage applied */
-  commissionRate: int("commissionRate").notNull(), // Stored as basis points (1000 = 10%)
-  /** Period start date */
-  periodStart: timestamp("periodStart").notNull(),
-  /** Period end date */
-  periodEnd: timestamp("periodEnd").notNull(),
-  /** Status */
-  status: mysqlEnum("status", ["pending", "approved", "paid", "cancelled"]).default("pending").notNull(),
-  /** Paid date */
-  paidAt: timestamp("paidAt"),
-  /** Created timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type VendingCommission = typeof vendingCommissions.$inferSelect;
-export type InsertVendingCommission = typeof vendingCommissions.$inferInsert;
-
-
-/**
- * Notification preferences for distributors.
- * Allows users to customize which notifications they receive.
- */
-export const notificationPreferences = mysqlTable("notification_preferences", {
-  id: int("id").autoincrement().primaryKey(),
-  /** User ID (references users table) */
-  userId: int("userId").notNull(),
-  /** Receive notifications for new referrals */
-  referrals: boolean("referrals").default(true).notNull(),
-  /** Receive notifications for commission payouts */
-  commissions: boolean("commissions").default(true).notNull(),
-  /** Receive notifications for team updates (new members, rank changes) */
-  teamUpdates: boolean("teamUpdates").default(true).notNull(),
-  /** Receive promotional notifications */
-  promotions: boolean("promotions").default(true).notNull(),
-  /** Receive order notifications */
-  orders: boolean("orders").default(true).notNull(),
-  /** Receive system announcements */
-  announcements: boolean("announcements").default(true).notNull(),
-  /** Email digest frequency: none, daily, weekly */
-  digestFrequency: mysqlEnum("digestFrequency", ["none", "daily", "weekly"]).default("none").notNull(),
-  /** Preferred digest day for weekly (0=Sunday, 6=Saturday) */
-  digestDay: int("digestDay").default(1),
-  /** Preferred digest hour (0-23) */
-  digestHour: int("digestHour").default(9),
-  /** Last digest sent timestamp */
-  lastDigestSent: timestamp("lastDigestSent"),
-  /** Created timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Updated timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type NotificationPreference = typeof notificationPreferences.$inferSelect;
-export type InsertNotificationPreference = typeof notificationPreferences.$inferInsert;
-
-/**
- * Email digest queue for batched notifications.
- * Stores notifications to be included in digest emails.
- */
-export const emailDigestQueue = mysqlTable("email_digest_queue", {
-  id: int("id").autoincrement().primaryKey(),
-  /** User ID to receive the digest */
-  userId: int("userId").notNull(),
-  /** Notification type */
-  notificationType: varchar("notificationType", { length: 50 }).notNull(),
-  /** Notification title */
-  title: varchar("title", { length: 255 }).notNull(),
-  /** Notification content */
-  content: text("content").notNull(),
-  /** Related entity ID (order, commission, etc.) */
-  relatedId: int("relatedId"),
-  /** Whether this has been included in a digest */
-  processed: boolean("processed").default(false).notNull(),
-  /** Created timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type EmailDigestQueueItem = typeof emailDigestQueue.$inferSelect;
-export type InsertEmailDigestQueueItem = typeof emailDigestQueue.$inferInsert;
-
-
-/**
- * Territory reservations table for 48-hour hold system.
- * Allows users to reserve a territory while completing their application.
- */
-export const territoryReservations = mysqlTable("territory_reservations", {
-  id: int("id").autoincrement().primaryKey(),
-  /** User ID who made the reservation */
-  userId: int("userId").notNull(),
-  /** Territory name/description */
-  territoryName: varchar("territoryName", { length: 255 }).notNull(),
-  /** State abbreviation */
-  state: varchar("state", { length: 2 }).notNull(),
-  /** Territory center latitude */
-  centerLat: decimal("centerLat", { precision: 10, scale: 7 }).notNull(),
-  /** Territory center longitude */
-  centerLng: decimal("centerLng", { precision: 10, scale: 7 }).notNull(),
-  /** Territory radius in miles */
-  radiusMiles: decimal("radiusMiles", { precision: 10, scale: 2 }).notNull(),
-  /** Territory area in square miles */
-  areaSqMiles: decimal("areaSqMiles", { precision: 10, scale: 2 }).notNull(),
-  /** Estimated population */
-  population: int("population").notNull(),
-  /** Calculated license fee */
-  licenseFee: int("licenseFee").notNull(),
-  /** Reservation status */
-  status: mysqlEnum("status", ["active", "expired", "converted", "cancelled"]).default("active").notNull(),
-  /** Reservation expiration timestamp (48 hours from creation) */
-  expiresAt: timestamp("expiresAt").notNull(),
-  /** Email reminder sent flag */
-  reminderSent: boolean("reminderSent").default(false).notNull(),
-  /** Converted to license application ID */
-  convertedToLicenseId: int("convertedToLicenseId"),
-  /** Reservation creation timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Last update timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type TerritoryReservation = typeof territoryReservations.$inferSelect;
-export type InsertTerritoryReservation = typeof territoryReservations.$inferInsert;
-
-
-/**
- * Multi-Factor Authentication (MFA) settings table.
- * Stores TOTP secrets and backup codes for user accounts.
- */
-export const mfaSettings = mysqlTable("mfa_settings", {
-  id: int("id").autoincrement().primaryKey(),
-  /** User ID (foreign key to users table) */
-  userId: int("userId").notNull().unique(),
-  /** TOTP secret key (encrypted) */
-  totpSecret: varchar("totpSecret", { length: 255 }).notNull(),
-  /** Whether MFA is enabled for this user */
-  isEnabled: boolean("isEnabled").default(false).notNull(),
-  /** Backup codes (JSON array of hashed codes) */
-  backupCodes: text("backupCodes"),
-  /** Number of backup codes remaining */
-  backupCodesRemaining: int("backupCodesRemaining").default(10).notNull(),
-  /** Last successful MFA verification timestamp */
-  lastVerifiedAt: timestamp("lastVerifiedAt"),
-  /** Number of failed verification attempts */
-  failedAttempts: int("failedAttempts").default(0).notNull(),
-  /** Lockout until timestamp (after too many failed attempts) */
-  lockedUntil: timestamp("lockedUntil"),
-  /** MFA setup timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Last update timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type MfaSetting = typeof mfaSettings.$inferSelect;
-export type InsertMfaSetting = typeof mfaSettings.$inferInsert;
-
-/**
- * MFA recovery requests table.
- * Stores account recovery requests for users who lost MFA access.
- */
-export const mfaRecoveryRequests = mysqlTable("mfa_recovery_requests", {
-  id: int("id").autoincrement().primaryKey(),
-  /** User ID requesting recovery */
-  userId: int("userId").notNull(),
-  /** User email for verification */
-  email: varchar("email", { length: 320 }).notNull(),
-  /** Recovery token (sent via email) */
-  recoveryToken: varchar("recoveryToken", { length: 64 }).notNull().unique(),
-  /** Token expiration (24 hours) */
-  tokenExpiry: timestamp("tokenExpiry").notNull(),
-  /** Recovery request status */
-  status: mysqlEnum("status", ["pending", "email_verified", "approved", "rejected", "completed", "expired"]).default("pending").notNull(),
-  /** Identity verification answers (JSON) */
-  verificationAnswers: text("verificationAnswers"),
-  /** Admin notes for approval/rejection */
-  adminNotes: text("adminNotes"),
-  /** Admin who processed the request */
-  processedBy: int("processedBy"),
-  /** IP address of request */
-  ipAddress: varchar("ipAddress", { length: 45 }),
-  /** User agent of request */
-  userAgent: text("userAgent"),
-  /** Request timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Last update timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type MfaRecoveryRequest = typeof mfaRecoveryRequests.$inferSelect;
-export type InsertMfaRecoveryRequest = typeof mfaRecoveryRequests.$inferInsert;
-
-/**
- * Vending machines table for IoT monitoring.
- * Stores vending machine information and real-time status.
- */
-export const vendingMachines = mysqlTable("vending_machines", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Machine serial number */
-  serialNumber: varchar("serialNumber", { length: 50 }).notNull().unique(),
-  /** Machine nickname/label */
-  nickname: varchar("nickname", { length: 100 }),
-  /** Owner user ID */
-  ownerId: int("ownerId").notNull(),
-  /** Territory license ID (if applicable) */
-  territoryLicenseId: int("territoryLicenseId"),
-  /** Machine model */
-  model: varchar("model", { length: 100 }).default("NEON-VM-2000").notNull(),
-  /** Installation location address */
-  locationAddress: text("locationAddress"),
-  /** Location latitude */
-  locationLat: decimal("locationLat", { precision: 10, scale: 7 }),
-  /** Location longitude */
-  locationLng: decimal("locationLng", { precision: 10, scale: 7 }),
-  /** Location type (mall, gym, office, etc.) */
-  locationType: mysqlEnum("locationType", ["mall", "gym", "office", "school", "hospital", "airport", "hotel", "gas_station", "other"]).default("other").notNull(),
-  /** Machine status */
-  status: mysqlEnum("status", ["online", "offline", "maintenance", "error"]).default("offline").notNull(),
-  /** Last heartbeat/ping timestamp */
-  lastHeartbeat: timestamp("lastHeartbeat"),
-  /** Current temperature in Fahrenheit */
-  temperature: decimal("temperature", { precision: 5, scale: 2 }),
-  /** Temperature status */
-  temperatureStatus: mysqlEnum("temperatureStatus", ["normal", "warning", "critical"]).default("normal").notNull(),
-  /** Door status */
-  doorStatus: mysqlEnum("doorStatus", ["closed", "open", "jammed"]).default("closed").notNull(),
-  /** Payment system status */
-  paymentStatus: mysqlEnum("paymentStatus", ["operational", "card_only", "cash_only", "offline"]).default("operational").notNull(),
-  /** Total lifetime sales count */
-  totalSalesCount: int("totalSalesCount").default(0).notNull(),
-  /** Total lifetime revenue in cents */
-  totalRevenue: int("totalRevenue").default(0).notNull(),
-  /** Today's sales count */
-  todaySalesCount: int("todaySalesCount").default(0).notNull(),
-  /** Today's revenue in cents */
-  todayRevenue: int("todayRevenue").default(0).notNull(),
-  /** Installation date */
-  installedAt: timestamp("installedAt"),
-  /** Last maintenance date */
-  lastMaintenanceAt: timestamp("lastMaintenanceAt"),
-  /** Next scheduled maintenance */
-  nextMaintenanceAt: timestamp("nextMaintenanceAt"),
-  /** Machine creation timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Last update timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type VendingMachine = typeof vendingMachines.$inferSelect;
-export type InsertVendingMachine = typeof vendingMachines.$inferInsert;
-
-/**
- * Vending machine inventory table.
- * Tracks product stock levels in each machine.
- */
-export const vendingInventory = mysqlTable("vending_inventory", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Vending machine ID */
-  machineId: int("machineId").notNull(),
-  /** Product slot number (1-12 typically) */
-  slotNumber: int("slotNumber").notNull(),
-  /** Product name */
-  productName: varchar("productName", { length: 100 }).notNull(),
-  /** Product SKU */
-  productSku: varchar("productSku", { length: 50 }).notNull(),
-  /** Current stock quantity */
-  currentStock: int("currentStock").default(0).notNull(),
-  /** Maximum capacity for this slot */
-  maxCapacity: int("maxCapacity").default(10).notNull(),
-  /** Low stock threshold for alerts */
-  lowStockThreshold: int("lowStockThreshold").default(3).notNull(),
-  /** Price in cents */
-  priceInCents: int("priceInCents").notNull(),
-  /** Last restocked timestamp */
-  lastRestockedAt: timestamp("lastRestockedAt"),
-  /** Created timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Updated timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type VendingInventoryItem = typeof vendingInventory.$inferSelect;
-export type InsertVendingInventoryItem = typeof vendingInventory.$inferInsert;
-
-/**
- * Vending machine sales log.
- * Records each transaction from vending machines.
- */
-export const vendingSales = mysqlTable("vending_sales", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Vending machine ID */
-  machineId: int("machineId").notNull(),
-  /** Product slot number */
-  slotNumber: int("slotNumber").notNull(),
-  /** Product name at time of sale */
-  productName: varchar("productName", { length: 100 }).notNull(),
-  /** Product SKU */
-  productSku: varchar("productSku", { length: 50 }).notNull(),
-  /** Quantity sold */
-  quantity: int("quantity").default(1).notNull(),
-  /** Sale amount in cents */
-  amountInCents: int("amountInCents").notNull(),
-  /** Payment method */
-  paymentMethod: mysqlEnum("paymentMethod", ["card", "cash", "mobile", "free"]).default("card").notNull(),
-  /** Transaction reference */
-  transactionRef: varchar("transactionRef", { length: 100 }),
-  /** Sale timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type VendingSale = typeof vendingSales.$inferSelect;
-export type InsertVendingSale = typeof vendingSales.$inferInsert;
-
-/**
- * Vending machine alerts table.
- * Stores alerts and notifications for machine issues.
- */
-export const vendingAlerts = mysqlTable("vending_alerts", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Vending machine ID */
-  machineId: int("machineId").notNull(),
-  /** Alert type */
-  alertType: mysqlEnum("alertType", ["low_stock", "temperature", "offline", "door_open", "payment_error", "maintenance_due", "error"]).notNull(),
-  /** Alert severity */
-  severity: mysqlEnum("severity", ["info", "warning", "critical"]).default("info").notNull(),
-  /** Alert title */
-  title: varchar("title", { length: 200 }).notNull(),
-  /** Alert message/description */
-  message: text("message"),
-  /** Whether alert has been acknowledged */
-  acknowledged: boolean("acknowledged").default(false).notNull(),
-  /** User who acknowledged the alert */
-  acknowledgedBy: int("acknowledgedBy"),
-  /** Acknowledgment timestamp */
-  acknowledgedAt: timestamp("acknowledgedAt"),
-  /** Whether alert has been resolved */
-  resolved: boolean("resolved").default(false).notNull(),
-  /** Resolution timestamp */
-  resolvedAt: timestamp("resolvedAt"),
-  /** Alert creation timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type VendingAlert = typeof vendingAlerts.$inferSelect;
-export type InsertVendingAlert = typeof vendingAlerts.$inferInsert;
-
-/**
- * Maintenance requests table.
- * Tracks service requests for vending machines.
- */
-export const maintenanceRequests = mysqlTable("maintenance_requests", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Vending machine ID */
-  machineId: int("machineId").notNull(),
-  /** Requester user ID */
-  requesterId: int("requesterId").notNull(),
-  /** Request type */
-  requestType: mysqlEnum("requestType", ["repair", "restock", "cleaning", "inspection", "relocation", "upgrade"]).notNull(),
-  /** Priority level */
-  priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).default("medium").notNull(),
-  /** Request title */
-  title: varchar("title", { length: 200 }).notNull(),
-  /** Detailed description */
-  description: text("description"),
-  /** Attached photos (JSON array of URLs) */
-  photos: text("photos"),
-  /** Request status */
-  status: mysqlEnum("status", ["pending", "assigned", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
-  /** Assigned technician ID */
-  assignedTo: int("assignedTo"),
-  /** Scheduled service date */
-  scheduledDate: timestamp("scheduledDate"),
-  /** Completion date */
-  completedAt: timestamp("completedAt"),
-  /** Service notes */
-  serviceNotes: text("serviceNotes"),
-  /** Request creation timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Last update timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type MaintenanceRequest = typeof maintenanceRequests.$inferSelect;
-export type InsertMaintenanceRequest = typeof maintenanceRequests.$inferInsert;
-
-
-/**
- * Replicated websites table for distributor personalized sites.
- * Tracks unique subdomains, affiliate links, and site configuration.
- */
-export const replicatedWebsites = mysqlTable("replicated_websites", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Distributor ID (foreign key) */
-  distributorId: int("distributorId").notNull().unique(),
-  /** Unique subdomain (e.g., john.neonenergy.com) */
-  subdomain: varchar("subdomain", { length: 100 }).notNull().unique(),
-  /** Custom vanity URL slug (e.g., /d/john) */
-  vanitySlug: varchar("vanitySlug", { length: 50 }).unique(),
-  /** Affiliate tracking link */
-  affiliateLink: varchar("affiliateLink", { length: 500 }).notNull(),
-  /** Affiliate tracking code */
-  affiliateCode: varchar("affiliateCode", { length: 50 }).notNull().unique(),
-  /** Site status */
-  status: mysqlEnum("status", ["provisioning", "active", "suspended", "inactive"]).default("provisioning").notNull(),
-  /** Provisioning status details */
-  provisioningStatus: mysqlEnum("provisioningStatus", ["pending", "subdomain_assigned", "tracking_configured", "verified", "failed"]).default("pending").notNull(),
-  /** Last verification timestamp */
-  lastVerifiedAt: timestamp("lastVerifiedAt"),
-  /** Verification error message if any */
-  verificationError: text("verificationError"),
-  /** Custom bio for the site */
-  bio: text("bio"),
-  /** Profile photo URL */
-  profilePhotoUrl: varchar("profilePhotoUrl", { length: 500 }),
-  /** Location (city, state) */
-  location: varchar("location", { length: 255 }),
-  /** Custom headline */
-  headline: varchar("headline", { length: 255 }),
-  /** Social media links (JSON) */
-  socialLinks: text("socialLinks"),
-  /** Site theme/color preference */
-  themeColor: varchar("themeColor", { length: 20 }).default("#c8ff00"),
-  /** Total page views */
-  totalViews: int("totalViews").default(0).notNull(),
-  /** Total unique visitors */
-  uniqueVisitors: int("uniqueVisitors").default(0).notNull(),
-  /** Total signups from this site */
-  totalSignups: int("totalSignups").default(0).notNull(),
-  /** Total sales from this site */
-  totalSales: int("totalSales").default(0).notNull(),
-  /** Revenue generated from this site (in cents) */
-  totalRevenue: int("totalRevenue").default(0).notNull(),
-  /** Creation timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Last update timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type ReplicatedWebsite = typeof replicatedWebsites.$inferSelect;
-export type InsertReplicatedWebsite = typeof replicatedWebsites.$inferInsert;
-
-/**
- * Website analytics events for replicated sites.
- * Tracks page views, clicks, and conversions.
- */
-export const websiteAnalytics = mysqlTable("website_analytics", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Replicated website ID */
-  websiteId: int("websiteId").notNull(),
-  /** Event type */
-  eventType: mysqlEnum("eventType", ["page_view", "click", "signup", "purchase", "share"]).notNull(),
-  /** Page URL */
-  pageUrl: varchar("pageUrl", { length: 500 }),
-  /** Referrer URL */
-  referrerUrl: varchar("referrerUrl", { length: 500 }),
-  /** Visitor IP (hashed for privacy) */
-  visitorHash: varchar("visitorHash", { length: 64 }),
-  /** User agent */
-  userAgent: varchar("userAgent", { length: 500 }),
-  /** Country code */
-  country: varchar("country", { length: 2 }),
-  /** Device type */
-  deviceType: mysqlEnum("deviceType", ["desktop", "mobile", "tablet"]).default("desktop"),
-  /** Session ID */
-  sessionId: varchar("sessionId", { length: 64 }),
-  /** Conversion value (if purchase) */
-  conversionValue: int("conversionValue"),
-  /** Event timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type WebsiteAnalytic = typeof websiteAnalytics.$inferSelect;
-export type InsertWebsiteAnalytic = typeof websiteAnalytics.$inferInsert;
-
-/**
- * Website audit log for tracking provisioning and verification.
- */
-export const websiteAuditLog = mysqlTable("website_audit_log", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Replicated website ID */
-  websiteId: int("websiteId").notNull(),
-  /** Audit action type */
-  action: mysqlEnum("action", ["created", "subdomain_assigned", "tracking_configured", "verified", "verification_failed", "auto_fixed", "suspended", "reactivated"]).notNull(),
-  /** Previous status */
-  previousStatus: varchar("previousStatus", { length: 50 }),
-  /** New status */
-  newStatus: varchar("newStatus", { length: 50 }),
-  /** Issue type if any */
-  issueType: mysqlEnum("issueType", ["missing_tracking", "data_drift", "subdomain_conflict", "invalid_affiliate_link", "none"]).default("none"),
-  /** Issue severity */
-  issueSeverity: mysqlEnum("issueSeverity", ["low", "medium", "high", "critical"]).default("low"),
-  /** Auto-fix applied */
-  autoFixed: boolean("autoFixed").default(false),
-  /** Details/notes */
-  details: text("details"),
-  /** Performed by (system or admin user ID) */
-  performedBy: varchar("performedBy", { length: 50 }).default("system"),
-  /** Timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type WebsiteAuditLogEntry = typeof websiteAuditLog.$inferSelect;
-export type InsertWebsiteAuditLogEntry = typeof websiteAuditLog.$inferInsert;
-
-
-/**
- * Data backups table for system-wide backup management.
- * Stores backup metadata and allows restoration of deleted data.
- */
-export const dataBackups = mysqlTable("data_backups", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Backup name/description */
-  name: varchar("name", { length: 255 }).notNull(),
-  /** Backup type */
-  backupType: mysqlEnum("backupType", ["full", "incremental", "table_specific", "manual"]).default("manual").notNull(),
-  /** Tables included in backup (JSON array) */
-  tablesIncluded: text("tablesIncluded").notNull(),
-  /** Total records backed up */
-  totalRecords: int("totalRecords").default(0).notNull(),
-  /** Backup file path/URL in S3 */
-  backupFileUrl: varchar("backupFileUrl", { length: 500 }),
-  /** Backup file size in bytes */
-  fileSizeBytes: int("fileSizeBytes").default(0).notNull(),
-  /** Backup status */
-  status: mysqlEnum("status", ["in_progress", "completed", "failed", "expired"]).default("in_progress").notNull(),
-  /** Error message if failed */
-  errorMessage: text("errorMessage"),
-  /** Retention period in days */
-  retentionDays: int("retentionDays").default(30).notNull(),
-  /** Expiration date */
-  expiresAt: timestamp("expiresAt"),
-  /** Created by admin user ID */
-  createdBy: int("createdBy"),
-  /** Backup creation timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Backup completion timestamp */
-  completedAt: timestamp("completedAt"),
-});
-
-export type DataBackup = typeof dataBackups.$inferSelect;
-export type InsertDataBackup = typeof dataBackups.$inferInsert;
-
-/**
- * Backup data snapshots table.
- * Stores actual data snapshots for restoration.
- */
-export const backupSnapshots = mysqlTable("backup_snapshots", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Parent backup ID */
-  backupId: int("backupId").notNull(),
-  /** Table name */
-  tableName: varchar("tableName", { length: 100 }).notNull(),
-  /** Record ID from original table */
-  recordId: int("recordId").notNull(),
-  /** Full record data as JSON */
-  recordData: text("recordData").notNull(),
-  /** Record hash for integrity check */
-  dataHash: varchar("dataHash", { length: 64 }).notNull(),
-  /** Snapshot timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type BackupSnapshot = typeof backupSnapshots.$inferSelect;
-export type InsertBackupSnapshot = typeof backupSnapshots.$inferInsert;
-
-/**
- * Data restoration log table.
- * Tracks all restoration operations.
- */
-export const restorationLog = mysqlTable("restoration_log", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Backup ID used for restoration */
-  backupId: int("backupId").notNull(),
-  /** Restoration type */
-  restorationType: mysqlEnum("restorationType", ["full", "partial", "single_record"]).notNull(),
-  /** Tables restored (JSON array) */
-  tablesRestored: text("tablesRestored"),
-  /** Records restored count */
-  recordsRestored: int("recordsRestored").default(0).notNull(),
-  /** Restoration status */
-  status: mysqlEnum("status", ["in_progress", "completed", "failed", "rolled_back"]).default("in_progress").notNull(),
-  /** Error message if failed */
-  errorMessage: text("errorMessage"),
-  /** Performed by admin user ID */
-  performedBy: int("performedBy").notNull(),
-  /** Restoration started timestamp */
-  startedAt: timestamp("startedAt").defaultNow().notNull(),
-  /** Restoration completed timestamp */
-  completedAt: timestamp("completedAt"),
-});
-
-export type RestorationLogEntry = typeof restorationLog.$inferSelect;
-export type InsertRestorationLogEntry = typeof restorationLog.$inferInsert;
-
-/**
- * Deleted records archive table.
- * Automatically stores deleted records for potential restoration.
- */
-export const deletedRecordsArchive = mysqlTable("deleted_records_archive", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Original table name */
-  tableName: varchar("tableName", { length: 100 }).notNull(),
-  /** Original record ID */
-  originalId: int("originalId").notNull(),
-  /** Full record data as JSON */
-  recordData: text("recordData").notNull(),
-  /** Deletion reason */
-  deletionReason: varchar("deletionReason", { length: 255 }),
-  /** Deleted by user ID (null if system) */
-  deletedBy: int("deletedBy"),
-  /** Whether record can be restored */
-  canRestore: boolean("canRestore").default(true).notNull(),
-  /** Restoration deadline */
-  restoreDeadline: timestamp("restoreDeadline"),
-  /** Whether record was restored */
-  wasRestored: boolean("wasRestored").default(false).notNull(),
-  /** Restored timestamp */
-  restoredAt: timestamp("restoredAt"),
-  /** Restored by user ID */
-  restoredBy: int("restoredBy"),
-  /** Deletion timestamp */
-  deletedAt: timestamp("deletedAt").defaultNow().notNull(),
-});
-
-export type DeletedRecordArchive = typeof deletedRecordsArchive.$inferSelect;
-export type InsertDeletedRecordArchive = typeof deletedRecordsArchive.$inferInsert;
-
-/**
- * Comprehensive system audit log table.
- * Tracks all significant system actions for compliance and debugging.
- */
-export const systemAuditLog = mysqlTable("system_audit_log", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Action category */
-  category: mysqlEnum("category", [
-    "user", "distributor", "order", "commission", "website", 
-    "backup", "restore", "admin", "security", "system"
-  ]).notNull(),
-  /** Specific action type */
-  action: varchar("action", { length: 100 }).notNull(),
-  /** Affected entity type */
-  entityType: varchar("entityType", { length: 50 }).notNull(),
-  /** Affected entity ID */
-  entityId: int("entityId"),
-  /** User ID who performed action (null if system) */
-  userId: int("userId"),
-  /** User role at time of action */
-  userRole: varchar("userRole", { length: 50 }),
-  /** IP address */
-  ipAddress: varchar("ipAddress", { length: 45 }),
-  /** User agent */
-  userAgent: varchar("userAgent", { length: 500 }),
-  /** Previous state (JSON) */
-  previousState: text("previousState"),
-  /** New state (JSON) */
-  newState: text("newState"),
-  /** Additional metadata (JSON) */
-  metadata: text("metadata"),
-  /** Action result */
-  result: mysqlEnum("result", ["success", "failure", "partial"]).default("success").notNull(),
-  /** Error message if failed */
-  errorMessage: text("errorMessage"),
-  /** Severity level */
-  severity: mysqlEnum("severity", ["info", "warning", "error", "critical"]).default("info").notNull(),
-  /** Whether this action is reversible */
-  isReversible: boolean("isReversible").default(false).notNull(),
-  /** Related audit log entries (JSON array of IDs) */
-  relatedEntries: text("relatedEntries"),
-  /** Action timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type SystemAuditLogEntry = typeof systemAuditLog.$inferSelect;
-export type InsertSystemAuditLogEntry = typeof systemAuditLog.$inferInsert;
-
-/**
- * Scheduled backup configuration table.
- * Stores automated backup schedules.
- */
 export const backupSchedules = mysqlTable("backup_schedules", {
-  id: int("id").autoincrement().primaryKey(),
-  /** Schedule name */
-  name: varchar("name", { length: 100 }).notNull(),
-  /** Backup type */
-  backupType: mysqlEnum("backupType", ["full", "incremental"]).default("incremental").notNull(),
-  /** Tables to backup (JSON array, empty = all) */
-  tables: text("tables"),
-  /** Cron expression for schedule */
-  cronExpression: varchar("cronExpression", { length: 100 }).notNull(),
-  /** Retention period in days */
-  retentionDays: int("retentionDays").default(30).notNull(),
-  /** Whether schedule is active */
-  isActive: boolean("isActive").default(true).notNull(),
-  /** Last run timestamp */
-  lastRunAt: timestamp("lastRunAt"),
-  /** Next scheduled run */
-  nextRunAt: timestamp("nextRunAt"),
-  /** Last run status */
-  lastRunStatus: mysqlEnum("lastRunStatus", ["success", "failed", "never_run"]).default("never_run"),
-  /** Created by admin ID */
-  createdBy: int("createdBy"),
-  /** Created timestamp */
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  /** Updated timestamp */
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+	id: int().autoincrement().notNull(),
+	name: varchar({ length: 100 }).notNull(),
+	backupType: mysqlEnum(['full','incremental']).default('incremental').notNull(),
+	tables: text(),
+	cronExpression: varchar({ length: 100 }).notNull(),
+	retentionDays: int().default(30).notNull(),
+	isActive: tinyint().default(1).notNull(),
+	lastRunAt: timestamp({ mode: 'string' }),
+	nextRunAt: timestamp({ mode: 'string' }),
+	lastRunStatus: mysqlEnum(['success','failed','never_run']).default('never_run'),
+	createdBy: int(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 });
 
-export type BackupSchedule = typeof backupSchedules.$inferSelect;
-export type InsertBackupSchedule = typeof backupSchedules.$inferInsert;
+export const backupSnapshots = mysqlTable("backup_snapshots", {
+	id: int().autoincrement().notNull(),
+	backupId: int().notNull(),
+	tableName: varchar({ length: 100 }).notNull(),
+	recordId: int().notNull(),
+	recordData: text().notNull(),
+	dataHash: varchar({ length: 64 }).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const blogPosts = mysqlTable("blog_posts", {
+	id: int().autoincrement().notNull(),
+	slug: varchar({ length: 255 }).notNull(),
+	title: varchar({ length: 500 }).notNull(),
+	excerpt: text(),
+	content: text().notNull(),
+	featuredImage: varchar({ length: 500 }),
+	category: mysqlEnum(['product','health','business','franchise','distributor','news','lifestyle']).default('product').notNull(),
+	metaTitle: varchar({ length: 255 }),
+	metaDescription: text(),
+	keywords: text(),
+	status: mysqlEnum(['draft','published','archived']).default('draft').notNull(),
+	author: varchar({ length: 255 }).default('NEON Team'),
+	views: int().default(0),
+	publishedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("blog_posts_slug_unique").on(table.slug),
+]);
+
+export const claimedTerritories = mysqlTable("claimed_territories", {
+	id: int().autoincrement().notNull(),
+	territoryLicenseId: int().notNull(),
+	centerLat: decimal({ precision: 10, scale: 7 }).notNull(),
+	centerLng: decimal({ precision: 10, scale: 7 }).notNull(),
+	radiusMiles: int().notNull(),
+	territoryName: varchar({ length: 255 }).notNull(),
+	zipCode: varchar({ length: 20 }),
+	city: varchar({ length: 100 }),
+	state: varchar({ length: 50 }),
+	status: mysqlEnum(['pending','active','expired']).default('pending').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	expiresAt: timestamp({ mode: 'string' }),
+	renewalDate: timestamp({ mode: 'string' }),
+	expirationDate: timestamp({ mode: 'string' }),
+});
+
+export const commissions = mysqlTable("commissions", {
+	id: int().autoincrement().notNull(),
+	distributorId: int().notNull(),
+	saleId: int().notNull(),
+	sourceDistributorId: int(),
+	commissionType: mysqlEnum(['direct','team','rank_bonus','leadership']).notNull(),
+	level: int().notNull(),
+	amount: int().notNull(),
+	percentage: int().notNull(),
+	status: mysqlEnum(['pending','paid','cancelled']).default('pending').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const crowdfunding = mysqlTable("crowdfunding", {
+	id: int().autoincrement().notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	email: varchar({ length: 320 }).notNull(),
+	amount: int().notNull(),
+	rewardTier: varchar({ length: 100 }),
+	status: mysqlEnum(['pending','completed','refunded']).default('pending').notNull(),
+	message: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const customerReferralCodes = mysqlTable("customer_referral_codes", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	code: varchar({ length: 50 }).notNull(),
+	usageCount: int().default(0).notNull(),
+	successfulReferrals: int().default(0).notNull(),
+	isActive: tinyint().default(1).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("customer_referral_codes_code_unique").on(table.code),
+]);
+
+export const customerReferrals = mysqlTable("customer_referrals", {
+	id: int().autoincrement().notNull(),
+	referrerId: int().notNull(),
+	referredId: int().notNull(),
+	referralCode: varchar({ length: 50 }).notNull(),
+	purchaseCompleted: tinyint().default(0),
+	orderId: int(),
+	purchaseAmount: decimal({ precision: 10, scale: 2 }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	purchaseCompletedAt: timestamp({ mode: 'string' }),
+});
+
+export const customerRewards = mysqlTable("customer_rewards", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	rewardType: varchar({ length: 50 }).notNull(),
+	description: varchar({ length: 255 }).notNull(),
+	value: decimal({ precision: 10, scale: 2 }).notNull(),
+	referralCount: int().default(3),
+	status: mysqlEnum(['pending','available','redeemed','expired']).default('available').notNull(),
+	redemptionCode: varchar({ length: 50 }),
+	redeemedAt: timestamp({ mode: 'string' }),
+	redeemedOrderId: int(),
+	expiresAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const dataBackups = mysqlTable("data_backups", {
+	id: int().autoincrement().notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	backupType: mysqlEnum(['full','incremental','table_specific','manual']).default('manual').notNull(),
+	tablesIncluded: text().notNull(),
+	totalRecords: int().default(0).notNull(),
+	backupFileUrl: varchar({ length: 500 }),
+	fileSizeBytes: int().default(0).notNull(),
+	status: mysqlEnum(['in_progress','completed','failed','expired']).default('in_progress').notNull(),
+	errorMessage: text(),
+	retentionDays: int().default(30).notNull(),
+	expiresAt: timestamp({ mode: 'string' }),
+	createdBy: int(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	completedAt: timestamp({ mode: 'string' }),
+});
+
+export const deletedRecordsArchive = mysqlTable("deleted_records_archive", {
+	id: int().autoincrement().notNull(),
+	tableName: varchar({ length: 100 }).notNull(),
+	originalId: int().notNull(),
+	recordData: text().notNull(),
+	deletionReason: varchar({ length: 255 }),
+	deletedBy: int(),
+	canRestore: tinyint().default(1).notNull(),
+	restoreDeadline: timestamp({ mode: 'string' }),
+	wasRestored: tinyint().default(0).notNull(),
+	restoredAt: timestamp({ mode: 'string' }),
+	restoredBy: int(),
+	deletedAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const distributorAutoships = mysqlTable("distributor_autoships", {
+	id: int().autoincrement().notNull(),
+	distributorId: int().notNull(),
+	userId: int().notNull(),
+	name: varchar({ length: 255 }).default('Monthly Autoship'),
+	status: mysqlEnum(['active','paused','cancelled']).default('active').notNull(),
+	processDay: int().default(1).notNull(),
+	totalPv: int().default(0).notNull(),
+	totalPrice: int().default(0).notNull(),
+	paymentMethodId: varchar({ length: 255 }),
+	stripeCustomerId: varchar({ length: 255 }),
+	shippingAddress1: text(),
+	shippingAddress2: text(),
+	shippingCity: varchar({ length: 100 }),
+	shippingState: varchar({ length: 100 }),
+	shippingPostalCode: varchar({ length: 20 }),
+	shippingCountry: varchar({ length: 100 }).default('USA'),
+	nextProcessDate: timestamp({ mode: 'string' }),
+	lastProcessedDate: timestamp({ mode: 'string' }),
+	successfulOrders: int().default(0),
+	failedAttempts: int().default(0),
+	lastFailureReason: text(),
+	reminderSent: int().default(0),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
+export const distributorFreeRewards = mysqlTable("distributor_free_rewards", {
+	id: int().autoincrement().notNull(),
+	distributorId: int().notNull(),
+	pointsRedeemed: int().default(3).notNull(),
+	earnedMonth: varchar({ length: 7 }).notNull(),
+	status: mysqlEnum(['pending','shipped','delivered']).default('pending').notNull(),
+	trackingNumber: varchar({ length: 100 }),
+	shippedAt: timestamp({ mode: 'string' }),
+	deliveredAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const distributorRewardPoints = mysqlTable("distributor_reward_points", {
+	id: int().autoincrement().notNull(),
+	distributorId: int().notNull(),
+	points: int().default(0).notNull(),
+	source: varchar({ length: 50 }).notNull(),
+	description: varchar({ length: 255 }),
+	relatedId: int(),
+	periodMonth: varchar({ length: 7 }).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const distributors = mysqlTable("distributors", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	sponsorId: int(),
+	distributorCode: varchar({ length: 50 }).notNull(),
+	rank: mysqlEnum(['starter','bronze','silver','gold','platinum','diamond','crown_diamond','royal_diamond']).default('starter').notNull(),
+	personalSales: int().default(0).notNull(),
+	teamSales: int().default(0).notNull(),
+	totalEarnings: int().default(0).notNull(),
+	availableBalance: int().default(0).notNull(),
+	status: mysqlEnum(['active','inactive','suspended']).default('active').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+	placementPosition: mysqlEnum(['left','right']),
+	username: varchar({ length: 50 }),
+	subdomain: varchar({ length: 50 }),
+	leftLegVolume: int().default(0).notNull(),
+	rightLegVolume: int().default(0).notNull(),
+	monthlyPv: int().default(0).notNull(),
+	monthlyAutoshipPv: int().default(0).notNull(),
+	activeDownlineCount: int().default(0).notNull(),
+	isActive: int().default(0).notNull(),
+	lastQualificationDate: timestamp({ mode: 'string' }),
+	fastStartEligibleUntil: timestamp({ mode: 'string' }),
+	country: varchar({ length: 2 }),
+	phone: varchar({ length: 50 }),
+	address: text(),
+	city: varchar({ length: 100 }),
+	state: varchar({ length: 100 }),
+	zipCode: varchar({ length: 20 }),
+	dateOfBirth: varchar({ length: 20 }),
+	taxIdLast4: varchar({ length: 4 }),
+	agreedToPoliciesAt: timestamp({ mode: 'string' }),
+	agreedToTermsAt: timestamp({ mode: 'string' }),
+	taxId: varchar({ length: 255 }),
+	taxIdType: mysqlEnum(['ssn','ein']),
+	entityType: mysqlEnum(['individual','sole_proprietor','llc','s_corp','c_corp','partnership']),
+	businessName: varchar({ length: 255 }),
+	businessRegistrationNumber: varchar({ length: 50 }),
+	businessRegistrationState: varchar({ length: 50 }),
+	emergencyContactName: varchar({ length: 255 }),
+	emergencyContactPhone: varchar({ length: 50 }),
+	emergencyContactRelationship: varchar({ length: 100 }),
+	bankName: varchar({ length: 255 }),
+	bankAccountType: mysqlEnum(['checking','savings']),
+	bankAccountLast4: varchar({ length: 4 }),
+	bankRoutingNumber: varchar({ length: 255 }),
+	bankAccountNumber: varchar({ length: 255 }),
+	enrollmentPackage: mysqlEnum(['starter','pro','elite']),
+	autoshipEnabled: tinyint().default(0).notNull(),
+	autoshipPackageId: int(),
+	nextAutoshipDate: timestamp({ mode: 'string' }),
+	taxInfoCompleted: tinyint().default(0).notNull(),
+	taxInfoCompletedAt: timestamp({ mode: 'string' }),
+	w9Submitted: tinyint().default(0).notNull(),
+	w9SubmittedAt: timestamp({ mode: 'string' }),
+	enrollmentPackageId: int(),
+	firstName: varchar({ length: 255 }),
+	lastName: varchar({ length: 255 }),
+	email: varchar({ length: 255 }),
+	ssnLast4: varchar({ length: 4 }),
+	businessEntityType: varchar({ length: 100 }),
+	businessEin: varchar({ length: 50 }),
+},
+(table) => [
+	index("distributors_userId_unique").on(table.userId),
+	index("distributors_distributorCode_unique").on(table.distributorCode),
+	index("distributors_username_unique").on(table.username),
+	index("distributors_subdomain_unique").on(table.subdomain),
+]);
+
+export const emailDigestQueue = mysqlTable("email_digest_queue", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	notificationType: varchar({ length: 50 }).notNull(),
+	title: varchar({ length: 255 }).notNull(),
+	content: text().notNull(),
+	relatedId: int(),
+	processed: tinyint().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const enrollmentPackages = mysqlTable("enrollmentPackages", {
+	id: int().autoincrement().notNull(),
+	name: varchar({ length: 100 }).notNull(),
+	slug: varchar({ length: 100 }).notNull(),
+	description: text(),
+	price: int().notNull(),
+	businessVolume: int().default(0).notNull(),
+	productQuantity: int().default(0).notNull(),
+	productDetails: text(),
+	marketingMaterialsIncluded: tinyint().default(0).notNull(),
+	trainingAccessLevel: mysqlEnum(['basic','advanced','premium']).default('basic').notNull(),
+	fastStartBonusEligible: tinyint().default(0).notNull(),
+	isActive: tinyint().default(1).notNull(),
+	displayOrder: int().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("enrollmentPackages_slug_unique").on(table.slug),
+]);
+
+export const franchiseApplications = mysqlTable("franchise_applications", {
+	id: int().autoincrement().notNull(),
+	firstName: varchar({ length: 100 }).notNull(),
+	lastName: varchar({ length: 100 }).notNull(),
+	email: varchar({ length: 320 }).notNull(),
+	phone: varchar({ length: 50 }).notNull(),
+	territoryCity: varchar({ length: 100 }).notNull(),
+	territoryState: varchar({ length: 100 }).notNull(),
+	territorySize: varchar({ length: 50 }).notNull(),
+	exclusivityType: varchar({ length: 50 }).notNull(),
+	investmentCapital: varchar({ length: 50 }).notNull(),
+	financingNeeded: varchar({ length: 50 }),
+	netWorth: varchar({ length: 50 }),
+	businessExperience: varchar({ length: 100 }).notNull(),
+	distributionExperience: text(),
+	teamSize: varchar({ length: 50 }),
+	motivation: text().notNull(),
+	timeline: varchar({ length: 50 }).notNull(),
+	questions: text(),
+	status: mysqlEnum(['pending','under_review','approved','rejected']).default('pending').notNull(),
+	adminNotes: text(),
+	submittedAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	reviewedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const investorInquiries = mysqlTable("investor_inquiries", {
+	id: int().autoincrement().notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	email: varchar({ length: 320 }).notNull(),
+	phone: varchar({ length: 50 }),
+	company: varchar({ length: 255 }),
+	investmentRange: mysqlEnum(['under_10k','10k_50k','50k_100k','100k_500k','500k_1m','over_1m']).notNull(),
+	accreditedStatus: mysqlEnum(['yes','no','unsure']).notNull(),
+	investmentType: mysqlEnum(['equity','convertible_note','revenue_share','franchise','other']).notNull(),
+	referralSource: varchar({ length: 255 }),
+	message: text(),
+	status: mysqlEnum(['new','contacted','in_discussion','committed','declined']).default('new').notNull(),
+	adminNotes: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
+export const maintenanceRequests = mysqlTable("maintenance_requests", {
+	id: int().autoincrement().notNull(),
+	machineId: int().notNull(),
+	requesterId: int().notNull(),
+	requestType: mysqlEnum(['repair','restock','cleaning','inspection','relocation','upgrade']).notNull(),
+	priority: mysqlEnum(['low','medium','high','urgent']).default('medium').notNull(),
+	title: varchar({ length: 200 }).notNull(),
+	description: text(),
+	photos: text(),
+	status: mysqlEnum(['pending','assigned','in_progress','completed','cancelled']).default('pending').notNull(),
+	assignedTo: int(),
+	scheduledDate: timestamp({ mode: 'string' }),
+	completedAt: timestamp({ mode: 'string' }),
+	serviceNotes: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
+export const mfaRecoveryRequests = mysqlTable("mfa_recovery_requests", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	email: varchar({ length: 320 }).notNull(),
+	recoveryToken: varchar({ length: 64 }).notNull(),
+	tokenExpiry: timestamp({ mode: 'string' }).notNull(),
+	status: mysqlEnum(['pending','email_verified','approved','rejected','completed','expired']).default('pending').notNull(),
+	verificationAnswers: text(),
+	adminNotes: text(),
+	processedBy: int(),
+	ipAddress: varchar({ length: 45 }),
+	userAgent: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("mfa_recovery_requests_recoveryToken_unique").on(table.recoveryToken),
+]);
+
+export const mfaSettings = mysqlTable("mfa_settings", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	totpSecret: varchar({ length: 255 }).notNull(),
+	isEnabled: tinyint().default(0).notNull(),
+	backupCodes: text(),
+	backupCodesRemaining: int().default(10).notNull(),
+	lastVerifiedAt: timestamp({ mode: 'string' }),
+	failedAttempts: int().default(0).notNull(),
+	lockedUntil: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("mfa_settings_userId_unique").on(table.userId),
+]);
+
+export const neonNfts = mysqlTable("neon_nfts", {
+	id: int().autoincrement().notNull(),
+	orderId: int(),
+	preorderId: int(),
+	crowdfundingId: int(),
+	userId: int(),
+	tokenId: int().notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	description: text(),
+	imageUrl: varchar({ length: 500 }),
+	rarity: mysqlEnum(['legendary','epic','rare','uncommon','common']).notNull(),
+	rarityRank: int().notNull(),
+	estimatedValue: decimal({ precision: 10, scale: 2 }),
+	ownerEmail: varchar({ length: 320 }),
+	ownerName: varchar({ length: 255 }),
+	packageType: varchar({ length: 100 }),
+	txHash: varchar({ length: 100 }),
+	blockchainStatus: mysqlEnum(['pending','minted','transferred']).default('pending').notNull(),
+	mintedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("neon_nfts_tokenId_unique").on(table.tokenId),
+]);
+
+export const newsletterSubscriptions = mysqlTable("newsletter_subscriptions", {
+	id: int().autoincrement().notNull(),
+	email: varchar({ length: 320 }).notNull(),
+	name: varchar({ length: 255 }),
+	referrerId: int(),
+	discountTier: int().default(1).notNull(),
+	referralCount: int().default(0).notNull(),
+	status: mysqlEnum(['active','unsubscribed']).default('active').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	couponCode: varchar({ length: 20 }),
+	couponUsed: tinyint().default(0).notNull(),
+	couponUsedBy: int(),
+	couponUsedAt: timestamp({ mode: 'string' }),
+},
+(table) => [
+	index("newsletter_subscriptions_email_unique").on(table.email),
+	index("newsletter_subscriptions_couponCode_unique").on(table.couponCode),
+]);
+
+export const notificationPreferences = mysqlTable("notification_preferences", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	referrals: tinyint().default(1).notNull(),
+	commissions: tinyint().default(1).notNull(),
+	teamUpdates: tinyint().default(1).notNull(),
+	promotions: tinyint().default(1).notNull(),
+	orders: tinyint().default(1).notNull(),
+	announcements: tinyint().default(1).notNull(),
+	digestFrequency: mysqlEnum(['none','daily','weekly']).default('none').notNull(),
+	digestDay: int().default(1),
+	digestHour: int().default(9),
+	lastDigestSent: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
+export const notifications = mysqlTable("notifications", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	type: varchar({ length: 50 }).notNull(),
+	title: varchar({ length: 255 }).notNull(),
+	message: text().notNull(),
+	data: text(),
+	isRead: tinyint().default(0),
+	readAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const orders = mysqlTable("orders", {
+	id: int().autoincrement().notNull(),
+	userId: int(),
+	distributorId: int(),
+	packageId: int().notNull(),
+	orderNumber: varchar({ length: 50 }).notNull(),
+	customerName: varchar({ length: 255 }).notNull(),
+	customerEmail: varchar({ length: 320 }).notNull(),
+	shippingAddress: text().notNull(),
+	totalAmount: decimal({ precision: 10, scale: 2 }).notNull(),
+	pv: int().notNull(),
+	status: mysqlEnum(['pending','paid','shipped','delivered','cancelled']).default('pending').notNull(),
+	stripePaymentId: varchar({ length: 255 }),
+	isAutoShip: int().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("orders_orderNumber_unique").on(table.orderNumber),
+]);
+
+export const packages = mysqlTable("packages", {
+	id: int().autoincrement().notNull(),
+	name: varchar({ length: 100 }).notNull(),
+	type: mysqlEnum(['distributor','customer']).notNull(),
+	tier: mysqlEnum(['starter','pro','elite','single','12pack','24pack']).notNull(),
+	price: decimal({ precision: 10, scale: 2 }).notNull(),
+	pv: int().notNull(),
+	description: text(),
+	contents: text(),
+	active: int().default(1).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const payoutHistory = mysqlTable("payout_history", {
+	id: int().autoincrement().notNull(),
+	payoutRequestId: int().notNull(),
+	distributorId: int().notNull(),
+	amount: int().notNull(),
+	payoutMethod: varchar({ length: 50 }).notNull(),
+	transactionRef: varchar({ length: 255 }),
+	periodStart: timestamp({ mode: 'string' }),
+	periodEnd: timestamp({ mode: 'string' }),
+	commissionsIncluded: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const payoutRequests = mysqlTable("payout_requests", {
+	id: int().autoincrement().notNull(),
+	distributorId: int().notNull(),
+	amount: int().notNull(),
+	processingFee: int().default(0),
+	netAmount: int().notNull(),
+	payoutMethod: mysqlEnum(['stripe_connect','paypal','bank_transfer','check']).notNull(),
+	status: mysqlEnum(['pending','approved','processing','completed','failed','cancelled']).default('pending').notNull(),
+	stripeTransferId: varchar({ length: 255 }),
+	paypalPayoutId: varchar({ length: 255 }),
+	checkNumber: varchar({ length: 50 }),
+	approvedBy: int(),
+	approvedAt: timestamp({ mode: 'string' }),
+	processedAt: timestamp({ mode: 'string' }),
+	completedAt: timestamp({ mode: 'string' }),
+	failureReason: text(),
+	notes: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
+export const payoutSettings = mysqlTable("payout_settings", {
+	id: int().autoincrement().notNull(),
+	distributorId: int().notNull(),
+	payoutMethod: mysqlEnum(['stripe_connect','paypal','bank_transfer','check']).default('stripe_connect').notNull(),
+	stripeConnectAccountId: varchar({ length: 255 }),
+	stripeConnectStatus: mysqlEnum(['pending','onboarding','active','restricted','disabled']).default('pending'),
+	paypalEmail: varchar({ length: 320 }),
+	bankAccountName: varchar({ length: 255 }),
+	bankRoutingNumber: varchar({ length: 255 }),
+	bankAccountLast4: varchar({ length: 4 }),
+	bankAccountType: mysqlEnum(['checking','savings']).default('checking'),
+	checkMailingAddress: text(),
+	minimumPayout: int().default(5000).notNull(),
+	payoutFrequency: mysqlEnum(['weekly','biweekly','monthly']).default('weekly').notNull(),
+	taxFormSubmitted: int().default(0),
+	taxIdLast4: varchar({ length: 4 }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("payout_settings_distributorId_unique").on(table.distributorId),
+]);
+
+export const preorders = mysqlTable("preorders", {
+	id: int().autoincrement().notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	email: varchar({ length: 320 }).notNull(),
+	phone: varchar({ length: 50 }),
+	quantity: int().notNull(),
+	address: text().notNull(),
+	city: varchar({ length: 100 }).notNull(),
+	state: varchar({ length: 100 }).notNull(),
+	postalCode: varchar({ length: 20 }).notNull(),
+	country: varchar({ length: 100 }).default('USA').notNull(),
+	status: mysqlEnum(['pending','confirmed','shipped','delivered','cancelled']).default('pending').notNull(),
+	notes: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+	trackingNumber: varchar({ length: 100 }),
+	carrier: varchar({ length: 50 }),
+	estimatedDelivery: timestamp({ mode: 'string' }),
+	nftId: varchar({ length: 50 }),
+	nftImageUrl: text(),
+	nftMintStatus: mysqlEnum(['pending','ready','minted']).default('pending'),
+	nftRarity: varchar({ length: 50 }),
+	nftTheme: text(),
+});
+
+export const pushSubscriptions = mysqlTable("push_subscriptions", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	endpoint: text().notNull(),
+	p256Dh: text().notNull(),
+	auth: text().notNull(),
+	userAgent: text(),
+	isActive: tinyint().default(1).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
+export const rankHistory = mysqlTable("rank_history", {
+	id: int().autoincrement().notNull(),
+	distributorId: int().notNull(),
+	previousRank: varchar({ length: 50 }).notNull(),
+	newRank: varchar({ length: 50 }).notNull(),
+	personalPvAtChange: int().default(0),
+	teamPvAtChange: int().default(0),
+	notificationSent: tinyint().default(0),
+	achievedAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const referralTracking = mysqlTable("referral_tracking", {
+	id: int().autoincrement().notNull(),
+	referrerId: varchar({ length: 50 }).notNull(),
+	referrerName: varchar({ length: 255 }),
+	referralCode: varchar({ length: 50 }).notNull(),
+	referredPhone: varchar({ length: 50 }),
+	referredEmail: varchar({ length: 320 }),
+	referredName: varchar({ length: 255 }),
+	source: mysqlEnum(['sms','email','social','direct','whatsapp','twitter','facebook']).default('direct').notNull(),
+	status: mysqlEnum(['pending','clicked','signed_up','customer','distributor']).default('pending').notNull(),
+	convertedToCustomer: int().default(0).notNull(),
+	convertedToDistributor: int().default(0).notNull(),
+	customerOrderId: int(),
+	distributorId: int(),
+	bonusPaid: int().default(0).notNull(),
+	bonusAmount: int().default(0).notNull(),
+	clickedAt: timestamp({ mode: 'string' }),
+	signedUpAt: timestamp({ mode: 'string' }),
+	convertedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const replicatedWebsites = mysqlTable("replicated_websites", {
+	id: int().autoincrement().notNull(),
+	distributorId: int().notNull(),
+	subdomain: varchar({ length: 100 }).notNull(),
+	vanitySlug: varchar({ length: 50 }),
+	affiliateLink: varchar({ length: 500 }).notNull(),
+	affiliateCode: varchar({ length: 50 }).notNull(),
+	status: mysqlEnum(['provisioning','active','suspended','inactive']).default('provisioning').notNull(),
+	provisioningStatus: mysqlEnum(['pending','subdomain_assigned','tracking_configured','verified','failed']).default('pending').notNull(),
+	lastVerifiedAt: timestamp({ mode: 'string' }),
+	verificationError: text(),
+	bio: text(),
+	profilePhotoUrl: varchar({ length: 500 }),
+	location: varchar({ length: 255 }),
+	headline: varchar({ length: 255 }),
+	socialLinks: text(),
+	themeColor: varchar({ length: 20 }).default('#c8ff00'),
+	totalViews: int().default(0).notNull(),
+	uniqueVisitors: int().default(0).notNull(),
+	totalSignups: int().default(0).notNull(),
+	totalSales: int().default(0).notNull(),
+	totalRevenue: int().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("replicated_websites_distributorId_unique").on(table.distributorId),
+	index("replicated_websites_subdomain_unique").on(table.subdomain),
+	index("replicated_websites_vanitySlug_unique").on(table.vanitySlug),
+	index("replicated_websites_affiliateCode_unique").on(table.affiliateCode),
+]);
+
+export const restorationLog = mysqlTable("restoration_log", {
+	id: int().autoincrement().notNull(),
+	backupId: int().notNull(),
+	restorationType: mysqlEnum(['full','partial','single_record']).notNull(),
+	tablesRestored: text(),
+	recordsRestored: int().default(0).notNull(),
+	status: mysqlEnum(['in_progress','completed','failed','rolled_back']).default('in_progress').notNull(),
+	errorMessage: text(),
+	performedBy: int().notNull(),
+	startedAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	completedAt: timestamp({ mode: 'string' }),
+});
+
+export const rewardRedemptions = mysqlTable("reward_redemptions", {
+	id: int().autoincrement().notNull(),
+	rewardId: int().notNull(),
+	rewardType: mysqlEnum(['customer','distributor']).notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	email: varchar({ length: 320 }).notNull(),
+	phone: varchar({ length: 50 }),
+	addressLine1: text().notNull(),
+	addressLine2: text(),
+	city: varchar({ length: 100 }).notNull(),
+	state: varchar({ length: 100 }).notNull(),
+	postalCode: varchar({ length: 20 }).notNull(),
+	country: varchar({ length: 100 }).notNull(),
+	status: mysqlEnum(['pending','processing','shipped','delivered']).default('pending').notNull(),
+	trackingNumber: varchar({ length: 100 }),
+	shippedAt: timestamp({ mode: 'string' }),
+	deliveredAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const sales = mysqlTable("sales", {
+	id: int().autoincrement().notNull(),
+	distributorId: int(),
+	customerId: int(),
+	customerEmail: varchar({ length: 320 }).notNull(),
+	orderTotal: int().notNull(),
+	commissionVolume: int().notNull(),
+	saleType: mysqlEnum(['retail','distributor','autoship']).default('retail').notNull(),
+	paymentStatus: mysqlEnum(['pending','completed','refunded']).default('pending').notNull(),
+	orderDetails: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const scheduledMeetings = mysqlTable("scheduled_meetings", {
+	id: int().autoincrement().notNull(),
+	userId: int(),
+	name: varchar({ length: 255 }).notNull(),
+	email: varchar({ length: 320 }).notNull(),
+	phone: varchar({ length: 50 }),
+	meetingType: mysqlEnum(['franchise','vending','general']).notNull(),
+	scheduledAt: timestamp({ mode: 'string' }).notNull(),
+	durationMinutes: int().default(30).notNull(),
+	timezone: varchar({ length: 100 }).default('America/New_York').notNull(),
+	status: mysqlEnum(['scheduled','confirmed','completed','cancelled','no_show']).default('scheduled').notNull(),
+	notes: text(),
+	adminNotes: text(),
+	meetingLink: text(),
+	reminderSent: tinyint().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
+export const smsMessageLog = mysqlTable("sms_message_log", {
+	id: int().autoincrement().notNull(),
+	phone: varchar({ length: 50 }).notNull(),
+	recipientName: varchar({ length: 255 }),
+	messageType: mysqlEnum(['order_confirmation','shipping_update','delivery_confirmation','territory_submitted','territory_approved','territory_rejected','referral_invite','welcome','nft_minted','crowdfund_contribution','promotional']).notNull(),
+	messageContent: text().notNull(),
+	messageId: varchar({ length: 100 }),
+	status: mysqlEnum(['pending','sent','delivered','failed']).default('pending').notNull(),
+	errorMessage: text(),
+	sentAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	deliveredAt: timestamp({ mode: 'string' }),
+});
+
+export const smsOptIns = mysqlTable("sms_opt_ins", {
+	id: int().autoincrement().notNull(),
+	userId: int(),
+	phone: varchar({ length: 50 }).notNull(),
+	email: varchar({ length: 320 }),
+	name: varchar({ length: 255 }),
+	subscriberId: varchar({ length: 50 }).notNull(),
+	referralCode: varchar({ length: 50 }).notNull(),
+	referredBy: varchar({ length: 50 }),
+	optedIn: int().default(1).notNull(),
+	optInDate: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP'),
+	optOutDate: timestamp({ mode: 'string' }),
+	prefOrderUpdates: int().default(1).notNull(),
+	prefPromotions: int().default(1).notNull(),
+	prefReferralAlerts: int().default(1).notNull(),
+	prefTerritoryUpdates: int().default(1).notNull(),
+	totalReferrals: int().default(0).notNull(),
+	customersReferred: int().default(0).notNull(),
+	distributorsReferred: int().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("sms_opt_ins_subscriberId_unique").on(table.subscriberId),
+	index("sms_opt_ins_referralCode_unique").on(table.referralCode),
+]);
+
+export const systemAuditLog = mysqlTable("system_audit_log", {
+	id: int().autoincrement().notNull(),
+	category: mysqlEnum(['user','distributor','order','commission','website','backup','restore','admin','security','system']).notNull(),
+	action: varchar({ length: 100 }).notNull(),
+	entityType: varchar({ length: 50 }).notNull(),
+	entityId: int(),
+	userId: int(),
+	userRole: varchar({ length: 50 }),
+	ipAddress: varchar({ length: 45 }),
+	userAgent: varchar({ length: 500 }),
+	previousState: text(),
+	newState: text(),
+	metadata: text(),
+	result: mysqlEnum(['success','failure','partial']).default('success').notNull(),
+	errorMessage: text(),
+	severity: mysqlEnum(['info','warning','error','critical']).default('info').notNull(),
+	isReversible: tinyint().default(0).notNull(),
+	relatedEntries: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const territoryApplications = mysqlTable("territory_applications", {
+	id: int().autoincrement().notNull(),
+	userId: int(),
+	currentStep: int().default(1).notNull(),
+	centerLat: decimal({ precision: 10, scale: 7 }),
+	centerLng: decimal({ precision: 10, scale: 7 }),
+	radiusMiles: int(),
+	territoryName: varchar({ length: 255 }),
+	estimatedPopulation: int(),
+	termMonths: int(),
+	totalCost: int(),
+	firstName: varchar({ length: 100 }),
+	lastName: varchar({ length: 100 }),
+	email: varchar({ length: 320 }),
+	phone: varchar({ length: 50 }),
+	dateOfBirth: varchar({ length: 20 }),
+	streetAddress: varchar({ length: 255 }),
+	city: varchar({ length: 100 }),
+	state: varchar({ length: 50 }),
+	zipCode: varchar({ length: 20 }),
+	businessName: varchar({ length: 255 }),
+	businessType: mysqlEnum(['individual','llc','corporation','partnership']),
+	taxId: varchar({ length: 50 }),
+	yearsInBusiness: int(),
+	investmentCapital: int(),
+	franchiseExperience: text(),
+	whyInterested: text(),
+	agreedToTerms: int().default(0).notNull(),
+	signature: varchar({ length: 255 }),
+	submittedAt: timestamp({ mode: 'string' }),
+	status: mysqlEnum(['draft','submitted','under_review','approved','rejected']).default('draft').notNull(),
+	adminNotes: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
+export const territoryLicenses = mysqlTable("territory_licenses", {
+	id: int().autoincrement().notNull(),
+	userId: int(),
+	name: varchar({ length: 255 }).notNull(),
+	email: varchar({ length: 320 }).notNull(),
+	phone: varchar({ length: 50 }),
+	territory: text().notNull(),
+	coordinates: text(),
+	squareMiles: int().notNull(),
+	termMonths: int().notNull(),
+	pricePerSqMile: int().notNull(),
+	totalCost: int().notNull(),
+	depositAmount: int(),
+	financing: mysqlEnum(['full','deposit','monthly']).default('full').notNull(),
+	status: mysqlEnum(['pending','approved','rejected','active']).default('pending').notNull(),
+	notes: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
+export const territoryReservations = mysqlTable("territory_reservations", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	territoryName: varchar({ length: 255 }).notNull(),
+	state: varchar({ length: 2 }).notNull(),
+	centerLat: decimal({ precision: 10, scale: 7 }).notNull(),
+	centerLng: decimal({ precision: 10, scale: 7 }).notNull(),
+	radiusMiles: decimal({ precision: 10, scale: 2 }).notNull(),
+	areaSqMiles: decimal({ precision: 10, scale: 2 }).notNull(),
+	population: int().notNull(),
+	licenseFee: int().notNull(),
+	status: mysqlEnum(['active','expired','converted','cancelled']).default('active').notNull(),
+	expiresAt: timestamp({ mode: 'string' }).notNull(),
+	reminderSent: tinyint().default(0).notNull(),
+	convertedToLicenseId: int(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
+export const userProfiles = mysqlTable("user_profiles", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	customSlug: varchar({ length: 100 }),
+	profilePhotoUrl: text(),
+	displayName: varchar({ length: 255 }),
+	location: varchar({ length: 255 }),
+	bio: text(),
+	userType: mysqlEnum(['distributor','customer']).notNull(),
+	isPublished: tinyint().default(1).notNull(),
+	pageViews: int().default(0).notNull(),
+	signupsGenerated: int().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+	instagram: varchar({ length: 100 }),
+	tiktok: varchar({ length: 100 }),
+	facebook: varchar({ length: 255 }),
+	twitter: varchar({ length: 100 }),
+	youtube: varchar({ length: 255 }),
+	linkedin: varchar({ length: 255 }),
+	country: varchar({ length: 2 }),
+},
+(table) => [
+	index("user_profiles_userId_unique").on(table.userId),
+	index("user_profiles_customSlug_unique").on(table.customSlug),
+]);
+
+export const users = mysqlTable("users", {
+	id: int().autoincrement().notNull(),
+	openId: varchar({ length: 64 }).notNull(),
+	name: text(),
+	email: varchar({ length: 320 }),
+	loginMethod: varchar({ length: 64 }),
+	role: mysqlEnum(['user','admin']).default('user').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+	lastSignedIn: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	phone: varchar({ length: 50 }),
+	addressLine1: text(),
+	addressLine2: text(),
+	city: varchar({ length: 100 }),
+	state: varchar({ length: 100 }),
+	postalCode: varchar({ length: 20 }),
+	country: varchar({ length: 100 }),
+	emailVerified: tinyint().default(0).notNull(),
+	emailVerificationToken: varchar({ length: 64 }),
+	emailVerificationExpiry: timestamp({ mode: 'string' }),
+	phoneVerified: tinyint().default(0).notNull(),
+	smsVerificationCode: varchar({ length: 6 }),
+	smsVerificationExpiry: timestamp({ mode: 'string' }),
+	smsVerificationAttempts: int().default(0).notNull(),
+	lastSmsSentAt: timestamp({ mode: 'string' }),
+	username: varchar({ length: 50 }),
+	passwordHash: varchar({ length: 255 }),
+	userType: mysqlEnum(['customer','distributor','franchisee','admin']).default('customer').notNull(),
+	passwordResetToken: varchar({ length: 64 }),
+	passwordResetExpiry: timestamp({ mode: 'string' }),
+},
+(table) => [
+	index("users_openId_unique").on(table.openId),
+]);
+
+export const vendingAlerts = mysqlTable("vending_alerts", {
+	id: int().autoincrement().notNull(),
+	machineId: int().notNull(),
+	alertType: mysqlEnum(['low_stock','temperature','offline','door_open','payment_error','maintenance_due','error']).notNull(),
+	severity: mysqlEnum(['info','warning','critical']).default('info').notNull(),
+	title: varchar({ length: 200 }).notNull(),
+	message: text(),
+	acknowledged: tinyint().default(0).notNull(),
+	acknowledgedBy: int(),
+	acknowledgedAt: timestamp({ mode: 'string' }),
+	resolved: tinyint().default(0).notNull(),
+	resolvedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const vendingApplications = mysqlTable("vending_applications", {
+	id: int().autoincrement().notNull(),
+	firstName: varchar({ length: 100 }).notNull(),
+	lastName: varchar({ length: 100 }).notNull(),
+	email: varchar({ length: 320 }).notNull(),
+	phone: varchar({ length: 50 }).notNull(),
+	businessName: varchar({ length: 255 }),
+	businessType: varchar({ length: 100 }).notNull(),
+	yearsInBusiness: varchar({ length: 50 }),
+	city: varchar({ length: 100 }).notNull(),
+	state: varchar({ length: 100 }).notNull(),
+	zipCode: varchar({ length: 20 }).notNull(),
+	proposedLocations: text(),
+	numberOfMachines: varchar({ length: 50 }).notNull(),
+	investmentBudget: varchar({ length: 50 }),
+	timeline: varchar({ length: 50 }),
+	experience: text(),
+	questions: text(),
+	status: mysqlEnum(['pending','under_review','approved','rejected']).default('pending').notNull(),
+	adminNotes: text(),
+	submittedAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	reviewedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const vendingCommissions = mysqlTable("vending_commissions", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	sourceMachineId: int(),
+	commissionType: mysqlEnum(['direct_referral','network_cv','bonus']).notNull(),
+	amountCents: int().notNull(),
+	cvAmount: int().default(0).notNull(),
+	commissionRate: int().notNull(),
+	periodStart: timestamp({ mode: 'string' }).notNull(),
+	periodEnd: timestamp({ mode: 'string' }).notNull(),
+	status: mysqlEnum(['pending','approved','paid','cancelled']).default('pending').notNull(),
+	paidAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const vendingInventory = mysqlTable("vending_inventory", {
+	id: int().autoincrement().notNull(),
+	machineId: int().notNull(),
+	slotNumber: int().notNull(),
+	productName: varchar({ length: 100 }).notNull(),
+	productSku: varchar({ length: 50 }).notNull(),
+	currentStock: int().default(0).notNull(),
+	maxCapacity: int().default(10).notNull(),
+	lowStockThreshold: int().default(3).notNull(),
+	priceInCents: int().notNull(),
+	lastRestockedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
+export const vendingMachineOrders = mysqlTable("vending_machine_orders", {
+	id: int().autoincrement().notNull(),
+	userId: int(),
+	name: varchar({ length: 255 }).notNull(),
+	email: varchar({ length: 320 }).notNull(),
+	phone: varchar({ length: 50 }),
+	machineModel: varchar({ length: 100 }).notNull(),
+	quantity: int().default(1).notNull(),
+	totalPriceCents: int().notNull(),
+	depositAmountCents: int().notNull(),
+	paymentType: mysqlEnum(['full','deposit','payment_plan']).notNull(),
+	paymentPlanMonths: int(),
+	monthlyPaymentCents: int(),
+	amountPaidCents: int().default(0).notNull(),
+	remainingBalanceCents: int().notNull(),
+	paymentsMade: int().default(0).notNull(),
+	nextPaymentDue: timestamp({ mode: 'string' }),
+	stripeCustomerId: varchar({ length: 255 }),
+	stripeSubscriptionId: varchar({ length: 255 }),
+	stripePaymentIntentId: varchar({ length: 255 }),
+	status: mysqlEnum(['pending','deposit_paid','in_production','ready_for_delivery','delivered','cancelled','refunded']).default('pending').notNull(),
+	deliveryAddress: text(),
+	deliveryCity: varchar({ length: 100 }),
+	deliveryState: varchar({ length: 100 }),
+	deliveryZip: varchar({ length: 20 }),
+	estimatedDelivery: timestamp({ mode: 'string' }),
+	installationDate: timestamp({ mode: 'string' }),
+	notes: text(),
+	adminNotes: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
+export const vendingMachines = mysqlTable("vending_machines", {
+	id: int().autoincrement().notNull(),
+	serialNumber: varchar({ length: 50 }).notNull(),
+	nickname: varchar({ length: 100 }),
+	ownerId: int().notNull(),
+	territoryLicenseId: int(),
+	model: varchar({ length: 100 }).default('NEON-VM-2000').notNull(),
+	locationAddress: text(),
+	locationLat: decimal({ precision: 10, scale: 7 }),
+	locationLng: decimal({ precision: 10, scale: 7 }),
+	locationType: mysqlEnum(['mall','gym','office','school','hospital','airport','hotel','gas_station','other']).default('other').notNull(),
+	status: mysqlEnum(['online','offline','maintenance','error']).default('offline').notNull(),
+	lastHeartbeat: timestamp({ mode: 'string' }),
+	temperature: decimal({ precision: 5, scale: 2 }),
+	temperatureStatus: mysqlEnum(['normal','warning','critical']).default('normal').notNull(),
+	doorStatus: mysqlEnum(['closed','open','jammed']).default('closed').notNull(),
+	paymentStatus: mysqlEnum(['operational','card_only','cash_only','offline']).default('operational').notNull(),
+	totalSalesCount: int().default(0).notNull(),
+	totalRevenue: int().default(0).notNull(),
+	todaySalesCount: int().default(0).notNull(),
+	todayRevenue: int().default(0).notNull(),
+	installedAt: timestamp({ mode: 'string' }),
+	lastMaintenanceAt: timestamp({ mode: 'string' }),
+	nextMaintenanceAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("vending_machines_serialNumber_unique").on(table.serialNumber),
+]);
+
+export const vendingNetwork = mysqlTable("vending_network", {
+	id: int().autoincrement().notNull(),
+	machineId: varchar({ length: 50 }).notNull(),
+	ownerId: int().notNull(),
+	referrerId: int(),
+	location: varchar({ length: 255 }).notNull(),
+	status: mysqlEnum(['active','inactive','maintenance']).default('active').notNull(),
+	monthlyRevenue: int().default(0).notNull(),
+	totalSales: int().default(0).notNull(),
+	commissionVolume: int().default(0).notNull(),
+	networkLevel: int().default(0).notNull(),
+	installedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("vending_network_machineId_unique").on(table.machineId),
+]);
+
+export const vendingPaymentHistory = mysqlTable("vending_payment_history", {
+	id: int().autoincrement().notNull(),
+	orderId: int().notNull(),
+	amountCents: int().notNull(),
+	paymentType: mysqlEnum(['deposit','monthly','final','full']).notNull(),
+	paymentNumber: int(),
+	stripePaymentIntentId: varchar({ length: 255 }),
+	status: mysqlEnum(['pending','succeeded','failed','refunded']).default('pending').notNull(),
+	paidAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const vendingSales = mysqlTable("vending_sales", {
+	id: int().autoincrement().notNull(),
+	machineId: int().notNull(),
+	slotNumber: int().notNull(),
+	productName: varchar({ length: 100 }).notNull(),
+	productSku: varchar({ length: 50 }).notNull(),
+	quantity: int().default(1).notNull(),
+	amountInCents: int().notNull(),
+	paymentMethod: mysqlEnum(['card','cash','mobile','free']).default('card').notNull(),
+	transactionRef: varchar({ length: 100 }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const websiteAnalytics = mysqlTable("website_analytics", {
+	id: int().autoincrement().notNull(),
+	websiteId: int().notNull(),
+	eventType: mysqlEnum(['page_view','click','signup','purchase','share']).notNull(),
+	pageUrl: varchar({ length: 500 }),
+	referrerUrl: varchar({ length: 500 }),
+	visitorHash: varchar({ length: 64 }),
+	userAgent: varchar({ length: 500 }),
+	country: varchar({ length: 2 }),
+	deviceType: mysqlEnum(['desktop','mobile','tablet']).default('desktop'),
+	sessionId: varchar({ length: 64 }),
+	conversionValue: int(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const websiteAuditLog = mysqlTable("website_audit_log", {
+	id: int().autoincrement().notNull(),
+	websiteId: int().notNull(),
+	action: mysqlEnum(['created','subdomain_assigned','tracking_configured','verified','verification_failed','auto_fixed','suspended','reactivated']).notNull(),
+	previousStatus: varchar({ length: 50 }),
+	newStatus: varchar({ length: 50 }),
+	issueType: mysqlEnum(['missing_tracking','data_drift','subdomain_conflict','invalid_affiliate_link','none']).default('none'),
+	issueSeverity: mysqlEnum(['low','medium','high','critical']).default('low'),
+	autoFixed: tinyint().default(0),
+	details: text(),
+	performedBy: varchar({ length: 50 }).default('system'),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});

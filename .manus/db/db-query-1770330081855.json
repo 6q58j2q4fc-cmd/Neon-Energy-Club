@@ -1,0 +1,37 @@
+{
+  "query": "SELECT id, userId, distributorCode, username, subdomain, status, isActive FROM distributors LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT id, userId, distributorCode, username, subdomain, status, isActive FROM distributors LIMIT 10;",
+  "rows": [
+    {
+      "id": "1050001",
+      "userId": "1650938",
+      "distributorCode": "DIST1650938X2GLWR",
+      "username": "NULL",
+      "subdomain": "NULL",
+      "status": "active",
+      "isActive": "0"
+    },
+    {
+      "id": "1080001",
+      "userId": "2190047",
+      "distributorCode": "DIST2190047TZPU1P",
+      "username": "NULL",
+      "subdomain": "NULL",
+      "status": "active",
+      "isActive": "0"
+    },
+    {
+      "id": "1080002",
+      "userId": "2190048",
+      "distributorCode": "DIST21900481V3BXH",
+      "username": "NULL",
+      "subdomain": "NULL",
+      "status": "active",
+      "isActive": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tdistributorCode\tusername\tsubdomain\tstatus\tisActive\n1050001\t1650938\tDIST1650938X2GLWR\tNULL\tNULL\tactive\t0\n1080001\t2190047\tDIST2190047TZPU1P\tNULL\tNULL\tactive\t0\n1080002\t2190048\tDIST21900481V3BXH\tNULL\tNULL\tactive\t0\n",
+  "stderr": "",
+  "execution_time_ms": 96
+}

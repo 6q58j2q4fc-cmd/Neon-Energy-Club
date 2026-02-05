@@ -3796,10 +3796,12 @@ Provide step-by-step instructions with specific button names and locations. Keep
         slug: z.string().min(1),
       }))
       .query(async ({ input }) => {
+        console.log('[profile.getBySlug] Input:', input);
         const { getUserProfileBySlug, incrementProfilePageViews, getDistributorPublicProfile } = await import("./db");
         
         // First try to find by custom slug in userProfiles
         const profile = await getUserProfileBySlug(input.slug);
+        console.log('[profile.getBySlug] Profile from userProfiles:', profile ? 'found' : 'not found');
         
         if (profile) {
           // Increment page views

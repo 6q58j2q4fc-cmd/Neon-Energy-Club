@@ -1,0 +1,28 @@
+{
+  "query": "SELECT distributorCode, username, status, isActive FROM distributors LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT distributorCode, username, status, isActive FROM distributors LIMIT 10;",
+  "rows": [
+    {
+      "distributorCode": "DIST1650938X2GLWR",
+      "username": "NULL",
+      "status": "active",
+      "isActive": "1"
+    },
+    {
+      "distributorCode": "DIST2190047TZPU1P",
+      "username": "NULL",
+      "status": "active",
+      "isActive": "1"
+    },
+    {
+      "distributorCode": "DIST21900481V3BXH",
+      "username": "NULL",
+      "status": "active",
+      "isActive": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "distributorCode\tusername\tstatus\tisActive\nDIST1650938X2GLWR\tNULL\tactive\t1\nDIST2190047TZPU1P\tNULL\tactive\t1\nDIST21900481V3BXH\tNULL\tactive\t1\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}

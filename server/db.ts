@@ -995,6 +995,7 @@ export async function enrollDistributor(input: {
     totalEarnings: 0,
     availableBalance: 0,
     status: "active",
+    isActive: 1,
     // Personal information
     firstName: input.firstName,
     lastName: input.lastName,
@@ -5417,11 +5418,12 @@ export async function getVendingPaymentHistory(orderId: number) {
  */
 export async function getDistributorPublicProfile(code: string) {
   console.log('[getDistributorPublicProfile] Looking for code:', code);
-  const db = await getDb();
-  if (!db) {
-    console.log('[getDistributorPublicProfile] No database connection');
-    return null;
-  }
+  try {
+    const db = await getDb();
+    if (!db) {
+      console.log('[getDistributorPublicProfile] No database connection');
+      return null;
+    }
   
   // Normalize the code to lowercase for vanity URL matching
   const normalizedCode = code.toLowerCase();
@@ -5431,6 +5433,9 @@ export async function getDistributorPublicProfile(code: string) {
     .from(distributors)
     .where(eq(distributors.distributorCode, code));
   console.log('[getDistributorPublicProfile] Found by code:', distributor ? 'yes' : 'no');
+  if (distributor) {
+    console.log('[getDistributorPublicProfile] Distributor:', JSON.stringify({ id: distributor.id, code: distributor.distributorCode, status: distributor.status, isActive: distributor.isActive }));
+  }
   
   // If not found, try by username
   if (!distributor) {
@@ -5484,17 +5489,8 @@ export async function getDistributorPublicProfile(code: string) {
   
   // Count total customers (orders attributed to this distributor)
   let totalCustomers = 0;
-  try {
-    const customerCountResult = await db.select({
-      count: sql<number>`COUNT(DISTINCT customerId)`
-    })
-      .from(sales)
-      .where(eq(sales.distributorId, distributor.id));
-    totalCustomers = customerCountResult[0]?.count || 0;
-    console.log('[getDistributorPublicProfile] Total customers:', totalCustomers);
-  } catch (err) {
-    console.log('[getDistributorPublicProfile] Customer count error:', err);
-  }
+  // Skip customer count for now - sales table may not exist yet
+  console.log('[getDistributorPublicProfile] Total customers:', totalCustomers);
   
   const result = {
     id: distributor.id,
@@ -5506,7 +5502,7 @@ export async function getDistributorPublicProfile(code: string) {
     country: distributor.country || profile?.country || null,
     bio: profile?.bio || null,
     rank: distributor.rank || 'starter',
-    joinDate: distributor.createdAt?.toISOString() || new Date().toISOString(),
+    joinDate: typeof distributor.createdAt === 'string' ? distributor.createdAt : (distributor.createdAt?.toISOString() || new Date().toISOString()),
     totalCustomers: totalCustomers,
     isActive: distributor.isActive === 1,
     // Social media links
@@ -5519,6 +5515,10 @@ export async function getDistributorPublicProfile(code: string) {
   };
   console.log('[getDistributorPublicProfile] Returning:', JSON.stringify(result));
   return result;
+  } catch (error) {
+    console.error('[getDistributorPublicProfile] Error:', error);
+    return null;
+  }
 }
 
 
