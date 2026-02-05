@@ -5006,3 +5006,9 @@
 - [x] Tracking uses distributorId (not URL) so commissions unaffected by URL changes
 - [x] Old URLs return 404 (expected), new URLs work immediately
 - [x] Affiliate tracking via affiliateCode in replicatedWebsites table
+
+
+## URGENT FIX - Background Restoration (Feb 5, 2026)
+- [x] Investigated what background was accidentally removed (.vice-bg class was missing)
+- [x] Restored original .vice-bg class with tropical jungle night gradient
+- [x] Verified background displays correctly on homepage
