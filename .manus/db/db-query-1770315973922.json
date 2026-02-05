@@ -1,0 +1,55 @@
+{
+  "query": "SELECT u.id, u.name, u.email, u.username, u.userType, u.loginMethod, u.createdAt, d.id as distributor_id, d.distributorCode, d.username as dist_username, d.status, d.rank, d.isActive FROM users u LEFT JOIN distributors d ON u.id = d.userId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT u.id, u.name, u.email, u.username, u.userType, u.loginMethod, u.createdAt, d.id as distributor_id, d.distributorCode, d.username as dist_username, d.status, d.rank, d.isActive FROM users u LEFT JOIN distributors d ON u.id = d.userId;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Dakota Rea",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "username": "NULL",
+      "userType": "customer",
+      "loginMethod": "apple",
+      "createdAt": "2025-12-01 20:24:34",
+      "distributor_id": "NULL",
+      "distributorCode": "NULL",
+      "dist_username": "NULL",
+      "status": "NULL",
+      "rank": "NULL",
+      "isActive": "NULL"
+    },
+    {
+      "id": "510004",
+      "name": "Dakota Rea",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "username": "NULL",
+      "userType": "customer",
+      "loginMethod": "apple",
+      "createdAt": "2026-01-17 22:02:04",
+      "distributor_id": "NULL",
+      "distributorCode": "NULL",
+      "dist_username": "NULL",
+      "status": "NULL",
+      "rank": "NULL",
+      "isActive": "NULL"
+    },
+    {
+      "id": "1650938",
+      "name": "I.S.",
+      "email": "swinbvrne@gmail.com",
+      "username": "NULL",
+      "userType": "customer",
+      "loginMethod": "google",
+      "createdAt": "2026-01-31 09:00:22",
+      "distributor_id": "1050001",
+      "distributorCode": "DIST1650938X2GLWR",
+      "dist_username": "NULL",
+      "status": "active",
+      "rank": "starter",
+      "isActive": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tusername\tuserType\tloginMethod\tcreatedAt\tdistributor_id\tdistributorCode\tdist_username\tstatus\trank\tisActive\n1\tDakota Rea\tb4429bc6tn@privaterelay.appleid.com\tNULL\tcustomer\tapple\t2025-12-01 20:24:34\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\n510004\tDakota Rea\tb4429bc6tn@privaterelay.appleid.com\tNULL\tcustomer\tapple\t2026-01-17 22:02:04\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\n1650938\tI.S.\tswinbvrne@gmail.com\tNULL\tcustomer\tgoogle\t2026-01-31 09:00:22\t1050001\tDIST1650938X2GLWR\tNULL\tactive\tstarter\t0\n",
+  "stderr": "",
+  "execution_time_ms": 50
+}

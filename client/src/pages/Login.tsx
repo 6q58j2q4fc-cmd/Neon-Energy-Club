@@ -22,6 +22,16 @@ export default function Login() {
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: (data) => {
       toast.success(`Welcome back, ${data.user.name}!`);
+      
+      // Check if this is a pending distributor enrollment
+      const pendingEnrollment = sessionStorage.getItem('pendingDistributorEnrollment');
+      if (pendingEnrollment === 'true' && data.user.userType === "distributor") {
+        sessionStorage.removeItem('pendingDistributorEnrollment');
+        toast.info("Please complete your distributor enrollment form.");
+        setLocation("/join");
+        return;
+      }
+      
       // Redirect based on user type
       if (data.user.userType === "distributor") {
         setLocation("/distributor");

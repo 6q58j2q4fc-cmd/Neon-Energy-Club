@@ -80,8 +80,15 @@ export default function Register() {
 
   const registerMutation = trpc.auth.register.useMutation({
     onSuccess: () => {
-      toast.success("Account created! Please check your email to verify your account.");
-      setLocation("/login");
+      if (formData.userType === "distributor") {
+        toast.success("Account created! Please complete your distributor enrollment.");
+        // Store that they need to complete enrollment
+        sessionStorage.setItem('pendingDistributorEnrollment', 'true');
+        setLocation("/login");
+      } else {
+        toast.success("Account created! Please check your email to verify your account.");
+        setLocation("/login");
+      }
     },
     onError: (err) => {
       setError(err.message);

@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, name, email, username, userType, loginMethod, role, openId FROM users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT id, name, email, username, userType, loginMethod, role, openId FROM users;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Dakota Rea",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "username": "NULL",
+      "userType": "customer",
+      "loginMethod": "apple",
+      "role": "admin",
+      "openId": "KM4owryiZuvTGq7hhYe5tH"
+    },
+    {
+      "id": "510004",
+      "name": "Dakota Rea",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "username": "NULL",
+      "userType": "customer",
+      "loginMethod": "apple",
+      "role": "user",
+      "openId": "ZVD7RcFJMYovKDnnuKq7o4"
+    },
+    {
+      "id": "1650938",
+      "name": "I.S.",
+      "email": "swinbvrne@gmail.com",
+      "username": "NULL",
+      "userType": "customer",
+      "loginMethod": "google",
+      "role": "user",
+      "openId": "4VZqvYg9dUnU7AEadQ6xVs"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tusername\tuserType\tloginMethod\trole\topenId\n1\tDakota Rea\tb4429bc6tn@privaterelay.appleid.com\tNULL\tcustomer\tapple\tadmin\tKM4owryiZuvTGq7hhYe5tH\n510004\tDakota Rea\tb4429bc6tn@privaterelay.appleid.com\tNULL\tcustomer\tapple\tuser\tZVD7RcFJMYovKDnnuKq7o4\n1650938\tI.S.\tswinbvrne@gmail.com\tNULL\tcustomer\tgoogle\tuser\t4VZqvYg9dUnU7AEadQ6xVs\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

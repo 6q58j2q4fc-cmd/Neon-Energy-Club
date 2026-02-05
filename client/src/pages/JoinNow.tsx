@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { getLoginUrl } from "@/const";
+// Removed Manus OAuth import - using native login
 import { useLocation } from "wouter";
 import { Check, Users, ShoppingCart, TrendingUp, DollarSign, Gift, Sparkles, ArrowRight, Zap, Globe } from "lucide-react";
 import HamburgerHeader from "@/components/HamburgerHeader";
@@ -20,6 +20,28 @@ export default function JoinNow() {
   const [, setLocation] = useLocation();
   const [accountType, setAccountType] = useState<"customer" | "distributor" | null>(null);
   const [step, setStep] = useState<"choose" | "signup">("choose");
+  
+  // Check if user is already enrolled as a distributor
+  const { data: distributorData } = trpc.distributor.me.useQuery(
+    undefined,
+    { enabled: !!user && user.userType === "distributor" }
+  );
+  
+  // If already enrolled, redirect to dashboard
+  useEffect(() => {
+    if (distributorData) {
+      toast.info("You're already enrolled as a distributor!");
+      setLocation("/distributor");
+    }
+  }, [distributorData, setLocation]);
+  
+  // Check if user is a distributor type and auto-show enrollment form
+  useEffect(() => {
+    if (user && user.userType === "distributor" && step === "choose" && !distributorData) {
+      setAccountType("distributor");
+      setStep("signup");
+    }
+  }, [user, step, distributorData]);
 
   if (loading) {
     return (
@@ -30,14 +52,14 @@ export default function JoinNow() {
   }
 
   if (!user && step === "signup") {
-    window.location.href = getLoginUrl();
+    setLocation("/login");
     return null;
   }
 
   const handleChooseType = (type: "customer" | "distributor") => {
     setAccountType(type);
     if (!user) {
-      window.location.href = getLoginUrl();
+      setLocation("/login");
     } else {
       setStep("signup");
     }

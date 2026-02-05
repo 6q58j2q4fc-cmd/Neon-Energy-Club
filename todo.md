@@ -5080,3 +5080,26 @@
 - [x] Add /terms-and-conditions route and page
 - [x] Update distributor application form links to point to actual legal documents
 - [x] Test both legal document pages display correctly
+
+## Custom Domain Configuration (Feb 5, 2026)
+
+- [x] Verify replicated website routing system is properly configured
+- [x] Confirm getBySlug procedure handles distributor codes correctly
+- [x] Test catch-all route for personalized landing pages
+- [x] Document replicated website system in REPLICATED_WEBSITES.md
+- [x] Confirm system is ready for neonenergyclub.com custom domain
+
+## Critical Fixes (Feb 5, 2026)
+
+- [x] Fix issue preventing website from recognizing enrolled distributors
+- [x] Ensure distributor enrollment creates permanent replicated websites
+- [x] Verify native username/password login works for all distributors and customers
+- [x] Fix JoinNow page to redirect to native login instead of Manus OAuth
+- [x] Add automatic redirect to enrollment form for distributor-type users
+- [x] Add check to prevent re-enrollment if already a distributor
+- [x] Update Register page to guide distributors through enrollment
+- [x] Update Login page to redirect pending distributors to enrollment form
+- [x] Test complete distributor enrollment and login flow
+- [x] Verify distributor replicated websites work immediately after enrollment
+- [x] Create comprehensive test suite for distributor enrollment
+- [x] All tests passing (8/8)
