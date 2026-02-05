@@ -41,7 +41,7 @@ export default function Products() {
         price: 59.99,
         type: "product" as const,
         flavor: "original" as const,
-        image: "/neon-original-can.png",
+        image: "/neon-can-transparent-final.png",
       },
       pink: {
         id: "neon-pink-case",
@@ -57,7 +57,7 @@ export default function Products() {
         price: 62.99,
         type: "product" as const,
         flavor: "mixed" as const,
-        image: "/neon-original-can.png",
+        image: "/neon-can-transparent-final.png",
       },
     };
 
@@ -78,7 +78,7 @@ export default function Products() {
       price: 59.99,
       type: "product" as const,
       flavor: "original" as const,
-      image: "/neon-original-can.png",
+      image: "/neon-can-transparent-final.png",
     });
     setLocation("/checkout");
   };
@@ -196,7 +196,7 @@ export default function Products() {
                     <div className="absolute inset-0 bg-[#c8ff00]/20 rounded-full blur-[100px] scale-150" />
                     <div className="absolute inset-0 bg-[#c8ff00]/30 rounded-full blur-[60px] scale-100" />
                     <img
-                      src="/neon-original-can.png"
+                      src="/neon-can-transparent-final.png"
                       alt="NEON Original"
                       className="w-56 h-auto relative z-10 animate-float drop-shadow-[0_20px_60px_rgba(200,255,0,0.5)]"
                     />
@@ -315,7 +315,7 @@ export default function Products() {
                     <div className="absolute inset-0 bg-pink-500/20 rounded-full blur-[100px] scale-150" />
                     <div className="absolute inset-0 bg-pink-500/30 rounded-full blur-[60px] scale-100" />
                     <img
-                      src="/neon-pink-can-clean.png"
+                      src="/neon-pink-can-final.png"
                       alt="NEON Pink Electric Pom Passion"
                       className="w-56 h-auto relative z-10 animate-float drop-shadow-[0_20px_60px_rgba(255,0,128,0.5)]"
                       style={{ animationDelay: '0.5s' }}
@@ -493,7 +493,7 @@ export default function Products() {
               <div className="relative inline-block">
                 <div className="absolute inset-0 bg-green-500/20 rounded-full blur-[60px] scale-150" />
                 <img 
-                  src="/rainforest-trust-emblem.png" 
+                  src="/rainforest-trust-emblem.webp" 
                   alt="Rainforest Trust Conservation Circle Member" 
                   className="w-64 h-64 mx-auto md:mx-0 object-contain relative z-10 drop-shadow-[0_0_40px_rgba(0,255,100,0.4)]"
                 />

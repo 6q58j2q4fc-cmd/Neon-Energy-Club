@@ -5012,3 +5012,11 @@
 - [x] Investigated what background was accidentally removed (.vice-bg class was missing)
 - [x] Restored original .vice-bg class with tropical jungle night gradient
 - [x] Verified background displays correctly on homepage
+
+
+## URGENT FIX - Can Images Restoration (Feb 5, 2026)
+- [x] Investigated what can images were removed (neon-original-can.png reference was broken)
+- [x] Fixed homepage can image to use /neon-can-transparent-final.png
+- [x] Fixed Products page can images (Original and Pink)
+- [x] Fixed rainforest-trust-emblem.png to use .webp extension
+- [x] Verified all images display correctly on homepage and products page

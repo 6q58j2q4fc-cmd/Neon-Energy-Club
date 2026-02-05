@@ -40,7 +40,7 @@ export const products: ProductData[] = [
     tagline: "The \"Top Shelf\" Energy Drink",
     description: "Experience clean, sustained energy with our signature formula. Made with 24% real fruit juice, 100mg natural caffeine from green tea, and over 100% daily value of 6 essential B vitamins. Zero sugar, no taurine, and it glows under blacklight!",
     price: 59.99,
-    image: "/neon-original-can.png",
+    image: "/neon-can-transparent-final.png",
     flavor: "original",
     features: [
       { icon: Battery, text: "100mg Natural Caffeine" },

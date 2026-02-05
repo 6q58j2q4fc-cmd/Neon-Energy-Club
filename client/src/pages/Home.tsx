@@ -272,7 +272,7 @@ export default function Home() {
                 
                 {/* Main Can - Transparent Background */}
                 <img
-                  src="/neon-original-can.png"
+                  src="/neon-can-transparent-final.png"
                   alt="NEON Energy Drink Original - Green"
                   className="h-[450px] md:h-[550px] object-contain product-glow animate-float relative z-10"
                   style={{ filter: 'drop-shadow(0 0 80px rgba(184, 230, 0, 0.7)) drop-shadow(0 0 150px rgba(184, 230, 0, 0.4)) drop-shadow(0 40px 80px rgba(0, 0, 0, 0.6))' }}
