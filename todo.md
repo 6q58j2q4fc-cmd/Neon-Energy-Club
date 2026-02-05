@@ -5227,3 +5227,39 @@
 - [ ] Ensure search icon appears on mobile menu bar
 - [ ] Test on iOS iPhone browser specifically
 - [ ] Verify both icons are visible and functional on mobile
+
+## Mobile Menu Bar & Translation Fixes (Feb 5, 2026)
+
+### Mobile Menu Bar Fix
+- [ ] Find navigation component that handles mobile view
+- [ ] Add language/country selector icon to mobile menu bar
+- [ ] Add search icon to mobile menu bar  
+- [ ] Test on iOS mobile browser to verify icons appear
+- [ ] Ensure icons are properly positioned and functional
+
+### TypeScript Error Fixes
+- [ ] Update distributor.me tRPC query to return enrollmentPackageId field
+- [ ] Update distributor.me tRPC query to return autoshipEnabled field
+- [ ] Fix admin panel DistributorData.tsx to use correct field names
+- [ ] Verify all TypeScript errors are resolved
+
+### Translation Implementation
+- [ ] Update Home.tsx to use t() function with translation keys
+- [ ] Update Products.tsx to use t() function with translation keys
+- [ ] Update About.tsx to use t() function with translation keys
+- [ ] Test language selector switches content between English and Spanish
+- [ ] Verify all translated text displays correctly
+
+## Mobile Menu Bar & Translations (Feb 5, 2026)
+
+- [x] Investigate Header.tsx to find mobile menu bar structure
+- [x] Add language selector to mobile menu bar
+- [x] Add search icon to mobile menu bar
+- [x] Fix TypeScript errors in admin panel (enrollmentPackageId, autoshipEnabled)
+- [x] Add enrollmentPackageId and autoshipEnabled to listAllDistributors query
+- [x] Add type assertions to DistributorData.tsx to resolve TypeScript errors
+- [ ] Test mobile view on iOS to confirm icons appear
+- [ ] Update Home.tsx to use t() translation function
+- [ ] Update Products.tsx to use t() translation function
+- [ ] Update About.tsx to use t() translation function
+- [ ] Test language selector on all updated pages

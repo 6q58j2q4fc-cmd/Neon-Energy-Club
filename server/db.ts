@@ -2915,6 +2915,8 @@ export async function listAllDistributors(options?: {
     isActive: distributors.isActive,
     status: distributors.status,
     createdAt: distributors.createdAt,
+    enrollmentPackageId: distributors.enrollmentPackageId,
+    autoshipEnabled: distributors.autoshipEnabled,
     name: users.name,
     email: users.email,
   })

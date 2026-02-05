@@ -181,24 +181,24 @@ export default function DistributorData() {
                             )}
                           </TableCell>
                           <TableCell>
-                            {distributor.enrollmentPackageId ? (
-                              <Badge variant="secondary">Package #{distributor.enrollmentPackageId}</Badge>
+                            {(distributor as any).enrollmentPackageId ? (
+                              <Badge variant="secondary">Package #{(distributor as any).enrollmentPackageId}</Badge>
                             ) : (
                               "—"
                             )}
                           </TableCell>
                           <TableCell>
-                            {distributor.autoshipEnabled ? (
+                            {(distributor as any).autoshipEnabled ? (
                               <Badge className="bg-green-500">Active</Badge>
                             ) : (
                               <Badge variant="outline">Inactive</Badge>
                             )}
                           </TableCell>
                           <TableCell>
-                            {distributor.autoshipEnabled ? (
+                            {(distributor as any).autoshipEnabled ? (
                               <Badge className="bg-green-500">Yes</Badge>
                             ) : (
-                              <Badge variant="destructive">No</Badge>
+                              <Badge variant="outline">No</Badge>
                             )}
                           </TableCell>
                           <TableCell>
