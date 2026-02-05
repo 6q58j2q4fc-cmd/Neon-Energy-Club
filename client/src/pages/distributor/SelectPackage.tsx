@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Check, AlertTriangle, Zap, Crown, Gem, Package, TrendingUp, Users, DollarSign } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -13,7 +13,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 export default function SelectPackage() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
-  const { toast } = useToast();
+  // Using sonner toast
   const [selectedPackageId, setSelectedPackageId] = useState<number | null>(null);
   const [autoshipEnabled, setAutoshipEnabled] = useState(true);
   const [showWarning, setShowWarning] = useState(false);
@@ -23,7 +23,7 @@ export default function SelectPackage() {
 
   useEffect(() => {
     // If user is already enrolled and has a package, redirect to dashboard
-    if (distributorInfo && distributorInfo.enrollmentPackageId) {
+    if (distributorInfo && distributorInfo.enrollmentPackage) {
       setLocation("/distributor");
     }
   }, [distributorInfo, setLocation]);
@@ -39,17 +39,14 @@ export default function SelectPackage() {
 
   const selectPackageMutation = trpc.distributor.selectEnrollmentPackage.useMutation({
     onSuccess: () => {
-      toast({
-        title: "Package Selected!",
+      toast.success("Package Selected!", {
         description: "Your enrollment is complete. Welcome to the NEON family!",
       });
       setLocation("/distributor");
     },
     onError: (error) => {
-      toast({
-        title: "Selection Failed",
+      toast.error("Selection Failed", {
         description: error.message,
-        variant: "destructive",
       });
     },
   });

@@ -231,6 +231,12 @@ export const distributors = mysqlTable("distributors", {
   fastStartEligibleUntil: timestamp("fastStartEligibleUntil"),
   /** Account status */
   status: mysqlEnum("status", ["active", "inactive", "suspended"]).default("active").notNull(),
+  /** First name */
+  firstName: varchar("firstName", { length: 100 }),
+  /** Last name */
+  lastName: varchar("lastName", { length: 100 }),
+  /** Email address */
+  email: varchar("email", { length: 255 }),
   /** Country code (ISO 3166-1 alpha-2) for flag display */
   country: varchar("country", { length: 2 }),
   /** Phone number */
@@ -246,19 +252,25 @@ export const distributors = mysqlTable("distributors", {
   /** Date of birth */
   dateOfBirth: varchar("dateOfBirth", { length: 20 }),
   /** Last 4 digits of SSN/Tax ID (for tax reporting) */
-  taxIdLast4: varchar("taxIdLast4", { length: 4 }),
+  ssnLast4: varchar("ssnLast4", { length: 4 }),
   /** Full SSN or EIN (encrypted) - for IRS 1099 reporting */
   taxId: varchar("taxId", { length: 255 }),
   /** Tax ID type: SSN (individual) or EIN (business) */
   taxIdType: mysqlEnum("taxIdType", ["ssn", "ein"]),
   /** Business entity type if enrolled as business */
-  entityType: mysqlEnum("entityType", ["individual", "sole_proprietor", "llc", "s_corp", "c_corp", "partnership"]),
+  businessEntityType: mysqlEnum("businessEntityType", ["individual", "llc", "corporation", "partnership"]),
   /** Registered business name (if applicable) */
   businessName: varchar("businessName", { length: 255 }),
-  /** Business registration number/EIN */
-  businessRegistrationNumber: varchar("businessRegistrationNumber", { length: 50 }),
-  /** Business registration state */
-  businessRegistrationState: varchar("businessRegistrationState", { length: 50 }),
+  /** Business EIN/Tax ID */
+  businessEin: varchar("businessEin", { length: 50 }),
+  /** Business street address */
+  businessAddress: text("businessAddress"),
+  /** Business city */
+  businessCity: varchar("businessCity", { length: 100 }),
+  /** Business state */
+  businessState: varchar("businessState", { length: 100 }),
+  /** Business ZIP code */
+  businessZipCode: varchar("businessZipCode", { length: 20 }),
   /** Emergency contact name */
   emergencyContactName: varchar("emergencyContactName", { length: 255 }),
   /** Emergency contact phone */

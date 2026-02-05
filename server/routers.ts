@@ -1037,17 +1037,38 @@ export const appRouter = router({
     enroll: protectedProcedure
       .input(
         z.object({
-          sponsorCode: z.string().optional(),
-          country: z.string().length(2).optional(), // ISO 3166-1 alpha-2 country code
+          // Personal Information
+          firstName: z.string().optional(),
+          lastName: z.string().optional(),
+          email: z.string().email().optional(),
           phone: z.string().optional(),
+          dateOfBirth: z.string().optional(),
+          // Address
           address: z.string().optional(),
           city: z.string().optional(),
           state: z.string().optional(),
           zipCode: z.string().optional(),
-          dateOfBirth: z.string().optional(),
+          country: z.string().length(2).optional(), // ISO 3166-1 alpha-2 country code
+          // Business Entity
+          entityType: z.enum(["individual", "llc", "corporation", "partnership"]).optional(),
+          businessName: z.string().optional(),
+          businessEin: z.string().optional(),
+          businessAddress: z.string().optional(),
+          businessCity: z.string().optional(),
+          businessState: z.string().optional(),
+          businessZipCode: z.string().optional(),
+          // Emergency Contact
+          emergencyContactName: z.string().optional(),
+          emergencyContactPhone: z.string().optional(),
+          emergencyContactRelationship: z.string().optional(),
+          // Sponsor
+          sponsorCode: z.string().optional(),
+          // Tax
           taxIdLast4: z.string().max(4).optional(),
+          // Agreements
           agreedToPolicies: z.boolean().optional(),
           agreedToTerms: z.boolean().optional(),
+          agreeToAutoship: z.boolean().optional(),
         })
       )
       .mutation(async ({ input, ctx }) => {
@@ -1066,6 +1087,27 @@ export const appRouter = router({
         const distributor = await enrollDistributor({
           userId: ctx.user.id,
           sponsorCode: input.sponsorCode,
+          firstName: input.firstName,
+          lastName: input.lastName,
+          email: input.email,
+          phone: input.phone,
+          dateOfBirth: input.dateOfBirth,
+          address: input.address,
+          city: input.city,
+          state: input.state,
+          zipCode: input.zipCode,
+          country: input.country,
+          entityType: input.entityType,
+          businessName: input.businessName,
+          businessEin: input.businessEin,
+          businessAddress: input.businessAddress,
+          businessCity: input.businessCity,
+          businessState: input.businessState,
+          businessZipCode: input.businessZipCode,
+          emergencyContactName: input.emergencyContactName,
+          emergencyContactPhone: input.emergencyContactPhone,
+          emergencyContactRelationship: input.emergencyContactRelationship,
+          taxIdLast4: input.taxIdLast4,
         });
         
         // Update distributor country if provided
@@ -1073,7 +1115,7 @@ export const appRouter = router({
           await updateDistributorCountry(distributor.id, input.country);
         }
         
-        // Update additional application info
+        // Update additional application info (keeping for backward compatibility)
         if (distributor) {
           await updateDistributorApplicationInfo(distributor.id, {
             phone: input.phone,
@@ -1260,7 +1302,7 @@ export const appRouter = router({
           .set({
             taxId: encryptedTaxId,
             taxIdType: input.taxIdType,
-            taxIdLast4,
+            ssnLast4: taxIdLast4,
             taxInfoCompleted: true,
             taxInfoCompletedAt: new Date(),
             w9Submitted: true,
@@ -1356,7 +1398,6 @@ export const appRouter = router({
           .set({
             enrollmentPackageId: input.packageId,
             autoshipEnabled: input.autoshipEnabled,
-            commissionEligible: input.autoshipEnabled,
           })
           .where(eq(distributors.id, distributor.id));
 

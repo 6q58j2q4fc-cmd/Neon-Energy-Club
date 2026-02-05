@@ -935,7 +935,31 @@ export async function redeemCouponCode(couponCode: string, orderId: number) {
 }
 
 // Distributor functions
-export async function enrollDistributor(input: { userId: number; sponsorCode?: string }) {
+export async function enrollDistributor(input: { 
+  userId: number; 
+  sponsorCode?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  dateOfBirth?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
+  entityType?: "individual" | "llc" | "corporation" | "partnership";
+  businessName?: string;
+  businessEin?: string;
+  businessAddress?: string;
+  businessCity?: string;
+  businessState?: string;
+  businessZipCode?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  emergencyContactRelationship?: string;
+  taxIdLast4?: string;
+}) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -971,6 +995,32 @@ export async function enrollDistributor(input: { userId: number; sponsorCode?: s
     totalEarnings: 0,
     availableBalance: 0,
     status: "active",
+    // Personal information
+    firstName: input.firstName,
+    lastName: input.lastName,
+    email: input.email,
+    phone: input.phone,
+    dateOfBirth: input.dateOfBirth,
+    // Address
+    address: input.address,
+    city: input.city,
+    state: input.state,
+    zipCode: input.zipCode,
+    country: input.country,
+    // Business entity
+    businessEntityType: input.entityType,
+    businessName: input.businessName,
+    businessEin: input.businessEin,
+    businessAddress: input.businessAddress,
+    businessCity: input.businessCity,
+    businessState: input.businessState,
+    businessZipCode: input.businessZipCode,
+    // Emergency contact
+    emergencyContactName: input.emergencyContactName,
+    emergencyContactPhone: input.emergencyContactPhone,
+    emergencyContactRelationship: input.emergencyContactRelationship,
+    // Tax
+    ssnLast4: input.taxIdLast4,
   });
   
   return {
@@ -5581,7 +5631,7 @@ export async function updateDistributorApplicationInfo(
         state: data.state || null,
         zipCode: data.zipCode || null,
         dateOfBirth: data.dateOfBirth || null,
-        taxIdLast4: data.taxIdLast4 || null,
+        ssnLast4: data.taxIdLast4 || null,
         agreedToPoliciesAt: data.agreedToPolicies ? (data.agreedAt || new Date()) : null,
         agreedToTermsAt: data.agreedToTerms ? (data.agreedAt || new Date()) : null,
         updatedAt: new Date(),

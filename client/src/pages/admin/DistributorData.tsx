@@ -195,7 +195,7 @@ export default function DistributorData() {
                             )}
                           </TableCell>
                           <TableCell>
-                            {distributor.commissionEligible ? (
+                            {distributor.autoshipEnabled ? (
                               <Badge className="bg-green-500">Yes</Badge>
                             ) : (
                               <Badge variant="destructive">No</Badge>

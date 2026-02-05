@@ -5203,3 +5203,27 @@
 - [ ] Test complete enrollment flow with backend procedures
 - [ ] Test admin data viewer with sample data
 - [ ] Test language selector on updated pages
+
+## EnrollmentForm Backend Fix & Translation System (Feb 5, 2026)
+
+### Backend Updates
+- [ ] Update distributor.enroll procedure to accept firstName, lastName
+- [ ] Add emergency contact fields to distributor.enroll procedure
+- [ ] Add business entity fields to distributor.enroll procedure
+- [ ] Update enrollDistributor function in server/db.ts to store all new fields
+- [ ] Fix toast import in EnrollmentForm.tsx
+
+### Translation System
+- [ ] Create client/src/locales directory
+- [ ] Create en.json with all English translation keys
+- [ ] Create es.json with all Spanish translation keys
+- [ ] Update Home page to use t() function for all text
+- [ ] Update Products page to use t() function for all text
+- [ ] Update About page to use t() function for all text
+
+### Mobile Menu Bar Fix
+- [ ] Locate the mobile menu bar component
+- [ ] Ensure language selector appears on mobile menu bar
+- [ ] Ensure search icon appears on mobile menu bar
+- [ ] Test on iOS iPhone browser specifically
+- [ ] Verify both icons are visible and functional on mobile

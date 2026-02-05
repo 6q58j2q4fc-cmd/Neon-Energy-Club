@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { trpc } from "@/lib/trpc";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Building2, User, Phone, Mail, MapPin, Users, AlertCircle, Shield, CheckCircle2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -51,7 +51,7 @@ interface EnrollmentFormData {
 
 export default function EnrollmentForm() {
   const [, setLocation] = useLocation();
-  const { toast } = useToast();
+  // Using sonner toast
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<EnrollmentFormData>({
     firstName: "",
@@ -75,18 +75,15 @@ export default function EnrollmentForm() {
 
   const enrollMutation = trpc.distributor.enroll.useMutation({
     onSuccess: (data) => {
-      toast({
-        title: "Enrollment Successful!",
+      toast.success("Enrollment Successful!", {
         description: `Your distributor code is: ${data.distributorCode}`,
       });
       // Redirect to package selection
       setLocation("/distributor/select-package");
     },
     onError: (error) => {
-      toast({
-        title: "Enrollment Failed",
+      toast.error("Enrollment Failed", {
         description: error.message,
-        variant: "destructive",
       });
     },
   });
@@ -117,10 +114,8 @@ export default function EnrollmentForm() {
     if (validateStep(step)) {
       setStep(prev => prev + 1);
     } else {
-      toast({
-        title: "Incomplete Information",
+      toast.error("Incomplete Information", {
         description: "Please fill in all required fields before continuing.",
-        variant: "destructive",
       });
     }
   };
@@ -131,10 +126,8 @@ export default function EnrollmentForm() {
 
   const handleSubmit = () => {
     if (!validateStep(5)) {
-      toast({
-        title: "Incomplete Information",
+      toast.error("Incomplete Information", {
         description: "Please agree to all terms and policies.",
-        variant: "destructive",
       });
       return;
     }
