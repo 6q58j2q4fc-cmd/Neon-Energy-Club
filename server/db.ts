@@ -5546,6 +5546,55 @@ function getEarningsTier(earnings: number): string {
 }
 
 
+// ==================== DISTRIBUTOR APPLICATION INFO ====================
+
+/**
+ * Update distributor application info (phone, address, tax info, agreements)
+ */
+export async function updateDistributorApplicationInfo(
+  distributorId: number,
+  data: {
+    phone?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    dateOfBirth?: string;
+    taxIdLast4?: string;
+    agreedToPolicies?: boolean;
+    agreedToTerms?: boolean;
+    agreedAt?: Date;
+  }
+): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    // Store application info in the distributors table or a related table
+    // For now, we'll store key fields in the existing distributor record
+    // and log the agreement for compliance
+    await db.update(distributors)
+      .set({
+        phone: data.phone || null,
+        address: data.address || null,
+        city: data.city || null,
+        state: data.state || null,
+        zipCode: data.zipCode || null,
+        dateOfBirth: data.dateOfBirth || null,
+        taxIdLast4: data.taxIdLast4 || null,
+        agreedToPoliciesAt: data.agreedToPolicies ? (data.agreedAt || new Date()) : null,
+        agreedToTermsAt: data.agreedToTerms ? (data.agreedAt || new Date()) : null,
+        updatedAt: new Date(),
+      })
+      .where(eq(distributors.id, distributorId));
+    
+    return true;
+  } catch (err) {
+    console.error('[updateDistributorApplicationInfo] Error:', err);
+    return false;
+  }
+}
+
 // ==================== VENDING NETWORK FUNCTIONS ====================
 
 /**

@@ -219,6 +219,18 @@ function DistributorSignupForm({ user }: { user: any }) {
   const [sponsorCode, setSponsorCode] = useState("");
   const [country, setCountry] = useState("US");
   
+  // Additional form fields for complete application
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [zipCode, setZipCode] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [ssn, setSsn] = useState(""); // Last 4 digits only for tax purposes
+  const [agreedToPolicies, setAgreedToPolicies] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [agreedToAge, setAgreedToAge] = useState(false);
+  
   const enrollDistributor = trpc.distributor.enroll.useMutation({
     onSuccess: () => {
       toast.success("Welcome to the NEON family! Your distributor account is active.");
@@ -231,86 +243,297 @@ function DistributorSignupForm({ user }: { user: any }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    enrollDistributor.mutate({ sponsorCode: sponsorCode || undefined, country });
+    
+    // Validate required agreements
+    if (!agreedToPolicies) {
+      toast.error("You must agree to the Policies and Procedures to continue.");
+      return;
+    }
+    if (!agreedToTerms) {
+      toast.error("You must agree to the Terms and Conditions to continue.");
+      return;
+    }
+    if (!agreedToAge) {
+      toast.error("You must confirm you are at least 18 years old to continue.");
+      return;
+    }
+    if (!phone) {
+      toast.error("Phone number is required.");
+      return;
+    }
+    
+    enrollDistributor.mutate({ 
+      sponsorCode: sponsorCode || undefined, 
+      country,
+      phone,
+      address,
+      city,
+      state,
+      zipCode,
+      dateOfBirth,
+      taxIdLast4: ssn,
+      agreedToPolicies: true,
+      agreedToTerms: true,
+    });
   };
 
   return (
     <section className="py-20">
       <div className="container px-6">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-5xl font-black mb-4">
-              COMPLETE YOUR <span className="text-[#c8ff00] neon-text">ENROLLMENT</span>
+              DISTRIBUTOR <span className="text-[#c8ff00] neon-text">APPLICATION</span>
             </h2>
             <p className="text-xl text-gray-400">
-              You're one step away from building your NEON business
+              Complete your application to become an official NEON Distributor
             </p>
           </div>
 
           <Card className="bg-gradient-to-br from-[#0a0a0a] to-black border-[#c8ff00]/30">
             <CardHeader>
-              <CardTitle className="text-2xl font-black">Distributor Information</CardTitle>
-              <CardDescription>Your account details are pre-filled from your profile</CardDescription>
+              <CardTitle className="text-2xl font-black">Distributor Application Form</CardTitle>
+              <CardDescription>Please fill out all required fields to complete your enrollment</CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label>Name</Label>
-                  <Input
-                    value={user.name || ""}
-                    disabled
-                    className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white"
-                  />
+              <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Personal Information Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold text-[#c8ff00] border-b border-[#c8ff00]/30 pb-2">Personal Information</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Full Name *</Label>
+                      <Input
+                        value={user.name || ""}
+                        disabled
+                        className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Email Address *</Label>
+                      <Input
+                        value={user.email || ""}
+                        disabled
+                        className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone Number *</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        placeholder="(555) 123-4567"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white placeholder:text-gray-500 focus:border-[#c8ff00]"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="dateOfBirth">Date of Birth *</Label>
+                      <Input
+                        id="dateOfBirth"
+                        type="date"
+                        value={dateOfBirth}
+                        onChange={(e) => setDateOfBirth(e.target.value)}
+                        className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white focus:border-[#c8ff00]"
+                        required
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input
-                    value={user.email || ""}
-                    disabled
-                    className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white"
-                  />
+                {/* Address Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold text-[#c8ff00] border-b border-[#c8ff00]/30 pb-2">Mailing Address</h3>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="address">Street Address</Label>
+                    <Input
+                      id="address"
+                      type="text"
+                      placeholder="123 Main Street, Apt 4B"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white placeholder:text-gray-500 focus:border-[#c8ff00]"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="space-y-2 col-span-2 md:col-span-1">
+                      <Label htmlFor="city">City</Label>
+                      <Input
+                        id="city"
+                        type="text"
+                        placeholder="City"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white placeholder:text-gray-500 focus:border-[#c8ff00]"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="state">State/Province</Label>
+                      <Input
+                        id="state"
+                        type="text"
+                        placeholder="State"
+                        value={state}
+                        onChange={(e) => setState(e.target.value)}
+                        className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white placeholder:text-gray-500 focus:border-[#c8ff00]"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="zipCode">ZIP/Postal Code</Label>
+                      <Input
+                        id="zipCode"
+                        type="text"
+                        placeholder="12345"
+                        value={zipCode}
+                        onChange={(e) => setZipCode(e.target.value)}
+                        className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white placeholder:text-gray-500 focus:border-[#c8ff00]"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="country">Country *</Label>
+                      <Select value={country} onValueChange={setCountry}>
+                        <SelectTrigger className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#0a0a0a] border-[#c8ff00]/30 max-h-[300px]">
+                          {SUPPORTED_COUNTRIES.map((c) => (
+                            <SelectItem key={c.code} value={c.code} className="text-white hover:bg-[#c8ff00]/20">
+                              <span className="flex items-center gap-2">
+                                <span className="text-lg">{c.flag}</span>
+                                <span>{c.name}</span>
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="country">Country</Label>
-                  <Select value={country} onValueChange={setCountry}>
-                    <SelectTrigger className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white">
-                      <SelectValue placeholder="Select your country" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#0a0a0a] border-[#c8ff00]/30 max-h-[300px]">
-                      {SUPPORTED_COUNTRIES.map((c) => (
-                        <SelectItem key={c.code} value={c.code} className="text-white hover:bg-[#c8ff00]/20">
-                          <span className="flex items-center gap-2">
-                            <span className="text-lg">{c.flag}</span>
-                            <span>{c.name}</span>
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-sm text-gray-500">
-                    Your country flag will be displayed on your replicated website
-                  </p>
+                {/* Tax Information Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold text-[#c8ff00] border-b border-[#c8ff00]/30 pb-2">Tax Information</h3>
+                  <p className="text-sm text-gray-400">Required for commission payments over $600/year (US residents)</p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="ssn">SSN/Tax ID (Last 4 digits)</Label>
+                      <Input
+                        id="ssn"
+                        type="text"
+                        placeholder="XXXX"
+                        maxLength={4}
+                        value={ssn}
+                        onChange={(e) => setSsn(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                        className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white placeholder:text-gray-500 focus:border-[#c8ff00]"
+                      />
+                      <p className="text-xs text-gray-500">Only the last 4 digits are stored for verification</p>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="sponsorCode">Sponsor Code (Optional)</Label>
-                  <Input
-                    id="sponsorCode"
-                    type="text"
-                    placeholder="Enter your sponsor's code"
-                    value={sponsorCode}
-                    onChange={(e) => setSponsorCode(e.target.value)}
-                    className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white placeholder:text-gray-500 focus:border-[#c8ff00]"
-                  />
-                  <p className="text-sm text-gray-500">
-                    If you were referred by someone, enter their code here
-                  </p>
+                {/* Sponsor Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold text-[#c8ff00] border-b border-[#c8ff00]/30 pb-2">Sponsor Information</h3>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="sponsorCode">Sponsor/Referral Code (Optional)</Label>
+                    <Input
+                      id="sponsorCode"
+                      type="text"
+                      placeholder="Enter your sponsor's distributor code"
+                      value={sponsorCode}
+                      onChange={(e) => setSponsorCode(e.target.value.toUpperCase())}
+                      className="bg-[#0a0a0a] border-[#c8ff00]/30 text-white placeholder:text-gray-500 focus:border-[#c8ff00]"
+                    />
+                    <p className="text-sm text-gray-500">
+                      If you were referred by an existing distributor, enter their code here. If left blank, you will be placed under NEON Corporation.
+                    </p>
+                  </div>
                 </div>
 
+                {/* Agreements Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold text-[#c8ff00] border-b border-[#c8ff00]/30 pb-2">Agreements & Acknowledgments</h3>
+                  
+                  <div className="space-y-4 bg-[#0a0a0a] border border-[#c8ff00]/20 rounded-lg p-4">
+                    {/* Policies and Procedures */}
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        id="agreedToPolicies"
+                        checked={agreedToPolicies}
+                        onChange={(e) => setAgreedToPolicies(e.target.checked)}
+                        className="mt-1 w-5 h-5 rounded border-[#c8ff00]/30 bg-[#0a0a0a] text-[#c8ff00] focus:ring-[#c8ff00] focus:ring-offset-0 cursor-pointer"
+                      />
+                      <label htmlFor="agreedToPolicies" className="text-sm text-gray-300 cursor-pointer">
+                        <span className="text-white font-semibold">I have read and agree to NEON Corporation's </span>
+                        <a href="/policies-and-procedures" target="_blank" className="text-[#c8ff00] underline hover:text-[#a8d600]">
+                          Policies and Procedures
+                        </a>
+                        <span className="text-white font-semibold"> *</span>
+                        <p className="text-gray-500 text-xs mt-1">
+                          This document outlines the rules, guidelines, and expectations for all NEON distributors including conduct, marketing guidelines, and compliance requirements.
+                        </p>
+                      </label>
+                    </div>
+
+                    {/* Terms and Conditions */}
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        id="agreedToTerms"
+                        checked={agreedToTerms}
+                        onChange={(e) => setAgreedToTerms(e.target.checked)}
+                        className="mt-1 w-5 h-5 rounded border-[#c8ff00]/30 bg-[#0a0a0a] text-[#c8ff00] focus:ring-[#c8ff00] focus:ring-offset-0 cursor-pointer"
+                      />
+                      <label htmlFor="agreedToTerms" className="text-sm text-gray-300 cursor-pointer">
+                        <span className="text-white font-semibold">I have read and agree to NEON Corporation's </span>
+                        <a href="/terms" target="_blank" className="text-[#c8ff00] underline hover:text-[#a8d600]">
+                          Terms and Conditions
+                        </a>
+                        <span className="text-white font-semibold"> *</span>
+                        <p className="text-gray-500 text-xs mt-1">
+                          This agreement covers the legal terms of your distributor relationship with NEON Corporation including compensation plan, termination, and dispute resolution.
+                        </p>
+                      </label>
+                    </div>
+
+                    {/* Age Verification */}
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        id="agreedToAge"
+                        checked={agreedToAge}
+                        onChange={(e) => setAgreedToAge(e.target.checked)}
+                        className="mt-1 w-5 h-5 rounded border-[#c8ff00]/30 bg-[#0a0a0a] text-[#c8ff00] focus:ring-[#c8ff00] focus:ring-offset-0 cursor-pointer"
+                      />
+                      <label htmlFor="agreedToAge" className="text-sm text-gray-300 cursor-pointer">
+                        <span className="text-white font-semibold">I confirm that I am at least 18 years of age *</span>
+                        <p className="text-gray-500 text-xs mt-1">
+                          You must be at least 18 years old to become a NEON distributor.
+                        </p>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* What happens next */}
                 <div className="bg-[#c8ff00]/10 border border-[#c8ff00]/30 rounded-lg p-6">
-                  <h4 className="font-bold text-[#c8ff00] mb-3">What happens next?</h4>
+                  <h4 className="font-bold text-[#c8ff00] mb-3">What happens after you submit?</h4>
                   <ul className="space-y-2 text-sm text-gray-300">
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-[#c8ff00] mt-0.5 flex-shrink-0" />
@@ -318,7 +541,7 @@ function DistributorSignupForm({ user }: { user: any }) {
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-[#c8ff00] mt-0.5 flex-shrink-0" />
-                      <span>Unique distributor code and custom website</span>
+                      <span>Unique distributor code and custom replicated website (neonenergyclub.com/YOURCODE)</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-[#c8ff00] mt-0.5 flex-shrink-0" />
@@ -326,19 +549,23 @@ function DistributorSignupForm({ user }: { user: any }) {
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-[#c8ff00] mt-0.5 flex-shrink-0" />
-                      <span>Start earning commissions immediately</span>
+                      <span>Start earning commissions on all sales immediately</span>
                     </li>
                   </ul>
                 </div>
 
                 <Button
                   type="submit"
-                  disabled={enrollDistributor.isPending}
-                  className="w-full bg-[#c8ff00] text-black hover:bg-[#a8d600] font-black h-14 text-lg neon-pulse"
+                  disabled={enrollDistributor.isPending || !agreedToPolicies || !agreedToTerms || !agreedToAge}
+                  className="w-full bg-[#c8ff00] text-black hover:bg-[#a8d600] font-black h-14 text-lg neon-pulse disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {enrollDistributor.isPending ? "Enrolling..." : "Activate My Distributor Account"}
+                  {enrollDistributor.isPending ? "Processing Application..." : "Submit Distributor Application"}
                   <Sparkles className="w-6 h-6 ml-2" />
                 </Button>
+                
+                <p className="text-center text-xs text-gray-500">
+                  By submitting this application, you agree to receive communications from NEON Corporation regarding your distributor account.
+                </p>
               </form>
             </CardContent>
           </Card>

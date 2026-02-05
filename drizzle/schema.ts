@@ -233,6 +233,24 @@ export const distributors = mysqlTable("distributors", {
   status: mysqlEnum("status", ["active", "inactive", "suspended"]).default("active").notNull(),
   /** Country code (ISO 3166-1 alpha-2) for flag display */
   country: varchar("country", { length: 2 }),
+  /** Phone number */
+  phone: varchar("phone", { length: 50 }),
+  /** Street address */
+  address: text("address"),
+  /** City */
+  city: varchar("city", { length: 100 }),
+  /** State/Province */
+  state: varchar("state", { length: 100 }),
+  /** ZIP/Postal code */
+  zipCode: varchar("zipCode", { length: 20 }),
+  /** Date of birth */
+  dateOfBirth: varchar("dateOfBirth", { length: 20 }),
+  /** Last 4 digits of SSN/Tax ID (for tax reporting) */
+  taxIdLast4: varchar("taxIdLast4", { length: 4 }),
+  /** Timestamp when user agreed to Policies and Procedures */
+  agreedToPoliciesAt: timestamp("agreedToPoliciesAt"),
+  /** Timestamp when user agreed to Terms and Conditions */
+  agreedToTermsAt: timestamp("agreedToTermsAt"),
   /** Enrollment timestamp */
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   /** Last update timestamp */

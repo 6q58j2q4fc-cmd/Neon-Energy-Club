@@ -5043,3 +5043,23 @@
 - [x] Restored AmbientSoundToggle component to App.tsx
 - [x] Floating volume control now appears in bottom-left corner
 - [x] Jungle sounds auto-play on page load (with browser interaction unlock for iOS)
+
+
+## Fix Replicated Website Links & Distributor Application (Feb 5, 2026)
+- [ ] Fix replicated website links not working when copied/pasted into browser
+- [ ] Investigate why neonenergyclub.com/[CODE] shows "Page Not Found"
+- [ ] Create complete distributor application form
+- [ ] Add checkbox for agreeing to Neon Corporation's Policies and Procedures
+- [ ] Add checkbox for agreeing to Terms and Conditions
+- [ ] Ensure enroll distributor buttons link to the application form
+
+
+## Distributor Application Form Enhancement (Feb 5, 2026)
+- [x] Added complete distributor application form with all required fields
+- [x] Added checkbox for Policies and Procedures agreement
+- [x] Added checkbox for Terms and Conditions agreement
+- [x] Added age verification checkbox (must be 18+)
+- [x] Added phone, address, city, state, zip, DOB, and tax ID fields
+- [x] Updated database schema with new distributor columns
+- [x] Distributor enrollment buttons now show full application form
+- [x] Replicated website URLs work when custom domain is configured in Settings → Domains

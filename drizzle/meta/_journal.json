@@ -274,6 +274,13 @@
       "when": 1770198453073,
       "tag": "0038_numerous_sharon_carter",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "5",
+      "when": 1770313175643,
+      "tag": "0039_supreme_proudstar",
+      "breakpoints": true
     }
   ]
 }

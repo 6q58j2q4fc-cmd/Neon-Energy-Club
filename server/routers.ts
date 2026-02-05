@@ -1039,12 +1039,29 @@ export const appRouter = router({
         z.object({
           sponsorCode: z.string().optional(),
           country: z.string().length(2).optional(), // ISO 3166-1 alpha-2 country code
+          phone: z.string().optional(),
+          address: z.string().optional(),
+          city: z.string().optional(),
+          state: z.string().optional(),
+          zipCode: z.string().optional(),
+          dateOfBirth: z.string().optional(),
+          taxIdLast4: z.string().max(4).optional(),
+          agreedToPolicies: z.boolean().optional(),
+          agreedToTerms: z.boolean().optional(),
         })
       )
       .mutation(async ({ input, ctx }) => {
-        const { enrollDistributor, createDistributorProfile, createEmailVerification, updateDistributorCountry } = await import("./db");
+        const { enrollDistributor, createDistributorProfile, createEmailVerification, updateDistributorCountry, updateDistributorApplicationInfo } = await import("./db");
         const { provisionReplicatedWebsite } = await import("./websiteProvisioning");
         const { sendEmailVerification } = await import("./emailNotifications");
+        
+        // Validate required agreements
+        if (!input.agreedToPolicies || !input.agreedToTerms) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'You must agree to the Policies and Procedures and Terms and Conditions to enroll.',
+          });
+        }
         
         const distributor = await enrollDistributor({
           userId: ctx.user.id,
@@ -1054,6 +1071,22 @@ export const appRouter = router({
         // Update distributor country if provided
         if (distributor && input.country) {
           await updateDistributorCountry(distributor.id, input.country);
+        }
+        
+        // Update additional application info
+        if (distributor) {
+          await updateDistributorApplicationInfo(distributor.id, {
+            phone: input.phone,
+            address: input.address,
+            city: input.city,
+            state: input.state,
+            zipCode: input.zipCode,
+            dateOfBirth: input.dateOfBirth,
+            taxIdLast4: input.taxIdLast4,
+            agreedToPolicies: input.agreedToPolicies,
+            agreedToTerms: input.agreedToTerms,
+            agreedAt: new Date(),
+          });
         }
         
         // Automatically create personalized profile for new distributor
