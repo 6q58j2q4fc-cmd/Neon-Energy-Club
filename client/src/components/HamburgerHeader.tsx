@@ -301,10 +301,10 @@ export default function HamburgerHeader({ variant = "default" }: HamburgerHeader
                 )}
               </button>
 
-              {/* Search Button - hidden on small screens */}
+              {/* Search Button - always visible */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="hidden sm:flex w-10 h-10 items-center justify-center rounded-xl bg-white/5 border border-white/20 hover:bg-white/10 hover:border-white/30 transition-all duration-200"
+                className="flex w-10 h-10 items-center justify-center rounded-xl bg-white/5 border border-white/20 hover:bg-white/10 hover:border-white/30 transition-all duration-200"
                 aria-label="Search"
               >
                 <Search className="w-6 h-6" strokeWidth={2.5} style={{ color: accentColor[variant] }} />

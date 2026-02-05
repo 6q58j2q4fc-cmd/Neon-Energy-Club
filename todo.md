@@ -4981,3 +4981,28 @@
 - [x] Verify replicated site URLs use neonenergyclub.com/[CODE] format (updated getBySlug to check distributor codes)
 - [x] Test complete distributor signup flow with replicated site generation (11 tests passing)
 - [x] Verify replicated sites are publicly accessible without login (catch-all route at /:slug)
+
+
+## Critical Fixes (Feb 4, 2026)
+
+### Jungle Music & Header Controls
+- [x] Find original jungle music audio file and restore auto-play (CDN URL: https://files.manuscdn.com/...)
+- [x] Fix volume control visibility on top menu bar (mobile + desktop) - 48x48 touch target, always visible
+- [x] Ensure search icon is visible in header navigation - removed hidden sm:flex class
+
+### Admin Panel Security
+- [x] Restrict admin panel option to only admins (hide from regular users) - removed from Footer
+- [x] Verify admin role check in navigation - all admin routes use adminProcedure middleware
+
+### Native Authentication System
+- [x] Native username/password registration already implemented (Register.tsx)
+- [x] Native username/password login already implemented (Login.tsx)
+- [x] Password management implemented (forgot password, change password)
+- [x] Manus OAuth is optional secondary method, native auth is primary
+- [x] Users can login with website's native auth at /login
+
+### Distributor Custom Domain Updates
+- [x] Custom domain changes update live immediately via profile.updateSlug procedure
+- [x] Tracking uses distributorId (not URL) so commissions unaffected by URL changes
+- [x] Old URLs return 404 (expected), new URLs work immediately
+- [x] Affiliate tracking via affiliateCode in replicatedWebsites table
