@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { SEO } from "@/components/SEO";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
-import { ShoppingCart, Check, Zap, Leaf, Apple, Cherry, Sparkles, Star, Award, Heart, Shield, ExternalLink, Flame, Droplets, Battery, Globe } from "lucide-react";
+import { ShoppingCart, Check, Zap, Leaf, Apple, Cherry, Sparkles, Star, Award, Heart, Shield, ExternalLink, Flame, Droplets, Battery, Globe, Gem } from "lucide-react";
 import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
 import CustomerPhotoGallery from "@/components/CustomerPhotoGallery";
@@ -204,9 +204,15 @@ export default function Products() {
                   
                   {/* Product info */}
                   <div className="text-center space-y-4">
-                    <h3 className="text-5xl font-black bg-gradient-to-r from-[#c8ff00] to-[#a8e600] bg-clip-text text-transparent">
-                      NEON ORIGINAL
-                    </h3>
+                    <div className="flex items-center justify-center gap-3">
+                      <h3 className="text-5xl font-black bg-gradient-to-r from-[#c8ff00] to-[#a8e600] bg-clip-text text-transparent">
+                        NEON ORIGINAL
+                      </h3>
+                      <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 text-sm font-bold">
+                        <Gem className="w-4 h-4" />
+                        NFT
+                      </span>
+                    </div>
                     <p className="text-white/50 text-lg font-medium">The "Top Shelf" Energy Drink</p>
                     
                     {/* Pre-order Notice */}
@@ -324,9 +330,15 @@ export default function Products() {
                   
                   {/* Product info */}
                   <div className="text-center space-y-4">
-                    <h3 className="text-5xl font-black bg-gradient-to-r from-pink-400 to-pink-300 bg-clip-text text-transparent">
-                      NEON PINK™
-                    </h3>
+                    <div className="flex items-center justify-center gap-3">
+                      <h3 className="text-5xl font-black bg-gradient-to-r from-pink-400 to-pink-300 bg-clip-text text-transparent">
+                        NEON PINK™
+                      </h3>
+                      <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 text-sm font-bold">
+                        <Gem className="w-4 h-4" />
+                        NFT
+                      </span>
+                    </div>
                     <p className="text-white/50 text-lg font-medium">Electric Pom Passion</p>
                     <p className="text-pink-300/80 text-sm italic">The first energy drink engineered for women's health</p>
                     

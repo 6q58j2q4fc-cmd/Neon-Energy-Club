@@ -5028,3 +5028,10 @@
 - [x] Removed "Play jungle sounds" text - now just shows volume icon
 - [x] Jungle sounds auto-play on page load (with browser interaction unlock for iOS)
 - [x] Using exact same jungle audio URL: files.manuscdn.com/...wUAXKFjPJqRxCuoX.mp3
+
+
+## NFT Icons on Tier Packages (Feb 5, 2026) - COMPLETED
+- [x] Identified which tier packages include NFTs (all tiers include NFTs)
+- [x] Added NFT icon/badge to tier packages on Home page (Supporter, Energizer, VIP Insider)
+- [x] Added NFT icon/badge to tier packages on Crowdfund page (all 4 tiers)
+- [x] Added NFT icon/badge to products on Products page (NEON Original, NEON Pink)

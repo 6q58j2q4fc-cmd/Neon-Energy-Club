@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { Check, Star, Zap, Crown, Gift, ArrowLeft, TrendingUp, Users, Clock } from "lucide-react";
+import { Check, Star, Zap, Crown, Gift, ArrowLeft, TrendingUp, Users, Clock, Gem } from "lucide-react";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import { SEO } from "@/components/SEO";
 
@@ -20,9 +20,10 @@ const rewardTiers = [
     amount: 25,
     icon: Gift,
     popular: false,
+    hasNFT: true,
     rewards: [
       "1 Limited Edition Can",
-      "Digital Thank You Card",
+      "Digital Thank You Card (NFT)",
       "Campaign Updates",
       "Backer Badge",
     ],
@@ -33,12 +34,14 @@ const rewardTiers = [
     amount: 100,
     icon: Zap,
     popular: true,
+    hasNFT: true,
     rewards: [
       "1 Case (24 Cans)",
       "Limited Edition T-Shirt",
       "Exclusive Poster",
       "VIP Backer Status",
       "Early Access to Products",
+      "Exclusive NFT Collectible",
     ],
   },
   {
@@ -47,12 +50,14 @@ const rewardTiers = [
     amount: 500,
     icon: Star,
     popular: false,
+    hasNFT: true,
     rewards: [
       "5 Cases (120 Cans)",
       "Limited Edition Merchandise Pack",
       "Your Name on Website",
       "Exclusive Virtual Event Access",
       "Lifetime 20% Discount",
+      "Rare NFT Collectible",
     ],
   },
   {
@@ -61,6 +66,7 @@ const rewardTiers = [
     amount: 2500,
     icon: Crown,
     popular: false,
+    hasNFT: true,
     rewards: [
       "25 Cases (600 Cans)",
       "Complete Merchandise Collection",
@@ -68,6 +74,7 @@ const rewardTiers = [
       "Private Launch Party Invite",
       "Lifetime VIP Status",
       "Direct Line to Founders",
+      "Ultra-Rare Founder NFT",
     ],
   },
 ];
@@ -230,7 +237,15 @@ export default function Crowdfund() {
                       <Icon className={`w-10 h-10 ${isSelected ? 'text-[#c8ff00] neon-glow' : 'text-[#c8ff00]/60'}`} />
                       {isSelected && <Check className="w-6 h-6 text-[#c8ff00]" />}
                     </div>
-                    <CardTitle className="text-xl font-bold text-[#c8ff00]">{tier.name}</CardTitle>
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="text-xl font-bold text-[#c8ff00]">{tier.name}</CardTitle>
+                      {tier.hasNFT && (
+                        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 text-[10px] font-bold">
+                          <Gem className="w-3 h-3" />
+                          NFT
+                        </span>
+                      )}
+                    </div>
                     <CardDescription className="text-4xl font-black text-white">${tier.amount}</CardDescription>
                   </CardHeader>
                   <CardContent>

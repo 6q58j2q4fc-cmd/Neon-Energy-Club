@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useLocation, Link } from "wouter";
-import { Zap, MapPin, DollarSign, Clock, TrendingUp, Users, Star, Sparkles, ArrowRight, Gift, Target, Trophy, ChevronDown, Shield, Leaf, Heart, Play } from "lucide-react";
+import { Zap, MapPin, DollarSign, Clock, TrendingUp, Users, Star, Sparkles, ArrowRight, Gift, Target, Trophy, ChevronDown, Shield, Leaf, Heart, Play, Gem } from "lucide-react";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import MobileVideoPlayer from "@/components/MobileVideoPlayer";
 import OptimizedVideoPlayer from "@/components/OptimizedVideoPlayer";
@@ -413,9 +413,9 @@ export default function Home() {
               <div className="space-y-4">
                 <h3 className="text-xl font-bold text-white mb-6">REWARD TIERS</h3>
                 {[
-                  { name: "Supporter", price: 25, reward: "1 Limited Edition Can + Digital Card", popular: false },
-                  { name: "Energizer", price: 100, reward: "24 Cans + T-Shirt + VIP Status", popular: true },
-                  { name: "VIP Insider", price: 500, reward: "120 Cans + Merch Pack + 20% Lifetime", popular: false },
+                  { name: "Supporter", price: 25, reward: "1 Limited Edition Can + Digital Card", popular: false, hasNFT: true },
+                  { name: "Energizer", price: 100, reward: "24 Cans + T-Shirt + VIP Status + NFT", popular: true, hasNFT: true },
+                  { name: "VIP Insider", price: 500, reward: "120 Cans + Merch Pack + 20% Lifetime + Exclusive NFT", popular: false, hasNFT: true },
                 ].map((tier, i) => (
                   <div
                     key={i}
@@ -428,10 +428,16 @@ export default function Home() {
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-bold text-white">{tier.name}</span>
                           {tier.popular && (
                             <span className="badge-neon text-[10px]">POPULAR</span>
+                          )}
+                          {tier.hasNFT && (
+                            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 text-[10px] font-bold">
+                              <Gem className="w-3 h-3" />
+                              NFT
+                            </span>
                           )}
                         </div>
                         <p className="text-sm text-white/50 mt-1">{tier.reward}</p>
