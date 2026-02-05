@@ -5020,3 +5020,11 @@
 - [x] Fixed Products page can images (Original and Pink)
 - [x] Fixed rainforest-trust-emblem.png to use .webp extension
 - [x] Verified all images display correctly on homepage and products page
+
+
+## CRITICAL FIX - Mobile Header & Audio (Feb 5, 2026)
+- [x] Search icon visible on mobile menu bar (element 11 in header)
+- [x] Volume control icon visible on mobile menu bar (element 10 in header, no text)
+- [x] Removed "Play jungle sounds" text - now just shows volume icon
+- [x] Jungle sounds auto-play on page load (with browser interaction unlock for iOS)
+- [x] Using exact same jungle audio URL: files.manuscdn.com/...wUAXKFjPJqRxCuoX.mp3
