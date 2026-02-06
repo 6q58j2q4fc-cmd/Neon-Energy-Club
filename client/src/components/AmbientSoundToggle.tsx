@@ -116,14 +116,23 @@ export function AmbientSoundToggle() {
     }
   };
 
-  const handleVolumeChange = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleVolumeChange = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     if (!sliderRef.current) return;
     const rect = sliderRef.current.getBoundingClientRect();
-    const y = e.clientY - rect.top;
+    
+    // Handle both mouse and touch events
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const y = clientY - rect.top;
     const height = rect.height;
+    
     // Invert because slider goes from bottom (0%) to top (100%)
     const newVolume = Math.max(0, Math.min(1, 1 - (y / height)));
     setVolume(newVolume);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.preventDefault(); // Prevent scrolling while dragging
+    handleVolumeChange(e);
   };
 
   // If hidden, show only a small reveal button
@@ -169,19 +178,26 @@ export function AmbientSoundToggle() {
         {/* Vertical Slider Track */}
         <div 
           ref={sliderRef}
-          className="relative w-3 h-32 bg-white/10 rounded-full cursor-pointer overflow-hidden"
+          className="relative w-8 h-40 bg-white/10 rounded-full cursor-pointer overflow-hidden touch-none"
           onClick={handleVolumeChange}
           onMouseMove={(e) => e.buttons === 1 && handleVolumeChange(e)}
+          onTouchStart={handleVolumeChange}
+          onTouchMove={handleTouchMove}
         >
           {/* Filled portion */}
           <div 
             className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#c8ff00] to-[#00ffff] rounded-full transition-all duration-100"
             style={{ height: `${volume * 100}%` }}
           />
-          {/* Thumb indicator */}
+          {/* Thumb indicator - larger for mobile */}
           <div 
-            className="absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-[#c8ff00] rounded-full shadow-lg border-2 border-white transition-all duration-100"
-            style={{ bottom: `calc(${volume * 100}% - 8px)` }}
+            className="absolute left-1/2 -translate-x-1/2 w-7 h-7 bg-[#c8ff00] rounded-full shadow-lg border-2 border-white transition-all duration-100 pointer-events-none"
+            style={{ bottom: `calc(${volume * 100}% - 14px)` }}
+          />
+          {/* Larger invisible touch target */}
+          <div 
+            className="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full pointer-events-none"
+            style={{ bottom: `calc(${volume * 100}% - 24px)` }}
           />
         </div>
         

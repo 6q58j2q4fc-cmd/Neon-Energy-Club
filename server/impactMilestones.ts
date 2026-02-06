@@ -9,6 +9,7 @@ import { getDb } from "./db";
 import { eq } from "drizzle-orm";
 import { distributors } from "../drizzle/schema";
 import { getLifetimeImpact, type ImpactCalculation } from "./charityImpact";
+import { BADGE_URLS } from "./badgeUrls";
 
 export interface Milestone {
   id: string;
@@ -18,6 +19,7 @@ export interface Milestone {
   category: 'trees' | 'habitat' | 'species' | 'animals' | 'total' | 'team';
   threshold: number;
   badgeColor: string;
+  badgeImageUrl?: string;
   shareText: string;
 }
 
@@ -28,8 +30,16 @@ export interface Achievement {
   shareUrl?: string;
 }
 
-// Define all charity impact milestones
-export const CHARITY_MILESTONES: Milestone[] = [
+// Helper function to attach badge URLs to milestones
+function attachBadgeUrls(milestones: Milestone[]): Milestone[] {
+  return milestones.map(m => ({
+    ...m,
+    badgeImageUrl: BADGE_URLS[m.id] || undefined
+  }));
+}
+
+// Define all charity impact milestones (without badge URLs)
+const RAW_MILESTONES: Milestone[] = [
   // Tree Protection Milestones
   {
     id: 'first_tree',
@@ -262,6 +272,9 @@ export const CHARITY_MILESTONES: Milestone[] = [
     shareText: '5,000 environmental impacts! 🌟 NEON Energy: Fuel your body, save the planet!'
   },
 ];
+
+// Export milestones with badge URLs attached
+export const CHARITY_MILESTONES = attachBadgeUrls(RAW_MILESTONES);
 
 /**
  * Check which milestones a distributor has achieved

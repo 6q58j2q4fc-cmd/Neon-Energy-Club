@@ -5554,3 +5554,64 @@
 - Implemented trophy icons and top 3 highlighting
 - Created gamification elements for engagement
 - Added route to App.tsx at /impact-leaderboard
+
+
+## New Priority Tasks - Volume Control & Impact Enhancements
+
+### Volume Control Mobile UX
+- [x] Find volume control component (AmbientSoundToggle.tsx)
+- [x] Increase touch target size for mobile (w-3 → w-8, h-32 → h-40)
+- [x] Add larger thumb/handle for easier grabbing (w-4 → w-7, h-4 → h-7)
+- [x] Improve touch sensitivity and drag responsiveness (added touch events, preventDefault)
+- [x] Added touch-none class to prevent scroll interference
+- [ ] Test on iOS and Android devices (requires user testing)
+
+### Badge Graphics Generation
+- [ ] Design badge templates for each milestone category
+- [ ] Generate 20+ badge images using AI
+- [ ] Optimize images for social media sharing
+- [ ] Integrate badges into achievement system
+- [ ] Add download/share functionality
+
+### Milestone Notifications
+- [ ] Implement notification system for achievement unlocks
+- [ ] Create notification templates for each milestone type
+- [ ] Add real-time notification delivery
+- [ ] Build notification preferences UI
+- [ ] Test notification delivery across devices
+
+### Impact Analytics Dashboard
+- [ ] Design analytics dashboard layout
+- [ ] Implement Chart.js visualizations
+- [ ] Add impact trends over time chart
+- [ ] Add team growth visualization
+- [ ] Add progress toward next rank chart
+- [ ] Integrate with existing charity impact data
+- [ ] Add date range filters
+
+
+## Badge Graphics & Milestone System (Current Session)
+
+### Badge Graphics
+- [x] Generate badge graphics for all 20+ milestones using AI
+- [x] Upload badges to S3/CDN (all 20 badges uploaded)
+- [x] Integrate badge URLs into milestone system (helper function created)
+- [ ] Test badge display in UI
+
+### Milestone Notifications (In Progress)
+- [x] Create notification system for milestone achievements
+- [x] Implement push notification infrastructure (ready for Web Push API integration)
+- [x] Add notification preferences system (milestone, team, rank, email digest)
+- [x] Create tRPC endpoints for notifications
+- [ ] Add celebration animations for new badges (frontend)
+- [ ] Create notification preferences UI in distributor portal (frontend)
+
+### Impact Analytics Dashboard (In Progress)
+- [x] Build impact analytics dashboard with charts (recharts library)
+- [x] Add impact trends over time visualization (area charts, line charts)
+- [x] Create impact distribution visualization (pie charts, bar charts)
+- [x] Show progress toward next milestone with progress bars
+- [x] Add category comparison charts
+- [x] Create 3-tab interface (Trends, Distribution, Progress)
+- [x] Add route to App.tsx
+- [ ] Add downloadable impact reports (future enhancement)

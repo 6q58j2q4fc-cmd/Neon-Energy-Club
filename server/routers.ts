@@ -5344,6 +5344,51 @@ Provide step-by-step instructions with specific button names and locations. Keep
         const stats = await getMilestoneStats(ctx.user.id);
         return stats;
       }),
+
+    // Get unread milestone notifications
+    getNotifications: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getUnreadNotifications } = await import('./milestoneNotifications');
+        const notifications = await getUnreadNotifications(ctx.user.id);
+        return notifications;
+      }),
+
+    // Mark notification as read
+    markNotificationRead: protectedProcedure
+      .input(z.object({
+        notificationId: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { markNotificationRead } = await import('./milestoneNotifications');
+        await markNotificationRead(input.notificationId);
+        return { success: true };
+      }),
+
+    // Mark notification as celebrated
+    markNotificationCelebrated: protectedProcedure
+      .input(z.object({
+        notificationId: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { markNotificationCelebrated } = await import('./milestoneNotifications');
+        await markNotificationCelebrated(input.notificationId);
+        return { success: true };
+      }),
+
+    // Update notification preferences
+    updateNotificationPreferences: protectedProcedure
+      .input(z.object({
+        milestoneAchievements: z.boolean().optional(),
+        teamMilestones: z.boolean().optional(),
+        rankAdvancement: z.boolean().optional(),
+        emailDigest: z.enum(['none', 'daily', 'weekly']).optional(),
+        pushNotifications: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { updateNotificationPreferences } = await import('./milestoneNotifications');
+        await updateNotificationPreferences(ctx.user.id, input);
+        return { success: true };
+      }),
   }),
 
 });
