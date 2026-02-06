@@ -31,6 +31,8 @@ import VendingCheckout from "@/components/VendingCheckout";
 import VendingMachineTree from "@/components/VendingMachineTree";
 import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
+import { AIVendingTutorial } from "@/components/AIVendingTutorial";
+import { IntelligentTerritoryMap } from "@/components/IntelligentTerritoryMap";
 
 export default function VendingMachines() {
   // Initialize hash navigation
@@ -44,6 +46,7 @@ export default function VendingMachines() {
   const [bookCallDialogOpen, setBookCallDialogOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [selectedMachineModel, setSelectedMachineModel] = useState("standard");
+  const [tutorialOpen, setTutorialOpen] = useState(false);
   
   // Calculate ROI
   const dailyProfit = dailySales * (pricePerCan - costPerCan);
@@ -144,6 +147,18 @@ export default function VendingMachines() {
                       <VendingApplicationForm isBookCall onClose={() => setBookCallDialogOpen(false)} />
                     </DialogContent>
                   </Dialog>
+                </div>
+                
+                {/* AI Tutorial CTA */}
+                <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-[#c8ff00]/10 to-transparent border border-[#c8ff00]/20">
+                  <p className="text-white mb-2">🤖 <span className="font-bold">New:</span> Discover why this is the "Redbox of Energy Drinks"</p>
+                  <Button 
+                    onClick={() => setTutorialOpen(true)}
+                    variant="link" 
+                    className="text-[#c8ff00] hover:text-[#d4ff33] p-0 h-auto font-semibold"
+                  >
+                    Watch Interactive Tutorial →
+                  </Button>
                 </div>
                 
                 {/* Vending Checkout Dialog */}
@@ -432,6 +447,19 @@ export default function VendingMachines() {
                 </motion.div>
               ))}
             </div>
+            
+            {/* Intelligent Territory Map */}
+            <div className="mt-16">
+              <div className="text-center mb-12">
+                <h3 className="text-3xl md:text-4xl font-black text-white mb-4">
+                  FIND YOUR <span className="neon-text-glow">PERFECT LOCATION</span>
+                </h3>
+                <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+                  Our AI analyzes your zip code to suggest optimal vending machine locations with power access information and solar panel recommendations.
+                </p>
+              </div>
+              <IntelligentTerritoryMap />
+            </div>
           </div>
         </section>
 
@@ -522,6 +550,9 @@ export default function VendingMachines() {
 
         <Footer />
       </div>
+      
+      {/* AI Vending Tutorial Modal */}
+      <AIVendingTutorial isOpen={tutorialOpen} onClose={() => setTutorialOpen(false)} />
     </>
   );
 }

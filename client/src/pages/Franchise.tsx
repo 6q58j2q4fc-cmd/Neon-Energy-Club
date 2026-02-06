@@ -25,6 +25,7 @@ import { TerritoryPDFExport } from "@/components/TerritoryPDFExport";
 import ROICalculator from "@/components/ROICalculator";
 import TerritoryReservation from "@/components/TerritoryReservation";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { AIVendingTutorial } from "@/components/AIVendingTutorial";
 
 // Territory pricing data (price per square mile per month)
 const territoryPricing = {

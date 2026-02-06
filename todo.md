@@ -5788,3 +5788,47 @@
 - [ ] Fix db null safety errors
 - [ ] Achieve zero TypeScript errors
 - [ ] Final verification and checkpoint
+
+
+## New Features - Country Restrictions & AI Vending Tutorial
+
+### Country-Based Signup Restrictions
+- [ ] Define allowed countries list (US, Canada, EU countries)
+- [ ] Update country selector to show all countries but restrict signup
+- [ ] Add validation on signup forms to check country eligibility
+- [ ] Display informational message for non-eligible countries
+- [ ] Update backend validation to enforce country restrictions
+- [ ] Test signup flow for US, Canada, Germany (allowed)
+- [ ] Test signup flow for Japan, Australia, Brazil (restricted)
+
+### Interactive AI Vending Tutorial
+- [x] Create "Redbox of Energy Drinks" concept storyline
+- [x] Design interactive tutorial component with step-by-step walkthrough
+- [x] Explain AI sales bot features (lead generation, customer interaction)
+- [x] Showcase selfie cam lead capture functionality
+- [x] Demonstrate WiFi hotspot marketing features
+- [ ] Add visual mockups/animations of vending machine interface
+- [ ] Create comparison with traditional vending (Redbox model)
+- [x] Add tutorial to Vending and Franchise pages
+- [ ] Test tutorial flow and user engagement
+
+### Intelligent Territory Map with Business Location Suggestions
+- [ ] Integrate zip code lookup API for location data
+- [x] Create algorithm to suggest optimal vending machine locations
+- [x] Add business location markers to territory map
+- [ ] Implement auto-population of suggested locations on zip code entry
+- [ ] Add location scoring system (foot traffic, demographics, competition)
+- [x] Show power access indicators for each suggested location
+- [x] Add solar panel upgrade recommendations for locations without power
+- [ ] Calculate ROI estimates for each suggested location
+- [ ] Add filtering options (power access, foot traffic, cost)
+- [ ] Test map functionality with various zip codes
+
+### Power Access & Solar Panel Features
+- [ ] Research power grid data sources for location mapping
+- [ ] Add power access status to location suggestions (grid/solar/hybrid)
+- [ ] Calculate solar panel costs and ROI for off-grid locations
+- [ ] Show estimated installation costs for solar upgrades
+- [ ] Add environmental impact metrics (CO2 savings)
+- [ ] Create solar panel upgrade calculator
+- [ ] Test power access indicators on map
