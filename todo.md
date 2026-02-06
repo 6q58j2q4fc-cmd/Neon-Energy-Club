@@ -5832,3 +5832,60 @@
 - [ ] Add environmental impact metrics (CO2 savings)
 - [ ] Create solar panel upgrade calculator
 - [ ] Test power access indicators on map
+
+
+## Final Implementation Sprint - Complete All Remaining Tasks
+
+### 1. Fix Remaining 169 TypeScript Errors
+- [x] Add missing schema fields (taxIdType, ssnLast4, einLast4) to distributors table
+- [x] Implement db null checks for all database operations
+- [x] Resolve Date type mismatches in charityImpact.ts
+- [ ] Fix expirationDate type issues in claimed_territories
+- [ ] Add proper type guards for nullable fields
+- [ ] Verify zero TypeScript errors
+
+### 2. Unify Translation System
+- [ ] Consolidate LanguageContext.tsx and translations.ts into single structure
+- [ ] Decide on flat keys vs nested objects approach
+- [ ] Update all translation references to use unified structure
+- [ ] Implement working language switching on Home page
+- [ ] Test language switching across all 10 languages
+- [ ] Verify text changes on all pages when language is selected
+
+### 3. Test International Checkout
+- [ ] Add test products to cart
+- [ ] Test UK checkout (GBP, Postcode, +44 country code)
+- [ ] Test Canada checkout (CAD, Postal Code, +1 country code)
+- [ ] Test Germany checkout (EUR, Postleitzahl, +49 country code)
+- [ ] Test Japan checkout (JPY, Postal Code, +81 country code)
+- [ ] Verify PhoneInput component works correctly
+- [ ] Verify dynamic postal code labels display correctly
+
+### 4. Integrate Real Location Data API
+- [ ] Set up Google Places API integration
+- [ ] Create backend endpoint for location suggestions
+- [ ] Fetch actual business locations based on zip code
+- [ ] Get foot traffic data and demographics
+- [ ] Replace simulated location data with real data
+- [ ] Add error handling for API failures
+- [ ] Test with various zip codes across US/Canada/EU
+
+### 5. Add Country-Specific Form Validation
+- [ ] Create backend validation middleware for country eligibility
+- [ ] Enforce US/Canada/EU restrictions on signup forms
+- [ ] Return appropriate error messages for ineligible countries
+- [ ] Create waitlist signup form for restricted countries
+- [ ] Store waitlist entries in database
+- [ ] Send notification when waitlist signup occurs
+- [ ] Test validation with various country selections
+
+### 6. Create Vending Machine Comparison Tool
+- [ ] Design comparison calculator UI
+- [ ] Add input fields (location type, foot traffic, operating hours)
+- [ ] Calculate traditional vending ROI
+- [ ] Calculate NEON AI vending ROI
+- [ ] Show side-by-side comparison
+- [ ] Highlight competitive advantages (AI bot, selfie cam, WiFi)
+- [ ] Add export/share functionality
+- [ ] Integrate into VendingMachines.tsx page
+- [ ] Test calculations with various inputs

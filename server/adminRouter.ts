@@ -1252,7 +1252,7 @@ export const adminRouter = router({
             tables: input.tables ? JSON.stringify(input.tables) : null,
             cronExpression: input.cronExpression,
             retentionDays: input.retentionDays,
-            isActive: input.isActive ? 1 : 0,
+            isActive: input.isActive ? 1 : 0 ? 1 : 0,
           })
           .where(eq(backupSchedules.id, input.id));
         return { success: true, id: input.id };
@@ -1263,7 +1263,7 @@ export const adminRouter = router({
           tables: input.tables ? JSON.stringify(input.tables) : null,
           cronExpression: input.cronExpression,
           retentionDays: input.retentionDays,
-          isActive: input.isActive ? 1 : 0,
+          isActive: input.isActive ? 1 : 0 ? 1 : 0,
           createdBy: ctx.user.id,
         });
         return { success: true, id: Number(result.insertId) };

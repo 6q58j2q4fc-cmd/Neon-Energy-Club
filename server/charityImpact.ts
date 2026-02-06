@@ -283,6 +283,8 @@ export async function saveImpactSummary(
       .where(eq(charityImpactTracking.id, existing[0].id));
   } else {
     // Insert new record
+    if (!db) throw new Error('Database not initialized');
+
     await db.insert(charityImpactTracking).values({
       distributorId,
       periodStart,
