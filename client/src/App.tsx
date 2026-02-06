@@ -71,6 +71,7 @@ import NeonPink from "./pages/NeonPink";
 import ApplicationForms from "./pages/ApplicationForms";
 import Search from "./pages/Search";
 import PackageSelection from "./pages/PackageSelection";
+import MarketingAssets from "./pages/MarketingAssets";
 import AmbientSoundToggle from "./components/AmbientSoundToggle";
 import UnifiedChatBot from "./components/UnifiedChatBot";
 import CookieConsent from "./components/CookieConsent";
@@ -116,6 +117,7 @@ function Router() {
         <Route path={"/faq"} component={FAQ} />
           <Route path="/join" component={JoinNow} />
         <Route path="/package-selection" component={PackageSelection} />
+        <Route path="/marketing-assets" component={MarketingAssets} />
         <Route path={"/distributor/dashboard"} component={DistributorDashboard} />
         <Route path={"/distributor/tax-information"} component={TaxInformation} />
         <Route path={"/admin/distributor-data"} component={DistributorData} />
