@@ -229,8 +229,8 @@ export default function Home() {
                   className="bg-[#c8ff00] hover:bg-[#d4ff33] text-black font-bold px-6 md:px-8 h-12 md:h-14 text-base md:text-lg rounded-xl shadow-[0_0_20px_rgba(200,255,0,0.4)] hover:shadow-[0_0_30px_rgba(200,255,0,0.6)] transition-all group touch-friendly-lg"
                 >
                   <Gift className="w-5 h-5 mr-2 group-hover:animate-bounce" />
-                  <span className="hidden sm:inline">YES! GET MY NEON NOW</span>
-                  <span className="sm:hidden">GET NEON NOW</span>
+                  <span className="hidden sm:inline">YES! GET STARTED</span>
+                  <span className="sm:hidden">GET STARTED</span>
                 </Button>
                 <Button
                   onClick={() => { playSound('preorder'); setLocation("/products"); }}

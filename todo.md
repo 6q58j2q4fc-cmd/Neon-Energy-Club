@@ -5773,3 +5773,18 @@
 - [ ] Test country-specific form fields (US, UK, Canada, Germany)
 - [ ] Verify zero TypeScript errors
 - [ ] Final checkpoint and delivery
+
+
+## Final Sprint - Complete Implementation
+- [ ] Implement Home page translation with t() calls (BLOCKED: conflicting translation files)
+- [ ] Unify translation key structure (LanguageContext.tsx uses flat keys, translations.ts uses nested)
+- [ ] Test language switching on Home page (EN, ES, FR, DE, JA)
+- [ ] Test UK checkout (phone +44, "Postcode" label)
+- [ ] Test Canada checkout (phone +1, "Postal Code" label)
+- [ ] Test Germany checkout (phone +49, "PLZ" label)
+- [ ] Test Japan checkout (phone +81, "郵便番号" label)
+- [ ] Fix DistributorData TypeScript errors (missing fields)
+- [ ] Fix admin dashboard TypeScript errors
+- [ ] Fix db null safety errors
+- [ ] Achieve zero TypeScript errors
+- [ ] Final verification and checkpoint
