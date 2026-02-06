@@ -94,8 +94,8 @@ export function RankHistory() {
                     <div className="flex items-center gap-1">
                       <TrendingUp className="w-4 h-4" />
                       <span>
-                        {record.personalPVAtChange?.toLocaleString() || 0} PV / 
-                        ${((record.teamPVAtChange || 0) / 100).toLocaleString()} Team
+                        {record.personalPvAtChange?.toLocaleString() || 0} PV / 
+                        ${((record.teamPvAtChange || 0) / 100).toLocaleString()} Team
                       </span>
                     </div>
                   </div>

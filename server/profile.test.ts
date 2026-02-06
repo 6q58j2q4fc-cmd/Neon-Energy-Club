@@ -16,8 +16,8 @@ vi.mock("./db", () => ({
     postalCode: "10001",
     country: "USA",
     role: "user",
-    createdAt: new Date(),
-    lastSignedIn: new Date(),
+    createdAt: new Date().toISOString(),
+    lastSignedIn: new Date().toISOString(),
   }),
 }));
 

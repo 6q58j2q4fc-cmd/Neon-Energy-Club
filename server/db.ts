@@ -135,7 +135,7 @@ export async function createEmailVerification(userId: number): Promise<{ token: 
     .set({
       emailVerificationToken: token,
       emailVerificationExpiry: expiresAt,
-      emailVerified: false,
+      emailVerified: 0,
     })
     .where(eq(users.id, userId));
 
@@ -164,14 +164,14 @@ export async function verifyEmailToken(token: string): Promise<{ success: boolea
   const user = result[0];
 
   // Check if token has expired
-  if (user.emailVerificationExpiry && new Date() > user.emailVerificationExpiry) {
+  if (user.emailVerificationExpiry && new Date().toISOString() > user.emailVerificationExpiry) {
     return { success: false, error: "Verification token has expired" };
   }
 
   // Mark email as verified and clear token
   await db.update(users)
     .set({
-      emailVerified: true,
+      emailVerified: 1,
       emailVerificationToken: null,
       emailVerificationExpiry: null,
     })
@@ -211,7 +211,7 @@ export async function isEmailVerified(userId: number): Promise<boolean> {
     .where(eq(users.id, userId))
     .limit(1);
 
-  return result.length > 0 ? result[0].emailVerified : false;
+  return result.length > 0 ? result[0].emailVerified : 0;
 }
 
 /**
@@ -304,8 +304,8 @@ export async function createSmsVerification(userId: number, phoneNumber: string)
       smsVerificationCode: code,
       smsVerificationExpiry: expiresAt,
       smsVerificationAttempts: newAttempts,
-      lastSmsSentAt: new Date(),
-      phoneVerified: false,
+      lastSmsSentAt: new Date().toISOString(),
+      phoneVerified: 0,
     })
     .where(eq(users.id, userId));
 
@@ -339,14 +339,14 @@ export async function verifySmsCode(userId: number, code: string): Promise<{ suc
   }
 
   // Check if code has expired
-  if (user.smsVerificationExpiry && new Date() > user.smsVerificationExpiry) {
+  if (user.smsVerificationExpiry && new Date().toISOString() > user.smsVerificationExpiry) {
     return { success: false, error: "Verification code has expired. Please request a new one." };
   }
 
   // Mark phone as verified and clear code
   await db.update(users)
     .set({
-      phoneVerified: true,
+      phoneVerified: 1,
       smsVerificationCode: null,
       smsVerificationExpiry: null,
       smsVerificationAttempts: 0,
@@ -370,7 +370,7 @@ export async function isPhoneVerified(userId: number): Promise<boolean> {
     .where(eq(users.id, userId))
     .limit(1);
 
-  return result.length > 0 ? result[0].phoneVerified : false;
+  return result.length > 0 ? result[0].phoneVerified : 0;
 }
 
 /**
@@ -746,7 +746,7 @@ export async function subscribeNewsletter(input: { email: string; name: string }
     discountTier: 1, // Base tier for email signup
     referralCount: 0,
     couponCode,
-    couponUsed: false,
+    couponUsed: 0,
     status: "active",
   });
   
@@ -829,7 +829,7 @@ export async function addNewsletterReferrals(subscriptionId: number, friendEmail
         discountTier: 1,
         referralCount: 0,
         couponCode: friendCouponCode,
-        couponUsed: false,
+        couponUsed: 0,
         status: "active",
       });
       addedCount++;
@@ -925,8 +925,8 @@ export async function redeemCouponCode(couponCode: string, orderId: number) {
   // Mark coupon as used
   await db.update(newsletterSubscriptions)
     .set({
-      couponUsed: true,
-      couponUsedAt: new Date(),
+      couponUsed: 1,
+      couponUsedAt: new Date().toISOString(),
       couponUsedOrderId: orderId,
     })
     .where(eq(newsletterSubscriptions.couponCode, normalizedCode));
@@ -2683,7 +2683,7 @@ export async function getDistributorGenealogy(userId: number, maxDepth: number =
       teamSales: distributors.teamSales,
       leftLegVolume: distributors.leftLegVolume,
       rightLegVolume: distributors.rightLegVolume,
-      monthlyPV: distributors.monthlyPV,
+      monthlyPv: distributors.monthlyPv,
       isActive: distributors.isActive,
       placementPosition: distributors.placementPosition,
       createdAt: distributors.createdAt,
@@ -2726,7 +2726,7 @@ export async function getDistributorGenealogy(userId: number, maxDepth: number =
       teamSales: distributor.teamSales,
       leftLegVolume: distributor.leftLegVolume,
       rightLegVolume: distributor.rightLegVolume,
-      monthlyPV: distributor.monthlyPV,
+      monthlyPv: distributor.monthlyPv,
       isActive: distributor.isActive,
     },
     tree,
@@ -2815,7 +2815,7 @@ export async function getDistributorActivityStatus(userId: number) {
   
   const activeDownlineCount = activeDownline[0]?.count || 0;
   const isActive = isDistributorActive(
-    distributor.monthlyPV,
+    distributor.monthlyPv,
     activeDownlineCount,
     ACTIVITY_REQUIREMENTS.MIN_DOWNLINE_PV
   );
@@ -2823,10 +2823,10 @@ export async function getDistributorActivityStatus(userId: number) {
   return {
     isActive,
     requirements: {
-      monthlyPV: {
+      monthlyPv: {
         required: ACTIVITY_REQUIREMENTS.MIN_MONTHLY_PV,
-        current: distributor.monthlyPV,
-        met: distributor.monthlyPV >= ACTIVITY_REQUIREMENTS.MIN_MONTHLY_PV,
+        current: distributor.monthlyPv,
+        met: distributor.monthlyPv >= ACTIVITY_REQUIREMENTS.MIN_MONTHLY_PV,
         description: "Monthly order of at least 2x 24-packs of NEON (48 PV)",
       },
       activeDownline: {
@@ -2912,7 +2912,7 @@ export async function listAllDistributors(options?: {
     teamSales: distributors.teamSales,
     totalEarnings: distributors.totalEarnings,
     availableBalance: distributors.availableBalance,
-    monthlyPV: distributors.monthlyPV,
+    monthlyPv: distributors.monthlyPv,
     isActive: distributors.isActive,
     status: distributors.status,
     createdAt: distributors.createdAt,
@@ -2943,7 +2943,7 @@ export async function listAllDistributors(options?: {
       teamSales: distributors.teamSales,
       totalEarnings: distributors.totalEarnings,
       availableBalance: distributors.availableBalance,
-      monthlyPV: distributors.monthlyPV,
+      monthlyPv: distributors.monthlyPv,
       isActive: distributors.isActive,
       status: distributors.status,
       createdAt: distributors.createdAt,
@@ -3498,8 +3498,8 @@ export async function recordRankChange(data: {
   distributorId: number;
   previousRank: string;
   newRank: string;
-  personalPVAtChange: number;
-  teamPVAtChange: number;
+  personalPvAtChange: number;
+  teamPvAtChange: number;
 }): Promise<number | null> {
   const db = await getDb();
   if (!db) return null;
@@ -3508,9 +3508,9 @@ export async function recordRankChange(data: {
     distributorId: data.distributorId,
     previousRank: data.previousRank,
     newRank: data.newRank,
-    personalPVAtChange: data.personalPVAtChange,
-    teamPVAtChange: data.teamPVAtChange,
-    notificationSent: false,
+    personalPvAtChange: data.personalPvAtChange,
+    teamPvAtChange: data.teamPvAtChange,
+    notificationSent: 0,
   });
   
   return result[0]?.insertId || null;
@@ -3537,7 +3537,7 @@ export async function markRankNotificationSent(historyId: number): Promise<void>
   if (!db) return;
   
   await db.update(rankHistory)
-    .set({ notificationSent: true })
+    .set({ notificationSent: 1 })
     .where(eq(rankHistory.id, historyId));
 }
 
@@ -3550,7 +3550,7 @@ export async function getPendingRankNotifications() {
   
   return db.select()
     .from(rankHistory)
-    .where(eq(rankHistory.notificationSent, false))
+    .where(eq(rankHistory.notificationSent, 0))
     .orderBy(desc(rankHistory.achievedAt));
 }
 
@@ -3577,7 +3577,7 @@ export async function createNotification(data: {
     title: data.title,
     message: data.message,
     data: data.data ? JSON.stringify(data.data) : null,
-    isRead: false,
+    isRead: 0,
   });
   
   return result[0]?.insertId || null;
@@ -3608,7 +3608,7 @@ export async function getUnreadNotificationCount(userId: number): Promise<number
     .from(notifications)
     .where(and(
       eq(notifications.userId, userId),
-      eq(notifications.isRead, false)
+      eq(notifications.isRead, 0)
     ));
   
   return result[0]?.count || 0;
@@ -3622,7 +3622,7 @@ export async function markNotificationRead(notificationId: number): Promise<void
   if (!db) return;
   
   await db.update(notifications)
-    .set({ isRead: true, readAt: new Date() })
+    .set({ isRead: 1, readAt: new Date().toISOString() })
     .where(eq(notifications.id, notificationId));
 }
 
@@ -3634,10 +3634,10 @@ export async function markAllNotificationsRead(userId: number): Promise<void> {
   if (!db) return;
   
   await db.update(notifications)
-    .set({ isRead: true, readAt: new Date() })
+    .set({ isRead: 1, readAt: new Date().toISOString() })
     .where(and(
       eq(notifications.userId, userId),
-      eq(notifications.isRead, false)
+      eq(notifications.isRead, 0)
     ));
 }
 
@@ -3671,7 +3671,7 @@ export async function getLeaderboardByRank(limit = 50) {
     rank: distributors.rank,
     personalSales: distributors.personalSales,
     teamSales: distributors.teamSales,
-    monthlyPV: distributors.monthlyPV,
+    monthlyPv: distributors.monthlyPv,
     isActive: distributors.isActive,
     createdAt: distributors.createdAt,
   })
@@ -3694,7 +3694,7 @@ export async function getLeaderboardByTeamVolume(limit = 50) {
     rank: distributors.rank,
     personalSales: distributors.personalSales,
     teamSales: distributors.teamSales,
-    monthlyPV: distributors.monthlyPV,
+    monthlyPv: distributors.monthlyPv,
     leftLegVolume: distributors.leftLegVolume,
     rightLegVolume: distributors.rightLegVolume,
     isActive: distributors.isActive,
@@ -3718,11 +3718,11 @@ export async function getLeaderboardByMonthlyPV(limit = 50) {
     rank: distributors.rank,
     personalSales: distributors.personalSales,
     teamSales: distributors.teamSales,
-    monthlyPV: distributors.monthlyPV,
+    monthlyPv: distributors.monthlyPv,
     isActive: distributors.isActive,
   })
     .from(distributors)
-    .orderBy(desc(distributors.monthlyPV))
+    .orderBy(desc(distributors.monthlyPv))
     .limit(limit);
 }
 
@@ -3779,7 +3779,7 @@ export async function generateCustomerReferralCode(userId: number): Promise<stri
     code,
     usageCount: 0,
     successfulReferrals: 0,
-    isActive: true,
+    isActive: 1,
   });
 
   return code;
@@ -3855,7 +3855,7 @@ export async function recordCustomerReferral(
     referrerId,
     referredId,
     referralCode,
-    purchaseCompleted: false,
+    purchaseCompleted: 0,
   });
 
   // Update usage count
@@ -3895,7 +3895,7 @@ export async function completeCustomerReferral(
     .from(customerReferrals)
     .where(and(
       eq(customerReferrals.referredId, referredId),
-      eq(customerReferrals.purchaseCompleted, false)
+      eq(customerReferrals.purchaseCompleted, 0)
     ))
     .limit(1);
 
@@ -3904,7 +3904,7 @@ export async function completeCustomerReferral(
   // Update the referral
   await db.update(customerReferrals)
     .set({
-      purchaseCompleted: true,
+      purchaseCompleted: 1,
       orderId,
       purchaseAmount,
       purchaseCompletedAt: new Date(),
@@ -4194,7 +4194,7 @@ export async function redeemDistributorRewardWithShipping(
   await db.update(distributorFreeRewards)
     .set({
       status: "shipped",
-      shippedAt: new Date(),
+      shippedAt: new Date().toISOString(),
     })
     .where(and(
       eq(distributorFreeRewards.id, rewardId),
@@ -4553,8 +4553,8 @@ export async function savePushSubscription(data: {
         p256dh: data.p256dh,
         auth: data.auth,
         userAgent: data.userAgent || null,
-        isActive: true,
-        updatedAt: new Date(),
+        isActive: 1,
+        updatedAt: new Date().toISOString(),
       })
       .where(eq(pushSubscriptions.id, existing[0].id));
     return existing[0].id;
@@ -4567,7 +4567,7 @@ export async function savePushSubscription(data: {
     p256dh: data.p256dh,
     auth: data.auth,
     userAgent: data.userAgent || null,
-    isActive: true,
+    isActive: 1,
   });
 
   return result[0]?.insertId || null;
@@ -4584,7 +4584,7 @@ export async function getUserPushSubscriptions(userId: number) {
     .from(pushSubscriptions)
     .where(and(
       eq(pushSubscriptions.userId, userId),
-      eq(pushSubscriptions.isActive, true)
+      eq(pushSubscriptions.isActive, 1)
     ));
 }
 
@@ -4607,7 +4607,7 @@ export async function getDistributorPushSubscriptions() {
   })
     .from(pushSubscriptions)
     .innerJoin(distributors, eq(pushSubscriptions.userId, distributors.userId))
-    .where(eq(pushSubscriptions.isActive, true));
+    .where(eq(pushSubscriptions.isActive, 1));
 
   return results;
 }
@@ -4620,7 +4620,7 @@ export async function deactivatePushSubscription(endpoint: string): Promise<void
   if (!db) return;
 
   await db.update(pushSubscriptions)
-    .set({ isActive: false })
+    .set({ isActive: 0 })
     .where(eq(pushSubscriptions.endpoint, endpoint));
 }
 
@@ -4794,7 +4794,7 @@ export async function upsertUserProfile(data: {
         twitter: data.twitter || null,
         youtube: data.youtube || null,
         linkedin: data.linkedin || null,
-        updatedAt: new Date(),
+        updatedAt: new Date().toISOString(),
       })
       .where(eq(userProfiles.id, existing[0].id));
     return existing[0].id;
@@ -4815,7 +4815,7 @@ export async function upsertUserProfile(data: {
     youtube: data.youtube || null,
     linkedin: data.linkedin || null,
     userType: data.userType,
-    isPublished: true,
+    isPublished: 1,
   });
 
   return result[0]?.insertId || null;
@@ -4844,7 +4844,7 @@ export async function updateUserSlug(userId: number, newSlug: string): Promise<b
 
   if (existing[0]) {
     await db.update(userProfiles)
-      .set({ customSlug: normalizedSlug, updatedAt: new Date() })
+      .set({ customSlug: normalizedSlug, updatedAt: new Date().toISOString() })
       .where(eq(userProfiles.id, existing[0].id));
     return true;
   }
@@ -4866,7 +4866,7 @@ export async function updateProfilePhoto(userId: number, photoUrl: string): Prom
 
   if (existing[0]) {
     await db.update(userProfiles)
-      .set({ profilePhotoUrl: photoUrl, updatedAt: new Date() })
+      .set({ profilePhotoUrl: photoUrl, updatedAt: new Date().toISOString() })
       .where(eq(userProfiles.id, existing[0].id));
     return true;
   }
@@ -4975,7 +4975,7 @@ export async function getAllProfiles(limit = 50, offset = 0) {
 
   return db.select()
     .from(userProfiles)
-    .where(eq(userProfiles.isPublished, true))
+    .where(eq(userProfiles.isPublished, 1))
     .orderBy(desc(userProfiles.createdAt))
     .limit(limit)
     .offset(offset);
@@ -5073,7 +5073,7 @@ export async function updatePersonalizedProfile(userId: number, data: {
       displayName: data.displayName || undefined,
       bio: data.bio || undefined,
       location: data.location || undefined,
-      updatedAt: new Date(),
+      updatedAt: new Date().toISOString(),
     })
     .where(eq(userProfiles.id, existing[0].id));
   
@@ -5537,7 +5537,7 @@ export async function getPublicLeaderboard(limit: number = 10) {
       username: distributors.username,
       rank: distributors.rank,
       teamSales: distributors.teamSales,
-      monthlyPV: distributors.monthlyPV,
+      monthlyPv: distributors.monthlyPv,
       totalEarnings: distributors.totalEarnings,
       leftLegVolume: distributors.leftLegVolume,
       rightLegVolume: distributors.rightLegVolume,
@@ -5549,7 +5549,7 @@ export async function getPublicLeaderboard(limit: number = 10) {
       .orderBy(
         desc(distributors.totalEarnings),
         desc(distributors.teamSales),
-        desc(distributors.monthlyPV)
+        desc(distributors.monthlyPv)
       )
       .limit(limit);
     
@@ -5573,7 +5573,7 @@ export async function getPublicLeaderboard(limit: number = 10) {
           location: profile?.location || null,
           rank: dist.rank || 'starter',
           teamSize: dist.activeDownlineCount || 0,
-          monthlyVolume: dist.monthlyPV || 0,
+          monthlyVolume: dist.monthlyPv || 0,
           // Don't expose exact earnings, show tier instead
           earningsTier: getEarningsTier(dist.totalEarnings || 0),
         };
@@ -5977,7 +5977,7 @@ export async function updateNotificationPreferences(
       .update(notificationPreferences)
       .set({
         ...preferences,
-        updatedAt: new Date(),
+        updatedAt: new Date().toISOString(),
       })
       .where(eq(notificationPreferences.userId, userId));
   } else {
@@ -6030,7 +6030,7 @@ export async function addToDigestQueue(data: {
     title: data.title,
     content: data.content,
     relatedId: data.relatedId || null,
-    processed: false,
+    processed: 0,
   });
 
   return { id: Number(result[0].insertId) };
@@ -6049,7 +6049,7 @@ export async function getPendingDigestItems(userId: number) {
     .where(
       and(
         eq(emailDigestQueue.userId, userId),
-        eq(emailDigestQueue.processed, false)
+        eq(emailDigestQueue.processed, 0)
       )
     )
     .orderBy(emailDigestQueue.createdAt);
@@ -6065,7 +6065,7 @@ export async function markDigestItemsProcessed(itemIds: number[]) {
   for (const id of itemIds) {
     await db
       .update(emailDigestQueue)
-      .set({ processed: true })
+      .set({ processed: 1 })
       .where(eq(emailDigestQueue.id, id));
   }
 }
@@ -6298,7 +6298,7 @@ export async function getExpiringReservations(hoursBeforeExpiry: number = 6) {
   return await db.select().from(territoryReservations)
     .where(and(
       eq(territoryReservations.status, "active"),
-      eq(territoryReservations.reminderSent, false),
+      eq(territoryReservations.reminderSent, 0),
       lt(territoryReservations.expiresAt, threshold),
       gt(territoryReservations.expiresAt, now)
     ));
@@ -6312,7 +6312,7 @@ export async function markReservationReminderSent(reservationId: number) {
   if (!db) throw new Error("Database not available");
   
   await db.update(territoryReservations)
-    .set({ reminderSent: true })
+    .set({ reminderSent: 1 })
     .where(eq(territoryReservations.id, reservationId));
   
   return { success: true };
@@ -6389,8 +6389,8 @@ export async function enableMfa(userId: number) {
   
   await db.update(mfaSettings)
     .set({
-      isEnabled: true,
-      lastVerifiedAt: new Date(),
+      isEnabled: 1,
+      lastVerifiedAt: new Date().toISOString(),
     })
     .where(eq(mfaSettings.userId, userId));
   
@@ -6406,7 +6406,7 @@ export async function disableMfa(userId: number) {
   
   await db.update(mfaSettings)
     .set({
-      isEnabled: false,
+      isEnabled: 0,
       totpSecret: '',
       backupCodes: null,
       backupCodesRemaining: 0,
@@ -6481,7 +6481,7 @@ export async function recordMfaVerification(userId: number) {
   
   await db.update(mfaSettings)
     .set({
-      lastVerifiedAt: new Date(),
+      lastVerifiedAt: new Date().toISOString(),
       failedAttempts: 0,
     })
     .where(eq(mfaSettings.userId, userId));
@@ -6623,7 +6623,7 @@ export async function completeMfaRecovery(recoveryId: number, userId: number) {
   // Disable MFA for the user
   await db.update(mfaSettings)
     .set({
-      isEnabled: false,
+      isEnabled: 0,
       totpSecret: '',
       backupCodes: null,
       backupCodesRemaining: 0,
@@ -6743,7 +6743,7 @@ export async function getVendingAlerts(userId: number, machineId?: number, unack
   }
   
   if (unacknowledgedOnly) {
-    conditions.push(eq(vendingAlerts.acknowledged, false));
+    conditions.push(eq(vendingAlerts.acknowledged, 0));
   }
   
   return await db.select().from(vendingAlerts)
@@ -6761,9 +6761,9 @@ export async function acknowledgeVendingAlert(alertId: number, userId: number) {
   
   await db.update(vendingAlerts)
     .set({
-      acknowledged: true,
+      acknowledged: 1,
       acknowledgedBy: userId,
-      acknowledgedAt: new Date(),
+      acknowledgedAt: new Date().toISOString(),
     })
     .where(eq(vendingAlerts.id, alertId));
   
@@ -6873,7 +6873,7 @@ export async function getVendingDashboardSummary(userId: number) {
     .from(vendingAlerts)
     .where(and(
       sql`${vendingAlerts.machineId} IN (${sql.join(machineIds.map(id => sql`${id}`), sql`, `)})`,
-      eq(vendingAlerts.acknowledged, false)
+      eq(vendingAlerts.acknowledged, 0)
     ));
   const activeAlerts = alertsResult[0]?.count || 0;
   

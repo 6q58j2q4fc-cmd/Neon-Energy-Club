@@ -127,7 +127,7 @@ describe("Replicated Website System", () => {
         affiliateCode: "DIST123ABC-ABC123",
         status: "active",
         provisioningStatus: "verified",
-        lastVerifiedAt: new Date(),
+        lastVerifiedAt: new Date().toISOString(),
       };
       
       expect(websiteRecord.distributorId).toBeGreaterThan(0);

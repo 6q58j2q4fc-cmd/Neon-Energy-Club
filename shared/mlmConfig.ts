@@ -212,12 +212,12 @@ export const BREAKAGE_CONFIG = {
 
 // Calculate if distributor is active
 export function isDistributorActive(
-  monthlyPV: number,
+  monthlyPv: number,
   activeDownlineCount: number,
   downlineMinPV: number
 ): boolean {
   return (
-    monthlyPV >= ACTIVITY_REQUIREMENTS.MIN_MONTHLY_PV &&
+    monthlyPv >= ACTIVITY_REQUIREMENTS.MIN_MONTHLY_PV &&
     activeDownlineCount >= ACTIVITY_REQUIREMENTS.MIN_ACTIVE_DOWNLINE
   );
 }

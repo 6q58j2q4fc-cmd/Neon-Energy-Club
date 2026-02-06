@@ -1298,3 +1298,35 @@ export const charityImpactTracking = mysqlTable("charity_impact_tracking", {
 	index("charity_impact_tracking_distributorId_idx").on(table.distributorId),
 	index("charity_impact_tracking_periodStart_idx").on(table.periodStart),
 ]);
+
+
+// Type exports for Insert operations
+export type User = typeof users.$inferSelect;
+export type InsertTerritoryLicense = typeof territoryLicenses.$inferInsert;
+export type InsertCrowdfunding = typeof crowdfunding.$inferInsert;
+export type InsertNewsletterSubscription = typeof newsletterSubscriptions.$inferInsert;
+export type InsertTerritoryApplication = typeof territoryApplications.$inferInsert;
+export type InsertDistributorAutoship = typeof distributorAutoships.$inferInsert;
+export type InsertAutoshipItem = typeof autoshipItems.$inferInsert;
+export type InsertAutoshipOrder = typeof autoshipOrders.$inferInsert;
+export type InsertPayoutSetting = typeof payoutSettings.$inferInsert;
+export type InsertNotificationPreference = typeof notificationPreferences.$inferInsert;
+export type InsertEmailDigestQueueItem = typeof emailDigestQueue.$inferInsert;
+export type InsertMfaRecoveryRequest = typeof mfaRecoveryRequests.$inferInsert;
+export type InsertPayoutRequest = typeof payoutRequests.$inferInsert;
+export type InsertNotification = typeof notifications.$inferInsert;
+export type InsertCustomerReferral = typeof customerReferrals.$inferInsert;
+export type InsertCustomerReward = typeof customerRewards.$inferInsert;
+export type InsertCustomerReferralCode = typeof customerReferralCodes.$inferInsert;
+export type InsertDistributorRewardPoint = typeof distributorRewardPoints.$inferInsert;
+export type InsertDistributorFreeReward = typeof distributorFreeRewards.$inferInsert;
+export type InsertRewardRedemption = typeof rewardRedemptions.$inferInsert;
+export type InsertVendingApplication = typeof vendingApplications.$inferInsert;
+export type InsertFranchiseApplication = typeof franchiseApplications.$inferInsert;
+export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert;
+export type InsertUserProfile = typeof userProfiles.$inferInsert;
+export type InsertAffiliateLink = typeof affiliateLinks.$inferInsert;
+export type InsertRankHistory = typeof rankHistory.$inferInsert;
+export type InsertEmailDigestQueue = typeof emailDigestQueue.$inferInsert;
+export type InsertVendingAlert = typeof vendingAlerts.$inferInsert;
+export type InsertMfaSetting = typeof mfaSettings.$inferInsert;

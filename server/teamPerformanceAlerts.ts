@@ -136,7 +136,7 @@ export async function checkVolumeThreshold(
   if (!distributor) return null;
   
   const currentVolume = volumeType === "personal" 
-    ? distributor.totalPV || 0
+    ? distributor.totalPv || 0
     : distributor.teamVolume || 0;
   
   // Check if just crossed threshold (within 10% margin)

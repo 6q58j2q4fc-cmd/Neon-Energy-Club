@@ -115,7 +115,7 @@ export async function registerNativeUser(data: {
       loginMethod: "native",
       emailVerificationToken,
       emailVerificationExpiry,
-      emailVerified: false,
+      emailVerified: 0,
     });
     
     const userId = result[0].insertId;
@@ -232,7 +232,7 @@ export async function resetPassword(
   const user = userResults[0];
   
   // Check token expiry
-  if (!user.passwordResetExpiry || new Date() > user.passwordResetExpiry) {
+  if (!user.passwordResetExpiry || new Date().toISOString() > user.passwordResetExpiry) {
     return { success: false, error: "Reset token has expired" };
   }
   
@@ -275,14 +275,14 @@ export async function verifyEmail(token: string): Promise<{ success: boolean; er
   const user = userResults[0];
   
   // Check token expiry
-  if (!user.emailVerificationExpiry || new Date() > user.emailVerificationExpiry) {
+  if (!user.emailVerificationExpiry || new Date().toISOString() > user.emailVerificationExpiry) {
     return { success: false, error: "Verification token has expired" };
   }
   
   // Mark email as verified
   await db.update(users)
     .set({
-      emailVerified: true,
+      emailVerified: 1,
       emailVerificationToken: null,
       emailVerificationExpiry: null,
     })

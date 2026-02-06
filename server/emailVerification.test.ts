@@ -137,7 +137,7 @@ describe('Email Verification Functions', () => {
         id: 1,
         name: 'Test User',
         email: 'test@example.com',
-        emailVerified: false,
+        emailVerified: 0,
         emailVerificationToken: 'valid-token',
         emailVerificationExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000),
       };

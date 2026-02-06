@@ -18,7 +18,7 @@ interface TreeNode {
   teamSales: number;
   leftLegVolume: number;
   rightLegVolume: number;
-  monthlyPV: number;
+  monthlyPv: number;
   isActive: number;
   placementPosition?: string | null;
   depth: number;
@@ -37,7 +37,7 @@ interface GenealogyData {
     teamSales: number;
     leftLegVolume: number;
     rightLegVolume: number;
-    monthlyPV: number;
+    monthlyPv: number;
     isActive: number;
   };
   tree: TreeNode[];
@@ -64,7 +64,7 @@ const SAMPLE_TREE_DATA: GenealogyData = {
     teamSales: 1500000,
     leftLegVolume: 750000,
     rightLegVolume: 650000,
-    monthlyPV: 500,
+    monthlyPv: 500,
     isActive: 1,
   },
   tree: [
@@ -79,7 +79,7 @@ const SAMPLE_TREE_DATA: GenealogyData = {
       teamSales: 450000,
       leftLegVolume: 200000,
       rightLegVolume: 180000,
-      monthlyPV: 300,
+      monthlyPv: 300,
       isActive: 1,
       placementPosition: "left",
       depth: 1,
@@ -96,7 +96,7 @@ const SAMPLE_TREE_DATA: GenealogyData = {
           teamSales: 120000,
           leftLegVolume: 50000,
           rightLegVolume: 45000,
-          monthlyPV: 150,
+          monthlyPv: 150,
           isActive: 1,
           placementPosition: "left",
           depth: 2,
@@ -113,7 +113,7 @@ const SAMPLE_TREE_DATA: GenealogyData = {
               teamSales: 25000,
               leftLegVolume: 0,
               rightLegVolume: 0,
-              monthlyPV: 50,
+              monthlyPv: 50,
               isActive: 1,
               placementPosition: "left",
               depth: 3,
@@ -133,7 +133,7 @@ const SAMPLE_TREE_DATA: GenealogyData = {
           teamSales: 80000,
           leftLegVolume: 0,
           rightLegVolume: 0,
-          monthlyPV: 160,
+          monthlyPv: 160,
           isActive: 1,
           placementPosition: "right",
           depth: 2,
@@ -153,7 +153,7 @@ const SAMPLE_TREE_DATA: GenealogyData = {
       teamSales: 600000,
       leftLegVolume: 300000,
       rightLegVolume: 250000,
-      monthlyPV: 400,
+      monthlyPv: 400,
       isActive: 1,
       placementPosition: "right",
       depth: 1,
@@ -170,7 +170,7 @@ const SAMPLE_TREE_DATA: GenealogyData = {
           teamSales: 200000,
           leftLegVolume: 80000,
           rightLegVolume: 70000,
-          monthlyPV: 240,
+          monthlyPv: 240,
           isActive: 1,
           placementPosition: "left",
           depth: 2,
@@ -188,7 +188,7 @@ const SAMPLE_TREE_DATA: GenealogyData = {
           teamSales: 60000,
           leftLegVolume: 0,
           rightLegVolume: 0,
-          monthlyPV: 120,
+          monthlyPv: 120,
           isActive: 0,
           placementPosition: "right",
           depth: 2,
@@ -327,7 +327,7 @@ function TreeNodeCard({
           <div className="mt-2 grid grid-cols-2 gap-1 text-[10px]">
             <div className="text-center">
               <div className="text-gray-500">PV</div>
-              <div className="text-white font-medium">{node.monthlyPV}</div>
+              <div className="text-white font-medium">{node.monthlyPv}</div>
             </div>
             <div className="text-center">
               <div className="text-gray-500">Team</div>
@@ -736,7 +736,7 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true, sh
         teamSales: distributor.teamSales || 0,
         leftLegVolume: distributor.leftLegVolume || 0,
         rightLegVolume: distributor.rightLegVolume || 0,
-        monthlyPV: distributor.monthlyPV || 0,
+        monthlyPv: distributor.monthlyPv || 0,
         isActive: distributor.isActive || 0,
         placementPosition: distributor.placementPosition,
         depth: 0,
@@ -787,18 +787,18 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true, sh
               <div className="p-4 bg-black/50 rounded-lg border border-[#c8ff00]/20">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-gray-400">Monthly PV</span>
-                  <Badge variant={activityStatus.requirements.monthlyPV.met ? "default" : "outline"} className={activityStatus.requirements.monthlyPV.met ? "bg-green-500/20 text-green-400 border-green-500" : "border-red-500 text-red-400"}>
-                    {activityStatus.requirements.monthlyPV.met ? "✓ Met" : "Not Met"}
+                  <Badge variant={activityStatus.requirements.monthlyPv.met ? "default" : "outline"} className={activityStatus.requirements.monthlyPv.met ? "bg-green-500/20 text-green-400 border-green-500" : "border-red-500 text-red-400"}>
+                    {activityStatus.requirements.monthlyPv.met ? "✓ Met" : "Not Met"}
                   </Badge>
                 </div>
                 <div className="text-2xl font-bold text-white">
-                  {activityStatus.requirements.monthlyPV.current} / {activityStatus.requirements.monthlyPV.required} PV
+                  {activityStatus.requirements.monthlyPv.current} / {activityStatus.requirements.monthlyPv.required} PV
                 </div>
                 <Progress 
-                  value={Math.min(100, (activityStatus.requirements.monthlyPV.current / activityStatus.requirements.monthlyPV.required) * 100)} 
+                  value={Math.min(100, (activityStatus.requirements.monthlyPv.current / activityStatus.requirements.monthlyPv.required) * 100)} 
                   className="h-2 mt-2"
                 />
-                <p className="text-xs text-gray-500 mt-2">{activityStatus.requirements.monthlyPV.description}</p>
+                <p className="text-xs text-gray-500 mt-2">{activityStatus.requirements.monthlyPv.description}</p>
               </div>
               
               {/* Active Downline Requirement */}
@@ -1014,7 +1014,7 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true, sh
                         teamSales: treeData.distributor.teamSales,
                         leftLegVolume: treeData.distributor.leftLegVolume,
                         rightLegVolume: treeData.distributor.rightLegVolume,
-                        monthlyPV: treeData.distributor.monthlyPV,
+                        monthlyPv: treeData.distributor.monthlyPv,
                         isActive: treeData.distributor.isActive,
                         placementPosition: null,
                         depth: 0,
@@ -1034,7 +1034,7 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true, sh
                         teamSales: treeData.distributor.teamSales,
                         leftLegVolume: treeData.distributor.leftLegVolume,
                         rightLegVolume: treeData.distributor.rightLegVolume,
-                        monthlyPV: treeData.distributor.monthlyPV,
+                        monthlyPv: treeData.distributor.monthlyPv,
                         isActive: treeData.distributor.isActive,
                         placementPosition: null,
                         depth: 0,
@@ -1118,7 +1118,7 @@ export default function GenealogyTree({ rootDistributor, team, useApi = true, sh
                 <div className="text-sm text-gray-400 mb-1">Monthly PV</div>
                 <div className="flex items-center gap-2">
                   <Target className="w-5 h-5 text-[#c8ff00]" />
-                  <span className="text-xl font-bold">{selectedNode.monthlyPV}</span>
+                  <span className="text-xl font-bold">{selectedNode.monthlyPv}</span>
                 </div>
               </div>
               <div>

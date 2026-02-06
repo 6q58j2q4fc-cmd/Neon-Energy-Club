@@ -39,7 +39,7 @@ function convertGenealogyToTeamMember(data: any, position: "left" | "right" | "r
     name: data.name || data.username || "Team Member",
     rank: (data.rank || "starter").toUpperCase(),
     position,
-    personalVolume: data.personalSales || data.monthlyPV || 0,
+    personalVolume: data.personalSales || data.monthlyPv || 0,
     teamVolume: data.teamSales || (data.leftLegVolume || 0) + (data.rightLegVolume || 0),
     leftChild: leftChild ? convertGenealogyToTeamMember(leftChild, "left") : null,
     rightChild: rightChild ? convertGenealogyToTeamMember(rightChild, "right") : null,

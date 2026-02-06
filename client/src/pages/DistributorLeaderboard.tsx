@@ -149,7 +149,7 @@ export default function DistributorLeaderboard() {
               {type === "pv" && (
                 <div>
                   <div className="text-lg font-bold text-[#39FF14]">
-                    {distributor.monthlyPV?.toLocaleString() || 0} PV
+                    {distributor.monthlyPv?.toLocaleString() || 0} PV
                   </div>
                   <div className="text-xs text-zinc-400">This Month</div>
                 </div>

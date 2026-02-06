@@ -151,10 +151,10 @@ export async function updateNotificationPreferences(
   // await db.insert(notificationPreferences).values({
   //   distributorId,
   //   ...preferences,
-  //   updatedAt: new Date()
+  //   updatedAt: new Date().toISOString()
   // }).onDuplicateKeyUpdate({
   //   ...preferences,
-  //   updatedAt: new Date()
+  //   updatedAt: new Date().toISOString()
   // });
 }
 

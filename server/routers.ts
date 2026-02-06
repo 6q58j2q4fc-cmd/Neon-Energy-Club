@@ -596,7 +596,7 @@ export const appRouter = router({
           imageUrl: nft.imageUrl,
           rarity: nft.rarity || 'Common',
           theme: nft.theme,
-          createdAt: nft.createdAt?.toISOString() || new Date().toISOString(),
+          createdAt: nft.createdAt || new Date().toISOString(),
         }));
         
         return {
@@ -1303,9 +1303,9 @@ export const appRouter = router({
             taxId: encryptedTaxId,
             taxIdType: input.taxIdType,
             ssnLast4: taxIdLast4,
-            taxInfoCompleted: true,
+            taxInfoCompleted: 1,
             taxInfoCompletedAt: new Date(),
-            w9Submitted: true,
+            w9Submitted: 1,
             w9SubmittedAt: new Date(),
           })
           .where(eq(distributors.id, distributor.id));
@@ -1358,7 +1358,7 @@ export const appRouter = router({
         return await db
           .select()
           .from(enrollmentPackages)
-          .where(eq(enrollmentPackages.isActive, true));
+          .where(eq(enrollmentPackages.isActive, 1));
       }),
 
     // Select enrollment package
@@ -1450,7 +1450,7 @@ export const appRouter = router({
           teamSales: distributor.teamSales,
           leftLegVolume: distributor.leftLegVolume,
           rightLegVolume: distributor.rightLegVolume,
-          monthlyPV: distributor.monthlyPV,
+          monthlyPv: distributor.monthlyPv,
           totalDownline: stats.teamSize,
           activeDownline: activeDownline,
           commissionTotal: totalCommissions,
@@ -1463,7 +1463,7 @@ export const appRouter = router({
           rank: member.rank,
           personalSales: member.personalSales,
           teamSales: member.teamSales,
-          monthlyPV: member.monthlyPV,
+          monthlyPv: member.monthlyPv,
           isActive: member.isActive,
           joinDate: member.createdAt,
         }));
@@ -1488,7 +1488,7 @@ export const appRouter = router({
           rank: member.rank,
           personalSales: member.personalSales,
           teamSales: member.teamSales,
-          monthlyPV: member.monthlyPV,
+          monthlyPv: member.monthlyPv,
           isActive: member.isActive,
           joinDate: member.createdAt,
         }));
@@ -1519,7 +1519,7 @@ export const appRouter = router({
           teamSales: distributor.teamSales,
           leftLegVolume: distributor.leftLegVolume,
           rightLegVolume: distributor.rightLegVolume,
-          monthlyPV: distributor.monthlyPV,
+          monthlyPv: distributor.monthlyPv,
           totalDownline: stats.teamSize,
           activeDownline: activeDownline,
           commissionTotal: totalCommissions,
@@ -3826,7 +3826,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
             userType: 'distributor' as const,
             pageViews: 0,
             createdAt: new Date(distributorProfile.joinDate),
-            updatedAt: new Date(),
+            updatedAt: new Date().toISOString(),
             instagram: distributorProfile.instagram,
             tiktok: distributorProfile.tiktok,
             facebook: distributorProfile.facebook,
@@ -4643,7 +4643,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
         // Store the secret (not enabled yet)
         await createOrUpdateMfaSettings(ctx.user.id, {
           totpSecret: secret,
-          isEnabled: false,
+          isEnabled: 0,
         });
         
         return {
@@ -4918,7 +4918,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
         }
         
         // Check if token is expired
-        if (new Date() > recovery.tokenExpiry) {
+        if (new Date().toISOString() > recovery.tokenExpiry) {
           return { valid: false, reason: "Recovery token has expired" };
         }
         
@@ -4954,7 +4954,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
         const { getMfaRecoveryByToken, submitRecoveryVerification } = await import("./db");
         
         const recovery = await getMfaRecoveryByToken(input.token);
-        if (!recovery || new Date() > recovery.tokenExpiry) {
+        if (!recovery || new Date().toISOString() > recovery.tokenExpiry) {
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: "Invalid or expired recovery token",

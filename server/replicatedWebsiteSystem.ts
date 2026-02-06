@@ -81,7 +81,7 @@ export async function generateReplicatedSite(userId: number): Promise<Replicated
     await db.insert(userProfiles).values({
       userId,
       userType: 'distributor',
-      isPublished: true,
+      isPublished: 1,
       pageViews: 0,
       signupsGenerated: 0,
     });
@@ -169,7 +169,7 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
       siteId: distributorId,
       distributorCode: 'unknown',
       status: 'error',
-      issues: [{ type: 'data_drift', severity: 'critical', description: 'Database unavailable', autoFixed: false }],
+      issues: [{ type: 'data_drift', severity: 'critical', description: 'Database unavailable', autoFixed: 0 }],
       lastAuditedAt: new Date(),
     };
   }
@@ -184,7 +184,7 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
       siteId: distributorId,
       distributorCode: 'unknown',
       status: 'error',
-      issues: [{ type: 'data_drift', severity: 'critical', description: 'Distributor not found', autoFixed: false }],
+      issues: [{ type: 'data_drift', severity: 'critical', description: 'Distributor not found', autoFixed: 0 }],
       lastAuditedAt: new Date(),
     };
   }
@@ -209,7 +209,7 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
       type: 'missing_tracking',
       severity: 'medium',
       description: 'Missing affiliate link - auto-created',
-      autoFixed: true,
+      autoFixed: 1,
       fixDetails: `Created affiliate link with code ${distributor.distributorCode}`,
     });
   }
@@ -245,7 +245,7 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
       type: 'commission_error',
       severity: 'high',
       description: `Commission mismatch: expected ${expectedDirectCommissions}, actual ${actualDirectCommissions}`,
-      autoFixed: false,
+      autoFixed: 0,
     });
   }
 
@@ -259,7 +259,7 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
     await db.insert(userProfiles).values({
       userId: distributor.userId,
       userType: 'distributor',
-      isPublished: true,
+      isPublished: 1,
       pageViews: 0,
       signupsGenerated: 0,
     });
@@ -267,7 +267,7 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
       type: 'data_drift',
       severity: 'medium',
       description: 'Missing user profile - auto-created',
-      autoFixed: true,
+      autoFixed: 1,
     });
   }
 
@@ -281,7 +281,7 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
       type: 'data_drift',
       severity: 'low',
       description: 'Missing subdomain - auto-generated',
-      autoFixed: true,
+      autoFixed: 1,
       fixDetails: `Set subdomain to ${subdomain}`,
     });
   }

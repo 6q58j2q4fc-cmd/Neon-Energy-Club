@@ -22,7 +22,7 @@ vi.mock("./db", () => ({
       totalCost: 180000,
       financing: "full",
       status: "pending",
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     },
   ]),
   updateTerritoryLicenseStatus: vi.fn().mockResolvedValue(undefined),
@@ -35,7 +35,7 @@ vi.mock("./db", () => ({
       amount: 100,
       rewardTier: "ENERGIZER",
       status: "completed",
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     },
   ]),
   getCrowdfundingStats: vi.fn().mockResolvedValue({
@@ -68,9 +68,9 @@ function createAdminContext(): TrpcContext {
     name: "Admin User",
     loginMethod: "manus",
     role: "admin",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    lastSignedIn: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    lastSignedIn: new Date().toISOString(),
   };
 
   return {
@@ -93,9 +93,9 @@ function createUserContext(): TrpcContext {
     name: "Regular User",
     loginMethod: "manus",
     role: "user",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    lastSignedIn: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    lastSignedIn: new Date().toISOString(),
   };
 
   return {

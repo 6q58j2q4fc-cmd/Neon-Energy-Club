@@ -208,11 +208,11 @@ describe("Autoship and Payout Integration", () => {
       items: [
         { sku: "NEON-24PK-MIXED", quantity: 2, pvPerUnit: 24 },
       ],
-      totalPV: 48,
+      totalPv: 48,
       totalPrice: 14400, // $144.00
     };
     
-    expect(autoshipOrder.totalPV).toBe(48);
+    expect(autoshipOrder.totalPv).toBe(48);
     expect(autoshipOrder.totalPrice).toBe(14400);
   });
 

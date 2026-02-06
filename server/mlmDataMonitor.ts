@@ -68,7 +68,7 @@ export async function validateCommissions(distributorId: number): Promise<Integr
       affectedRecordId: distributorId,
       affectedTable: 'commissions',
       suggestedFix: `Recalculate commissions for distributor ${distributorId}`,
-      autoFixed: false,
+      autoFixed: 0,
     });
   }
   
@@ -121,7 +121,7 @@ export async function validateReferralTracking(): Promise<IntegrityIssue[]> {
         affectedRecordId: order.id,
         affectedTable: 'orders',
         suggestedFix: `Attribute order ${order.id} to referrer ${referral.referrerId}`,
-        autoFixed: false,
+        autoFixed: 0,
       });
     }
   }
@@ -163,7 +163,7 @@ export async function validateVolumeCalculations(distributorId: number): Promise
       affectedRecordId: distributorId,
       affectedTable: 'distributors',
       suggestedFix: `Update personal sales for distributor ${distributorId} to ${calculatedPersonalSales}`,
-      autoFixed: false,
+      autoFixed: 0,
     });
   }
   
@@ -203,7 +203,7 @@ export async function validateRankEligibility(distributorId: number): Promise<In
     const req = rankRequirements[nextRank];
     
     if (req && 
-        distributor.monthlyPV >= req.pv && 
+        distributor.monthlyPv >= req.pv && 
         distributor.activeDownlineCount >= req.teamSize &&
         distributor.teamSales >= req.teamPV) {
       issues.push({
@@ -213,7 +213,7 @@ export async function validateRankEligibility(distributorId: number): Promise<In
         affectedRecordId: distributorId,
         affectedTable: 'distributors',
         suggestedFix: `Advance distributor ${distributorId} to ${nextRank}`,
-        autoFixed: false,
+        autoFixed: 0,
       });
       break; // Only report one rank advancement at a time
     }
@@ -419,7 +419,7 @@ export async function processOrderCommissions(orderId: number): Promise<void> {
   await db.update(distributors)
     .set({ 
       personalSales: sql`${distributors.personalSales} + ${commissionVolume}`,
-      monthlyPV: sql`${distributors.monthlyPV} + ${commissionVolume}`,
+      monthlyPv: sql`${distributors.monthlyPv} + ${commissionVolume}`,
     })
     .where(eq(distributors.id, distributor.id));
   

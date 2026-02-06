@@ -18,9 +18,9 @@ function createAuthContext(role: "user" | "admin" = "user"): { ctx: TrpcContext 
     name: `Test User ${userId}`,
     loginMethod: "manus",
     role,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    lastSignedIn: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    lastSignedIn: new Date().toISOString(),
   };
 
   const ctx: TrpcContext = {

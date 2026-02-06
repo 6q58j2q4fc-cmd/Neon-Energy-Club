@@ -47,9 +47,9 @@ describe('Homepage Features', () => {
 
     it('should respect the limit parameter', async () => {
       const mockUsers = [
-        { id: 1, name: 'User 1', createdAt: new Date(), profilePhotoUrl: null, location: null },
-        { id: 2, name: 'User 2', createdAt: new Date(), profilePhotoUrl: null, location: null },
-        { id: 3, name: 'User 3', createdAt: new Date(), profilePhotoUrl: null, location: null },
+        { id: 1, name: 'User 1', createdAt: new Date().toISOString(), profilePhotoUrl: null, location: null },
+        { id: 2, name: 'User 2', createdAt: new Date().toISOString(), profilePhotoUrl: null, location: null },
+        { id: 3, name: 'User 3', createdAt: new Date().toISOString(), profilePhotoUrl: null, location: null },
       ];
 
       (getRecentJoinedUsers as any).mockResolvedValue(mockUsers.slice(0, 2));

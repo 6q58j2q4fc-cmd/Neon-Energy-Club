@@ -37,7 +37,7 @@ describe("User Orders and NFTs", () => {
           email: "test@example.com",
           quantity: 2,
           status: "pending",
-          createdAt: new Date(),
+          createdAt: new Date().toISOString(),
         },
       ];
 
@@ -60,7 +60,7 @@ describe("User Orders and NFTs", () => {
           email: "test@example.com",
           amount: 100,
           status: "completed",
-          createdAt: new Date(),
+          createdAt: new Date().toISOString(),
         },
       ];
 

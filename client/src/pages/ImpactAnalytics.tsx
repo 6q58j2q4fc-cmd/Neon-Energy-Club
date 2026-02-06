@@ -38,18 +38,18 @@ export default function ImpactAnalytics() {
   const chartData = history?.map((h, idx) => ({
     name: `Period ${idx + 1}`,
     trees: h.treesProtected || 0,
-    animals: h.animalsSaved || 0,
+    animals: h.animalLivesSaved || 0,
     habitat: h.habitatProtected || 0,
-    species: h.speciesProtected || 0,
-    total: (h.treesProtected || 0) + (h.animalsSaved || 0) + (h.habitatProtected || 0) + (h.speciesProtected || 0)
+    species: h.treesProtected || 0,
+    total: (h.treesProtected || 0) + (h.animalLivesSaved || 0) + (h.habitatProtected || 0) + (h.treesProtected || 0)
   })) || [];
 
   // Category distribution for pie chart
   const categoryData = [
     { name: "Trees", value: lifetime?.treesProtected || 0, color: "#22c55e" },
-    { name: "Animals", value: lifetime?.animalsSaved || 0, color: "#ec4899" },
+    { name: "Animals", value: lifetime?.animalLivesSaved || 0, color: "#ec4899" },
     { name: "Habitat", value: lifetime?.habitatProtected || 0, color: "#3b82f6" },
-    { name: "Species", value: lifetime?.speciesProtected || 0, color: "#a855f7" }
+    { name: "Species", value: lifetime?.treesProtected || 0, color: "#a855f7" }
   ].filter(d => d.value > 0);
 
   // Achievement progress
@@ -116,7 +116,7 @@ export default function ImpactAnalytics() {
             <Award className="h-4 w-4 text-pink-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{lifetime?.animalsSaved || 0}</div>
+            <div className="text-2xl font-bold">{lifetime?.animalLivesSaved || 0}</div>
             <p className="text-xs text-muted-foreground">
               {achievementProgress?.animals || 0} milestones achieved
             </p>

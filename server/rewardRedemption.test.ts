@@ -52,7 +52,7 @@ describe('Reward Redemption', () => {
       description: 'Free 12-Pack Case',
       value: '42.00',
       status: 'available',
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     };
 
     it('should get customer reward by ID', async () => {
@@ -121,7 +121,7 @@ describe('Reward Redemption', () => {
       pointsRedeemed: 3,
       earnedMonth: '2026-01',
       status: 'pending',
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     };
 
     it('should get distributor by user ID', async () => {
@@ -171,7 +171,7 @@ describe('Reward Redemption', () => {
         city: 'Los Angeles',
         state: 'CA',
         status: 'pending',
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
       },
       {
         id: 2,
@@ -183,7 +183,7 @@ describe('Reward Redemption', () => {
         state: 'CA',
         status: 'shipped',
         trackingNumber: 'TRACK123',
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
       },
     ];
 

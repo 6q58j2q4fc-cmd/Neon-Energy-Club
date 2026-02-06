@@ -13,7 +13,7 @@ describe('Genealogy Tree Enhancement', () => {
         teamSales: 0,
         leftLegVolume: 0,
         rightLegVolume: 0,
-        monthlyPV: 0,
+        monthlyPv: 0,
         isActive: 1,
       },
       tree: [], // No team members
@@ -57,7 +57,7 @@ describe('Genealogy Tree Enhancement', () => {
       teamSales: 5000, // $50.00
       leftLegVolume: 0,
       rightLegVolume: 0,
-      monthlyPV: 50,
+      monthlyPv: 50,
       isActive: 1,
     };
 
@@ -67,7 +67,7 @@ describe('Genealogy Tree Enhancement', () => {
     expect(distributor.rank).toBe('starter');
     expect(distributor.personalSales).toBeGreaterThanOrEqual(0);
     expect(distributor.teamSales).toBeGreaterThanOrEqual(0);
-    expect(distributor.monthlyPV).toBeGreaterThanOrEqual(0);
+    expect(distributor.monthlyPv).toBeGreaterThanOrEqual(0);
     expect(distributor.isActive).toBe(1);
   });
 });

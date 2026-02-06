@@ -12,7 +12,7 @@ interface DistributorAnalytics {
   teamSales: number;
   leftLegVolume: number;
   rightLegVolume: number;
-  monthlyPV: number;
+  monthlyPv: number;
   totalDownline: number;
   activeDownline: number;
   commissionTotal: number;
@@ -25,7 +25,7 @@ interface TeamMember {
   rank: string;
   personalSales: number;
   teamSales: number;
-  monthlyPV: number;
+  monthlyPv: number;
   isActive: number;
   joinDate: Date;
 }
@@ -50,7 +50,7 @@ export async function generateDistributorInsights(
 
 **Distributor Profile:**
 - Rank: ${analytics.rank}
-- Personal Volume (PV): ${analytics.monthlyPV}
+- Personal Volume (PV): ${analytics.monthlyPv}
 - Personal Sales: $${(analytics.personalSales / 100).toFixed(2)}
 - Team Sales: $${(analytics.teamSales / 100).toFixed(2)}
 - Left Leg Volume: $${(analytics.leftLegVolume / 100).toFixed(2)}
@@ -61,7 +61,7 @@ export async function generateDistributorInsights(
 - Days in Business: ${Math.floor((Date.now() - analytics.joinDate.getTime()) / (1000 * 60 * 60 * 24))}
 
 **Team Overview:**
-${teamMembers.slice(0, 10).map(member => `- ${member.name || "Anonymous"}: ${member.rank}, PV: ${member.monthlyPV}, ${member.isActive ? "Active" : "Inactive"}`).join("\n")}
+${teamMembers.slice(0, 10).map(member => `- ${member.name || "Anonymous"}: ${member.rank}, PV: ${member.monthlyPv}, ${member.isActive ? "Active" : "Inactive"}`).join("\n")}
 
 Provide 3-5 specific, actionable insights in the following categories:
 1. Performance analysis (current strengths and weaknesses)
@@ -164,7 +164,7 @@ export async function analyzeTeamTrends(
   timeframe: "week" | "month" | "quarter"
 ): Promise<string> {
   const activeCount = teamMembers.filter(m => m.isActive).length;
-  const totalPV = teamMembers.reduce((sum, m) => sum + m.monthlyPV, 0);
+  const totalPV = teamMembers.reduce((sum, m) => sum + m.monthlyPv, 0);
   const avgPV = teamMembers.length > 0 ? totalPV / teamMembers.length : 0;
 
   const prompt = `Analyze this MLM team's performance over the past ${timeframe}:
@@ -224,7 +224,7 @@ export async function generateCommissionOptimization(
 
 **Current Status:**
 - Rank: ${analytics.rank}
-- Monthly PV: ${analytics.monthlyPV}
+- Monthly PV: ${analytics.monthlyPv}
 - Left Leg: $${(analytics.leftLegVolume / 100).toFixed(2)}
 - Right Leg: $${(analytics.rightLegVolume / 100).toFixed(2)}
 - Leg Imbalance: ${legImbalancePercent.toFixed(1)}%
@@ -288,11 +288,11 @@ function generateFallbackInsights(analytics: DistributorAnalytics): AnalyticsIns
   }
 
   // Check personal volume
-  if (analytics.monthlyPV < 48) {
+  if (analytics.monthlyPv < 48) {
     insights.push({
       category: "performance",
       title: "Personal Volume Below Activity Requirement",
-      description: `Your current PV is ${analytics.monthlyPV}. You need 48 PV to maintain active status and earn commissions. Consider setting up an autoship to ensure consistent monthly volume.`,
+      description: `Your current PV is ${analytics.monthlyPv}. You need 48 PV to maintain active status and earn commissions. Consider setting up an autoship to ensure consistent monthly volume.`,
       priority: "high",
       actionable: true,
       suggestedAction: "Set up a monthly autoship of at least 2 cases (48 PV) to stay active"
@@ -341,7 +341,7 @@ function generateFallbackRecommendations(analytics: DistributorAnalytics): strin
     );
   }
 
-  if (analytics.monthlyPV < 100) {
+  if (analytics.monthlyPv < 100) {
     recommendations.push(
       "Increase your personal volume to qualify for higher commission percentages and bonuses"
     );

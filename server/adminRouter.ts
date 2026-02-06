@@ -341,7 +341,7 @@ export const adminRouter = router({
         title: input.title,
         message: input.message,
         type: input.type,
-        isRead: false,
+        isRead: 0,
         createdAt: new Date().toISOString(),
       });
       
@@ -377,7 +377,7 @@ export const adminRouter = router({
           title: input.title,
           message: input.message,
           type: input.type,
-          isRead: false,
+          isRead: 0,
           createdAt: new Date().toISOString(),
         }));
         
@@ -1042,7 +1042,7 @@ export const adminRouter = router({
             recordData: snapshot.recordData,
             deletionReason: `Pre-restore archive for backup ${input.backupId}`,
             deletedBy: ctx.user.id,
-            canRestore: true,
+            canRestore: 1,
             restoreDeadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
           });
 
@@ -1068,7 +1068,7 @@ export const adminRouter = router({
           userRole: ctx.user.role,
           result: "success",
           severity: "warning",
-          isReversible: true,
+          isReversible: 1,
           metadata: JSON.stringify({ recordsRestored, restorationType: input.restorationType }),
         });
 
@@ -1098,13 +1098,13 @@ export const adminRouter = router({
 
       const offset = (input.page - 1) * input.limit;
       let query = db.select().from(deletedRecordsArchive)
-        .where(eq(deletedRecordsArchive.canRestore, true))
+        .where(eq(deletedRecordsArchive.canRestore, 1))
         .orderBy(desc(deletedRecordsArchive.deletedAt));
 
       if (input.tableName) {
         query = db.select().from(deletedRecordsArchive)
           .where(and(
-            eq(deletedRecordsArchive.canRestore, true),
+            eq(deletedRecordsArchive.canRestore, 1),
             eq(deletedRecordsArchive.tableName, input.tableName)
           ))
           .orderBy(desc(deletedRecordsArchive.deletedAt));
@@ -1112,7 +1112,7 @@ export const adminRouter = router({
 
       const records = await query.limit(input.limit).offset(offset);
       const [totalCount] = await db.select({ count: count() }).from(deletedRecordsArchive)
-        .where(eq(deletedRecordsArchive.canRestore, true));
+        .where(eq(deletedRecordsArchive.canRestore, 1));
 
       return {
         records: records.map(r => ({
@@ -1151,10 +1151,10 @@ export const adminRouter = router({
       // Mark as restored
       await db.update(deletedRecordsArchive)
         .set({
-          wasRestored: true,
+          wasRestored: 1,
           restoredAt: new Date().toISOString(),
           restoredBy: ctx.user.id,
-          canRestore: false,
+          canRestore: 0,
         })
         .where(eq(deletedRecordsArchive.id, input.archiveId));
 
