@@ -1269,3 +1269,32 @@ export const legVolumes = mysqlTable("leg_volumes", {
 ]);
 
 
+
+export const charityImpactTracking = mysqlTable("charity_impact_tracking", {
+	id: int().autoincrement().notNull(),
+	distributorId: int().notNull(),
+	periodStart: date().notNull(),
+	periodEnd: date().notNull(),
+	personalCansOriginal: int().default(0).notNull(),
+	personalCansPink: int().default(0).notNull(),
+	personalTreesProtected: decimal({ precision: 10, scale: 2 }).default('0').notNull(),
+	personalHabitatProtected: decimal({ precision: 10, scale: 2 }).default('0').notNull(),
+	personalSpeciesSaved: decimal({ precision: 10, scale: 2 }).default('0').notNull(),
+	personalAnimalLivesSaved: decimal({ precision: 10, scale: 2 }).default('0').notNull(),
+	teamCansOriginal: int().default(0).notNull(),
+	teamCansPink: int().default(0).notNull(),
+	teamTreesProtected: decimal({ precision: 10, scale: 2 }).default('0').notNull(),
+	teamHabitatProtected: decimal({ precision: 10, scale: 2 }).default('0').notNull(),
+	teamSpeciesSaved: decimal({ precision: 10, scale: 2 }).default('0').notNull(),
+	teamAnimalLivesSaved: decimal({ precision: 10, scale: 2 }).default('0').notNull(),
+	totalTreesProtected: decimal({ precision: 10, scale: 2 }).default('0').notNull(),
+	totalHabitatProtected: decimal({ precision: 10, scale: 2 }).default('0').notNull(),
+	totalSpeciesSaved: decimal({ precision: 10, scale: 2 }).default('0').notNull(),
+	totalAnimalLivesSaved: decimal({ precision: 10, scale: 2 }).default('0').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("charity_impact_tracking_distributorId_idx").on(table.distributorId),
+	index("charity_impact_tracking_periodStart_idx").on(table.periodStart),
+]);

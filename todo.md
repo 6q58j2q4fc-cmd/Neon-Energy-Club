@@ -5373,3 +5373,40 @@
 - [ ] Create self-healing logic for data discrepancies
 - [ ] Add anomaly detection for suspicious patterns
 - [ ] Implement automated alerting for commission errors
+
+
+## Charity Impact Tracking Feature
+
+### Phase 1: Design & Schema
+- [x] Design impact calculation formulas for NEON Original (trees/habitats/species)
+- [x] Design impact calculation formulas for NEON Pink (animal lives saved)
+- [x] Create charity_impact_tracking table
+- [x] Define point value system per can and case
+
+### Phase 2: Impact Calculation Engine
+- [x] Implement personal purchase impact calculator
+- [x] Implement team sales impact calculator
+- [x] Create impact aggregation functions
+- [x] Add automatic impact posting on order completion
+- [x] Create tRPC procedures for impact tracking
+
+### Phase 3: Dashboard UI
+- [x] Create charity impact dashboard component
+- [x] Add impact visualization (charts/counters)
+- [x] Display personal vs team impact breakdown
+- [x] Add product-specific impact cards (Original vs Pink)
+- [x] Show running totals and milestones
+- [x] Add route to App.tsx
+
+### Phase 4: Integration
+- [x] Integrate with order history tracking
+- [x] Integrate with team sales volume calculations
+- [x] Add real-time impact updates via webhook
+- [ ] Create impact notification system (deferred - can be added later)
+
+### Phase 5: Testing & Delivery
+- [x] Test impact calculations with sample orders
+- [x] Verify team sales aggregation
+- [x] Test with multiple distributors
+- [x] All 16 tests passing
+- [ ] Create checkpoint and deliver

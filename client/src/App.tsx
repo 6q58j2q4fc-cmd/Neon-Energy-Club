@@ -48,6 +48,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import GiveBack from "./pages/GiveBack";
 import OrderHistory from "./pages/OrderHistory";
 import GenealogyTutorial from "./pages/GenealogyTutorial";
+import CharityImpact from "./pages/CharityImpact";
 import VendingDashboard from "./pages/VendingDashboard";
 import MfaSettings from "./pages/MfaSettings";
 import PoliciesAndProcedures from "./pages/PoliciesAndProcedures";
@@ -162,6 +163,8 @@ function Router() {
         <Route path="/customer-portal" component={CustomerPortal} />
         <Route path="/order-history" component={OrderHistory} />
         <Route path="/genealogy-tutorial" component={GenealogyTutorial} />
+        <Route path="/charity-impact" component={CharityImpact} />
+        <Route path="/impact" component={CharityImpact} />
         <Route path="/vending-dashboard" component={VendingDashboard} />
         <Route path="/mfa-settings" component={MfaSettings} />
         <Route path="/security" component={MfaSettings} />

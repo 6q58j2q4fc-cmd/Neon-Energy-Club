@@ -5254,6 +5254,71 @@ Provide step-by-step instructions with specific button names and locations. Keep
       }),
   }),
 
+  // Charity Impact Tracking
+  impact: router({
+    // Get impact summary for current month
+    getSummary: protectedProcedure
+      .input(z.object({
+        periodStart: z.string().optional(),
+        periodEnd: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { getImpactSummary } = await import('./charityImpact');
+        
+        // Default to current month if no period specified
+        const now = new Date();
+        const periodStart = input.periodStart || new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        const periodEnd = input.periodEnd || new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+        
+        const summary = await getImpactSummary(ctx.user.id, periodStart, periodEnd);
+        return summary;
+      }),
+
+    // Get lifetime impact totals
+    getLifetime: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getLifetimeImpact } = await import('./charityImpact');
+        const lifetime = await getLifetimeImpact(ctx.user.id);
+        return lifetime;
+      }),
+
+    // Get impact history
+    getHistory: protectedProcedure
+      .input(z.object({
+        limit: z.number().min(1).max(24).optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { getImpactHistory } = await import('./charityImpact');
+        const history = await getImpactHistory(ctx.user.id, input.limit || 12);
+        return history;
+      }),
+
+    // Get impact leaderboard
+    getLeaderboard: protectedProcedure
+      .input(z.object({
+        type: z.enum(['personal', 'team', 'total']),
+        metric: z.enum(['trees', 'habitat', 'species', 'animals']),
+        limit: z.number().min(1).max(100).optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getImpactLeaderboard } = await import('./charityImpact');
+        const leaderboard = await getImpactLeaderboard(
+          input.type,
+          input.metric,
+          input.limit || 10
+        );
+        return leaderboard;
+      }),
+
+    // Check milestones
+    checkMilestones: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { checkMilestones } = await import('./charityImpact');
+        const milestones = await checkMilestones(ctx.user.id);
+        return milestones;
+      }),
+  }),
+
 });
 
 // Helper function to anonymize names for privacy on public leaderboard

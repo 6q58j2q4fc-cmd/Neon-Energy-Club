@@ -152,6 +152,16 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session): Promis
       if (orderId) {
         await processOrderCommissions(orderId);
         console.log(`[Stripe Webhook] Processed commissions for order ${orderId}`);
+        
+        // Update charity impact tracking
+        try {
+          const { updateImpactOnOrderCompletion } = await import('./charityImpact');
+          await updateImpactOnOrderCompletion(orderId);
+          console.log(`[Stripe Webhook] Updated charity impact for order ${orderId}`);
+        } catch (error: any) {
+          console.error(`[Stripe Webhook] Error updating charity impact:`, error);
+          // Don't fail the webhook if impact tracking fails
+        }
       }
     }
   }
