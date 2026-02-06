@@ -5,8 +5,10 @@ import Footer from "@/components/Footer";
 import { SEO } from "@/components/SEO";
 import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function About() {
+  const { t, language } = useLanguage();
   const [, setLocation] = useLocation();
   const [isVisible, setIsVisible] = useState(false);
   

@@ -34,8 +34,10 @@ import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
 import { SEO } from "@/components/SEO";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function AdminTerritories() {
+  const { t, language } = useLanguage();
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");

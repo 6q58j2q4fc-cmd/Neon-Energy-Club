@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Select,
   SelectContent,
@@ -81,6 +82,7 @@ const CARRIERS: Record<string, CarrierConfig> = {
 };
 
 export default function AdminShippingSettings() {
+  const { t, language } = useLanguage();
   const [activeCarrier, setActiveCarrier] = useState('ups');
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [environment, setEnvironment] = useState<'sandbox' | 'production'>('sandbox');

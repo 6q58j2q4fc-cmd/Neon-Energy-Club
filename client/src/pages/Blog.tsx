@@ -9,6 +9,7 @@ import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
 import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const categories = [
   { value: "all", label: "All Posts" },
@@ -22,6 +23,7 @@ const categories = [
 ];
 
 export default function Blog() {
+  const { t, language } = useLanguage();
   const [, setLocation] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");

@@ -12,6 +12,7 @@ import Footer from "@/components/Footer";
 import { ShoppingBag, CreditCard, Lock, ArrowLeft, Zap, AlertCircle, Loader2, Truck, Tag, Check, X } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Shipping options with prices
 const SHIPPING_OPTIONS = [
@@ -33,6 +34,7 @@ const US_STATES = [
 ];
 
 export default function Checkout() {
+  const { t, language } = useLanguage();
   const { items, totalPrice, clearCart } = useCart();
   const { user } = useAuth();
   const [name, setName] = useState(user?.name || "");

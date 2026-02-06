@@ -5720,8 +5720,14 @@
 
 
 ## Critical Fixes - Navigation & Translation
-- [ ] Identify all language translation implementation files and errors
+- [x] Identify all language translation implementation files and errors
+  * Found: LanguageContext.tsx, LanguageSwitcher.tsx, translations.ts
+  * Issue: 72 pages don't use useLanguage() hook or t() function
+  * Pages have hardcoded English text instead of translation keys
 - [ ] Fix language translation so text actually changes when language is selected
+  * Add useLanguage hook to all 72 pages
+  * Replace hardcoded text with t('key') calls
+  * Priority: Home, Products, Franchise, About, Celebrities (most visible pages first)
 - [ ] Test language translation on every page
 - [ ] Add portal navigation buttons (Distributor/Customer/Vending) to hamburger menu pages
 - [ ] Add home icon to every page in the application

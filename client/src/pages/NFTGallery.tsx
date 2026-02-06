@@ -7,6 +7,7 @@ import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
 import { trpc } from "@/lib/trpc";
 import { SEO } from "@/components/SEO";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Rarity colors and icons
 const rarityConfig = {
@@ -18,6 +19,7 @@ const rarityConfig = {
 };
 
 export default function NFTGallery() {
+  const { t, language } = useLanguage();
   const [, setLocation] = useLocation();
   const [page, setPage] = useState(1);
   const [rarityFilter, setRarityFilter] = useState<string | undefined>(undefined);

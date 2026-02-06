@@ -12,8 +12,10 @@ import { useHashNavigation } from "@/hooks/useHashNavigation";
 import CustomerPhotoGallery from "@/components/CustomerPhotoGallery";
 import { ProductQuickView, products as productData, ProductData } from "@/components/ProductQuickView";
 import { Eye } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Products() {
+  const { t, language } = useLanguage();
   const [, setLocation] = useLocation();
   const [isVisible, setIsVisible] = useState(false);
   const { addItem, setIsOpen } = useCart();

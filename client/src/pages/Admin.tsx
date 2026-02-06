@@ -27,8 +27,10 @@ import { trpc } from "@/lib/trpc";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Admin() {
+  const { t, language } = useLanguage();
   const { user, loading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
   const utils = trpc.useUtils();

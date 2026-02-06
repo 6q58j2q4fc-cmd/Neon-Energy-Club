@@ -7,6 +7,7 @@ import { Star, Play, Music, TrendingUp, ExternalLink, Zap, Menu, X } from "lucid
 import { SEO } from "@/components/SEO";
 import { motion, AnimatePresence } from "framer-motion";
 import HamburgerHeader from "@/components/HamburgerHeader";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Celebrity data with real YouTube video IDs
 const celebrities = [
@@ -74,6 +75,7 @@ const featuredVideos = [
 ];
 
 export default function Celebrities() {
+  const { t, language } = useLanguage();
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [isVisible, setIsVisible] = useState(false);

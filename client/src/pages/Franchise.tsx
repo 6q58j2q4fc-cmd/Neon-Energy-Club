@@ -24,6 +24,7 @@ import type { TerritoryPricingOutput } from "../../../shared/territoryPricing";
 import { TerritoryPDFExport } from "@/components/TerritoryPDFExport";
 import ROICalculator from "@/components/ROICalculator";
 import TerritoryReservation from "@/components/TerritoryReservation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Territory pricing data (price per square mile per month)
 const territoryPricing = {
@@ -51,6 +52,7 @@ const territoryPricing = {
 };
 
 export default function Franchise() {
+  const { t, language } = useLanguage();
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [isVisible, setIsVisible] = useState(false);

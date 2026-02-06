@@ -5,8 +5,10 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TreePine, Home, Bird, Heart, TrendingUp, Award, Users } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function CharityImpact() {
+  const { t, language } = useLanguage();
   const { data: summary, isLoading: summaryLoading } = trpc.impact.getSummary.useQuery({});
   const { data: lifetime, isLoading: lifetimeLoading } = trpc.impact.getLifetime.useQuery();
   const { data: milestones, isLoading: milestonesLoading } = trpc.impact.checkMilestones.useQuery();

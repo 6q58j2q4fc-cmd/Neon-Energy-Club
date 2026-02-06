@@ -18,8 +18,10 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
 import { LAUNCH_DATE } from "@/hooks/useCountdown";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Home() {
+  const { t, language } = useLanguage();
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { playSound } = useSoundEffects();

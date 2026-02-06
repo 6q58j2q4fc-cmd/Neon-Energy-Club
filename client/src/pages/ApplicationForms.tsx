@@ -5,8 +5,10 @@ import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Download, FileText, Users, Truck, ShoppingCart, CheckCircle } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ApplicationForms() {
+  const { t, language } = useLanguage();
   const [downloadingForm, setDownloadingForm] = useState<string | null>(null);
 
   const forms = [

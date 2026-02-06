@@ -42,6 +42,7 @@ import {
   Tag
 } from "lucide-react";
 import { ShippingLabelModal } from "@/components/ShippingLabelModal";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type OrderStatus = "pending" | "paid" | "shipped" | "delivered" | "cancelled";
 
@@ -64,6 +65,7 @@ interface Order {
 }
 
 export default function AdminOrders() {
+  const { t, language } = useLanguage();
   const { user, loading } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");

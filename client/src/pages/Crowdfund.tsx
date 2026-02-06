@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Check, Star, Zap, Crown, Gift, ArrowLeft, TrendingUp, Users, Clock, Gem } from "lucide-react";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import { SEO } from "@/components/SEO";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Reward tiers
 const rewardTiers = [
@@ -80,6 +81,7 @@ const rewardTiers = [
 ];
 
 export default function Crowdfund() {
+  const { t, language } = useLanguage();
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [isVisible, setIsVisible] = useState(false);

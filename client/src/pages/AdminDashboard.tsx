@@ -15,6 +15,7 @@ import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -53,6 +54,7 @@ import {
 } from "lucide-react";
 
 export default function AdminDashboard() {
+  const { t, language } = useLanguage();
   const { user, loading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("overview");

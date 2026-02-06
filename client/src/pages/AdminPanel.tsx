@@ -52,6 +52,7 @@ import { Database, Globe } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 
 export default function AdminPanel() {
+  const { t, language } = useLanguage();
   const [location, navigate] = useLocation();
   const { user, loading } = useAuth();
   
@@ -1208,6 +1209,7 @@ function SystemSettings() {
 
 // Missing import for CreditCard
 import { CreditCard } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 
 // Data Auditor Component - LLM-powered data integrity monitoring
