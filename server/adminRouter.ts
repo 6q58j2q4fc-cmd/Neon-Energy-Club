@@ -180,7 +180,7 @@ export const adminRouter = router({
       
       await db
         .update(users)
-        .set({ role: input.role, updatedAt: new Date() })
+        .set({ role: input.role, updatedAt: new Date().toISOString() })
         .where(eq(users.id, input.userId));
       
       return { success: true, message: `User role updated to ${input.role}` };
@@ -198,7 +198,7 @@ export const adminRouter = router({
       
       await db
         .update(users)
-        .set({ userType: input.userType, updatedAt: new Date() })
+        .set({ userType: input.userType, updatedAt: new Date().toISOString() })
         .where(eq(users.id, input.userId));
       
       return { success: true, message: `User type updated to ${input.userType}` };
@@ -222,7 +222,7 @@ export const adminRouter = router({
           passwordHash,
           passwordResetToken: null,
           passwordResetExpiry: null,
-          updatedAt: new Date(),
+          updatedAt: new Date().toISOString(),
         })
         .where(eq(users.id, input.userId));
       
@@ -245,7 +245,7 @@ export const adminRouter = router({
           emailVerified: input.verified,
           emailVerificationToken: null,
           emailVerificationExpiry: null,
-          updatedAt: new Date(),
+          updatedAt: new Date().toISOString(),
         })
         .where(eq(users.id, input.userId));
       
@@ -280,7 +280,7 @@ export const adminRouter = router({
             username: null,
             passwordHash: null,
             phone: null,
-            updatedAt: new Date(),
+            updatedAt: new Date().toISOString(),
           })
           .where(eq(users.id, input.userId));
         return { success: true, message: "User account deactivated" };
@@ -342,7 +342,7 @@ export const adminRouter = router({
         message: input.message,
         type: input.type,
         isRead: false,
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
       });
       
       return { success: true, message: "Notification sent" };
@@ -378,7 +378,7 @@ export const adminRouter = router({
           message: input.message,
           type: input.type,
           isRead: false,
-          createdAt: new Date(),
+          createdAt: new Date().toISOString(),
         }));
         
         await db.insert(notifications).values(notificationValues);
@@ -699,7 +699,7 @@ export const adminRouter = router({
       
       await db
         .update(orders)
-        .set({ status: input.status, updatedAt: new Date() })
+        .set({ status: input.status, updatedAt: new Date().toISOString() })
         .where(eq(orders.id, input.orderId));
       
       return { success: true, message: `Order status updated to ${input.status}` };
@@ -762,7 +762,7 @@ export const adminRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
       
-      const updateData: Record<string, any> = { updatedAt: new Date() };
+      const updateData: Record<string, any> = { updatedAt: new Date().toISOString() };
       if (input.name) updateData.name = input.name;
       if (input.email) updateData.email = input.email;
       if (input.phone) updateData.phone = input.phone;
@@ -794,7 +794,7 @@ export const adminRouter = router({
       // In production, you'd want a dedicated suspended field
       await db
         .update(users)
-        .set({ updatedAt: new Date() })
+        .set({ updatedAt: new Date().toISOString() })
         .where(eq(users.id, input.userId));
       
       return { success: true, message: input.suspended ? "User suspended" : "User unsuspended" };
@@ -969,7 +969,7 @@ export const adminRouter = router({
         .set({
           status: "completed",
           totalRecords,
-          completedAt: new Date(),
+          completedAt: new Date().toISOString(),
         })
         .where(eq(dataBackups.id, Number(backupId)));
 
@@ -1054,7 +1054,7 @@ export const adminRouter = router({
           .set({
             status: "completed",
             recordsRestored,
-            completedAt: new Date(),
+            completedAt: new Date().toISOString(),
           })
           .where(eq(restorationLog.id, Number(restorationEntry.insertId)));
 
@@ -1152,7 +1152,7 @@ export const adminRouter = router({
       await db.update(deletedRecordsArchive)
         .set({
           wasRestored: true,
-          restoredAt: new Date(),
+          restoredAt: new Date().toISOString(),
           restoredBy: ctx.user.id,
           canRestore: false,
         })

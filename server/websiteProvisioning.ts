@@ -170,7 +170,7 @@ export async function provisionReplicatedWebsite(
       affiliateCode,
       status: "active",
       provisioningStatus: "verified",
-      lastVerifiedAt: new Date(),
+      lastVerifiedAt: new Date().toISOString(),
     });
 
     const websiteId = Number(result[0].insertId);
@@ -388,7 +388,7 @@ export async function autoFixWebsiteIssues(
 
     // Apply updates if any
     if (Object.keys(updates).length > 0 && website.length > 0) {
-      updates.lastVerifiedAt = new Date();
+      updates.lastVerifiedAt = new Date().toISOString();
       updates.verificationError = null;
 
       await db.update(replicatedWebsites)

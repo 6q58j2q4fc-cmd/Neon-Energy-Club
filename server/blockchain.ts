@@ -221,7 +221,7 @@ export async function mintNftOnChain(
         .set({
           txHash: tx.hash,
           blockchainStatus: "minted",
-          mintedAt: new Date(),
+          mintedAt: new Date().toISOString(),
         })
         .where(eq(neonNfts.tokenId, tokenId));
       

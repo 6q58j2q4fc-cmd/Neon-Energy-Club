@@ -5634,9 +5634,9 @@ export async function updateDistributorApplicationInfo(
         zipCode: data.zipCode || null,
         dateOfBirth: data.dateOfBirth || null,
         ssnLast4: data.taxIdLast4 || null,
-        agreedToPoliciesAt: data.agreedToPolicies ? (data.agreedAt || new Date()) : null,
-        agreedToTermsAt: data.agreedToTerms ? (data.agreedAt || new Date()) : null,
-        updatedAt: new Date(),
+        agreedToPoliciesAt: data.agreedToPolicies ? (data.agreedAt || new Date().toISOString()) : null,
+        agreedToTermsAt: data.agreedToTerms ? (data.agreedAt || new Date().toISOString()) : null,
+        updatedAt: new Date().toISOString(),
       })
       .where(eq(distributors.id, distributorId));
     
