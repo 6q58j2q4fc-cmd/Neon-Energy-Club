@@ -251,8 +251,8 @@ export async function saveImpactSummary(
     .where(
       and(
         eq(charityImpactTracking.distributorId, distributorId),
-        eq(charityImpactTracking.periodStart, periodStart),
-        eq(charityImpactTracking.periodEnd, periodEnd)
+        eq(charityImpactTracking.periodStart, new Date(periodStart)),
+        eq(charityImpactTracking.periodEnd, new Date(periodEnd))
       )
     )
     .limit(1);
@@ -436,8 +436,8 @@ export async function getImpactLeaderboard(
     .from(charityImpactTracking)
     .where(
       and(
-        eq(charityImpactTracking.periodStart, periodStart),
-        eq(charityImpactTracking.periodEnd, periodEnd)
+        eq(charityImpactTracking.periodStart, new Date(periodStart)),
+        eq(charityImpactTracking.periodEnd, new Date(periodEnd))
       )
     )
     .orderBy(sql`${sql.raw(column)} DESC`)

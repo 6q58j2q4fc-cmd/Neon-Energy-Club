@@ -12,9 +12,9 @@ interface NotificationItem {
   title: string;
   message: string;
   data?: string | null;
-  isRead: boolean | null;
-  readAt?: Date | null;
-  createdAt: Date;
+  isRead: number | null;
+  readAt?: string | null;
+  createdAt: string;
 }
 
 // Icon mapping for notification types

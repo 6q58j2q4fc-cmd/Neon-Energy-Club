@@ -915,7 +915,7 @@ export const adminRouter = router({
         tablesIncluded: JSON.stringify(tablesToBackup),
         status: "in_progress",
         retentionDays: input.retentionDays,
-        expiresAt,
+        expiresAt: expiresAt.toISOString(),
         createdBy: ctx.user.id,
       });
 
@@ -1043,7 +1043,7 @@ export const adminRouter = router({
             deletionReason: `Pre-restore archive for backup ${input.backupId}`,
             deletedBy: ctx.user.id,
             canRestore: 1,
-            restoreDeadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            restoreDeadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
           });
 
           recordsRestored++;
@@ -1252,7 +1252,7 @@ export const adminRouter = router({
             tables: input.tables ? JSON.stringify(input.tables) : null,
             cronExpression: input.cronExpression,
             retentionDays: input.retentionDays,
-            isActive: input.isActive,
+            isActive: input.isActive ? 1 : 0,
           })
           .where(eq(backupSchedules.id, input.id));
         return { success: true, id: input.id };
@@ -1263,7 +1263,7 @@ export const adminRouter = router({
           tables: input.tables ? JSON.stringify(input.tables) : null,
           cronExpression: input.cronExpression,
           retentionDays: input.retentionDays,
-          isActive: input.isActive,
+          isActive: input.isActive ? 1 : 0,
           createdBy: ctx.user.id,
         });
         return { success: true, id: Number(result.insertId) };
