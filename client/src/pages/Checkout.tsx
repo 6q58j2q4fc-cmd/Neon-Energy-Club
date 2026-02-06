@@ -13,6 +13,8 @@ import { ShoppingBag, CreditCard, Lock, ArrowLeft, Zap, AlertCircle, Loader2, Tr
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import PhoneInput from "@/components/PhoneInput";
+import { getCountryFormConfig } from "@shared/countryFormConfig";
 
 // Shipping options with prices
 const SHIPPING_OPTIONS = [
@@ -45,7 +47,10 @@ export default function Checkout() {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [postalCode, setPostalCode] = useState("");
-  const [country] = useState("USA");
+  const [country, setCountry] = useState("US");
+  
+  // Get country-specific form configuration
+  const formConfig = getCountryFormConfig(country);
   const [shippingMethod, setShippingMethod] = useState("standard");
   const [couponCode, setCouponCode] = useState("");
   const [couponValidation, setCouponValidation] = useState<{
@@ -269,14 +274,12 @@ export default function Checkout() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-white">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
+                  <PhoneInput
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="(555) 123-4567"
-                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-500"
+                    onChange={setPhone}
+                    label="Phone Number"
+                    defaultCountryCode={formConfig.phoneCode}
+                    className=""
                   />
                 </div>
               </CardContent>
@@ -345,13 +348,13 @@ export default function Checkout() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="postalCode" className="text-white">ZIP Code *</Label>
+                    <Label htmlFor="postalCode" className="text-white">{formConfig.postalCodeLabel} *</Label>
                     <Input
                       id="postalCode"
                       type="text"
                       value={postalCode}
                       onChange={(e) => setPostalCode(e.target.value)}
-                      placeholder="90001"
+                      placeholder={formConfig.postalCodePlaceholder}
                       required
                       className="bg-white/10 border-white/20 text-white placeholder:text-gray-500"
                     />

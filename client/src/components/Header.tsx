@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ShoppingCart, User, Users, Building2, Heart, MapPin, Settings, LogOut, Crown, Gift, BarChart3, Package, Search } from "lucide-react";
+import {Menu, X, ShoppingCart, User, Users, Building2, Heart, MapPin, Settings, LogOut, Crown, Gift, BarChart3, Package, Search, Home} from "lucide-react";
 import { HeaderSoundControl } from "./HeaderSoundControl";
 import {
   DropdownMenu,

@@ -5733,3 +5733,32 @@
 - [ ] Add home icon to every page in the application
 - [ ] Verify all navigation works correctly
 - [ ] Save final checkpoint with all fixes
+
+
+## Phase 4: Complete Translation & Country-Specific Forms
+- [ ] Replace all hardcoded English text with t('key') calls across all 72 pages
+- [ ] Test language switching on Home, Products, Franchise, About pages
+- [ ] Implement country-specific form field requirements
+  * Zip Code vs Postal Code labels based on country
+  * Address field formats (US vs UK vs other countries)
+  * State/Province/Region labels based on country
+- [ ] Add phone country code selector to all forms
+  * Distributor application forms
+  * Customer application forms
+  * Checkout forms
+  * Contact forms
+- [x] Update checkout page to comply with selected country requirements
+  * Added PhoneInput with country code selector
+  * Dynamic postal code label (ZIP/Postcode/etc) based on country
+  * Dynamic placeholders based on country format
+- [ ] Test forms with different countries selected
+
+## Phase 5: Home Icon & Navigation
+- [x] Add home icon/button to Header component (Logo already acts as home button)
+- [x] Verify home icon appears on all pages (Header is global)
+- [x] Test home icon navigation works correctly (Logo click navigates to /)
+
+## Phase 6: Final TypeScript Error Fixes
+- [ ] Fix remaining 169 TypeScript errors
+- [ ] Achieve zero TypeScript errors
+- [ ] Verify clean build
