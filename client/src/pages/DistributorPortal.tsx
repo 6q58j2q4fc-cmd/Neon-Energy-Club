@@ -261,8 +261,8 @@ export default function DistributorPortal() {
   
   // Preview link uses the current domain for testing
   const previewLink = distributorProfile?.distributorCode
-    ? `${window.location.origin}/d/${distributorProfile.distributorCode}`
-    : `${window.location.origin}/d/demo`;
+    ? `${window.location.origin}/${distributorProfile.distributorCode}`
+    : `${window.location.origin}/demo`;
 
   const subdomain = distributorProfile?.subdomain 
     ? `${distributorProfile.subdomain}.neon.energy`
@@ -736,19 +736,19 @@ export default function DistributorPortal() {
                       <label className="text-sm text-gray-400">Your Replicated Website</label>
                       <div className="flex gap-2">
                         <Input 
-                          value={`${window.location.origin}/d/${distributorProfile?.distributorCode}`} 
+                          value={`${window.location.origin}/${distributorProfile?.distributorCode}`} 
                           readOnly 
                           className="bg-black/50 border-gray-700 text-white"
                         />
                         <Button 
-                          onClick={() => copyToClipboard(`${window.location.origin}/d/${distributorProfile?.distributorCode}`, "Replicated website link")}
+                          onClick={() => copyToClipboard(`${window.location.origin}/${distributorProfile?.distributorCode}`, "Replicated website link")}
                           variant="outline"
                           className="border-[#c8ff00]/30 text-[#c8ff00]"
                         >
                           <Copy className="w-4 h-4" />
                         </Button>
                         <Button 
-                          onClick={() => window.open(`${window.location.origin}/d/${distributorProfile?.distributorCode}`, '_blank')}
+                          onClick={() => window.open(`${window.location.origin}/${distributorProfile?.distributorCode}`, '_blank')}
                           variant="outline"
                           className="border-[#c8ff00]/30 text-[#c8ff00]"
                         >
@@ -1141,7 +1141,7 @@ export default function DistributorPortal() {
                           Copy
                         </Button>
                         <Button
-                          onClick={() => window.open(`${window.location.origin}/d/${distributorProfile?.distributorCode}`, '_blank')}
+                          onClick={() => window.open(`${window.location.origin}/${distributorProfile?.distributorCode}`, '_blank')}
                           variant="outline"
                           className="border-[#c8ff00] text-[#c8ff00] hover:bg-[#c8ff00]/10 font-bold px-6"
                         >

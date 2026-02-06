@@ -255,8 +255,8 @@ function DistributorSignupForm({ user }: { user: any }) {
   
   const enrollDistributor = trpc.distributor.enroll.useMutation({
     onSuccess: () => {
-      toast.success("Welcome to the NEON family! Your distributor account is active.");
-      setLocation("/distributor/dashboard");
+      toast.success("Welcome to the NEON family! Let's choose your starter package.");
+      setLocation("/package-selection");
     },
     onError: (error: any) => {
       toast.error(error.message || "Failed to enroll");

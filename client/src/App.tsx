@@ -70,6 +70,7 @@ import NeonOriginal from "./pages/NeonOriginal";
 import NeonPink from "./pages/NeonPink";
 import ApplicationForms from "./pages/ApplicationForms";
 import Search from "./pages/Search";
+import PackageSelection from "./pages/PackageSelection";
 import AmbientSoundToggle from "./components/AmbientSoundToggle";
 import UnifiedChatBot from "./components/UnifiedChatBot";
 import CookieConsent from "./components/CookieConsent";
@@ -113,7 +114,8 @@ function Router() {
         <Route path={"/celebrities"} component={Celebrities} />
         <Route path={"/crowdfund"} component={Crowdfund} />
         <Route path={"/faq"} component={FAQ} />
-        <Route path={"/join"} component={JoinNow} />
+          <Route path="/join" component={JoinNow} />
+        <Route path="/package-selection" component={PackageSelection} />
         <Route path={"/distributor/dashboard"} component={DistributorDashboard} />
         <Route path={"/distributor/tax-information"} component={TaxInformation} />
         <Route path={"/admin/distributor-data"} component={DistributorData} />
