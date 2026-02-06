@@ -5389,6 +5389,28 @@ Provide step-by-step instructions with specific button names and locations. Keep
         await updateNotificationPreferences(ctx.user.id, input);
         return { success: true };
       }),
+
+    // Team Performance Alerts
+    getTeamAlerts: protectedProcedure
+      .input(z.object({
+        limit: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { getDistributorAlerts } = await import('./teamPerformanceAlerts');
+        const alerts = await getDistributorAlerts(ctx.user.id, input.limit);
+        return alerts;
+      }),
+
+    // Mark team alert as read
+    markTeamAlertRead: protectedProcedure
+      .input(z.object({
+        alertId: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { markAlertAsRead } = await import('./teamPerformanceAlerts');
+        await markAlertAsRead(input.alertId);
+        return { success: true };
+      }),
   }),
 
 });

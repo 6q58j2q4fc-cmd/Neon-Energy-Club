@@ -63,6 +63,7 @@ import NavigationHeader from "@/components/NavigationHeader";
 import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
 import NeonLogo from "@/components/NeonLogo";
 import ProgressTrackerBot from "@/components/ProgressTrackerBot";
+import OnboardingTutorial from "@/components/OnboardingTutorial";
 
 export default function DistributorPortal() {
   const [location, setLocation] = useLocation();
@@ -282,6 +283,8 @@ export default function DistributorPortal() {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Onboarding Tutorial */}
+      <OnboardingTutorial />
       {/* Breadcrumb - Mobile only */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-black/90 backdrop-blur-sm border-b border-[#c8ff00]/20 px-4 py-2">
         <Breadcrumb 
@@ -303,20 +306,21 @@ export default function DistributorPortal() {
           {[
             { id: "dashboard", icon: BarChart3, label: "Dashboard" },
             { id: "my-website", icon: Globe, label: "My Website" },
-            { id: "my-team", icon: Users, label: "My Team" },
+            { id: "my-team", icon: Users, label: "My Team", dataTutorial: "my-team" },
             { id: "sales", icon: ShoppingCart, label: "Sales" },
-            { id: "commissions", icon: DollarSign, label: "Commissions" },
+            { id: "commissions", icon: DollarSign, label: "Commissions", dataTutorial: "commissions" },
             { id: "payouts", icon: CreditCard, label: "Payouts" },
             { id: "rank-history", icon: Award, label: "Rank History" },
             { id: "marketing", icon: Share2, label: "Marketing" },
             { id: "training", icon: BookOpen, label: "Training" },
             { id: "autoship", icon: Repeat, label: "Auto-Ship" },
             { id: "rewards", icon: Gift, label: "3-for-Free" },
-            { id: "settings", icon: Settings, label: "Settings" },
+            { id: "settings", icon: Settings, label: "Settings", dataTutorial: "settings" },
           ].map((item) => (
             <button
               key={item.id}
               onClick={() => handleTabChange(item.id)}
+              data-tutorial={item.dataTutorial}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                 activeTab === item.id 
                   ? 'bg-[#c8ff00]/20 text-[#c8ff00]' 
@@ -1123,7 +1127,7 @@ export default function DistributorPortal() {
                   </div>
                   
                   {/* Website URL Display */}
-                  <div className="bg-black/60 rounded-xl p-6 border border-[#c8ff00]/30 mb-6">
+                  <div className="bg-black/60 rounded-xl p-6 border border-[#c8ff00]/30 mb-6" data-tutorial="replicated-website">
                     <div className="text-sm text-gray-400 mb-2 flex items-center gap-2">
                       <Link className="w-4 h-4" />
                       Your Unique Website URL
@@ -1153,7 +1157,7 @@ export default function DistributorPortal() {
                   </div>
                   
                   {/* Quick Share Buttons */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6" data-tutorial="share-buttons">
                     <Button
                       onClick={() => {
                         const url = encodeURIComponent(`https://neonenergyclub.com/${distributorProfile?.distributorCode}`);
@@ -1354,6 +1358,7 @@ export default function DistributorPortal() {
             <button
               key={item.id}
               onClick={() => handleTabChange(item.id)}
+              data-tutorial={item.dataTutorial}
               className={`flex flex-col items-center py-2 px-2 rounded-lg transition-colors ${
                 activeTab === item.id ? 'text-[#c8ff00]' : 'text-gray-500'
               }`}
