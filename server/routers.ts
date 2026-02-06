@@ -5310,12 +5310,39 @@ Provide step-by-step instructions with specific button names and locations. Keep
         return leaderboard;
       }),
 
-    // Check milestones
+    // Check milestones (legacy - kept for compatibility)
     checkMilestones: protectedProcedure
       .query(async ({ ctx }) => {
         const { checkMilestones } = await import('./charityImpact');
         const milestones = await checkMilestones(ctx.user.id);
         return milestones;
+      }),
+
+    // Get achieved milestones with full details
+    getAchievements: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { checkAchievedMilestones } = await import('./impactMilestones');
+        const achievements = await checkAchievedMilestones(ctx.user.id);
+        return achievements;
+      }),
+
+    // Get next milestone to achieve
+    getNextMilestone: protectedProcedure
+      .input(z.object({
+        category: z.enum(['trees', 'habitat', 'species', 'animals', 'total', 'team']).optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        const { getNextMilestone } = await import('./impactMilestones');
+        const next = await getNextMilestone(ctx.user.id, input?.category);
+        return next;
+      }),
+
+    // Get milestone statistics
+    getMilestoneStats: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getMilestoneStats } = await import('./impactMilestones');
+        const stats = await getMilestoneStats(ctx.user.id);
+        return stats;
       }),
   }),
 

@@ -161,9 +161,9 @@ export async function calculateTeamImpact(
 ): Promise<ImpactCalculation> {
   const db = await getDb();
   
-  // Get all downline distributors
-  // TODO: Implement binary tree traversal when binaryTree module is enabled
-  const downlineIds: number[] = [];
+  // Get all downline distributors using binary tree
+  const { getAllDownline } = await import('./binaryTree');
+  const downlineIds = await getAllDownline(distributorId);
 
   if (downlineIds.length === 0) {
     return calculateImpactFromCans(0, 0);
@@ -193,7 +193,7 @@ export async function calculateTeamImpact(
   const cansOriginal = Math.round(totalCans * 0.5);
   const cansPink = Math.round(totalCans * 0.5);
 
-  return calculateImpactFromCans(cansOriginal, totalCansPink);
+  return calculateImpactFromCans(cansOriginal, cansPink);
 }
 
 /**
