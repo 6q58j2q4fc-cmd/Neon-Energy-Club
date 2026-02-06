@@ -14,7 +14,7 @@ export default function NeonLogo({ className = "", onClick }: NeonLogoProps) {
       {/* Main NEON Text - Static SVG */}
       <svg
         viewBox="0 0 260 70"
-        className="w-[120px] sm:w-[140px] md:w-[160px] h-auto"
+        className="w-[140px] sm:w-[170px] md:w-[200px] h-auto"
       >
         {/* Simple glow filter */}
         <defs>
@@ -75,28 +75,30 @@ export default function NeonLogo({ className = "", onClick }: NeonLogoProps) {
           />
         </g>
 
-        {/* Registered trademark */}
+        {/* Registered trademark - more prominent */}
         <text
-          x="248"
-          y="22"
+          x="250"
+          y="18"
           fill={neonColor}
-          fontSize="14"
+          fontSize="16"
+          fontWeight="bold"
           fontFamily="Arial, sans-serif"
-          style={{ opacity: 0.8 }}
+          filter="url(#neonGlow)"
+          style={{ opacity: 0.95 }}
         >
           ®
         </text>
       </svg>
 
-      {/* Horizontal line separator - perfectly centered */}
+      {/* Horizontal line separator - shorter to match text width */}
       <div
         className="mt-0.5 mx-auto"
         style={{ 
-          width: '100%',
-          maxWidth: '120px',
+          width: '85%',
+          maxWidth: '140px',
           height: '2px',
-          background: `linear-gradient(90deg, transparent, ${neonColor} 15%, ${neonColor} 85%, transparent)`,
-          boxShadow: `0 0 6px ${neonColor}`,
+          background: `linear-gradient(90deg, transparent 5%, ${neonColor} 20%, ${neonColor} 80%, transparent 95%)`,
+          boxShadow: `0 0 8px ${neonColor}`,
         }}
       />
 

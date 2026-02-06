@@ -5410,3 +5410,123 @@
 - [x] Test with multiple distributors
 - [x] All 16 tests passing
 - [ ] Create checkpoint and deliver
+
+
+## New Feature Implementation Tasks
+
+### 1. Rank Advancement System
+- [ ] Audit existing rank system implementation
+- [ ] Implement automatic rank qualification checks
+- [ ] Create rank advancement logic with 7-tier structure (Starter → Royal Diamond)
+- [ ] Add rank qualification rules (PV, team size, leg balance requirements)
+- [ ] Create rank advancement notification system
+- [ ] Build rank history tracking
+- [ ] Write vitest tests for rank advancement
+
+### 2. Earnings Dashboard
+- [ ] Audit existing dashboard components
+- [ ] Build commission breakdown UI
+- [ ] Add real-time team statistics display
+- [ ] Create genealogy tree visualization
+- [ ] Implement commission history table
+- [ ] Add earnings analytics charts
+- [ ] Write vitest tests for dashboard
+
+### 3. Commission Workflow Integration
+- [ ] Audit existing commission calculation code
+- [ ] Connect commission calculations to order placement
+- [ ] Connect commission calculations to distributor enrollment
+- [ ] Implement automatic commission posting on customer orders
+- [ ] Implement automatic commission posting on new distributor joins
+- [ ] Add commission transaction logging
+- [ ] Write vitest tests for workflow integration
+
+### 4. Language Selector System
+- [ ] Audit existing language selector implementation
+- [ ] Implement working language selector with country flags
+- [ ] Add auto-translation for all page text
+- [ ] Create language persistence (localStorage/cookies)
+- [ ] Design and position flag icon on website
+- [ ] Test language switching on all pages
+- [ ] Write vitest tests for language system
+
+### 5. Logo Improvements
+- [x] Increase NEON logo size on main page (140px -> 200px responsive)
+- [x] Improve logo image quality (already SVG - highest quality)
+- [x] Shorten underline under NEON text (100% -> 85% width)
+- [x] Add registered trademark symbol (®) to NEON logo (already exists, made more prominent)
+- [ ] Add trademark symbols to all NEON/NEON Pink product mentions across website
+- [ ] Test logo display on all pages
+
+### 6. Charity Rewards & NEON Coin
+- [ ] Add monthly order consistency tracking
+- [ ] Implement rewards accumulation system
+- [ ] Create NEON Coin points calculation
+- [ ] Build rewards redemption UI
+- [ ] Add "Cash in for NEON Coin" feature
+- [ ] Create rewards history tracking
+- [ ] Write vitest tests for rewards system
+
+### 7. Intelligent Chatbot Enhancement
+- [ ] Audit existing chatbot implementation
+- [ ] Implement website content learning system
+- [ ] Add real-time data synchronization
+- [ ] Create automatic knowledge base updates
+- [ ] Improve chatbot accuracy with website changes
+- [ ] Test chatbot responses for accuracy
+- [ ] Write vitest tests for chatbot intelligence
+
+
+## Priority Tasks - User Requested
+
+### Team Impact Tracking
+- [ ] Refactor binaryTree.ts with proper async/await patterns
+- [ ] Re-enable binary tree module
+- [ ] Integrate team impact calculation with charity impact system
+- [ ] Test team-wide environmental impact calculations
+- [ ] Verify downline impact aggregation
+
+### Impact Milestones & Badges
+- [ ] Design milestone achievement system (100 trees, 1000 animals, etc.)
+- [ ] Create badge graphics/icons for achievements
+- [ ] Implement milestone tracking and detection
+- [ ] Build shareable badge system
+- [ ] Add social sharing for achievements
+- [ ] Create milestone notification system
+
+### Impact Leaderboard
+- [ ] Design leaderboard UI for top environmental contributors
+- [ ] Implement leaderboard ranking logic
+- [ ] Add filters (monthly, all-time, by product type)
+- [ ] Create leaderboard page/component
+- [ ] Add gamification elements
+- [ ] Test leaderboard accuracy
+
+### Search Bar Fix
+- [ ] Identify search bar component
+- [ ] Debug typing/input issues
+- [ ] Fix search functionality
+- [ ] Test search across all pages
+- [ ] Verify search results accuracy
+
+### FAQ Content
+- [ ] Research NEON Energy Drink FAQs online
+- [ ] Compile comprehensive FAQ list
+- [ ] Create/update FAQ page
+- [ ] Organize FAQs by category
+- [ ] Add search functionality to FAQs
+
+### Product Page Fixes
+- [ ] Fix bottom of NEON cans being cut off
+- [ ] Remove white background from Susan B Komen logo
+- [ ] Enlarge NEON Pink can size
+- [ ] Enlarge NEON Original can size
+- [ ] Test product page display on all screen sizes
+
+### Main Page Logo & Design Fixes
+- [ ] Add NEON Green Disney Campaign Manager logo near can
+- [ ] Enlarge Disney Campaign Manager logo at bottom
+- [ ] Make Disney logo well visible
+- [ ] Move "new can design" flashing icon under the can
+- [ ] Fix icon blocking can image
+- [ ] Test main page layout on all devices
