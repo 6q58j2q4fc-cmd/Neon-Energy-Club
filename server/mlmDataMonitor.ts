@@ -37,14 +37,14 @@ export async function validateCommissions(distributorId: number): Promise<Integr
   const issues: IntegrityIssue[] = [];
   
   // Get distributor info
-  const [distributor] = await db.select().from(distributors).where(eq(distributors.id, distributorId));
+  const [distributor] = await db!.select().from(distributors).where(eq(distributors.id, distributorId));
   if (!distributor) return issues;
   
   // Get all commissions for this distributor
-  const distributorCommissions = await db.select().from(commissions).where(eq(commissions.distributorId, distributorId));
+  const distributorCommissions = await db!.select().from(commissions).where(eq(commissions.distributorId, distributorId));
   
   // Get all sales attributed to this distributor
-  const distributorSales = await db.select().from(sales).where(eq(sales.distributorId, distributorId));
+  const distributorSales = await db!.select().from(sales).where(eq(sales.distributorId, distributorId));
   
   // Calculate expected commissions based on compensation plan
   const expectedDirectCommission = distributorSales.reduce((sum, sale) => {
@@ -102,14 +102,14 @@ export async function validateReferralTracking(): Promise<IntegrityIssue[]> {
   const issues: IntegrityIssue[] = [];
   
   // Find orders without distributor attribution that came from referral links
-  const unattributedOrders = await db.select()
+  const unattributedOrders = await db!.select()
     .from(orders)
     .where(sql`${orders.distributorId} IS NULL AND ${orders.createdAt} > DATE_SUB(NOW(), INTERVAL 30 DAY)`)
     .limit(100);
   
   for (const order of unattributedOrders) {
     // Check if there's a referral tracking record for this order
-    const [referral] = await db.select()
+    const [referral] = await db!.select()
       .from(referralTracking)
       .where(eq(referralTracking.customerOrderId, order.id));
     
@@ -139,11 +139,11 @@ export async function validateVolumeCalculations(distributorId: number): Promise
   const issues: IntegrityIssue[] = [];
   
   // Get distributor
-  const [distributor] = await db.select().from(distributors).where(eq(distributors.id, distributorId));
+  const [distributor] = await db!.select().from(distributors).where(eq(distributors.id, distributorId));
   if (!distributor) return issues;
   
   // Calculate actual personal sales from orders
-  const personalSalesResult = await db.select({
+  const personalSalesResult = await db!.select({
     total: sql<number>`COALESCE(SUM(${orders.pv}), 0)`
   })
     .from(orders)
@@ -180,7 +180,7 @@ export async function validateRankEligibility(distributorId: number): Promise<In
   const issues: IntegrityIssue[] = [];
   
   // Get distributor
-  const [distributor] = await db.select().from(distributors).where(eq(distributors.id, distributorId));
+  const [distributor] = await db!.select().from(distributors).where(eq(distributors.id, distributorId));
   if (!distributor) return issues;
   
   // Rank requirements
@@ -228,7 +228,7 @@ export async function validateRankEligibility(distributorId: number): Promise<In
 export async function runFullIntegrityCheck(): Promise<DataIntegrityReport> {
   const db = await getDb();
   const report: DataIntegrityReport = {
-    timestamp: new Date(),
+    timestamp: new Date().toISOString(),
     checksPerformed: 0,
     issuesFound: 0,
     issuesFixed: 0,
@@ -238,7 +238,7 @@ export async function runFullIntegrityCheck(): Promise<DataIntegrityReport> {
   if (!db) return report;
   
   // Get all active distributors
-  const activeDistributors = await db.select()
+  const activeDistributors = await db!.select()
     .from(distributors)
     .where(eq(distributors.status, 'active'))
     .limit(100);
@@ -311,7 +311,7 @@ export async function autoFixIssues(issues: IntegrityIssue[]): Promise<number> {
       switch (issue.type) {
         case 'volume_discrepancy':
           // Recalculate and update volume
-          const volumeResult = await db.select({
+          const volumeResult = await db!.select({
             total: sql<number>`COALESCE(SUM(${orders.pv}), 0)`
           })
             .from(orders)
@@ -320,7 +320,7 @@ export async function autoFixIssues(issues: IntegrityIssue[]): Promise<number> {
               eq(orders.status, 'paid')
             ));
           
-          await db.update(distributors)
+          await db!.update(distributors)
             .set({ personalSales: volumeResult[0]?.total || 0 })
             .where(eq(distributors.id, issue.affectedRecordId));
           
@@ -330,12 +330,12 @@ export async function autoFixIssues(issues: IntegrityIssue[]): Promise<number> {
           
         case 'referral_unattributed':
           // Find the referrer and attribute the order
-          const [referral] = await db.select()
+          const [referral] = await db!.select()
             .from(referralTracking)
             .where(eq(referralTracking.customerOrderId, issue.affectedRecordId));
           
           if (referral?.distributorId) {
-            await db.update(orders)
+            await db!.update(orders)
               .set({ distributorId: referral.distributorId })
               .where(eq(orders.id, issue.affectedRecordId));
             
@@ -360,11 +360,11 @@ export async function processOrderCommissions(orderId: number): Promise<void> {
   if (!db) return;
   
   // Get the order
-  const [order] = await db.select().from(orders).where(eq(orders.id, orderId));
+  const [order] = await db!.select().from(orders).where(eq(orders.id, orderId));
   if (!order || !order.distributorId) return;
   
   // Get the distributor
-  const [distributor] = await db.select().from(distributors).where(eq(distributors.id, order.distributorId));
+  const [distributor] = await db!.select().from(distributors).where(eq(distributors.id, order.distributorId));
   if (!distributor) return;
   
   const commissionVolume = order.pv;
@@ -373,7 +373,7 @@ export async function processOrderCommissions(orderId: number): Promise<void> {
   const directRate = getRankCommissionRate(distributor.rank);
   const directCommission = Math.round(commissionVolume * directRate * 100); // In cents
   
-  await db.insert(commissions).values({
+  await db!.insert(commissions).values({
     distributorId: distributor.id,
     saleId: orderId,
     sourceDistributorId: distributor.id,
@@ -390,12 +390,12 @@ export async function processOrderCommissions(orderId: number): Promise<void> {
   let level = 1;
   
   while (currentSponsorId && level <= 5) {
-    const [sponsor] = await db.select().from(distributors).where(eq(distributors.id, currentSponsorId));
+    const [sponsor] = await db!.select().from(distributors).where(eq(distributors.id, currentSponsorId));
     if (!sponsor || sponsor.isActive !== 1) break;
     
     const teamCommission = Math.round(commissionVolume * unilevelRates[level - 1] * 100);
     
-    await db.insert(commissions).values({
+    await db!.insert(commissions).values({
       distributorId: sponsor.id,
       saleId: orderId,
       sourceDistributorId: distributor.id,
@@ -407,7 +407,7 @@ export async function processOrderCommissions(orderId: number): Promise<void> {
     });
     
     // Update sponsor's team sales
-    await db.update(distributors)
+    await db!.update(distributors)
       .set({ teamSales: sql`${distributors.teamSales} + ${commissionVolume}` })
       .where(eq(distributors.id, sponsor.id));
     
@@ -416,7 +416,7 @@ export async function processOrderCommissions(orderId: number): Promise<void> {
   }
   
   // 3. Update distributor's personal sales
-  await db.update(distributors)
+  await db!.update(distributors)
     .set({ 
       personalSales: sql`${distributors.personalSales} + ${commissionVolume}`,
       monthlyPv: sql`${distributors.monthlyPv} + ${commissionVolume}`,
@@ -424,7 +424,7 @@ export async function processOrderCommissions(orderId: number): Promise<void> {
     .where(eq(distributors.id, distributor.id));
   
   // 4. Update available balance
-  await db.update(distributors)
+  await db!.update(distributors)
     .set({ 
       availableBalance: sql`${distributors.availableBalance} + ${directCommission}`,
       totalEarnings: sql`${distributors.totalEarnings} + ${directCommission}`,
@@ -446,7 +446,7 @@ export async function trackReferralClick(distributorCode: string, visitorInfo: {
   if (!db) return null;
   
   // Find the distributor by code
-  const [distributor] = await db.select()
+  const [distributor] = await db!.select()
     .from(distributors)
     .where(eq(distributors.distributorCode, distributorCode));
   
@@ -456,24 +456,24 @@ export async function trackReferralClick(distributorCode: string, visitorInfo: {
   const trackingId = `ref_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   
   // Record the click in affiliate links
-  const [link] = await db.select()
+  const [link] = await db!.select()
     .from(affiliateLinks)
     .where(eq(affiliateLinks.distributorId, distributor.id));
   
   if (link) {
-    await db.update(affiliateLinks)
+    await db!.update(affiliateLinks)
       .set({ clicks: sql`${affiliateLinks.clicks} + 1` })
       .where(eq(affiliateLinks.id, link.id));
   }
   
   // Create referral tracking record
-  await db.insert(referralTracking).values({
+  await db!.insert(referralTracking).values({
     referrerId: distributor.distributorCode,
     referrerName: distributor.username || distributor.distributorCode,
     referralCode: trackingId,
     source: 'direct',
     status: 'clicked',
-    clickedAt: new Date(),
+    clickedAt: new Date().toISOString(),
   });
   
   return { trackingId, distributorId: distributor.id };

@@ -63,7 +63,7 @@ export async function checkFirstSale(distributorId: number): Promise<TeamAlert |
         salesCount: 1,
         rank: distributor.rank,
       },
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       read: false,
     };
   }
@@ -109,7 +109,7 @@ export async function checkRankAdvancement(
         newRank,
         advancementDate: new Date().toISOString(),
       },
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       read: false,
     };
   }
@@ -156,7 +156,7 @@ export async function checkVolumeThreshold(
         threshold,
         currentVolume,
       },
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       read: false,
     };
   }
@@ -217,7 +217,7 @@ export async function checkTeamMilestone(
         threshold,
         currentCount,
       },
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       read: false,
     };
   }

@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import HamburgerHeader from "@/components/HamburgerHeader";
 import Footer from "@/components/Footer";
-import { ShoppingBag, CreditCard, Lock, ArrowLeft, Zap, AlertCircle, Loader2, Truck, Tag, Check, X } from "lucide-react";
+import { ShoppingBag, CreditCard, Lock, ArrowLeft, Zap, AlertCircle, Loader2, Truck, Tag, Check, X, RefreshCw } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -37,7 +37,7 @@ const US_STATES = [
 
 export default function Checkout() {
   const { t, language } = useLanguage();
-  const { items, totalPrice, clearCart } = useCart();
+  const { items, totalPrice, clearCart, autoshipEnabled, setAutoshipEnabled, autoshipFrequency, setAutoshipFrequency } = useCart();
   const { user } = useAuth();
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
@@ -88,8 +88,11 @@ export default function Checkout() {
   const discountPercent = couponValidation?.valid ? (couponValidation.discountPercent || 0) : 0;
   const discountAmount = (totalPrice * discountPercent) / 100;
 
+  // Calculate autoship discount
+  const autoshipDiscount = autoshipEnabled ? totalPrice * 0.05 : 0;
+
   // Calculate final total
-  const finalTotal = totalPrice - discountAmount + shippingCost;
+  const finalTotal = totalPrice - discountAmount - autoshipDiscount + shippingCost;
 
   const { data: stripeConfig } = trpc.payment.isConfigured.useQuery();
   
@@ -483,15 +486,44 @@ export default function Checkout() {
                   )}
                 </div>
 
+                {/* Auto-Ship Status */}
+                <div className="pt-4 border-t border-white/20">
+                  <div className={`rounded-xl p-4 border transition-all ${autoshipEnabled ? 'bg-[#c8ff00]/10 border-[#c8ff00]/30' : 'bg-white/5 border-white/10'}`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <RefreshCw className={`w-4 h-4 ${autoshipEnabled ? 'text-[#c8ff00]' : 'text-white/40'}`} />
+                        <span className={`text-sm font-bold ${autoshipEnabled ? 'text-[#c8ff00]' : 'text-white/50'}`}>
+                          Auto-Ship {autoshipEnabled ? 'ON' : 'OFF'} — {autoshipEnabled ? 'Save 5%' : 'No discount'}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => setAutoshipEnabled(!autoshipEnabled)}
+                        className={`relative w-12 h-6 rounded-full transition-all duration-300 ${autoshipEnabled ? 'bg-[#c8ff00]' : 'bg-white/20'}`}
+                      >
+                        <div className={`absolute top-0.5 w-5 h-5 rounded-full transition-all duration-300 ${autoshipEnabled ? 'left-6 bg-black' : 'left-0.5 bg-white/60'}`} />
+                      </button>
+                    </div>
+                    {autoshipEnabled && (
+                      <p className="text-xs text-[#c8ff00]/60 mt-2">Ships {autoshipFrequency === 'monthly' ? 'every month' : 'every 2 weeks'} automatically</p>
+                    )}
+                  </div>
+                </div>
+
                 {/* Price Breakdown */}
                 <div className="pt-4 border-t border-white/20 space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-400">Subtotal</span>
                     <span className="text-white">${totalPrice.toFixed(2)}</span>
                   </div>
+                  {autoshipDiscount > 0 && (
+                    <div className="flex justify-between items-center text-[#c8ff00]">
+                      <span>Auto-Ship Discount (5%)</span>
+                      <span>-${autoshipDiscount.toFixed(2)}</span>
+                    </div>
+                  )}
                   {discountAmount > 0 && (
                     <div className="flex justify-between items-center text-[#c8ff00]">
-                      <span>Discount ({discountPercent}%)</span>
+                      <span>Coupon Discount ({discountPercent}%)</span>
                       <span>-${discountAmount.toFixed(2)}</span>
                     </div>
                   )}

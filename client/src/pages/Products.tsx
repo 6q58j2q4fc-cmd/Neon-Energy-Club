@@ -54,9 +54,9 @@ export default function Products() {
         image: "/neon-pink-can-new.png",
       },
       mixed: {
-        id: "neon-mixed-case",
-        name: "NEON Mixed Case (12 Original + 12 Pink)",
-        price: 62.99,
+        id: "neon-combo-cases",
+        name: "NEON Combo: 1 Case Original + 1 Case Pink (48 Cans Total)",
+        price: 119.99,
         type: "product" as const,
         flavor: "mixed" as const,
         image: "/neon-can-transparent-final.png",
@@ -405,7 +405,7 @@ export default function Products() {
             </div>
           </div>
 
-          {/* Mixed Case Option - Premium Design */}
+          {/* Try a Case of Each - Premium Design */}
           <div id="mixed" className="mt-16 relative scroll-focus-target">
             <div className="relative rounded-[2rem] overflow-hidden">
               {/* Gradient background */}
@@ -413,23 +413,53 @@ export default function Products() {
               <div className="absolute inset-0 backdrop-blur-xl" />
               <div className="absolute inset-0 border-2 border-white/10 rounded-[2rem]" />
               
-              <div className="relative p-12 text-center">
-                <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-[#c8ff00]/20 to-pink-500/20 border border-white/20 mb-6">
-                  <Sparkles className="w-5 h-5 text-[#c8ff00]" />
-                  <span className="text-white font-bold tracking-wider">BEST VALUE</span>
+              <div className="relative p-8 md:p-12">
+                <div className="text-center mb-8">
+                  <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-[#c8ff00]/20 to-pink-500/20 border border-white/20 mb-6">
+                    <Sparkles className="w-5 h-5 text-[#c8ff00]" />
+                    <span className="text-white font-bold tracking-wider">BEST VALUE — SAVE $4.99</span>
+                  </div>
+                  
+                  <h3 className="text-4xl md:text-5xl font-black text-white mb-4">Try a Case of Each!</h3>
+                  <p className="text-white/50 text-lg">Get a full case of NEON Original + a full case of NEON Pink</p>
                 </div>
-                
-                <h3 className="text-4xl md:text-5xl font-black text-white mb-4">Can't Decide? Try Both!</h3>
-                <p className="text-white/50 text-lg mb-8">Mixed Case: 12 Original + 12 Pink</p>
-                
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                  <span className="text-6xl font-black bg-gradient-to-r from-[#c8ff00] to-pink-400 bg-clip-text text-transparent">$62.99</span>
+
+                {/* Two case display */}
+                <div className="grid md:grid-cols-2 gap-6 mb-8">
+                  {/* Original Case */}
+                  <div className="bg-black/40 border border-[#c8ff00]/20 rounded-2xl p-6 text-center">
+                    <div className="w-24 h-32 mx-auto mb-4 relative">
+                      <img src="/neon-can-transparent-final.png" alt="NEON Original" className="w-full h-full object-contain" />
+                    </div>
+                    <h4 className="text-xl font-black text-[#c8ff00] mb-1">NEON Original</h4>
+                    <p className="text-white/50 text-sm mb-2">24 × 8.4oz Cans</p>
+                    <p className="text-white/30 text-xs">Full Case — Citrus Blast Energy</p>
+                  </div>
+                  
+                  {/* Pink Case */}
+                  <div className="bg-black/40 border border-pink-500/20 rounded-2xl p-6 text-center">
+                    <div className="w-24 h-32 mx-auto mb-4 relative">
+                      <img src="/neon-pink-can-new.png" alt="NEON Pink" className="w-full h-full object-contain" />
+                    </div>
+                    <h4 className="text-xl font-black text-pink-400 mb-1">NEON Pink</h4>
+                    <p className="text-white/50 text-sm mb-2">24 × 8.4oz Cans</p>
+                    <p className="text-white/30 text-xs">Full Case — Electric Pom Passion</p>
+                  </div>
+                </div>
+
+                {/* Price and CTA */}
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-4 mb-2">
+                    <span className="text-2xl text-white/30 line-through">$124.98</span>
+                    <span className="text-6xl font-black bg-gradient-to-r from-[#c8ff00] to-pink-400 bg-clip-text text-transparent">$119.99</span>
+                  </div>
+                  <p className="text-white/40 text-sm mb-6">48 cans total — 2 full cases of 24 × 8.4oz each</p>
                   <Button
                     onClick={() => handlePreOrder("mixed")}
-                    className="bg-gradient-to-r from-[#c8ff00] via-[#00ff88] to-pink-500 text-black hover:opacity-90 font-black px-12 py-7 text-lg rounded-2xl shadow-[0_10px_50px_rgba(200,255,0,0.3)]"
+                    className="bg-gradient-to-r from-[#c8ff00] via-[#00ff88] to-pink-500 text-black hover:opacity-90 font-black px-12 py-7 text-xl rounded-2xl shadow-[0_10px_50px_rgba(200,255,0,0.3)] hover:shadow-[0_15px_60px_rgba(200,255,0,0.5)] transition-all"
                   >
-                    <ShoppingCart className="w-6 h-6 mr-3" />
-                    Add Mixed Case
+                    <ShoppingCart className="w-7 h-7 mr-3" />
+                    Add Both Cases to Cart
                   </Button>
                 </div>
               </div>

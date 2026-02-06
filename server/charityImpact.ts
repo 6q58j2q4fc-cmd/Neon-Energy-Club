@@ -285,7 +285,7 @@ export async function saveImpactSummary(
     // Insert new record
     if (!db) throw new Error('Database not initialized');
 
-    await db.insert(charityImpactTracking).values({
+    await db!.insert(charityImpactTracking).values({
       distributorId,
       periodStart,
       periodEnd,

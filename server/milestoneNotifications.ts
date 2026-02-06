@@ -148,7 +148,7 @@ export async function updateNotificationPreferences(
   console.log(`[Notification Preferences] Updated for distributor ${distributorId}:`, preferences);
   
   // TODO: Store preferences in database
-  // await db.insert(notificationPreferences).values({
+  // await db!.insert(notificationPreferences).values({
   //   distributorId,
   //   ...preferences,
   //   updatedAt: new Date().toISOString()

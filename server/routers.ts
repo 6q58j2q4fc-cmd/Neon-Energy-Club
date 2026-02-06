@@ -551,7 +551,7 @@ export const appRouter = router({
         }
         
         // Get NFTs
-        const nfts = await db.select({
+        const nfts = await db!.select({
           id: preorders.id,
           orderNumber: preorders.nftId,
           imageUrl: preorders.nftImageUrl,
@@ -566,13 +566,13 @@ export const appRouter = router({
           .offset(offset);
         
         // Get total count
-        const countResult = await db.select({ count: sql<number>`count(*)` })
+        const countResult = await db!.select({ count: sql<number>`count(*)` })
           .from(preorders)
           .where(whereClause);
         const total = countResult[0]?.count || 0;
         
         // Get stats by rarity
-        const rarityStats = await db.select({
+        const rarityStats = await db!.select({
           rarity: preorders.nftRarity,
           count: sql<number>`count(*)`,
         })
@@ -1127,7 +1127,7 @@ export const appRouter = router({
             taxIdLast4: input.taxIdLast4,
             agreedToPolicies: input.agreedToPolicies,
             agreedToTerms: input.agreedToTerms,
-            agreedAt: new Date(),
+            agreedAt: new Date().toISOString(),
           });
         }
         
@@ -1304,9 +1304,9 @@ export const appRouter = router({
             taxIdType: input.taxIdType,
             ssnLast4: taxIdLast4,
             taxInfoCompleted: 1,
-            taxInfoCompletedAt: new Date(),
+            taxInfoCompletedAt: new Date().toISOString(),
             w9Submitted: 1,
-            w9SubmittedAt: new Date(),
+            w9SubmittedAt: new Date().toISOString(),
           })
           .where(eq(distributors.id, distributor.id));
 
@@ -2460,7 +2460,7 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
           agreedToTerms: 1,
           signature: input.signature,
           status: "submitted",
-          submittedAt: new Date(),
+          submittedAt: new Date().toISOString(),
         });
         
         // Get application details for notification
@@ -2687,7 +2687,7 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
         const application = await createVendingApplication({
           ...input,
           status: "pending",
-          submittedAt: new Date(),
+          submittedAt: new Date().toISOString(),
         });
         
         // Notify admin of new vending application
@@ -2729,7 +2729,7 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
         const application = await createFranchiseApplication({
           ...input,
           status: "pending",
-          submittedAt: new Date(),
+          submittedAt: new Date().toISOString(),
         });
         
         // Notify admin of new franchise application
@@ -3030,7 +3030,7 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
       .input(z.object({ phone: z.string().min(10) }))
       .mutation(async ({ input }) => {
         const { updateSMSOptIn } = await import("./db");
-        await updateSMSOptIn(input.phone, { optedIn: 0, optOutDate: new Date() });
+        await updateSMSOptIn(input.phone, { optedIn: 0, optOutDate: new Date().toISOString() });
         return { success: true };
       }),
 
@@ -3453,7 +3453,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
         // Find the referrer by code
         const { customerReferralCodes } = await import("../drizzle/schema");
         const { eq } = await import("drizzle-orm");
-        const codeResult = await db.select()
+        const codeResult = await db!.select()
           .from(customerReferralCodes)
           .where(eq(customerReferralCodes.code, input.referralCode))
           .limit(1);
@@ -5231,7 +5231,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         
         // Delete test distributors
-        const testDistributorsDeleted = await db.delete(distributors)
+        const testDistributorsDeleted = await db!.delete(distributors)
           .where(
             or(
               like(distributors.username, '%test%'),
@@ -5242,7 +5242,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
           );
         
         // Delete test referral tracking
-        await db.delete(referralTracking)
+        await db!.delete(referralTracking)
           .where(
             or(
               like(referralTracking.referrerId, '%test%'),

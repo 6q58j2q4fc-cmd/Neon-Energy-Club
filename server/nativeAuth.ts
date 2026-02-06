@@ -41,7 +41,7 @@ export async function isUsernameAvailable(username: string): Promise<boolean> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const existing = await db.select({ id: users.id })
+  const existing = await db!.select({ id: users.id })
     .from(users)
     .where(eq(users.username, username))
     .limit(1);
@@ -56,7 +56,7 @@ export async function isEmailAvailable(email: string): Promise<boolean> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const existing = await db.select({ id: users.id })
+  const existing = await db!.select({ id: users.id })
     .from(users)
     .where(eq(users.email, email))
     .limit(1);
@@ -104,7 +104,7 @@ export async function registerNativeUser(data: {
   const emailVerificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
   
   try {
-    const result = await db.insert(users).values({
+    const result = await db!.insert(users).values({
       openId,
       username: data.username,
       email: data.email,
@@ -138,7 +138,7 @@ export async function authenticateNativeUser(
   if (!db) throw new Error("Database not available");
   
   // Find user by username or email
-  const userResults = await db.select()
+  const userResults = await db!.select()
     .from(users)
     .where(
       or(
@@ -166,8 +166,8 @@ export async function authenticateNativeUser(
   }
   
   // Update last signed in
-  await db.update(users)
-    .set({ lastSignedIn: new Date() })
+  await db!.update(users)
+    .set({ lastSignedIn: new Date().toISOString() })
     .where(eq(users.id, user.id));
   
   // Return user without sensitive data
@@ -183,7 +183,7 @@ export async function requestPasswordReset(email: string): Promise<{ success: bo
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const userResults = await db.select()
+  const userResults = await db!.select()
     .from(users)
     .where(eq(users.email, email))
     .limit(1);
@@ -199,7 +199,7 @@ export async function requestPasswordReset(email: string): Promise<{ success: bo
   const resetToken = generateToken();
   const resetExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
   
-  await db.update(users)
+  await db!.update(users)
     .set({
       passwordResetToken: resetToken,
       passwordResetExpiry: resetExpiry,
@@ -220,7 +220,7 @@ export async function resetPassword(
   if (!db) throw new Error("Database not available");
   
   // Find user with valid token
-  const userResults = await db.select()
+  const userResults = await db!.select()
     .from(users)
     .where(eq(users.passwordResetToken, token))
     .limit(1);
@@ -245,7 +245,7 @@ export async function resetPassword(
   const passwordHash = await hashPassword(newPassword);
   
   // Update password and clear reset token
-  await db.update(users)
+  await db!.update(users)
     .set({
       passwordHash,
       passwordResetToken: null,
@@ -263,7 +263,7 @@ export async function verifyEmail(token: string): Promise<{ success: boolean; er
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const userResults = await db.select()
+  const userResults = await db!.select()
     .from(users)
     .where(eq(users.emailVerificationToken, token))
     .limit(1);
@@ -280,7 +280,7 @@ export async function verifyEmail(token: string): Promise<{ success: boolean; er
   }
   
   // Mark email as verified
-  await db.update(users)
+  await db!.update(users)
     .set({
       emailVerified: 1,
       emailVerificationToken: null,
@@ -302,7 +302,7 @@ export async function changePassword(
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const userResults = await db.select()
+  const userResults = await db!.select()
     .from(users)
     .where(eq(users.id, userId))
     .limit(1);
@@ -329,7 +329,7 @@ export async function changePassword(
   // Hash new password
   const passwordHash = await hashPassword(newPassword);
   
-  await db.update(users)
+  await db!.update(users)
     .set({ passwordHash })
     .where(eq(users.id, userId));
   

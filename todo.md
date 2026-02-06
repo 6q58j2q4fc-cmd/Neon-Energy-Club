@@ -5889,3 +5889,12 @@
 - [ ] Add export/share functionality
 - [ ] Integrate into VendingMachines.tsx page
 - [ ] Test calculations with various inputs
+
+
+## Product Section & Autoship Updates
+- [x] Change "Try Both" section to full case of each (24 cans NEON Original + 24 cans NEON Pink)
+- [x] Update product images and buttons to reflect full cases
+- [x] Update shopping cart to show both cases with correct quantities
+- [x] Set autoship checkbox to always default to YES/checked
+- [x] Add distributor warning when autoship is turned off (lose active status without 2 cases/month)
+- [x] Test cart reflects correct case quantities and pricing

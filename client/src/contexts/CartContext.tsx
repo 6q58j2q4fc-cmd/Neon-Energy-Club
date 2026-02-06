@@ -22,15 +22,22 @@ interface CartContextType {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   openCart: () => void;
+  autoshipEnabled: boolean;
+  setAutoshipEnabled: (enabled: boolean) => void;
+  autoshipFrequency: "monthly" | "biweekly";
+  setAutoshipFrequency: (freq: "monthly" | "biweekly") => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CART_STORAGE_KEY = "neon-cart";
+const AUTOSHIP_STORAGE_KEY = "neon-autoship";
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [autoshipEnabled, setAutoshipEnabled] = useState(true); // Default to YES
+  const [autoshipFrequency, setAutoshipFrequency] = useState<"monthly" | "biweekly">("monthly");
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -42,12 +49,30 @@ export function CartProvider({ children }: { children: ReactNode }) {
         console.error("Failed to parse cart from localStorage:", e);
       }
     }
+    const savedAutoship = localStorage.getItem(AUTOSHIP_STORAGE_KEY);
+    if (savedAutoship) {
+      try {
+        const parsed = JSON.parse(savedAutoship);
+        setAutoshipEnabled(parsed.enabled ?? true);
+        setAutoshipFrequency(parsed.frequency ?? "monthly");
+      } catch (e) {
+        console.error("Failed to parse autoship from localStorage:", e);
+      }
+    }
   }, []);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
   }, [items]);
+
+  // Save autoship to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(AUTOSHIP_STORAGE_KEY, JSON.stringify({
+      enabled: autoshipEnabled,
+      frequency: autoshipFrequency,
+    }));
+  }, [autoshipEnabled, autoshipFrequency]);
 
   const addItem = (newItem: Omit<CartItem, "quantity"> & { quantity?: number }) => {
     setItems((prev) => {
@@ -99,6 +124,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         isOpen,
         setIsOpen,
         openCart,
+        autoshipEnabled,
+        setAutoshipEnabled,
+        autoshipFrequency,
+        setAutoshipFrequency,
       }}
     >
       {children}

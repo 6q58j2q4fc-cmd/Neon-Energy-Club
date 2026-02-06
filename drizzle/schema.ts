@@ -1340,3 +1340,11 @@ export type InsertVendingCommission = typeof vendingCommissions.$inferInsert;
 export type InsertReferralTracking = typeof referralTracking.$inferInsert;
 export type InsertSMSMessageLog = typeof smsMessageLog.$inferInsert;
 export type InsertTerritoryReservation = typeof territoryReservations.$inferInsert;
+
+export type InsertPreorder = typeof preorders.$inferInsert;
+export type InsertClaimedTerritory = typeof claimedTerritories.$inferInsert;
+export type InsertNeonNft = typeof neonNfts.$inferInsert;
+export type InsertInvestorInquiry = typeof investorInquiries.$inferInsert;
+export type InsertBlogPost = typeof blogPosts.$inferInsert;
+export type InsertSMSOptIn = typeof smsOptIns.$inferInsert;
+export type InsertPayoutHistoryRecord = typeof payoutHistory.$inferInsert;

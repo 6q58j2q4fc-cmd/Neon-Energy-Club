@@ -62,7 +62,7 @@ export async function generateReplicatedSite(userId: number): Promise<Replicated
   if (!db) return null;
 
   // Get distributor info
-  const [distributor] = await db.select()
+  const [distributor] = await db!.select()
     .from(distributors)
     .where(eq(distributors.userId, userId));
 
@@ -72,20 +72,20 @@ export async function generateReplicatedSite(userId: number): Promise<Replicated
   }
 
   // Get or create user profile
-  let [profile] = await db.select()
+  let [profile] = await db!.select()
     .from(userProfiles)
     .where(eq(userProfiles.userId, userId));
 
   if (!profile) {
     // Create default profile
-    await db.insert(userProfiles).values({
+    await db!.insert(userProfiles).values({
       userId,
       userType: 'distributor',
       isPublished: 1,
       pageViews: 0,
       signupsGenerated: 0,
     });
-    [profile] = await db.select()
+    [profile] = await db!.select()
       .from(userProfiles)
       .where(eq(userProfiles.userId, userId));
   }
@@ -100,7 +100,7 @@ export async function generateReplicatedSite(userId: number): Promise<Replicated
     let attempts = 0;
     let finalSubdomain = subdomain;
     while (attempts < 10) {
-      const [existing] = await db.select()
+      const [existing] = await db!.select()
         .from(distributors)
         .where(eq(distributors.subdomain, finalSubdomain));
       
@@ -110,7 +110,7 @@ export async function generateReplicatedSite(userId: number): Promise<Replicated
     }
 
     // Update distributor with subdomain
-    await db.update(distributors)
+    await db!.update(distributors)
       .set({ subdomain: finalSubdomain })
       .where(eq(distributors.id, distributor.id));
     
@@ -118,12 +118,12 @@ export async function generateReplicatedSite(userId: number): Promise<Replicated
   }
 
   // Create affiliate link if not exists
-  const [existingLink] = await db.select()
+  const [existingLink] = await db!.select()
     .from(affiliateLinks)
     .where(eq(affiliateLinks.distributorId, distributor.id));
 
   if (!existingLink) {
-    await db.insert(affiliateLinks).values({
+    await db!.insert(affiliateLinks).values({
       distributorId: distributor.id,
       linkCode: distributor.distributorCode,
       campaignName: 'Main Referral Link',
@@ -170,12 +170,12 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
       distributorCode: 'unknown',
       status: 'error',
       issues: [{ type: 'data_drift', severity: 'critical', description: 'Database unavailable', autoFixed: 0 }],
-      lastAuditedAt: new Date(),
+      lastAuditedAt: new Date().toISOString(),
     };
   }
 
   // Get distributor
-  const [distributor] = await db.select()
+  const [distributor] = await db!.select()
     .from(distributors)
     .where(eq(distributors.id, distributorId));
 
@@ -185,18 +185,18 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
       distributorCode: 'unknown',
       status: 'error',
       issues: [{ type: 'data_drift', severity: 'critical', description: 'Distributor not found', autoFixed: 0 }],
-      lastAuditedAt: new Date(),
+      lastAuditedAt: new Date().toISOString(),
     };
   }
 
   // Check 1: Verify affiliate link exists
-  const [link] = await db.select()
+  const [link] = await db!.select()
     .from(affiliateLinks)
     .where(eq(affiliateLinks.distributorId, distributorId));
 
   if (!link) {
     // Auto-fix: Create affiliate link
-    await db.insert(affiliateLinks).values({
+    await db!.insert(affiliateLinks).values({
       distributorId,
       linkCode: distributor.distributorCode,
       campaignName: 'Main Referral Link',
@@ -215,7 +215,7 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
   }
 
   // Check 2: Verify referral tracking is working
-  const recentReferrals = await db.select({ count: sql<number>`COUNT(*)` })
+  const recentReferrals = await db!.select({ count: sql<number>`COUNT(*)` })
     .from(referralTracking)
     .where(and(
       eq(referralTracking.referrerId, distributor.distributorCode),
@@ -223,11 +223,11 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
     ));
 
   // Check 3: Verify commission calculations
-  const distributorSales = await db.select()
+  const distributorSales = await db!.select()
     .from(sales)
     .where(eq(sales.distributorId, distributorId));
 
-  const distributorCommissions = await db.select()
+  const distributorCommissions = await db!.select()
     .from(commissions)
     .where(eq(commissions.distributorId, distributorId));
 
@@ -250,13 +250,13 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
   }
 
   // Check 4: Verify profile data consistency
-  const [profile] = await db.select()
+  const [profile] = await db!.select()
     .from(userProfiles)
     .where(eq(userProfiles.userId, distributor.userId));
 
   if (!profile) {
     // Auto-fix: Create profile
-    await db.insert(userProfiles).values({
+    await db!.insert(userProfiles).values({
       userId: distributor.userId,
       userType: 'distributor',
       isPublished: 1,
@@ -274,7 +274,7 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
   // Check 5: Verify subdomain is set
   if (!distributor.subdomain) {
     const subdomain = distributor.distributorCode.toLowerCase().replace(/[^a-z0-9]/g, '-');
-    await db.update(distributors)
+    await db!.update(distributors)
       .set({ subdomain })
       .where(eq(distributors.id, distributorId));
     issues.push({
@@ -300,7 +300,7 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
     distributorCode: distributor.distributorCode,
     status,
     issues,
-    lastAuditedAt: new Date(),
+    lastAuditedAt: new Date().toISOString(),
   };
 }
 
@@ -311,7 +311,7 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
 export async function runDailyDataAudit(): Promise<DataIntegrityReport> {
   const db = await getDb();
   const report: DataIntegrityReport = {
-    timestamp: new Date(),
+    timestamp: new Date().toISOString(),
     sitesAudited: 0,
     issuesFound: 0,
     issuesFixed: 0,
@@ -327,7 +327,7 @@ export async function runDailyDataAudit(): Promise<DataIntegrityReport> {
   console.log('[DailyAudit] Starting daily data integrity audit...');
 
   // Get all active distributors
-  const activeDistributors = await db.select()
+  const activeDistributors = await db!.select()
     .from(distributors)
     .where(eq(distributors.status, 'active'))
     .orderBy(desc(distributors.createdAt));
@@ -400,7 +400,7 @@ async function cleanupTestData(): Promise<number> {
 
   try {
     // Delete test distributors (inactive with no sales and test-like names)
-    const testDistributors = await db.delete(distributors)
+    const testDistributors = await db!.delete(distributors)
       .where(
         or(
           like(distributors.username, '%test%'),
@@ -417,7 +417,7 @@ async function cleanupTestData(): Promise<number> {
       );
 
     // Delete test referral tracking
-    await db.delete(referralTracking)
+    await db!.delete(referralTracking)
       .where(
         or(
           like(referralTracking.referrerId, '%test%'),
@@ -449,7 +449,7 @@ export async function verifyBuyerFlow(distributorCode: string): Promise<{
   }
 
   // Step 1: Verify distributor exists
-  const [distributor] = await db.select()
+  const [distributor] = await db!.select()
     .from(distributors)
     .where(eq(distributors.distributorCode, distributorCode));
 
@@ -460,7 +460,7 @@ export async function verifyBuyerFlow(distributorCode: string): Promise<{
   steps.push({ step: 'Distributor Lookup', status: 'pass', details: `Found: ${distributor.distributorCode}` });
 
   // Step 2: Verify affiliate link
-  const [link] = await db.select()
+  const [link] = await db!.select()
     .from(affiliateLinks)
     .where(eq(affiliateLinks.distributorId, distributor.id));
 
@@ -479,7 +479,7 @@ export async function verifyBuyerFlow(distributorCode: string): Promise<{
   let level = 0;
   while (currentSponsorId && level < 5) {
     uplineChain.push(currentSponsorId);
-    const [sponsor] = await db.select()
+    const [sponsor] = await db!.select()
       .from(distributors)
       .where(eq(distributors.id, currentSponsorId));
     currentSponsorId = sponsor?.sponsorId || null;
@@ -508,14 +508,14 @@ export async function getReplicatedSiteStats(): Promise<{
     return { totalSites: 0, activeSites: 0, sitesWithIssues: 0, lastAuditTime: null };
   }
 
-  const totalResult = await db.select({ count: sql<number>`COUNT(*)` })
+  const totalResult = await db!.select({ count: sql<number>`COUNT(*)` })
     .from(distributors);
 
-  const activeResult = await db.select({ count: sql<number>`COUNT(*)` })
+  const activeResult = await db!.select({ count: sql<number>`COUNT(*)` })
     .from(distributors)
     .where(eq(distributors.status, 'active'));
 
-  const withSubdomainResult = await db.select({ count: sql<number>`COUNT(*)` })
+  const withSubdomainResult = await db!.select({ count: sql<number>`COUNT(*)` })
     .from(distributors)
     .where(and(
       eq(distributors.status, 'active'),
@@ -526,7 +526,7 @@ export async function getReplicatedSiteStats(): Promise<{
     totalSites: totalResult[0]?.count || 0,
     activeSites: activeResult[0]?.count || 0,
     sitesWithIssues: withSubdomainResult[0]?.count || 0,
-    lastAuditTime: new Date(),
+    lastAuditTime: new Date().toISOString(),
   };
 }
 

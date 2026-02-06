@@ -58,7 +58,7 @@ export default function DistributorData() {
   const filteredDistributors = distributors?.filter((d) =>
     d.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     d.distributorCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    d.businessName?.toLowerCase().includes(searchTerm.toLowerCase())
+    (d.businessName ?? "N/A").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -158,25 +158,25 @@ export default function DistributorData() {
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            {formatBusinessEntity(distributor.businessEntityType)}
+                            {formatBusinessEntity(distributor.businessEntityType ?? "N/A")}
                           </TableCell>
-                          <TableCell>{distributor.businessName || "—"}</TableCell>
+                          <TableCell>{(distributor.businessName ?? "N/A") || "—"}</TableCell>
                           <TableCell className="font-mono text-sm">
                             {revealedTaxInfo.has(distributor.id) ? (
                               <span className="text-destructive">
-                                {distributor.taxIdType === "ssn"
-                                  ? distributor.ssnLast4
-                                    ? `***-**-${distributor.ssnLast4}`
+                                {(distributor.taxIdType ?? "N/A") === "ssn"
+                                  ? distributor.ssnLast4 ?? "N/A"
+                                    ? `***-**-${distributor.ssnLast4 ?? "N/A"}`
                                     : "Not provided"
-                                  : distributor.einLast4
-                                  ? `**-***${distributor.einLast4}`
+                                  : distributor.einLast4 ?? "N/A"
+                                  ? `**-***${distributor.einLast4 ?? "N/A"}`
                                   : "Not provided"}
                               </span>
                             ) : (
                               <span className="text-muted-foreground">
-                                {distributor.taxIdType === "ssn"
-                                  ? maskSSN(distributor.ssnLast4)
-                                  : maskEIN(distributor.einLast4)}
+                                {(distributor.taxIdType ?? "N/A") === "ssn"
+                                  ? maskSSN(distributor.ssnLast4 ?? "N/A")
+                                  : maskEIN(distributor.einLast4 ?? "N/A")}
                               </span>
                             )}
                           </TableCell>

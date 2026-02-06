@@ -927,7 +927,7 @@ export async function redeemCouponCode(couponCode: string, orderId: number) {
     .set({
       couponUsed: 1,
       couponUsedAt: new Date().toISOString(),
-      couponUsedOrderId: orderId,
+       orderId,
     })
     .where(eq(newsletterSubscriptions.couponCode, normalizedCode));
   
@@ -1446,7 +1446,7 @@ export async function createBlogPost(data: {
   
   await db.insert(blogPosts).values({
     ...data,
-    publishedAt: data.status === "published" ? new Date() : null,
+    publishedAt: data.status === "published" ? new Date().toISOString() : null,
   });
   
   return { success: true };
@@ -2149,7 +2149,7 @@ export async function trackReferralClick(referralCode: string, phone?: string, e
     referredName: name,
     source: "sms",
     status: "clicked",
-    clickedAt: new Date(),
+    clickedAt: new Date().toISOString(),
   });
   
   // Increment referrer's total referrals
@@ -2198,7 +2198,7 @@ export async function convertReferralToCustomer(referralCode: string, orderId: n
       customerOrderId: orderId,
       referredEmail: customerEmail,
       referredName: customerName,
-      convertedAt: new Date(),
+      convertedAt: new Date().toISOString(),
     })
     .where(eq(referralTracking.referralCode, referralCode));
   
@@ -2219,7 +2219,7 @@ export async function convertReferralToDistributor(referralCode: string, distrib
       distributorId,
       referredEmail: distributorEmail,
       referredName: distributorName,
-      convertedAt: new Date(),
+      convertedAt: new Date().toISOString(),
     })
     .where(eq(referralTracking.referralCode, referralCode));
   
@@ -3140,7 +3140,7 @@ async function recalculateAutoshipTotals(autoshipId: number) {
   }
   
   await db.update(distributorAutoships)
-    .set({ totalPV, totalPrice })
+    .set({ totalPv, totalPrice })
     .where(eq(distributorAutoships.id, autoshipId));
 }
 
@@ -3907,7 +3907,7 @@ export async function completeCustomerReferral(
       purchaseCompleted: 1,
       orderId,
       purchaseAmount,
-      purchaseCompletedAt: new Date(),
+      purchaseCompletedAt: new Date().toISOString(),
     })
     .where(eq(customerReferrals.id, referral[0].id));
 
@@ -3964,7 +3964,7 @@ export async function redeemCustomerReward(
   const result = await db.update(customerRewards)
     .set({
       status: "redeemed",
-      redeemedAt: new Date(),
+      redeemedAt: new Date().toISOString(),
       redeemedOrderId: orderId,
     })
     .where(and(
@@ -4129,7 +4129,7 @@ export async function redeemCustomerRewardWithShipping(
   await db.update(customerRewards)
     .set({
       status: "redeemed",
-      redeemedAt: new Date(),
+      redeemedAt: new Date().toISOString(),
     })
     .where(and(
       eq(customerRewards.id, rewardId),
@@ -4496,7 +4496,7 @@ export async function updateVendingApplicationStatus(
     .set({
       status,
       adminNotes: adminNotes || null,
-      reviewedAt: new Date(),
+      reviewedAt: new Date().toISOString(),
     })
     .where(eq(vendingApplications.id, applicationId));
 }
@@ -4516,7 +4516,7 @@ export async function updateFranchiseApplicationStatus(
     .set({
       status,
       adminNotes: adminNotes || null,
-      reviewedAt: new Date(),
+      reviewedAt: new Date().toISOString(),
     })
     .where(eq(franchiseApplications.id, applicationId));
 }
@@ -4532,7 +4532,7 @@ export async function updateFranchiseApplicationStatus(
 export async function savePushSubscription(data: {
   userId: number;
   endpoint: string;
-  p256dh: string;
+  p256Dh: string;
   auth: string;
   userAgent?: string;
 }): Promise<number | null> {
@@ -4550,7 +4550,7 @@ export async function savePushSubscription(data: {
     await db.update(pushSubscriptions)
       .set({
         userId: data.userId,
-        p256dh: data.p256dh,
+        p256Dh: data.p256Dh,
         auth: data.auth,
         userAgent: data.userAgent || null,
         isActive: 1,
@@ -4564,7 +4564,7 @@ export async function savePushSubscription(data: {
   const result = await db.insert(pushSubscriptions).values({
     userId: data.userId,
     endpoint: data.endpoint,
-    p256dh: data.p256dh,
+    p256Dh: data.p256Dh,
     auth: data.auth,
     userAgent: data.userAgent || null,
     isActive: 1,
@@ -4600,7 +4600,7 @@ export async function getDistributorPushSubscriptions() {
     subscriptionId: pushSubscriptions.id,
     userId: pushSubscriptions.userId,
     endpoint: pushSubscriptions.endpoint,
-    p256dh: pushSubscriptions.p256dh,
+    p256Dh: pushSubscriptions.p256Dh,
     auth: pushSubscriptions.auth,
     distributorId: distributors.id,
     distributorCode: distributors.distributorCode,
@@ -5931,12 +5931,12 @@ export async function getNotificationPreferences(userId: number) {
   // Return default preferences if none exist
   return {
     userId,
-    referrals: true,
-    commissions: true,
-    teamUpdates: true,
-    promotions: true,
-    orders: true,
-    announcements: true,
+    referrals: 1,
+    commissions: 1,
+    teamUpdates: 1,
+    promotions: 1,
+    orders: 1,
+    announcements: 1,
     digestFrequency: "none" as const,
     digestDay: 1,
     digestHour: 9,
@@ -6079,7 +6079,7 @@ export async function updateLastDigestSent(userId: number) {
 
   await db
     .update(notificationPreferences)
-    .set({ lastDigestSent: new Date() })
+    .set({ lastDigestSent: new Date().toISOString() })
     .where(eq(notificationPreferences.userId, userId));
 }
 
