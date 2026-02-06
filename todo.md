@@ -5898,3 +5898,15 @@
 - [x] Set autoship checkbox to always default to YES/checked
 - [x] Add distributor warning when autoship is turned off (lose active status without 2 cases/month)
 - [x] Test cart reflects correct case quantities and pricing
+
+## NEON Dreams Book Update (Feb 6, 2026)
+- [x] Upload NEON Dreams book cover image to project (neon-dreams-book.jpg)
+- [x] Replace empty book placeholder on About page with actual book cover image
+- [x] Add "A portion of every book sold will be donated to the Rainforest Trust" message to About page
+- [x] Replace book placeholders on Shop page (Books tab) with actual book cover images
+- [x] Add Rainforest Trust donation message to Shop page Books section
+- [x] Update all 3 book product cards (physical, audiobook, bundle) with real book cover
+- [x] Add neon glow hover effects to book images
+- [x] Test About page book section displays correctly
+- [x] Test Shop page Books tab displays correctly with charity message
+- [x] Verify Rainforest Trust link is clickable and functional

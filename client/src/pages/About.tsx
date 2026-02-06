@@ -182,18 +182,11 @@ export default function About() {
               <div className="flex flex-col md:flex-row gap-8 items-center">
                 {/* Book Cover */}
                 <div className="w-48 md:w-56 flex-shrink-0">
-                  <div className="aspect-[2/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a2e] rounded-lg shadow-[0_0_40px_rgba(200,255,0,0.2)] border border-[#c8ff00]/50 p-4 flex flex-col justify-between">
-                    <div>
-                      <div className="text-[#c8ff00] text-xs font-bold tracking-widest mb-2">COMING SOON</div>
-                      <h4 className="text-3xl font-black text-white leading-tight">NEON</h4>
-                      <h4 className="text-3xl font-black text-[#c8ff00] leading-tight">DREAMS</h4>
-                    </div>
-                    <div>
-                      <div className="w-full h-px bg-gradient-to-r from-transparent via-[#c8ff00] to-transparent my-4"></div>
-                      <p className="text-white/60 text-xs">The NEON Story</p>
-                      <p className="text-[#c8ff00] text-sm font-semibold">by Dakota Rea</p>
-                    </div>
-                  </div>
+                  <img 
+                    src="/neon-dreams-book.jpg" 
+                    alt="NEON Dreams Book Cover - Coming Soon by Dakota Rea"
+                    className="w-full h-auto rounded-lg shadow-[0_0_40px_rgba(200,255,0,0.3)] border border-[#c8ff00]/50 hover:shadow-[0_0_60px_rgba(200,255,0,0.5)] transition-all duration-300"
+                  />
                 </div>
                 
                 {/* Book Info */}
@@ -205,11 +198,17 @@ export default function About() {
                     <span className="text-[#c8ff00]">NEON DREAMS</span>
                   </h3>
                   <p className="text-xl text-white/80 mb-4">The Untold Story Behind the Energy Revolution</p>
-                  <p className="text-gray-300 leading-relaxed mb-6">
+                  <p className="text-gray-300 leading-relaxed mb-4">
                     Go behind the scenes of NEON Energy Drink's incredible journey. From a small startup in Bend, Oregon 
                     to a global phenomenon reaching 15% of the world's population. Dakota Rea shares the triumphs, 
                     challenges, and lessons learned building one of the fastest-growing beverage brands in history.
                   </p>
+                  <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-4 mb-6">
+                    <p className="text-green-400 font-semibold flex items-center gap-2">
+                      <span className="text-2xl">🌳</span>
+                      A portion of every book sold will be donated to the <a href="https://www.rainforesttrust.org/" target="_blank" rel="noopener noreferrer" className="underline hover:text-green-300 transition-colors">Rainforest Trust</a>
+                    </p>
+                  </div>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                     <button 
                       onClick={() => window.open('/shop?product=neon-dreams-book', '_blank')}

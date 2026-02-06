@@ -574,10 +574,16 @@ export default function Shop() {
             <TabsContent value="books">
               <div className="text-center mb-12">
                 <h2 className="text-3xl font-bold mb-4">NEON DREAMS</h2>
-                <p className="text-gray-400 max-w-2xl mx-auto">
+                <p className="text-gray-400 max-w-2xl mx-auto mb-4">
                   The untold story behind the energy revolution. Pre-order Dakota Rea's book 
                   and discover the journey that built NEON Energy.
                 </p>
+                <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-4 max-w-2xl mx-auto">
+                  <p className="text-green-400 font-semibold flex items-center justify-center gap-2">
+                    <span className="text-2xl">🌳</span>
+                    A portion of every book sold will be donated to the <a href="https://www.rainforesttrust.org/" target="_blank" rel="noopener noreferrer" className="underline hover:text-green-300 transition-colors">Rainforest Trust</a>
+                  </p>
+                </div>
               </div>
 
               <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -596,17 +602,12 @@ export default function Shop() {
                       )}
                       
                       <CardHeader className="text-center pb-2">
-                        <div className="w-32 h-44 mx-auto mb-4 bg-gradient-to-br from-[#0a0a0a] to-[#1a1a2e] rounded-lg shadow-[0_0_30px_rgba(200,255,0,0.2)] border border-[#c8ff00]/50 p-3 flex flex-col justify-between">
-                          <div>
-                            <div className="text-[#c8ff00] text-[8px] font-bold tracking-widest mb-1">PRE-ORDER</div>
-                            <h4 className="text-lg font-black text-white leading-tight">NEON</h4>
-                            <h4 className="text-lg font-black text-[#c8ff00] leading-tight">DREAMS</h4>
-                          </div>
-                          <div>
-                            <div className="w-full h-px bg-gradient-to-r from-transparent via-[#c8ff00] to-transparent my-2"></div>
-                            <p className="text-white/60 text-[8px]">The NEON Story</p>
-                            <p className="text-[#c8ff00] text-[10px] font-semibold">by Dakota Rea</p>
-                          </div>
+                        <div className="w-32 h-44 mx-auto mb-4">
+                          <img 
+                            src="/neon-dreams-book.jpg" 
+                            alt="NEON Dreams Book Cover"
+                            className="w-full h-full object-cover rounded-lg shadow-[0_0_30px_rgba(200,255,0,0.3)] border border-[#c8ff00]/50 hover:shadow-[0_0_40px_rgba(200,255,0,0.5)] transition-all duration-300"
+                          />
                         </div>
                         <CardTitle className="text-xl text-white">{book.name}</CardTitle>
                         <CardDescription className="text-gray-400">{book.description}</CardDescription>
