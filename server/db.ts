@@ -134,7 +134,7 @@ export async function createEmailVerification(userId: number): Promise<{ token: 
   await db.update(users)
     .set({
       emailVerificationToken: token,
-      emailVerificationExpiry: expiresAt,
+      emailVerificationExpiry: expiresAt.toISOString(),
       emailVerified: 0,
     })
     .where(eq(users.id, userId));
@@ -310,7 +310,7 @@ export async function createSmsVerification(userId: number, phoneNumber: string)
     })
     .where(eq(users.id, userId));
 
-  return { code, expiresAt };
+  return { code, expiresAt: expiresAt.toISOString() };
 }
 
 /**

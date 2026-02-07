@@ -25,8 +25,8 @@ export default function DistributorDashboard() {
 
   const distributorInfo = trpc.distributor.me.useQuery();
   const distributorStats = trpc.distributor.stats.useQuery();
-  const team = trpc.distributor.team.data?.useQuery();
-  const affiliateLinks = trpc.distributor.affiliateLinks.data?.useQuery();
+  const team = trpc.distributor.team.useQuery();
+  const affiliateLinks = trpc.distributor.affiliateLinks.useQuery();
 
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
