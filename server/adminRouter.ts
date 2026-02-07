@@ -1288,6 +1288,7 @@ export const adminRouter = router({
     
     // Log the health check
     const db = await getDb();
+  if (!db) return [];
     if (db) {
       await db.insert(systemAuditLog).values({
         category: "website",
@@ -1313,6 +1314,7 @@ export const adminRouter = router({
     
     // Log the auto-fix
     const db = await getDb();
+  if (!db) return [];
     if (db) {
       await db.insert(systemAuditLog).values({
         category: "website",

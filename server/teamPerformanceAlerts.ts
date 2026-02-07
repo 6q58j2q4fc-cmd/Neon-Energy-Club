@@ -26,6 +26,7 @@ export interface AlertTrigger {
  */
 export async function checkFirstSale(distributorId: number): Promise<TeamAlert | null> {
   const db = await getDb();
+  if (!db) return [];
   
   // Get distributor info
   const [distributor] = await db!
@@ -80,6 +81,7 @@ export async function checkRankAdvancement(
   newRank: string
 ): Promise<TeamAlert | null> {
   const db = await getDb();
+  if (!db) return [];
   
   const [distributor] = await db!
     .select()
@@ -126,6 +128,7 @@ export async function checkVolumeThreshold(
   threshold: number
 ): Promise<TeamAlert | null> {
   const db = await getDb();
+  if (!db) return [];
   
   const [distributor] = await db!
     .select()
@@ -173,6 +176,7 @@ export async function checkTeamMilestone(
   threshold: number
 ): Promise<TeamAlert | null> {
   const db = await getDb();
+  if (!db) return [];
   
   const [distributor] = await db!
     .select()

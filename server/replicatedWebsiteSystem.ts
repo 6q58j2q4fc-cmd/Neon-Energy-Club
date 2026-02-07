@@ -163,6 +163,7 @@ export async function generateReplicatedSite(userId: number): Promise<Replicated
  */
 export async function auditReplicatedSite(distributorId: number): Promise<SiteAuditResult> {
   const db = await getDb();
+  if (!db) return [];
   const issues: SiteIssue[] = [];
 
   if (!db) {
@@ -311,6 +312,7 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
  */
 export async function runDailyDataAudit(): Promise<DataIntegrityReport> {
   const db = await getDb();
+  if (!db) return [];
   const report: DataIntegrityReport = {
     timestamp: new Date().toISOString(),
     sitesAudited: 0,
@@ -443,6 +445,7 @@ export async function verifyBuyerFlow(distributorCode: string): Promise<{
   steps: { step: string; status: 'pass' | 'fail'; details?: string }[];
 }> {
   const db = await getDb();
+  if (!db) return [];
   const steps: { step: string; status: 'pass' | 'fail'; details?: string }[] = [];
 
   if (!db) {

@@ -41,6 +41,7 @@ export async function notifyMilestoneAchievement(
   achievement: Achievement
 ): Promise<void> {
   const db = await getDb();
+  if (!db) return ;
   
   // Get distributor info
   const [distributor] = await db
@@ -168,6 +169,7 @@ export async function getUnreadNotifications(distributorId: number): Promise<Mil
   
   // TODO: Query notifications from database
   // const db = await getDb();
+  if (!db) return ;
   // return await db
   //   .select()
   //   .from(milestoneNotifications)
@@ -186,6 +188,7 @@ export async function markNotificationRead(notificationId: string): Promise<void
   
   // TODO: Update notification in database
   // const db = await getDb();
+  if (!db) return ;
   // await db
   //   .update(milestoneNotifications)
   //   .set({ read: true })
@@ -200,6 +203,7 @@ export async function markNotificationCelebrated(notificationId: string): Promis
   
   // TODO: Update notification in database
   // const db = await getDb();
+  if (!db) return ;
   // await db
   //   .update(milestoneNotifications)
   //   .set({ celebrated: true })

@@ -6246,3 +6246,40 @@
 - [ ] Save final checkpoint with zero TypeScript errors
 - [ ] Document all Phase 8 changes in final report
 - [ ] Deliver production-ready system
+
+## Phase 9: Zero-Error Surgical Strike (Target: 120→0 errors)
+
+### Patch 1: Fix Date→string conversions in server/db.ts
+- [ ] Fix line 6183 - territoryReservations expiresAt Date→string
+- [ ] Fix line 6533 - accountRecoveryRequests expiresAt Date→string
+- [ ] Run `pnpm exec tsc --noEmit` to verify fixes
+
+### Patch 2: Fix boolean→number for MySQL tinyint fields
+- [ ] Fix line 5983 - notificationPreferences boolean fields to 0/1
+- [ ] Convert referrals, commissions, teamUpdates, promotions, orders, announcements
+- [ ] Run `pnpm exec tsc --noEmit` to verify fixes
+
+### Patch 3: Add db null guards to server files
+- [ ] Add guards to server/binaryTree.ts (9 functions)
+- [ ] Add guards to server/charityImpact.ts (6 functions)
+- [ ] Add guards to server/milestoneNotifications.ts (1 function)
+- [ ] Run `pnpm exec tsc --noEmit` to verify fixes
+
+### Patch 4: Fix client-side Date/string mismatches
+- [ ] Fix MeetingScheduler.tsx lines 77-78, 150, 184, 192-193, 224, 227, 377, 437-438
+- [ ] Fix AutoshipManager.tsx Date parameter issues
+- [ ] Fix VendingIotDashboard.tsx lastPing Date→string
+- [ ] Fix SocialProofNotifications.tsx Date assignments
+- [ ] Run `pnpm exec tsc --noEmit` to verify fixes
+
+### Patch 5: Fix missing id property in MyOrders
+- [ ] Update server/routers.ts orders.list procedure to include id field
+- [ ] Verify MyOrders.tsx can access order.id
+- [ ] Run `pnpm exec tsc --noEmit` to verify fixes
+
+### Final Validation
+- [ ] Run `pnpm exec tsc --noEmit` - verify 0 errors
+- [ ] Run `pnpm test` - verify 100% pass rate
+- [ ] Test distributor portal functionality
+- [ ] Create pre-deploy-check.sh script
+- [ ] Save final checkpoint with zero errors

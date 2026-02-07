@@ -580,7 +580,7 @@ const MachineDetail = ({
                             {alert.severity.toUpperCase()}
                           </Badge>
                           <span className="text-xs text-gray-500">
-                            {alert.timestamp.toLocaleTimeString()}
+                            {new Date(alert.timestamp).toLocaleTimeString()}
                           </span>
                         </div>
                         <p className={alert.acknowledged ? 'text-gray-500' : 'text-white'}>

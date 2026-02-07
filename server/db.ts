@@ -129,7 +129,7 @@ export async function createEmailVerification(userId: number): Promise<{ token: 
 
   const token = generateVerificationToken();
   // Token expires in 24 hours
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
   await db.update(users)
     .set({
@@ -293,7 +293,7 @@ export async function createSmsVerification(userId: number, phoneNumber: string)
 
   const code = generateSmsCode();
   // Code expires in 10 minutes
-  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
 
   // Reset attempts if last SMS was more than 1 hour ago
   const newAttempts = (lastSmsDate && lastSmsDate > oneHourAgo) 
@@ -1263,6 +1263,7 @@ export async function calculateCommission(saleId: number) {
 
 async function calculateUplineCommissions(sponsorId: number, saleAmount: number, level: number) {
   const db = await getDb();
+  if (!db) return [];
   if (!db || level > 5) return; // Max 5 levels
   
   const sponsor = await db.select().from(distributors).where(eq(distributors.id, sponsorId)).limit(1);
@@ -5981,7 +5982,15 @@ export async function updateNotificationPreferences(
     await db
       .update(notificationPreferences)
       .set({
-        ...preferences,
+        referrals: preferences.referrals !== undefined ? (preferences.referrals ? 1 : 0) : undefined !== undefined ? (preferences.referrals ? 1 : 0) : undefined,
+        commissions: preferences.commissions !== undefined ? (preferences.commissions ? 1 : 0) : undefined !== undefined ? (preferences.commissions ? 1 : 0) : undefined,
+        teamUpdates: preferences.teamUpdates !== undefined ? (preferences.teamUpdates ? 1 : 0) : undefined !== undefined ? (preferences.teamUpdates ? 1 : 0) : undefined,
+        promotions: preferences.promotions !== undefined ? (preferences.promotions ? 1 : 0) : undefined !== undefined ? (preferences.promotions ? 1 : 0) : undefined,
+        orders: preferences.orders !== undefined ? (preferences.orders ? 1 : 0) : undefined !== undefined ? (preferences.orders ? 1 : 0) : undefined,
+        announcements: preferences.announcements !== undefined ? (preferences.announcements ? 1 : 0) : undefined !== undefined ? (preferences.announcements ? 1 : 0) : undefined,
+        digestFrequency: preferences.digestFrequency,
+        digestDay: preferences.digestDay,
+        digestHour: preferences.digestHour,
         updatedAt: new Date().toISOString(),
       })
       .where(eq(notificationPreferences.userId, userId));
@@ -5989,12 +5998,12 @@ export async function updateNotificationPreferences(
     // Create new preferences
     await db.insert(notificationPreferences).values({
       userId,
-      referrals: preferences.referrals ?? true,
-      commissions: preferences.commissions ?? true,
-      teamUpdates: preferences.teamUpdates ?? true,
-      promotions: preferences.promotions ?? true,
-      orders: preferences.orders ?? true,
-      announcements: preferences.announcements ?? true,
+      referrals: preferences.referrals !== undefined ? (preferences.referrals ? 1 : 0) : undefined !== undefined ? (preferences.referrals ? 1 : 0) : 1,
+      commissions: preferences.commissions !== undefined ? (preferences.commissions ? 1 : 0) : undefined !== undefined ? (preferences.commissions ? 1 : 0) : 1,
+      teamUpdates: preferences.teamUpdates !== undefined ? (preferences.teamUpdates ? 1 : 0) : undefined !== undefined ? (preferences.teamUpdates ? 1 : 0) : 1,
+      promotions: preferences.promotions !== undefined ? (preferences.promotions ? 1 : 0) : undefined !== undefined ? (preferences.promotions ? 1 : 0) : 1,
+      orders: preferences.orders !== undefined ? (preferences.orders ? 1 : 0) : undefined !== undefined ? (preferences.orders ? 1 : 0) : 1,
+      announcements: preferences.announcements !== undefined ? (preferences.announcements ? 1 : 0) : undefined !== undefined ? (preferences.announcements ? 1 : 0) : 1,
       digestFrequency: preferences.digestFrequency ?? "none",
       digestDay: preferences.digestDay ?? 1,
       digestHour: preferences.digestHour ?? 9,
@@ -6066,6 +6075,7 @@ export async function getPendingDigestItems(userId: number) {
  */
 export async function markDigestItemsProcessed(itemIds: number[]) {
   const db = await getDb();
+  if (!db) return [];
   if (!db || itemIds.length === 0) return;
 
   for (const id of itemIds) {
@@ -6176,7 +6186,7 @@ export async function createTerritoryReservation(data: Omit<InsertTerritoryReser
   }
   
   // Set expiration to 48 hours from now
-  const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
   
   const result = await db.insert(territoryReservations).values({
     ...data,
@@ -6529,12 +6539,13 @@ export async function createMfaRecoveryRequest(data: {
   // Token expires in 24 hours
   const tokenExpiry = new Date();
   tokenExpiry.setHours(tokenExpiry.getHours() + 24);
+  const tokenExpiryString = tokenExpiry.toISOString();
   
   const result = await db.insert(mfaRecoveryRequests).values({
     userId: data.userId,
     email: data.email,
     recoveryToken,
-    tokenExpiry,
+    tokenExpiry: tokenExpiryString,
     ipAddress: data.ipAddress || null,
     userAgent: data.userAgent || null,
     status: 'pending',

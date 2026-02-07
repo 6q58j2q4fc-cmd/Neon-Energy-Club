@@ -775,7 +775,7 @@ export async function sendMeetingConfirmation(data: {
     general: "General Consultation",
   };
   
-  const formattedDate = data.scheduledAt.toLocaleDateString("en-US", {
+  const formattedDate = new Date(data.scheduledAt).toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
     month: "long",
@@ -1889,7 +1889,7 @@ export async function sendDeliveryConfirmationEmail(data: {
           </p>
 
           <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
-            <span style="color: #22c55e; font-size: 14px;">✓ Delivered on ${data.deliveredAt.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            <span style="color: #22c55e; font-size: 14px;">✓ Delivered on ${new Date(data.deliveredAt).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
           </div>
 
           ${data.nftImageUrl ? `

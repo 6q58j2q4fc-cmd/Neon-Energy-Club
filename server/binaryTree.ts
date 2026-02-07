@@ -43,6 +43,7 @@ export interface LegVolumes {
  */
 export async function getAllDownline(distributorId: number): Promise<number[]> {
   const db = await getDb();
+  if (!db) return [];
   
   try {
     // Get direct children
@@ -81,6 +82,7 @@ export async function getAllDownline(distributorId: number): Promise<number[]> {
  */
 export async function getDirectChildren(distributorId: number): Promise<TreePosition[]> {
   const db = await getDb();
+  if (!db) return { parentId: 0, position: "left" as PlacementPosition, depthLevel: 0 };
   
   try {
     const children = await db
@@ -103,6 +105,7 @@ export async function getDirectChildren(distributorId: number): Promise<TreePosi
  */
 export async function getUplinePath(distributorId: number): Promise<number[]> {
   const db = await getDb();
+  if (!db) return { parentId: 0, position: "left" as PlacementPosition, depthLevel: 0 };
   
   try {
     const upline: number[] = [];
@@ -138,6 +141,7 @@ export async function getUplinePath(distributorId: number): Promise<number[]> {
  */
 export async function calculateLegVolumes(distributorId: number): Promise<LegVolumes> {
   const db = await getDb();
+  if (!db) return { parentId: 0, position: "left" as PlacementPosition, depthLevel: 0 };
   
   try {
     // Get direct children
@@ -190,6 +194,7 @@ export async function getTeamSize(distributorId: number): Promise<number> {
  */
 export async function getTreeDepth(distributorId: number): Promise<number> {
   const db = await getDb();
+  if (!db) return { parentId: 0, position: "left" as PlacementPosition, depthLevel: 0 };
   
   try {
     const children = await getDirectChildren(distributorId);
@@ -224,6 +229,7 @@ export async function getTreeDepth(distributorId: number): Promise<number> {
  */
 export async function findOptimalPlacement(sponsorId: number): Promise<PlacementResult> {
   const db = await getDb();
+  if (!db) return { parentId: 0, position: "left" as PlacementPosition, depthLevel: 0 };
   
   try {
     // Get sponsor's tree position
@@ -281,6 +287,7 @@ export async function findOptimalPlacement(sponsorId: number): Promise<Placement
  */
 async function findSpilloverPosition(sponsorId: number): Promise<PlacementResult> {
   const db = await getDb();
+  if (!db) return { parentId: 0, position: "left" as PlacementPosition, depthLevel: 0 };
   
   try {
     // Get leg volumes to determine weaker leg
@@ -383,6 +390,7 @@ export async function placeDistributorInTree(
   preferredPosition?: PlacementPosition
 ): Promise<TreePosition> {
   const db = await getDb();
+  if (!db) return { parentId: 0, position: "left" as PlacementPosition, depthLevel: 0 };
   
   try {
     // Find optimal placement

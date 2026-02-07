@@ -304,7 +304,7 @@ export default function LiveChatWidget() {
                             message.sender === "user" ? "justify-end" : "justify-start"
                           )}>
                             <span className="text-[10px] opacity-60">
-                              {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                             {message.sender === "user" && message.status && (
                               <CheckCheck className={cn(

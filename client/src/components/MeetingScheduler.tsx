@@ -118,7 +118,7 @@ export default function MeetingScheduler({ meetingType, onSuccess, onClose }: Me
   const isDatePast = (date: string) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return date < today;
+    return new Date(date) < today;
   };
 
   // Check if a time slot is in the past for today
@@ -181,7 +181,7 @@ export default function MeetingScheduler({ meetingType, onSuccess, onClose }: Me
     const description = `Your ${meetingTypeLabels[meetingType]} with NEON Energy team.\n\nContact: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\n\nNotes: ${formData.notes || "None"}`;
     
     const formatICSDate = (date: string) => {
-      return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+      return new Date(date).toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
     };
     
     const icsContent = [
@@ -221,7 +221,7 @@ export default function MeetingScheduler({ meetingType, onSuccess, onClose }: Me
     const location = encodeURIComponent("Video Call (link will be sent via email)");
     
     const formatGoogleDate = (date: string) => {
-      return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+      return new Date(date).toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
     };
     
     const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}&details=${details}&location=${location}`;

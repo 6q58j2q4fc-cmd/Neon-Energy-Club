@@ -227,6 +227,7 @@ export async function validateRankEligibility(distributorId: number): Promise<In
  */
 export async function runFullIntegrityCheck(): Promise<DataIntegrityReport> {
   const db = await getDb();
+  if (!db) return [];
   const report: DataIntegrityReport = {
     timestamp: new Date().toISOString(),
     checksPerformed: 0,
