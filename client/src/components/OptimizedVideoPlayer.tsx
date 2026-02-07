@@ -302,7 +302,7 @@ export default function OptimizedVideoPlayer({
         muted={isMuted}
         playsInline
         webkit-playsinline="true"
-        preload="metadata"
+        preload="auto"
         className="w-full h-full object-cover"
         onLoadStart={handleLoadStart}
         onCanPlay={handleCanPlay}
