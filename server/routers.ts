@@ -460,6 +460,7 @@ export const appRouter = router({
             const trackingStatus = getTrackingStatus(order.status || 'pending');
             
             return {
+              id: order.id, // Add id property for MyOrders.tsx
               orderNumber: order.nftId || `NEON-${String(order.id).padStart(5, '0')}`,
               status: order.status || 'pending',
               quantity: order.quantity,

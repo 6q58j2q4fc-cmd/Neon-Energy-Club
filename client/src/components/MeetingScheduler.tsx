@@ -110,7 +110,7 @@ export default function MeetingScheduler({ meetingType, onSuccess, onClose }: Me
     const slotDate = setMinutes(setHours(date, hours), minutes);
     return bookedSlots.some(slot => {
       const bookedDate = new Date(slot.scheduledAt);
-      return Math.abs(bookedDate.getTime() - slotDate.getTime()) < 30 * 60 * 1000;
+      return Math.abs(new Date(bookedDate).getTime() - new Date(slotDate).getTime()) < 30 * 60 * 1000;
     });
   };
 

@@ -64,7 +64,7 @@ const CROWDFUNDING_TIERS = [
 ];
 
 function getTimeAgo(date: string): string {
-  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
   
   if (seconds < 60) return "just now";
   const minutes = Math.floor(seconds / 60);
@@ -167,7 +167,7 @@ function generateSimulatedNotification(): Notification {
   const location = SIMULATED_LOCATIONS[Math.floor(Math.random() * SIMULATED_LOCATIONS.length)];
   
   // Random timestamp within last 30 minutes for freshness
-  const timestamp = new Date(Date.now() - Math.random() * 30 * 60 * 1000);
+  const timestamp = new Date(Date.now() - Math.random() * 30 * 60 * 1000).toISOString();
   
   switch (type) {
     case "preorder":
@@ -226,7 +226,7 @@ export default function SocialProofNotifications() {
   const recordSimulated = trpc.crowdfunding.recordSimulated.useMutation();
 
   // Fetch real data from the database
-  const recentContributions = trpc.crowdfunding.recentContributions.useQuery(undefined, {
+  const recentContributions = trpc.crowdfunding.recentContributions.data?.useQuery(undefined, {
     refetchInterval: 60000, // Refetch every minute
   });
   
@@ -323,7 +323,7 @@ export default function SocialProofNotifications() {
     if (notification.isSimulated) {
       notification = {
         ...notification,
-        timestamp: new Date(Date.now().toISOString() - Math.random() * 5 * 60 * 1000), // Within last 5 minutes
+        timestamp: new Date(Date.now() - Math.random() * 5 * 60 * 1000).toISOString(), // Within last 5 minutes
       };
       
       // Record simulated contribution to crowdfunding goal
