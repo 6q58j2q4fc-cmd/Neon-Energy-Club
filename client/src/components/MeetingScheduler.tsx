@@ -189,8 +189,8 @@ export default function MeetingScheduler({ meetingType, onSuccess, onClose }: Me
       "VERSION:2.0",
       "PRODID:-//NEON Energy//Meeting Scheduler//EN",
       "BEGIN:VEVENT",
-      `DTSTART:${formatICSDate(startDate)}`,
-      `DTEND:${formatICSDate(endDate)}`,
+      `DTSTART:${formatICSDate(startDate.toISOString())}`,
+      `DTEND:${formatICSDate(endDate.toISOString())}`,
       `SUMMARY:${title}`,
       `DESCRIPTION:${description.replace(/\n/g, "\\n")}`,
       "LOCATION:Video Call (link will be sent via email)",
@@ -224,7 +224,7 @@ export default function MeetingScheduler({ meetingType, onSuccess, onClose }: Me
       return new Date(date).toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
     };
     
-    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}&details=${details}&location=${location}`;
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formatGoogleDate(startDate.toISOString())}/${formatGoogleDate(endDate.toISOString())}&details=${details}&location=${location}`;
     window.open(url, "_blank");
   };
 
@@ -374,7 +374,7 @@ export default function MeetingScheduler({ meetingType, onSuccess, onClose }: Me
                   variant="outline"
                   size="sm"
                   onClick={goToPreviousWeek}
-                  disabled={isDatePast(addDays(currentWeekStart, 6))}
+                  disabled={isDatePast(addDays(currentWeekStart, 6).toISOString())}
                   className="border-white/20 text-white hover:bg-white/10"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -435,7 +435,7 @@ export default function MeetingScheduler({ meetingType, onSuccess, onClose }: Me
                   <div className="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto">
                     {TIME_SLOTS.map((time) => {
                       const isBooked = isSlotBooked(selectedDate, time);
-                      const isPast = isTimePast(selectedDate, time);
+                      const isPast = isTimePast(selectedDate.toISOString(), time);
                       const isSelected = selectedTime === time;
                       
                       return (

@@ -315,7 +315,7 @@ export async function getDistributorAlerts(
 ): Promise<TeamAlert[]> {
   // In a production system, these would be stored in a database table
   // For now, returning empty array as alerts are generated in real-time
-  return null;
+  return [];
 }
 
 /**

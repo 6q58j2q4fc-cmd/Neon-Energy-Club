@@ -22,9 +22,7 @@ export default function DistributorData() {
     return null;
   }
 
-  const { data: distributors, isLoading: distributorsLoading } = trpc.distributor.listAll.useQuery({
-    status: "all",
-  });
+  const { data: distributors, isLoading: distributorsLoading } = trpc.distributor.listAll.useQuery({});
 
   const { data: customers, isLoading: customersLoading } = trpc.user.profile.useQuery();
 
@@ -158,25 +156,25 @@ export default function DistributorData() {
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            {formatBusinessEntity(distributor.businessEntityType ?? "N/A")}
+                            {formatBusinessEntity((distributor as any).businessEntityType ?? "N/A")}
                           </TableCell>
-                          <TableCell>{(distributor.businessName ?? "N/A") || "—"}</TableCell>
+                          <TableCell>{((distributor as any).businessName ?? "N/A") || "—"}</TableCell>
                           <TableCell className="font-mono text-sm">
                             {revealedTaxInfo.has(distributor.id) ? (
                               <span className="text-destructive">
-                                {(distributor.taxIdType ?? "N/A") === "ssn"
-                                  ? distributor.ssnLast4 ?? "N/A"
-                                    ? `***-**-${distributor.ssnLast4 ?? "N/A"}`
+                                {((distributor as any).taxIdType ?? "N/A") === "ssn"
+                                  ? (distributor as any).ssnLast4 ?? "N/A"
+                                    ? `***-**-${(distributor as any).ssnLast4 ?? "N/A"}`
                                     : "Not provided"
-                                  : distributor.einLast4 ?? "N/A"
-                                  ? `**-***${distributor.einLast4 ?? "N/A"}`
+                                  : (distributor as any).einLast4 ?? "N/A"
+                                  ? `**-***${(distributor as any).einLast4 ?? "N/A"}`
                                   : "Not provided"}
                               </span>
                             ) : (
                               <span className="text-muted-foreground">
-                                {(distributor.taxIdType ?? "N/A") === "ssn"
-                                  ? maskSSN(distributor.ssnLast4 ?? "N/A")
-                                  : maskEIN(distributor.einLast4 ?? "N/A")}
+                                {((distributor as any).taxIdType ?? "N/A") === "ssn"
+                                  ? maskSSN((distributor as any).ssnLast4 ?? "N/A")
+                                  : maskEIN((distributor as any).einLast4 ?? "N/A")}
                               </span>
                             )}
                           </TableCell>

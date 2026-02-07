@@ -227,7 +227,7 @@ export async function validateRankEligibility(distributorId: number): Promise<In
  */
 export async function runFullIntegrityCheck(): Promise<DataIntegrityReport> {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) return { timestamp: new Date().toISOString(), checksPerformed: 0, issuesFound: 0, issuesFixed: 0, details: [] };
   const report: DataIntegrityReport = {
     timestamp: new Date().toISOString(),
     checksPerformed: 0,
@@ -326,7 +326,7 @@ export async function autoFixIssues(issues: IntegrityIssue[]): Promise<number> {
             .where(eq(distributors.id, issue.affectedRecordId));
           
           fixedCount++;
-          issue.autoFixed = true;
+          issue.autoFixed = 1;
           break;
           
         case 'referral_unattributed':
@@ -341,7 +341,7 @@ export async function autoFixIssues(issues: IntegrityIssue[]): Promise<number> {
               .where(eq(orders.id, issue.affectedRecordId));
             
             fixedCount++;
-            issue.autoFixed = true;
+            issue.autoFixed = 1;
           }
           break;
       }

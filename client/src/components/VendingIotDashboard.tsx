@@ -119,7 +119,7 @@ const generateMockMachines = (): VendingMachine[] => {
           type: 'low_stock',
           severity: slot.currentStock <= 2 ? 'high' : 'medium',
           message: `${slot.product} is running low (${slot.currentStock} remaining)`,
-          timestamp: new Date(Date.now().toISOString() - Math.random() * 3600000),
+          timestamp: new Date(Date.now() - Math.random() * 3600000).toISOString(),
           acknowledged: Math.random() > 0.7,
         });
       }
@@ -133,7 +133,7 @@ const generateMockMachines = (): VendingMachine[] => {
         type: 'temperature',
         severity: temp > 45 ? 'critical' : 'high',
         message: `Temperature above optimal range: ${temp.toFixed(1)}°F`,
-        timestamp: new Date(Date.now().toISOString() - Math.random() * 1800000),
+        timestamp: new Date(Date.now() - Math.random() * 1800000).toISOString(),
         acknowledged: false,
       });
     }
@@ -145,7 +145,7 @@ const generateMockMachines = (): VendingMachine[] => {
         id: `sale-${idx}-${i}`,
         product: products[Math.floor(Math.random() * products.length)],
         amount: 3.99,
-        timestamp: new Date(Date.now().toISOString() - Math.random() * 86400000 * 7),
+        timestamp: new Date(Date.now() - Math.random() * 86400000 * 7).toISOString(),
         paymentMethod: ['card', 'cash', 'mobile'][Math.floor(Math.random() * 3)] as any,
       });
     }
@@ -155,7 +155,7 @@ const generateMockMachines = (): VendingMachine[] => {
       name: `NEON Machine #${1000 + idx}`,
       location: loc.name,
       status: isMaintenance ? 'maintenance' : isOnline ? 'online' : 'offline',
-      lastPing: new Date(Date.now().toISOString() - (isOnline ? Math.random() * 60000 : Math.random() * 3600000)),
+      lastPing: new Date(Date.now() - (isOnline ? Math.random() * 60000 : Math.random() * 3600000)).toISOString(),
       temperature: temp,
       humidity: 40 + Math.random() * 20,
       batteryBackup: 85 + Math.random() * 15,

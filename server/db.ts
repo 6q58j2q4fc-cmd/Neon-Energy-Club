@@ -134,7 +134,7 @@ export async function createEmailVerification(userId: number): Promise<{ token: 
   await db.update(users)
     .set({
       emailVerificationToken: token,
-      emailVerificationExpiry: expiresAt.toISOString(),
+      emailVerificationExpiry: expiresAt,
       emailVerified: 0,
     })
     .where(eq(users.id, userId));
@@ -304,7 +304,7 @@ export async function createSmsVerification(userId: number, phoneNumber: string)
     .set({
       phone: phoneNumber,
       smsVerificationCode: code,
-      smsVerificationExpiry: expiresAt.toISOString(),
+      smsVerificationExpiry: expiresAt,
       smsVerificationAttempts: newAttempts,
       lastSmsSentAt: new Date().toISOString(),
       phoneVerified: 0,
@@ -3939,7 +3939,7 @@ export async function completeCustomerReferral(
       referralCount: 3,
       status: "available",
       redemptionCode: rewardCode,
-      expiresAt: new Date().toISOString().toISOString(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
+      expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(), // 90 days
     });
   }
 }
@@ -4560,7 +4560,7 @@ export async function savePushSubscription(data: {
         auth: data.auth,
         userAgent: data.userAgent || null,
         isActive: 1,
-        updatedAt: new Date().toISOString().toISOString(),
+        updatedAt: new Date().toISOString(),
       })
       .where(eq(pushSubscriptions.id, existing[0].id));
     return existing[0].id;
@@ -4800,7 +4800,7 @@ export async function upsertUserProfile(data: {
         twitter: data.twitter || null,
         youtube: data.youtube || null,
         linkedin: data.linkedin || null,
-        updatedAt: new Date().toISOString().toISOString(),
+        updatedAt: new Date().toISOString(),
       })
       .where(eq(userProfiles.id, existing[0].id));
     return existing[0].id;
@@ -4850,7 +4850,7 @@ export async function updateUserSlug(userId: number, newSlug: string): Promise<b
 
   if (existing[0]) {
     await db.update(userProfiles)
-      .set({ customSlug: normalizedSlug, updatedAt: new Date().toISOString().toISOString() })
+      .set({ customSlug: normalizedSlug, updatedAt: new Date().toISOString() })
       .where(eq(userProfiles.id, existing[0].id));
     return true;
   }
@@ -4872,7 +4872,7 @@ export async function updateProfilePhoto(userId: number, photoUrl: string): Prom
 
   if (existing[0]) {
     await db.update(userProfiles)
-      .set({ profilePhotoUrl: photoUrl, updatedAt: new Date().toISOString().toISOString() })
+      .set({ profilePhotoUrl: photoUrl, updatedAt: new Date().toISOString() })
       .where(eq(userProfiles.id, existing[0].id));
     return true;
   }
@@ -5079,7 +5079,7 @@ export async function updatePersonalizedProfile(userId: number, data: {
       displayName: (data?.displayName ?? "N/A") || undefined,
       bio: data.bio || undefined,
       location: data.location || undefined,
-      updatedAt: new Date().toISOString().toISOString(),
+      updatedAt: new Date().toISOString(),
     })
     .where(eq(userProfiles.id, existing[0].id));
   
@@ -5508,7 +5508,7 @@ export async function getDistributorPublicProfile(code: string) {
     country: distributor.country || profile?.country || null,
     bio: profile?.bio || null,
     rank: distributor.rank || 'starter',
-    joinDate: typeof distributor.createdAt === 'string' ? distributor.createdAt : (distributor.createdAt?.toISOString() || new Date().toISOString()),
+    joinDate: typeof distributor.createdAt === 'string' ? distributor.createdAt : (distributor.createdAt ? new Date(distributor.createdAt).toISOString() : new Date().toISOString()),
     totalCustomers: totalCustomers,
     isActive: distributor.isActive === 1,
     // Social media links
@@ -5642,7 +5642,7 @@ export async function updateDistributorApplicationInfo(
         ssnLast4: data.taxIdLast4 || null,
         agreedToPoliciesAt: data.agreedToPolicies ? (data.agreedAt || new Date().toISOString()) : null,
         agreedToTermsAt: data.agreedToTerms ? (data.agreedAt || new Date().toISOString()) : null,
-        updatedAt: new Date().toISOString().toISOString(),
+        updatedAt: new Date().toISOString(),
       })
       .where(eq(distributors.id, distributorId));
     
@@ -5991,7 +5991,7 @@ export async function updateNotificationPreferences(
         digestFrequency: preferences.digestFrequency,
         digestDay: preferences.digestDay,
         digestHour: preferences.digestHour,
-        updatedAt: new Date().toISOString().toISOString(),
+        updatedAt: new Date().toISOString(),
       })
       .where(eq(notificationPreferences.userId, userId));
   } else {

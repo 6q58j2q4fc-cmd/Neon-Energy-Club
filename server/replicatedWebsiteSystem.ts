@@ -163,7 +163,7 @@ export async function generateReplicatedSite(userId: number): Promise<Replicated
  */
 export async function auditReplicatedSite(distributorId: number): Promise<SiteAuditResult> {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) return { siteId: distributorId, distributorCode: 'unknown', status: 'error', issues: [{ type: 'data_drift', severity: 'critical', description: 'Database unavailable', autoFixed: 0 }], lastAuditedAt: new Date().toISOString() };
   const issues: SiteIssue[] = [];
 
   if (!db) {
@@ -312,7 +312,7 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
  */
 export async function runDailyDataAudit(): Promise<DataIntegrityReport> {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) return { timestamp: new Date().toISOString(), sitesAudited: 0, issuesFound: 0, issuesFixed: 0, criticalIssues: 0, details: [] };
   const report: DataIntegrityReport = {
     timestamp: new Date().toISOString(),
     sitesAudited: 0,
@@ -445,7 +445,7 @@ export async function verifyBuyerFlow(distributorCode: string): Promise<{
   steps: { step: string; status: 'pass' | 'fail'; details?: string }[];
 }> {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) return { success: false, steps: [{ step: 'Database Connection', status: 'fail', details: 'Database unavailable' }] };
   const steps: { step: string; status: 'pass' | 'fail'; details?: string }[] = [];
 
   if (!db) {
