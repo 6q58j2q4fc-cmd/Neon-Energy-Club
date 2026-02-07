@@ -11,7 +11,7 @@ interface HeaderSoundControlProps {
 }
 
 // The exact jungle audio URL that was on the site
-const JUNGLE_AUDIO_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/wUAXKFjPJqRxCuoX.mp3";
+const JUNGLE_AUDIO_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/RuVzsuSkJvAbHtJf.mp3";
 
 export function HeaderSoundControl({ accentColor = "#c8ff00" }: HeaderSoundControlProps) {
   const [isPlaying, setIsPlaying] = useState(false);

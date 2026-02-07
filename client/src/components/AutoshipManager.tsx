@@ -37,7 +37,6 @@ interface Autoship {
   name: string | null;
   status: "active" | "paused" | "cancelled";
   processDay: number;
-  totalPV: number;
   totalPrice: number;
   paymentMethodId: string | null;
   shippingAddress1: string | null;

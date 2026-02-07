@@ -72,7 +72,7 @@ import ApplicationForms from "./pages/ApplicationForms";
 import Search from "./pages/Search";
 import PackageSelection from "./pages/PackageSelection";
 import MarketingAssets from "./pages/MarketingAssets";
-import AmbientSoundToggle from "./components/AmbientSoundToggle";
+
 import UnifiedChatBot from "./components/UnifiedChatBot";
 import CookieConsent from "./components/CookieConsent";
 import CartDrawer from "./components/CartDrawer";
@@ -202,7 +202,7 @@ function App() {
             <AvatarJungleAtmosphere intensity="low" />
             <Router />
             <CartDrawer />
-            <AmbientSoundToggle />
+
             <UnifiedChatBot />
             <CookieConsent />
           </TooltipProvider>

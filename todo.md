@@ -6415,3 +6415,32 @@
 - [ ] Save final zero-error checkpoint
 - [ ] Document all fixes in PHASE14_ZERO_ERRORS.md
 - [ ] Deliver production deployment instructions
+
+## UI Improvements & TypeScript Zero Errors Sprint
+
+### UI Improvements
+- [ ] Move jungle sounds button from bottom-left to top menu volume control
+- [ ] Integrate jungle sounds into existing volume control icon
+- [ ] Remove colored backgrounds from product page cans
+- [ ] Make both cans larger on product pages
+- [ ] Fix can image bottom parts (pieces missing)
+
+### TypeScript Error Elimination (53 → 0 errors)
+- [ ] Fix AutoshipManager.tsx (4 errors) - Add totalPV property or cast to any
+- [ ] Fix binaryTree.ts (5 errors) - Apply displayName casting pattern
+- [ ] Fix emailNotifications.ts (2 errors) - Apply Date conversion pattern
+- [ ] Fix remaining scattered errors (~42 errors) using proven patterns
+- [ ] Verify zero errors with `pnpm exec tsc --noEmit`
+- [ ] Run full test suite to ensure 97.6%+ pass rate maintained
+
+## Phase 14 Progress Update
+
+### UI Improvements (Completed)
+- [x] Move jungle sounds button from bottom-left to top menu volume control
+- [x] Integrate jungle sounds into existing volume control icon
+- [x] Remove colored backgrounds from product page cans
+- [x] Make both cans larger on product pages (w-56 → w-80)
+
+### TypeScript Error Elimination Progress
+- [x] Fix AutoshipManager.tsx (4 errors) - Removed totalPV property
+- [ ] Continue fixing remaining errors (~50 remaining)

@@ -194,13 +194,10 @@ export default function Products() {
                 <div className="relative p-10">
                   {/* Product image with premium glow */}
                   <div className="relative mb-8 flex justify-center">
-                    {/* Multiple glow layers for depth */}
-                    <div className="absolute inset-0 bg-[#c8ff00]/20 rounded-full blur-[100px] scale-150" />
-                    <div className="absolute inset-0 bg-[#c8ff00]/30 rounded-full blur-[60px] scale-100" />
                     <img
                       src="/neon-can-transparent-final.png"
                       alt="NEON Original"
-                      className="w-56 h-auto relative z-10 animate-float drop-shadow-[0_20px_60px_rgba(200,255,0,0.5)]"
+                      className="w-80 h-auto relative z-10 animate-float drop-shadow-[0_20px_60px_rgba(200,255,0,0.5)]"
                     />
                   </div>
                   
@@ -319,13 +316,10 @@ export default function Products() {
                   
                   {/* Product image with premium glow */}
                   <div className="relative mb-8 flex justify-center">
-                    {/* Multiple glow layers for depth */}
-                    <div className="absolute inset-0 bg-pink-500/20 rounded-full blur-[100px] scale-150" />
-                    <div className="absolute inset-0 bg-pink-500/30 rounded-full blur-[60px] scale-100" />
                     <img
                       src="/neon-pink-can-final.png"
                       alt="NEON Pink Electric Pom Passion"
-                      className="w-56 h-auto relative z-10 animate-float drop-shadow-[0_20px_60px_rgba(255,0,128,0.5)]"
+                      className="w-80 h-auto relative z-10 animate-float drop-shadow-[0_20px_60px_rgba(255,0,128,0.5)]"
                       style={{ animationDelay: '0.5s' }}
                     />
                   </div>
