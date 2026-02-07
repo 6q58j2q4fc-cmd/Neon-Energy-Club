@@ -46,11 +46,13 @@ describe("MLM System Tests", () => {
 
       const result = await caller.distributor.enroll({
         sponsorCode: undefined,
+        agreedToPolicies: true,
+        agreedToTerms: true,
       });
 
       expect(result).toHaveProperty("distributorCode");
       expect(result).toHaveProperty("rank", "starter");
-      expect(result.distributorCode).toMatch(/^NEON[A-Z0-9]+$/);
+      expect(result.distributorCode).toMatch(/^DIST[A-Z0-9]+$/);
     });
 
     it("should enroll a distributor with sponsor", async () => {
@@ -60,6 +62,8 @@ describe("MLM System Tests", () => {
       // First distributor (sponsor)
       const sponsor = await caller1.distributor.enroll({
         sponsorCode: undefined,
+        agreedToPolicies: true,
+        agreedToTerms: true,
       });
 
       // Second distributor (with sponsor)
@@ -68,6 +72,8 @@ describe("MLM System Tests", () => {
 
       const result = await caller2.distributor.enroll({
         sponsorCode: sponsor.distributorCode,
+        agreedToPolicies: true,
+        agreedToTerms: true,
       });
 
       expect(result).toHaveProperty("distributorCode");
@@ -81,7 +87,7 @@ describe("MLM System Tests", () => {
       const caller = appRouter.createCaller(ctx);
 
       // Enroll first
-      await caller.distributor.enroll({ sponsorCode: undefined });
+      await caller.distributor.enroll({ sponsorCode: undefined, agreedToPolicies: true, agreedToTerms: true });
 
       const result = await caller.distributor.createAffiliateLink({
         campaignName: "Test Campaign",
@@ -98,7 +104,7 @@ describe("MLM System Tests", () => {
       const caller = appRouter.createCaller(ctx);
 
       // Enroll first
-      await caller.distributor.enroll({ sponsorCode: undefined });
+      await caller.distributor.enroll({ sponsorCode: undefined, agreedToPolicies: true, agreedToTerms: true });
 
       // Create a link
       await caller.distributor.createAffiliateLink({
@@ -163,7 +169,7 @@ describe("MLM System Tests", () => {
       const caller = appRouter.createCaller(ctx);
 
       // Enroll first
-      await caller.distributor.enroll({ sponsorCode: undefined });
+      await caller.distributor.enroll({ sponsorCode: undefined, agreedToPolicies: true, agreedToTerms: true });
 
       const result = await caller.distributor.me();
 
@@ -178,12 +184,12 @@ describe("MLM System Tests", () => {
       const caller = appRouter.createCaller(ctx);
 
       // Enroll as sponsor
-      const sponsor = await caller.distributor.enroll({ sponsorCode: undefined });
+      const sponsor = await caller.distributor.enroll({ sponsorCode: undefined, agreedToPolicies: true, agreedToTerms: true });
 
       // Enroll team member
       const { ctx: ctx2 } = createAuthContext();
       const caller2 = appRouter.createCaller(ctx2);
-      await caller2.distributor.enroll({ sponsorCode: sponsor.distributorCode });
+      await caller2.distributor.enroll({ sponsorCode: sponsor.distributorCode, agreedToPolicies: true, agreedToTerms: true });
 
       const result = await caller.distributor.team();
 

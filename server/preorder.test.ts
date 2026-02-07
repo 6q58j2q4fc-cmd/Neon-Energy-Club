@@ -85,7 +85,10 @@ describe("preorder.submit", () => {
       notes: "Please deliver in the morning",
     });
 
-    expect(result).toEqual({ success: true });
+    expect(result).toHaveProperty("success", true);
+    expect(result).toHaveProperty("orderId");
+    expect(result).toHaveProperty("nftId");
+    expect(result).toHaveProperty("message");
   });
 
   it("validates required fields", async () => {

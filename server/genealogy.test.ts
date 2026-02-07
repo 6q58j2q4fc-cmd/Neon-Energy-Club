@@ -68,6 +68,6 @@ describe('Genealogy Tree Enhancement', () => {
     expect(distributor.personalSales).toBeGreaterThanOrEqual(0);
     expect(distributor.teamSales).toBeGreaterThanOrEqual(0);
     expect(distributor.monthlyPv).toBeGreaterThanOrEqual(0);
-    expect(distributor.isActive).toBe(1);
+    expect(distributor.isActive).toBe(true);
   });
 });

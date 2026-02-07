@@ -44,7 +44,7 @@ describe('Country Selection', () => {
 
     it('should return null for invalid code', () => {
       const country = getCountryByCode('XX');
-      expect(country).toBeNull();
+      expect(country).toBeUndefined();
     });
 
     it('should handle lowercase codes', () => {
