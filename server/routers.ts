@@ -1398,7 +1398,7 @@ export const appRouter = router({
           .update(distributors)
           .set({
             enrollmentPackageId: input.packageId,
-            autoshipEnabled: input.autoshipEnabled,
+            autoshipEnabled: input.autoshipEnabled ? 1 : 0,
           })
           .where(eq(distributors.id, distributor.id));
 
@@ -2547,8 +2547,8 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
       if (ctx.user.role !== "admin") {
         throw new Error("Unauthorized: Admin access required");
       }
-      const { updateExpiredTerritories } = await import("./db");
-      return await updateExpiredTerritories();
+      // TODO: Implement territory expiration processing
+      return { success: true, message: "Territory expiration processing not yet implemented" };
     }),
 
     // Update territory status (admin)

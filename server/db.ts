@@ -442,7 +442,7 @@ async function generateOrderNftAsync(id: number) {
     if (!db) return;
     
     // Generate the unique NFT artwork
-    const { imageUrl, nftId } = await generateOrderNft(orderId);
+    const { imageUrl, nftId } = await generateOrderNft(id);
     
     // Update the order with NFT details
     await db.update(preorders)
@@ -451,11 +451,11 @@ async function generateOrderNftAsync(id: number) {
         nftImageUrl: imageUrl,
         nftMintStatus: 'pending',
       })
-      .where(eq(preorders.id, orderId));
+      .where(eq(preorders.id, id));
     
-    console.log(`[NFT] Generated NFT ${nftId} for order ${orderId}`);
+    console.log(`[NFT] Generated NFT ${nftId} for order ${id}`);
   } catch (error) {
-    console.error(`[NFT] Error generating NFT for order ${orderId}:`, error);
+    console.error(`[NFT] Error generating NFT for order ${id}:`, error);
   }
 }
 
@@ -502,7 +502,7 @@ export async function getPreorderNft(id: number) {
     createdAt: preorders.createdAt,
   })
     .from(preorders)
-    .where(eq(preorders.id, orderId))
+    .where(eq(preorders.id, id))
     .limit(1);
   
   return result.length > 0 ? result[0] : null;
@@ -552,10 +552,10 @@ export async function getPreorderByOrderNumber(orderNumber: string) {
 
 // Helper function to determine NFT rarity based on order number
 function getNftRarity(id: number): string {
-  if (orderId <= 10) return 'Legendary';
-  if (orderId <= 50) return 'Epic';
-  if (orderId <= 200) return 'Rare';
-  if (orderId <= 500) return 'Uncommon';
+  if (id <= 10) return 'Legendary';
+  if (id <= 50) return 'Epic';
+  if (id <= 200) return 'Rare';
+  if (id <= 500) return 'Uncommon';
   return 'Common';
 }
 
@@ -2202,7 +2202,7 @@ export async function convertReferralToCustomer(referralCode: string, id: number
     .set({
       status: "customer",
       convertedToCustomer: 1,
-      customerOrderId: orderId,
+      customerOrderId: id,
       referredEmail: customerEmail,
       referredName: customerName,
       convertedAt: new Date().toISOString(),
@@ -3202,7 +3202,7 @@ export async function updateAutoshipOrderStatus(
   
   await db.update(autoshipOrders)
     .set({ status, ...additionalData })
-    .where(eq(autoshipOrders.id, orderId));
+    .where(eq(autoshipOrders.id, id));
   
   return { success: true };
 }
@@ -3972,7 +3972,7 @@ export async function redeemCustomerReward(
     .set({
       status: "redeemed",
       redeemedAt: new Date().toISOString(),
-      redeemedOrderId: orderId,
+      redeemedOrderId: id,
     })
     .where(and(
       eq(customerRewards.id, rewardId),
@@ -5340,7 +5340,7 @@ export async function getVendingOrderById(id: number) {
   const db = await getDb();
   if (!db) return null;
   
-  const results = await db.select().from(vendingMachineOrders).where(eq(vendingMachineOrders.id, orderId)).limit(1);
+  const results = await db.select().from(vendingMachineOrders).where(eq(vendingMachineOrders.id, id)).limit(1);
   return results[0] || null;
 }
 
@@ -5397,7 +5397,7 @@ export async function updateVendingOrderStatus(id: number, data: {
   
   await db.update(vendingMachineOrders)
     .set(data as any)
-    .where(eq(vendingMachineOrders.id, orderId));
+    .where(eq(vendingMachineOrders.id, id));
   
   return { success: true };
 }
@@ -5415,7 +5415,7 @@ export async function getVendingPaymentHistory(id: number) {
   if (!db) return [];
   
   return await db.select().from(vendingPaymentHistory)
-    .where(eq(vendingPaymentHistory.orderId, orderId))
+    .where(eq(vendingPaymentHistory.orderId, id))
     .orderBy(desc(vendingPaymentHistory.createdAt));
 }
 
@@ -6944,16 +6944,16 @@ export async function getVendingAnalytics(userId: number, machineId?: number, pe
   let startDate: string;
   switch (period) {
     case "day":
-      startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
       break;
     case "week":
-      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
       break;
     case "month":
-      startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
       break;
     case "year":
-      startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+      startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000).toISOString();
       break;
   }
   

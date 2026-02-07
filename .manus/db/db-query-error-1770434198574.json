@@ -1,0 +1,12 @@
+{
+  "query": "-- 1. Rename totalPV → totalPv in autoship_orders\nALTER TABLE autoship_orders \n  CHANGE COLUMN `totalPV` `totalPv` INT DEFAULT 0 NOT NULL;\n\n-- 2. Rename totalPV → totalPv in distributor_autoships  \nALTER TABLE distributor_autoships\n  CHANGE COLUMN `totalPV` `totalPv` INT DEFAULT 0 NOT NULL;\n\n-- 3. Rename monthlyPV → monthlyPv in distributors\nALTER TABLE distributors\n  CHANGE COLUMN `monthlyPV` `monthlyPv` INT DEFAULT 0 NOT NULL;\n\n-- 4. Rename monthlyAutoshipPV → monthlyAutoshipPv in distributors\nALTER TABLE distributors\n  CHANGE COLUMN `monthlyAutoshipPV` `monthlyAutoshipPv` INT DEFAULT 0 NOT NULL;\n\n-- 5. Promote Dakota Rea to master distributor\nUPDATE distributors\nSET \n  rank = 'master_distributor',\n  status = 'active',\n  isActive = 1,\n  qualified = 1\nWHERE userId = (SELECT id FROM users WHERE name LIKE '%Dakota%Rea%' OR email LIKE '%dakota%' LIMIT 1);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute -- 1. Rename totalPV → totalPv in autoship_orders\nALTER TABLE autoship_orders \n  CHANGE COLUMN `totalPV` `totalPv` INT DEFAULT 0 NOT NULL;\n\n-- 2. Rename totalPV → totalPv in distributor_autoships  \nALTER TABLE distributor_autoships\n  CHANGE COLUMN `totalPV` `totalPv` INT DEFAULT 0 NOT NULL;\n\n-- 3. Rename monthlyPV → monthlyPv in distributors\nALTER TABLE distributors\n  CHANGE COLUMN `monthlyPV` `monthlyPv` INT DEFAULT 0 NOT NULL;\n\n-- 4. Rename monthlyAutoshipPV → monthlyAutoshipPv in distributors\nALTER TABLE distributors\n  CHANGE COLUMN `monthlyAutoshipPV` `monthlyAutoshipPv` INT DEFAULT 0 NOT NULL;\n\n-- 5. Promote Dakota Rea to master distributor\nUPDATE distributors\nSET \n  rank = 'master_distributor',\n  status = 'active',\n  isActive = 1,\n  qualified = 1\nWHERE userId = (SELECT id FROM users WHERE name LIKE '%Dakota%Rea%' OR email LIKE '%dakota%' LIMIT 1);",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1064 (42000) at line 18: You have an error in your SQL syntax; check the manual that corresponds to your TiDB version for the right syntax to use line 3 column 7 near \"rank = 'master_distributor',",
+    "  status = 'active',",
+    "  isActive = 1,",
+    "  qualified = 1",
+    "WHERE userId = (SELECT id FROM users WHERE name LIKE '%Dakota%Rea%' OR email LIKE '%dakota%' LIMIT 1)\""
+  ]
+}

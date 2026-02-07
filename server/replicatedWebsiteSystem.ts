@@ -39,7 +39,7 @@ interface SiteIssue {
   type: 'broken_link' | 'missing_tracking' | 'commission_error' | 'data_drift' | 'stale_data';
   severity: 'low' | 'medium' | 'high' | 'critical';
   description: string;
-  autoFixed: boolean;
+  autoFixed: number; // MySQL tinyint(1): 0 = false, 1 = true
   fixDetails?: string;
 }
 
@@ -311,7 +311,7 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
 export async function runDailyDataAudit(): Promise<DataIntegrityReport> {
   const db = await getDb();
   const report: DataIntegrityReport = {
-    timestamp: new Date().toISOString().toISOString(),
+    timestamp: new Date().toISOString(),
     sitesAudited: 0,
     issuesFound: 0,
     issuesFixed: 0,
@@ -501,7 +501,7 @@ export async function getReplicatedSiteStats(): Promise<{
   totalSites: number;
   activeSites: number;
   sitesWithIssues: number;
-  lastAuditTime: Date | null;
+  lastAuditTime: string | null;
 }> {
   const db = await getDb();
   if (!db) {
