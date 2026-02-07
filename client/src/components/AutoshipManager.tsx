@@ -343,7 +343,7 @@ export function AutoshipManager() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleToggleStatus(autoship)}
+                          onClick={() => handleToggleStatus(autoship as any)}
                           className="border-gray-600 text-gray-300 hover:bg-gray-800"
                         >
                           {autoship.status === "active" ? (
@@ -359,7 +359,7 @@ export function AutoshipManager() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleCancelAutoship(autoship)}
+                          onClick={() => handleCancelAutoship(autoship as any)}
                           className="border-red-600 text-red-400 hover:bg-red-900/20"
                         >
                           <X className="h-4 w-4 mr-1" /> Cancel
@@ -391,7 +391,7 @@ export function AutoshipManager() {
                     <p className="text-xs text-gray-400">Monthly Cost</p>
                   </div>
                   <div className="bg-gray-800/50 rounded-lg p-3 text-center">
-                    <p className="text-2xl font-bold text-white">{formatDate(autoship.nextProcessDate)}</p>
+                    <p className="text-2xl font-bold text-white">{formatDate(autoship.nextProcessDate as any)}</p>
                     <p className="text-xs text-gray-400">Next Order</p>
                   </div>
                   <div className="bg-gray-800/50 rounded-lg p-3 text-center">
@@ -423,7 +423,7 @@ export function AutoshipManager() {
                     {autoship.status !== "cancelled" && (
                       <Dialog open={showAddProductDialog && selectedAutoship?.id === autoship.id} onOpenChange={(open) => {
                         setShowAddProductDialog(open);
-                        if (open) setSelectedAutoship(autoship);
+                        if (open) setSelectedAutoship(autoship as any);
                       }}>
                         <DialogTrigger asChild>
                           <Button variant="outline" size="sm" className="border-gray-600 text-gray-300 hover:bg-gray-800">

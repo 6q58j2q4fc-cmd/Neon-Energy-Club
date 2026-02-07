@@ -136,7 +136,7 @@ export function NotificationPreferences() {
               </div>
             </div>
             <Switch
-              checked={currentPrefs?.referrals ?? true}
+              checked={Boolean(currentPrefs?.referrals) ?? true}
               onCheckedChange={() => handleToggle("referrals")}
             />
           </div>
@@ -150,7 +150,7 @@ export function NotificationPreferences() {
               </div>
             </div>
             <Switch
-              checked={currentPrefs?.commissions ?? true}
+              checked={Boolean(currentPrefs?.commissions) ?? true}
               onCheckedChange={() => handleToggle("commissions")}
             />
           </div>
@@ -164,7 +164,7 @@ export function NotificationPreferences() {
               </div>
             </div>
             <Switch
-              checked={currentPrefs?.teamUpdates ?? true}
+              checked={Boolean(currentPrefs?.teamUpdates) ?? true}
               onCheckedChange={() => handleToggle("teamUpdates")}
             />
           </div>
@@ -178,7 +178,7 @@ export function NotificationPreferences() {
               </div>
             </div>
             <Switch
-              checked={currentPrefs?.promotions ?? true}
+              checked={Boolean(currentPrefs?.promotions) ?? true}
               onCheckedChange={() => handleToggle("promotions")}
             />
           </div>
@@ -192,7 +192,7 @@ export function NotificationPreferences() {
               </div>
             </div>
             <Switch
-              checked={currentPrefs?.orders ?? true}
+              checked={Boolean(currentPrefs?.orders) ?? true}
               onCheckedChange={() => handleToggle("orders")}
             />
           </div>
@@ -206,7 +206,7 @@ export function NotificationPreferences() {
               </div>
             </div>
             <Switch
-              checked={currentPrefs?.announcements ?? true}
+              checked={Boolean(currentPrefs?.announcements) ?? true}
               onCheckedChange={() => handleToggle("announcements")}
             />
           </div>
