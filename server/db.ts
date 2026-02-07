@@ -256,7 +256,7 @@ export function generateSmsCode(): string {
  * Create SMS verification record for a user
  * Rate limited: max 3 SMS per hour, 10 per day
  */
-export async function createSmsVerification(userId: number, phoneNumber: string): Promise<{ code: string; expiresAt: Date } | { error: string }> {
+export async function createSmsVerification(userId: number, phoneNumber: string): Promise<{ code: string; expiresAt: string } | { error: string }> {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -310,7 +310,7 @@ export async function createSmsVerification(userId: number, phoneNumber: string)
     })
     .where(eq(users.id, userId));
 
-  return { code, expiresAt: expiresAt.toISOString() };
+  return { code, expiresAt };
 }
 
 /**

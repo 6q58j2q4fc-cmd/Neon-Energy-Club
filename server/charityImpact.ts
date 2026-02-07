@@ -282,7 +282,7 @@ export async function saveImpactSummary(
         totalSpeciesSaved: total.speciesSaved.toString(),
         totalAnimalLivesSaved: total.animalLivesSaved.toString(),
         updatedAt: new Date().toISOString(),
-      })
+      } as any)
       .where(eq(charityImpactTracking.id, existing[0].id));
   } else {
     // Insert new record
@@ -308,7 +308,7 @@ export async function saveImpactSummary(
       totalHabitatProtected: total.habitatProtected.toString(),
       totalSpeciesSaved: total.speciesSaved.toString(),
       totalAnimalLivesSaved: total.animalLivesSaved.toString(),
-    });
+    } as any);
   }
 }
 

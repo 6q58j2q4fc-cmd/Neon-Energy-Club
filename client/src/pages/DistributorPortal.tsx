@@ -316,7 +316,7 @@ export default function DistributorPortal() {
             { id: "autoship", icon: Repeat, label: "Auto-Ship" },
             { id: "rewards", icon: Gift, label: "3-for-Free" },
             { id: "settings", icon: Settings, label: "Settings", dataTutorial: "settings" },
-          ].map((item) => (
+          ].map((item: { id: string; icon: any; label: string; dataTutorial?: string }) => (
             <button
               key={item.id}
               onClick={() => handleTabChange(item.id)}
@@ -1354,7 +1354,7 @@ export default function DistributorPortal() {
             { id: "my-team", icon: Users, label: "Team" },
             { id: "commissions", icon: DollarSign, label: "Earnings" },
             { id: "marketing", icon: Share2, label: "Share" },
-          ].map((item) => (
+          ].map((item: { id: string; icon: any; label: string; dataTutorial?: string }) => (
             <button
               key={item.id}
               onClick={() => handleTabChange(item.id)}

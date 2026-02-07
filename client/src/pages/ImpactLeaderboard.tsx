@@ -11,7 +11,7 @@ export default function ImpactLeaderboard() {
   const [selectedType, setSelectedType] = useState<'personal' | 'team' | 'total'>('total');
   const [selectedMetric, setSelectedMetric] = useState<'trees' | 'habitat' | 'species' | 'animals'>('trees');
 
-  const { data: leaderboard, isLoading } = trpc.charityImpact.getLeaderboard.useQuery({
+  const { data: leaderboard, isLoading } = trpc.impact.getLeaderboard.useQuery({
     type: selectedType,
     metric: selectedMetric,
     limit: 50,

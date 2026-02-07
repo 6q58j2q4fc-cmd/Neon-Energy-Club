@@ -62,7 +62,7 @@ export function NftPreview({ orderId, nftId, showMintingNotice = true }: NftPrev
   
   // Poll for NFT data until it's available
   const { data, isLoading, refetch } = trpc.preorder.getNft.useQuery(
-    { orderId },
+    { id: orderId },
     {
       enabled: !!orderId,
       refetchInterval: (query) => {

@@ -121,7 +121,7 @@ export default function ProfileCustomization({ userType }: ProfileCustomizationP
     const timer = setTimeout(async () => {
       setIsCheckingSlug(true);
       try {
-        const response = await utils.client.profile.checkSlugAvailability.useQuery({ slug: customSlug });
+        const response = await utils.client.profile.checkSlugAvailability.query({ slug: customSlug });
         setSlugAvailable(response.available);
       } catch {
         setSlugAvailable(null);

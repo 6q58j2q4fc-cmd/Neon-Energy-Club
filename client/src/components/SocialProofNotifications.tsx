@@ -226,7 +226,7 @@ export default function SocialProofNotifications() {
   const recordSimulated = trpc.crowdfunding.recordSimulated.useMutation();
 
   // Fetch real data from the database
-  const recentContributions = trpc.crowdfunding.recentContributions.data?.useQuery(undefined, {
+  const recentContributions = trpc.crowdfunding.recentContributions.useQuery(undefined, {
     refetchInterval: 60000, // Refetch every minute
   });
   

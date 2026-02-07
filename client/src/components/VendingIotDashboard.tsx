@@ -674,7 +674,7 @@ export function VendingIotDashboard() {
         ...machine,
         todayRevenue: machine.todayRevenue + (Math.random() > 0.7 ? 3.99 : 0),
         todaySales: machine.todaySales + (Math.random() > 0.7 ? 1 : 0),
-        lastPing: machine.status === 'online' ? new Date() : machine.lastPing,
+        lastPing: machine.status === 'online' ? new Date().toISOString() : machine.lastPing,
       })));
       setLastUpdate(new Date());
     }, 10000);

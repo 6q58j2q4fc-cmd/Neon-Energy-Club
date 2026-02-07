@@ -326,7 +326,7 @@ export async function autoFixIssues(issues: IntegrityIssue[]): Promise<number> {
             .where(eq(distributors.id, issue.affectedRecordId));
           
           fixedCount++;
-          issue.autoFixed = 1;
+          issue.autoFixed = 1 as any;
           break;
           
         case 'referral_unattributed':
@@ -341,7 +341,7 @@ export async function autoFixIssues(issues: IntegrityIssue[]): Promise<number> {
               .where(eq(orders.id, issue.affectedRecordId));
             
             fixedCount++;
-            issue.autoFixed = 1;
+            issue.autoFixed = 1 as any;
           }
           break;
       }

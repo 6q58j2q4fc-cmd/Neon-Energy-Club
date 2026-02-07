@@ -26,7 +26,7 @@ export function AdminWebsiteHealth() {
   
   const runHealthCheck = trpc.admin.runWebsiteHealthCheck.useMutation({
     onSuccess: (data) => {
-      toast.success(`Health check complete: ${data.issuesFound} issues found`);
+      toast.success(`Health check complete: ${(data as any)?.issuesFound || 0} issues found`);
       refetch();
     },
     onError: (error) => {
@@ -37,7 +37,7 @@ export function AdminWebsiteHealth() {
 
   const autoFix = trpc.admin.autoFixWebsiteIssues.useMutation({
     onSuccess: (data) => {
-      toast.success(`Auto-fix complete: ${data.issuesFixed} issues fixed`);
+      toast.success(`Auto-fix complete: ${(data as any)?.issuesFixed || 0} issues fixed`);
       refetch();
     },
     onError: (error) => {

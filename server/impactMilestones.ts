@@ -348,7 +348,7 @@ export async function checkAchievedMilestones(distributorId: number): Promise<Ac
 export async function getNextMilestone(
   distributorId: number,
   category?: Milestone['category']
-): Promise<{ milestone: Milestone; progress: number; remaining: number } | null> {
+): Promise<{ milestone: Milestone; progress: number; remaining: number; currentValue: number; progressPercent: number } | null> {
   try {
     const impact = await getLifetimeImpact(distributorId);
     const achieved = await checkAchievedMilestones(distributorId);
@@ -397,6 +397,8 @@ export async function getNextMilestone(
         milestone,
         progress: (currentValue / milestone.threshold) * 100,
         remaining: milestone.threshold - currentValue,
+        currentValue,
+        progressPercent: Math.min(100, (currentValue / milestone.threshold) * 100),
       };
     }
 

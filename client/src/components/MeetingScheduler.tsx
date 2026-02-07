@@ -434,7 +434,7 @@ export default function MeetingScheduler({ meetingType, onSuccess, onClose }: Me
                   <Label className="text-white">Available Times for {format(selectedDate, "EEEE, MMM d")}</Label>
                   <div className="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto">
                     {TIME_SLOTS.map((time) => {
-                      const isBooked = isSlotBooked(selectedDate, time);
+                      const isBooked = isSlotBooked(selectedDate.toISOString(), time);
                       const isPast = isTimePast(selectedDate.toISOString(), time);
                       const isSelected = selectedTime === time;
                       
