@@ -89,7 +89,7 @@ export default function DistributorData() {
         </TabsList>
 
         <TabsContent value="distributors" className="mt-6">
-          <Card as any>
+          <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -229,7 +229,7 @@ export default function DistributorData() {
         </TabsContent>
 
         <TabsContent value="customers" className="mt-6">
-          <Card as any>
+          <Card>
             <CardHeader>
               <CardTitle>Customer Database</CardTitle>
               <CardDescription>

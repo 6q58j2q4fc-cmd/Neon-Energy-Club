@@ -246,7 +246,7 @@ export default function ComponentsShowcase() {
           {/* Text Colors Section */}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Text Colors</h3>
-            <Card as any>
+            <Card>
               <CardContent className="pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3">
@@ -325,7 +325,7 @@ export default function ComponentsShowcase() {
           {/* Color Combinations Section */}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Color Combinations</h3>
-            <Card as any>
+            <Card>
               <CardContent className="pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="bg-primary text-primary-foreground rounded-lg p-4">
@@ -384,7 +384,7 @@ export default function ComponentsShowcase() {
           {/* Buttons Section */}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Buttons</h3>
-            <Card as any>
+            <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-wrap gap-4">
                   <Button>Default</Button>
@@ -406,7 +406,7 @@ export default function ComponentsShowcase() {
           {/* Form Inputs Section */}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Form Inputs</h3>
-            <Card as any>
+            <Card>
               <CardContent className="pt-6 space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
@@ -680,7 +680,7 @@ export default function ComponentsShowcase() {
           {/* Data Display Section */}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Data Display</h3>
-            <Card as any>
+            <Card>
               <CardContent className="pt-6 space-y-6">
                 <div className="space-y-2">
                   <Label>Badges</Label>
@@ -897,7 +897,7 @@ export default function ComponentsShowcase() {
                 <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
               <TabsContent value="account">
-                <Card as any>
+                <Card>
                   <CardHeader>
                     <CardTitle>Account</CardTitle>
                     <CardDescription>
@@ -916,7 +916,7 @@ export default function ComponentsShowcase() {
                 </Card>
               </TabsContent>
               <TabsContent value="password">
-                <Card as any>
+                <Card>
                   <CardHeader>
                     <CardTitle>Password</CardTitle>
                     <CardDescription>
@@ -939,7 +939,7 @@ export default function ComponentsShowcase() {
                 </Card>
               </TabsContent>
               <TabsContent value="settings">
-                <Card as any>
+                <Card>
                   <CardHeader>
                     <CardTitle>Settings</CardTitle>
                     <CardDescription>
@@ -987,7 +987,7 @@ export default function ComponentsShowcase() {
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Collapsible</h3>
             <Collapsible>
-              <Card as any>
+              <Card>
                 <CardHeader>
                   <CollapsibleTrigger asChild>
                     <Button variant="ghost" className="w-full justify-between">
@@ -1017,7 +1017,7 @@ export default function ComponentsShowcase() {
           {/* Dialog, Sheet, Drawer Section */}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Overlays</h3>
-            <Card as any>
+            <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-wrap gap-4">
                   <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -1121,7 +1121,7 @@ export default function ComponentsShowcase() {
           {/* Menus Section */}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Menus</h3>
-            <Card as any>
+            <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-wrap gap-4">
                   <DropdownMenu>
@@ -1172,7 +1172,7 @@ export default function ComponentsShowcase() {
           {/* Calendar Section */}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Calendar</h3>
-            <Card as any>
+            <Card>
               <CardContent className="pt-6 flex justify-center">
                 <Calendar
                   mode="single"
@@ -1187,14 +1187,14 @@ export default function ComponentsShowcase() {
           {/* Carousel Section */}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Carousel</h3>
-            <Card as any>
+            <Card>
               <CardContent className="pt-6">
                 <Carousel className="w-full max-w-xs mx-auto">
                   <CarouselContent>
                     {Array.from({ length: 5 }).map((_, index) => (
                       <CarouselItem key={index}>
                         <div className="p-1">
-                          <Card as any>
+                          <Card>
                             <CardContent className="flex aspect-square items-center justify-center p-6">
                               <span className="text-4xl font-semibold">
                                 {index + 1}
@@ -1215,7 +1215,7 @@ export default function ComponentsShowcase() {
           {/* Toggle Section */}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Toggle</h3>
-            <Card as any>
+            <Card>
               <CardContent className="pt-6 space-y-4">
                 <div className="space-y-2">
                   <Label>Toggle</Label>
@@ -1256,7 +1256,7 @@ export default function ComponentsShowcase() {
           {/* Aspect Ratio & Scroll Area Section */}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Layout Components</h3>
-            <Card as any>
+            <Card>
               <CardContent className="pt-6 space-y-6">
                 <div className="space-y-2">
                   <Label>Aspect Ratio (16/9)</Label>
@@ -1288,7 +1288,7 @@ export default function ComponentsShowcase() {
           {/* Resizable Section */}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Resizable Panels</h3>
-            <Card as any>
+            <Card>
               <CardContent className="pt-6">
                 <ResizablePanelGroup
                   direction="horizontal"
@@ -1313,7 +1313,7 @@ export default function ComponentsShowcase() {
           {/* Toast Section */}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Toast</h3>
-            <Card as any>
+            <Card>
               <CardContent className="pt-6 space-y-4">
                 <div className="space-y-2">
                   <Label>Sonner Toast</Label>
@@ -1394,7 +1394,7 @@ export default function ComponentsShowcase() {
           {/* AI ChatBox Section */}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">AI ChatBox</h3>
-            <Card as any>
+            <Card>
               <CardContent className="pt-6">
                 <div className="space-y-4">
                   <div className="text-sm text-muted-foreground">

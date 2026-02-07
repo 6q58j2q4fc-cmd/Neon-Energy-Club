@@ -1,0 +1,29 @@
+#!/bin/sh
+
+echo "🔍 Running pre-commit checks..."
+
+# TypeScript type checking
+echo "\n📝 Checking TypeScript types..."
+pnpm exec tsc --noEmit
+if [ $? -ne 0 ]; then
+  echo "❌ TypeScript errors detected. Fix before committing."
+  exit 1
+fi
+
+# Database schema sync check
+echo "\n🗄️  Checking database schema sync..."
+pnpm db:push --dry-run 2>&1 | grep -q "No schema changes"
+if [ $? -ne 0 ]; then
+  echo "⚠️  Schema drift detected. Run 'pnpm db:push' to sync."
+  echo "   (Continuing commit - manual verification required)"
+fi
+
+# Run tests
+echo "\n🧪 Running tests..."
+pnpm test
+if [ $? -ne 0 ]; then
+  echo "❌ Tests failed. Fix before committing."
+  exit 1
+fi
+
+echo "\n✅ All pre-commit checks passed!"

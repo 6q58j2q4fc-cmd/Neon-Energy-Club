@@ -197,7 +197,7 @@ export interface NftMetadata {
 export function generateNftMetadata(
   orderNumber: number,
   imageUrl: string,
-  prelaunchEndDate: Date
+  prelaunchEndDate: string
 ): NftMetadata {
   const formattedNumber = formatOrderNumber(orderNumber);
   const themeIndex = orderNumber % NFT_THEMES.length;
@@ -220,7 +220,7 @@ export function generateNftMetadata(
       { trait_type: "Aesthetic", value: "Cyberpunk Neon" },
       { trait_type: "Brand", value: "NEON Energy Drink" },
     ],
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
     mintStatus: 'pending',
     mintEligibleAfter: prelaunchEndDate, // string (ISO timestamp)
   };

@@ -3938,7 +3938,7 @@ export async function completeCustomerReferral(
       referralCount: 3,
       status: "available",
       redemptionCode: rewardCode,
-      expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
+      expiresAt: new Date().toISOString(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
     });
   }
 }

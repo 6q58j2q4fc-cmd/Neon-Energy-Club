@@ -7,6 +7,77 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { calculateCommissions, placeBinaryNode, traverseGenealogyTree } from './mlmCommissions';
 import * as db from './db';
 
+// Mock distributor factory function with schema-compliant defaults
+function createMockDistributor(overrides: Partial<any> = {}): any {
+  return {
+    id: Math.floor(Math.random() * 10000),
+    userId: Math.floor(Math.random() * 10000),
+    sponsorId: null,
+    distributorCode: `TEST${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+    rank: 'starter',
+    personalSales: 0,
+    teamSales: 0,
+    totalEarnings: 0,
+    availableBalance: 0,
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    placementPosition: null,
+    username: null,
+    subdomain: null,
+    leftLegVolume: 0,
+    rightLegVolume: 0,
+    monthlyPv: 0,
+    monthlyAutoshipPv: 0,
+    activeDownlineCount: 0,
+    isActive: 1, // MySQL tinyint
+    lastQualificationDate: null,
+    fastStartEligibleUntil: null,
+    country: null,
+    phone: null,
+    address: null,
+    city: null,
+    state: null,
+    zipCode: null,
+    dateOfBirth: null,
+    taxIdLast4: null,
+    agreedToPoliciesAt: null,
+    agreedToTermsAt: null,
+    taxId: null,
+    taxIdType: null,
+    entityType: null,
+    businessName: null,
+    businessRegistrationNumber: null,
+    businessRegistrationState: null,
+    emergencyContactName: null,
+    emergencyContactPhone: null,
+    emergencyContactRelationship: null,
+    bankName: null,
+    bankAccountType: null,
+    bankAccountLast4: null,
+    bankRoutingNumber: null,
+    bankAccountNumber: null,
+    enrollmentPackage: null,
+    autoshipEnabled: 0,
+    autoshipPackageId: null,
+    nextAutoshipDate: null,
+    taxInfoCompleted: 0,
+    taxInfoCompletedAt: null,
+    w9Submitted: 0,
+    w9SubmittedAt: null,
+    enrollmentPackageId: null,
+    firstName: null,
+    lastName: null,
+    email: null,
+    ssnLast4: null,
+    businessEntityType: null,
+    businessEin: null,
+    leftLegId: null,
+    rightLegId: null,
+    ...overrides,
+  };
+}
+
 // Mock database functions
 vi.mock('./db', () => ({
   getDb: vi.fn(),
@@ -176,12 +247,12 @@ describe('MLM Commission Calculations', () => {
 
     it('should calculate commissions up to 5 levels deep', async () => {
       const distributors = [
-        { id: 1, sponsorId: null, rank: 'master_distributor' },
-        { id: 2, sponsorId: 1, rank: 'senior_distributor' },
-        { id: 3, sponsorId: 2, rank: 'distributor' },
-        { id: 4, sponsorId: 3, rank: 'distributor' },
-        { id: 5, sponsorId: 4, rank: 'distributor' },
-        { id: 6, sponsorId: 5, rank: 'distributor' }, // Level 6 - should not get commission
+        createMockDistributor({ id: 1, sponsorId: null, rank: 'royal_diamond' }),
+        createMockDistributor({ id: 2, sponsorId: 1, rank: 'diamond' }),
+        createMockDistributor({ id: 3, sponsorId: 2, rank: 'gold' }),
+        createMockDistributor({ id: 4, sponsorId: 3, rank: 'silver' }),
+        createMockDistributor({ id: 5, sponsorId: 4, rank: 'bronze' }),
+        createMockDistributor({ id: 6, sponsorId: 5, rank: 'starter' }), // Level 6 - should not get commission
       ];
 
       const sale = {
@@ -215,11 +286,11 @@ describe('MLM Commission Calculations', () => {
       ];
 
       const distributors = [
-        { id: 1, sponsorId: null, rank: 'master_distributor' },
-        { id: 2, sponsorId: 1, rank: 'senior_distributor' },
-        { id: 3, sponsorId: 2, rank: 'distributor' },
-        { id: 4, sponsorId: 3, rank: 'distributor' },
-        { id: 5, sponsorId: 4, rank: 'distributor' },
+        createMockDistributor({ id: 1, sponsorId: null, rank: 'royal_diamond' }),
+        createMockDistributor({ id: 2, sponsorId: 1, rank: 'diamond' }),
+        createMockDistributor({ id: 3, sponsorId: 2, rank: 'gold' }),
+        createMockDistributor({ id: 4, sponsorId: 3, rank: 'silver' }),
+        createMockDistributor({ id: 5, sponsorId: 4, rank: 'bronze' }),
       ];
 
       const sale = {
@@ -249,8 +320,8 @@ describe('MLM Commission Calculations', () => {
 
     it('should stop at top of tree when upline chain is shorter than 5 levels', async () => {
       const distributors = [
-        { id: 1, sponsorId: null, rank: 'master_distributor' },
-        { id: 2, sponsorId: 1, rank: 'distributor' },
+        createMockDistributor({ id: 1, sponsorId: null, rank: 'royal_diamond' }),
+        createMockDistributor({ id: 2, sponsorId: 1, rank: 'starter' }),
       ];
 
       const sale = {
@@ -275,9 +346,9 @@ describe('MLM Commission Calculations', () => {
 
     it('should not pay commission to inactive distributors', async () => {
       const distributors = [
-        { id: 1, sponsorId: null, rank: 'master_distributor', status: 'active' },
-        { id: 2, sponsorId: 1, rank: 'distributor', status: 'inactive' },
-        { id: 3, sponsorId: 2, rank: 'distributor', status: 'active' },
+        createMockDistributor({ id: 1, sponsorId: null, rank: 'royal_diamond', status: 'active' }),
+        createMockDistributor({ id: 2, sponsorId: 1, rank: 'starter', status: 'inactive' }),
+        createMockDistributor({ id: 3, sponsorId: 2, rank: 'starter', status: 'active' }),
       ];
 
       const sale = {

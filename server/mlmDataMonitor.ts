@@ -24,7 +24,7 @@ interface IntegrityIssue {
   affectedRecordId: number;
   affectedTable: string;
   suggestedFix: string;
-  autoFixed: boolean;
+  autoFixed: number; // 0 or 1 (MySQL tinyint)
 }
 
 /**
@@ -228,7 +228,7 @@ export async function validateRankEligibility(distributorId: number): Promise<In
 export async function runFullIntegrityCheck(): Promise<DataIntegrityReport> {
   const db = await getDb();
   const report: DataIntegrityReport = {
-    timestamp: new Date().toISOString().toISOString(),
+    timestamp: new Date().toISOString(),
     checksPerformed: 0,
     issuesFound: 0,
     issuesFixed: 0,
@@ -360,7 +360,7 @@ export async function processOrderCommissions(id: number): Promise<void> {
   if (!db) return;
   
   // Get the order
-  const [order] = await db!.select().from(orders).where(eq(orders.id, orderId));
+  const [order] = await db!.select().from(orders).where(eq(orders.id, id));
   if (!order || !order.distributorId) return;
   
   // Get the distributor
@@ -375,7 +375,7 @@ export async function processOrderCommissions(id: number): Promise<void> {
   
   await db!.insert(commissions).values({
     distributorId: distributor.id,
-    saleId: orderId,
+    saleId: id,
     sourceDistributorId: distributor.id,
     commissionType: 'direct',
     level: 1,
@@ -397,7 +397,7 @@ export async function processOrderCommissions(id: number): Promise<void> {
     
     await db!.insert(commissions).values({
       distributorId: sponsor.id,
-      saleId: orderId,
+      saleId: id,
       sourceDistributorId: distributor.id,
       commissionType: 'team',
       level: level + 1,
@@ -431,7 +431,7 @@ export async function processOrderCommissions(id: number): Promise<void> {
     })
     .where(eq(distributors.id, distributor.id));
   
-  console.log(`[MLM Monitor] Processed commissions for order ${orderId}: Direct $${directCommission / 100} to distributor ${distributor.id}`);
+  console.log(`[MLM Monitor] Processed commissions for order ${id}: Direct $${directCommission / 100} to distributor ${distributor.id}`);
 }
 
 /**

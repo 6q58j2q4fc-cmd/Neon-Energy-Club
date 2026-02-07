@@ -101,7 +101,7 @@ export async function registerNativeUser(data: {
   
   // Generate email verification token
   const emailVerificationToken = generateToken();
-  const emailVerificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  const emailVerificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24 hours
   
   try {
     const result = await db!.insert(users).values({
@@ -197,7 +197,7 @@ export async function requestPasswordReset(email: string): Promise<{ success: bo
   
   // Generate reset token
   const resetToken = generateToken();
-  const resetExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+  const resetExpiry = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
   
   await db!.update(users)
     .set({

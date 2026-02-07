@@ -279,7 +279,7 @@ export function BadgeShowcase({
   const totalCount = allBadges.length;
 
   return (
-    <Card as any>
+    <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>

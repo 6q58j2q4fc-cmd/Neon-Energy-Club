@@ -124,7 +124,7 @@ export default function UnifiedChatBot() {
         id: Date.now().toString(),
         role: "assistant",
         content: response.message,
-        timestamp: new Date().toISOString().toISOString(),
+        timestamp: new Date().toISOString(),
       }]);
       setIsLoading(false);
     },
@@ -134,7 +134,7 @@ export default function UnifiedChatBot() {
         id: Date.now().toString(),
         role: "assistant",
         content: "Sorry, I'm having trouble connecting. Please try again.",
-        timestamp: new Date().toISOString().toISOString(),
+        timestamp: new Date().toISOString(),
       }]);
       setIsLoading(false);
     }
@@ -172,7 +172,7 @@ export default function UnifiedChatBot() {
       id: "welcome",
       role: "assistant",
       content: welcomeContent,
-      timestamp: new Date().toISOString().toISOString(),
+      timestamp: new Date().toISOString(),
     }]);
   };
 
@@ -192,7 +192,7 @@ export default function UnifiedChatBot() {
       id: Date.now().toString(),
       role: "user",
       content: userMessage,
-      timestamp: new Date().toISOString().toISOString(),
+      timestamp: new Date().toISOString(),
     }]);
     setIsLoading(true);
 

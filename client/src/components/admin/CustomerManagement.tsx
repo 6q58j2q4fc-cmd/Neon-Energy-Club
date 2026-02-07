@@ -171,7 +171,7 @@ export function CustomerManagement({ customers, isLoading, onRefresh }: Customer
       </div>
 
       {/* Search and Filters */}
-      <Card as any>
+      <Card>
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
@@ -206,7 +206,7 @@ export function CustomerManagement({ customers, isLoading, onRefresh }: Customer
       </Card>
 
       {/* Customer Table */}
-      <Card as any>
+      <Card>
         <CardHeader>
           <CardTitle>Customer Directory</CardTitle>
           <CardDescription>
@@ -364,21 +364,21 @@ export function CustomerManagement({ customers, isLoading, onRefresh }: Customer
 
               {/* Stats Grid */}
               <div className="grid grid-cols-3 gap-4">
-                <Card as any>
+                <Card>
                   <CardContent className="p-4 text-center">
                     <ShoppingCart className="h-6 w-6 mx-auto mb-2 text-blue-500" />
                     <p className="text-2xl font-bold">{selectedCustomer.totalOrders || 0}</p>
                     <p className="text-sm text-muted-foreground">Total Orders</p>
                   </CardContent>
                 </Card>
-                <Card as any>
+                <Card>
                   <CardContent className="p-4 text-center">
                     <DollarSign className="h-6 w-6 mx-auto mb-2 text-green-500" />
                     <p className="text-2xl font-bold">${(selectedCustomer.lifetimeValue || 0).toLocaleString()}</p>
                     <p className="text-sm text-muted-foreground">Lifetime Value</p>
                   </CardContent>
                 </Card>
-                <Card as any>
+                <Card>
                   <CardContent className="p-4 text-center">
                     <Gift className="h-6 w-6 mx-auto mb-2 text-purple-500" />
                     <p className="text-2xl font-bold">{selectedCustomer.referralCount || 0}</p>
@@ -388,7 +388,7 @@ export function CustomerManagement({ customers, isLoading, onRefresh }: Customer
               </div>
 
               {/* Contact Info */}
-              <Card as any>
+              <Card>
                 <CardHeader>
                   <CardTitle className="text-base">Contact Information</CardTitle>
                 </CardHeader>
@@ -413,7 +413,7 @@ export function CustomerManagement({ customers, isLoading, onRefresh }: Customer
               </Card>
 
               {/* Notes Section */}
-              <Card as any>
+              <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-base">Notes</CardTitle>
                   <Button size="sm" variant="outline" onClick={() => setShowAddNote(true)}>

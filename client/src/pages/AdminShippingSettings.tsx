@@ -182,7 +182,7 @@ export default function AdminShippingSettings() {
 
             {Object.entries(CARRIERS).map(([key, config]) => (
               <TabsContent key={key} value={key} className="space-y-6">
-                <Card as any>
+                <Card>
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
@@ -305,7 +305,7 @@ export default function AdminShippingSettings() {
                 </Card>
 
                 {/* How to Get Credentials */}
-                <Card as any>
+                <Card>
                   <CardHeader>
                     <CardTitle className="text-lg">How to Get {config.name} API Credentials</CardTitle>
                   </CardHeader>
