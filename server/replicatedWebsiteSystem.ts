@@ -311,7 +311,7 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
 export async function runDailyDataAudit(): Promise<DataIntegrityReport> {
   const db = await getDb();
   const report: DataIntegrityReport = {
-    timestamp: new Date().toISOString(),
+    timestamp: new Date().toISOString().toISOString(),
     sitesAudited: 0,
     issuesFound: 0,
     issuesFixed: 0,

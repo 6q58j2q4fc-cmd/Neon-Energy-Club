@@ -1303,6 +1303,7 @@ export const charityImpactTracking = mysqlTable("charity_impact_tracking", {
 
 // Type exports for Insert operations
 export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
 export type InsertTerritoryLicense = typeof territoryLicenses.$inferInsert;
 export type InsertCrowdfunding = typeof crowdfunding.$inferInsert;
 export type InsertNewsletterSubscription = typeof newsletterSubscriptions.$inferInsert;

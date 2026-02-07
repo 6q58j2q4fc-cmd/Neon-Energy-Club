@@ -26,18 +26,18 @@ export async function checkExpiringTerritories(daysAhead: number = 30): Promise<
   try {
     // Calculate date range
     const now = new Date();
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + daysAhead);
+    const futureDate = new Date(now.getTime() + daysAhead * 24 * 60 * 60 * 1000);
+    const nowStr = now.toISOString();
+    const futureDateStr = futureDate.toISOString();
 
-    // Find approved territory applications with expiration dates within the range
-    const expiringTerritories = await db
+    const expiringTerritories = await db!
       .select()
       .from(claimedTerritories)
       .where(
         and(
           eq(claimedTerritories.status, "active"),
-          gte(claimedTerritories.expirationDate, now),
-          lte(claimedTerritories.expirationDate, futureDate)
+          gte(claimedTerritories.expirationDate, nowStr),
+          lte(claimedTerritories.expirationDate, futureDateStr)
         )
       );
 
@@ -112,34 +112,38 @@ export async function getTerritoryExpirationSummary(): Promise<{
     const in7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
     const in30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
     const in90Days = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
+    const nowStr = now.toISOString();
+    const in7DaysStr = in7Days.toISOString();
+    const in30DaysStr = in30Days.toISOString();
+    const in90DaysStr = in90Days.toISOString();
 
     const [expiringIn7, expiringIn30, expiringIn90, expired] = await Promise.all([
-      db.select({ count: sql<number>`COUNT(*)` })
+      db!.select({ count: sql<number>`COUNT(*)` })
         .from(claimedTerritories)
         .where(and(
           eq(claimedTerritories.status, "active"),
-          gte(claimedTerritories.expirationDate, now),
-          lte(claimedTerritories.expirationDate, in7Days)
+          gte(claimedTerritories.expirationDate, nowStr),
+          lte(claimedTerritories.expirationDate, in7DaysStr)
         )),
-      db.select({ count: sql<number>`COUNT(*)` })
+      db!.select({ count: sql<number>`COUNT(*)` })
         .from(claimedTerritories)
         .where(and(
           eq(claimedTerritories.status, "active"),
-          gte(claimedTerritories.expirationDate, now),
-          lte(claimedTerritories.expirationDate, in30Days)
+          gte(claimedTerritories.expirationDate, nowStr),
+          lte(claimedTerritories.expirationDate, in30DaysStr)
         )),
-      db.select({ count: sql<number>`COUNT(*)` })
+      db!.select({ count: sql<number>`COUNT(*)` })
         .from(claimedTerritories)
         .where(and(
           eq(claimedTerritories.status, "active"),
-          gte(claimedTerritories.expirationDate, now),
-          lte(claimedTerritories.expirationDate, in90Days)
+          gte(claimedTerritories.expirationDate, nowStr),
+          lte(claimedTerritories.expirationDate, in90DaysStr)
         )),
-      db.select({ count: sql<number>`COUNT(*)` })
+      db!.select({ count: sql<number>`COUNT(*)` })
         .from(claimedTerritories)
         .where(and(
           eq(claimedTerritories.status, "active"),
-          lte(claimedTerritories.expirationDate, now)
+          lte(claimedTerritories.expirationDate, nowStr)
         )),
     ]);
 

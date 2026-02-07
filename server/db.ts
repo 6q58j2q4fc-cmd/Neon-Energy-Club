@@ -61,11 +61,11 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     }
 
     if (!values.lastSignedIn) {
-      values.lastSignedIn = new Date();
+      values.lastSignedIn = new Date().toISOString();
     }
 
     if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = new Date();
+      updateSet.lastSignedIn = new Date().toISOString();
     }
 
     await db.insert(users).values(values).onDuplicateKeyUpdate({
@@ -134,7 +134,7 @@ export async function createEmailVerification(userId: number): Promise<{ token: 
   await db.update(users)
     .set({
       emailVerificationToken: token,
-      emailVerificationExpiry: expiresAt,
+      emailVerificationExpiry: expiresAt.toISOString(),
       emailVerified: 0,
     })
     .where(eq(users.id, userId));
@@ -211,7 +211,7 @@ export async function isEmailVerified(userId: number): Promise<boolean> {
     .where(eq(users.id, userId))
     .limit(1);
 
-  return result.length > 0 ? result[0].emailVerified : 0;
+  return result.length > 0 ? Boolean(result[0].emailVerified) : false;
 }
 
 /**
@@ -276,7 +276,8 @@ export async function createSmsVerification(userId: number, phoneNumber: string)
 
   // Check rate limiting - max 1 SMS per minute
   if (user.lastSmsSentAt) {
-    const timeSinceLastSms = Date.now() - user.lastSmsSentAt.getTime();
+    const lastSmsDate = new Date(user.lastSmsSentAt);
+    const timeSinceLastSms = Date.now() - lastSmsDate.getTime();
     if (timeSinceLastSms < 60 * 1000) {
       const secondsRemaining = Math.ceil((60 * 1000 - timeSinceLastSms) / 1000);
       return { error: `Please wait ${secondsRemaining} seconds before requesting another code` };
@@ -285,7 +286,8 @@ export async function createSmsVerification(userId: number, phoneNumber: string)
 
   // Check max attempts (reset after 1 hour)
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-  if (user.lastSmsSentAt && user.lastSmsSentAt > oneHourAgo && user.smsVerificationAttempts >= 5) {
+  const lastSmsDate = user.lastSmsSentAt ? new Date(user.lastSmsSentAt) : null;
+  if (lastSmsDate && lastSmsDate > oneHourAgo && user.smsVerificationAttempts >= 5) {
     return { error: "Too many verification attempts. Please try again in an hour." };
   }
 
@@ -294,7 +296,7 @@ export async function createSmsVerification(userId: number, phoneNumber: string)
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
   // Reset attempts if last SMS was more than 1 hour ago
-  const newAttempts = (user.lastSmsSentAt && user.lastSmsSentAt > oneHourAgo) 
+  const newAttempts = (lastSmsDate && lastSmsDate > oneHourAgo) 
     ? user.smsVerificationAttempts + 1 
     : 1;
 
@@ -302,7 +304,7 @@ export async function createSmsVerification(userId: number, phoneNumber: string)
     .set({
       phone: phoneNumber,
       smsVerificationCode: code,
-      smsVerificationExpiry: expiresAt,
+      smsVerificationExpiry: expiresAt.toISOString(),
       smsVerificationAttempts: newAttempts,
       lastSmsSentAt: new Date().toISOString(),
       phoneVerified: 0,
@@ -370,7 +372,7 @@ export async function isPhoneVerified(userId: number): Promise<boolean> {
     .where(eq(users.id, userId))
     .limit(1);
 
-  return result.length > 0 ? result[0].phoneVerified : 0;
+  return result.length > 0 ? Boolean(result[0].phoneVerified) : false;
 }
 
 /**
@@ -397,7 +399,14 @@ export async function getVerificationStatus(userId: number): Promise<{
     .where(eq(users.id, userId))
     .limit(1);
 
-  return result.length > 0 ? result[0] : null;
+  if (result.length === 0) return null;
+  
+  return {
+    emailVerified: Boolean(result[0].emailVerified),
+    phoneVerified: Boolean(result[0].phoneVerified),
+    email: result[0].email,
+    phone: result[0].phone,
+  };
 }
 
 /**
@@ -426,7 +435,7 @@ export async function createPreorder(data: InsertPreorder) {
 /**
  * Generate NFT asynchronously after order creation
  */
-async function generateOrderNftAsync(orderId: number) {
+async function generateOrderNftAsync(id: number) {
   try {
     const { generateOrderNft, formatOrderNumber } = await import("./nftGeneration");
     const db = await getDb();
@@ -481,7 +490,7 @@ export async function updatePreorderStatus(id: number, status: "pending" | "conf
 /**
  * Get NFT details for a preorder
  */
-export async function getPreorderNft(orderId: number) {
+export async function getPreorderNft(id: number) {
   const db = await getDb();
   if (!db) return null;
   
@@ -489,7 +498,7 @@ export async function getPreorderNft(orderId: number) {
     nftId: preorders.nftId,
     nftImageUrl: preorders.nftImageUrl,
     nftMintStatus: preorders.nftMintStatus,
-    orderId: preorders.id,
+    id: preorders.id,
     createdAt: preorders.createdAt,
   })
     .from(preorders)
@@ -542,7 +551,7 @@ export async function getPreorderByOrderNumber(orderNumber: string) {
 }
 
 // Helper function to determine NFT rarity based on order number
-function getNftRarity(orderId: number): string {
+function getNftRarity(id: number): string {
   if (orderId <= 10) return 'Legendary';
   if (orderId <= 50) return 'Epic';
   if (orderId <= 200) return 'Rare';
@@ -561,7 +570,7 @@ export async function getUserNfts(email: string) {
     nftId: preorders.nftId,
     nftImageUrl: preorders.nftImageUrl,
     nftMintStatus: preorders.nftMintStatus,
-    orderId: preorders.id,
+    id: preorders.id,
     createdAt: preorders.createdAt,
   })
     .from(preorders)
@@ -908,7 +917,7 @@ export async function validateCouponCode(couponCode: string) {
 }
 
 // Redeem a coupon code (mark as used)
-export async function redeemCouponCode(couponCode: string, orderId: number) {
+export async function redeemCouponCode(couponCode: string, id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -1557,11 +1566,11 @@ export async function getAllTerritoryApplications() {
  * Update claimed territory status based on expiration dates
  * Called automatically to keep map availability current
  */
-export async function updateExpiredTerritories() {
+export async function markExpiredTerritories() {
   const db = await getDb();
   if (!db) return { updated: 0 };
   
-  const now = new Date();
+  const now = new Date().toISOString();
   
   // Mark expired territories
   const result = await db.update(claimedTerritories)
@@ -1585,12 +1594,14 @@ export async function getTerritoriesExpiringSoon(daysAhead: number = 30) {
   
   const now = new Date();
   const futureDate = new Date(now.getTime() + daysAhead * 24 * 60 * 60 * 1000);
+  const nowStr = now.toISOString();
+  const futureDateStr = futureDate.toISOString();
   
   const territories = await db.select().from(claimedTerritories)
     .where(
       and(
         eq(claimedTerritories.status, "active"),
-        sql`${claimedTerritories.expirationDate} BETWEEN ${now} AND ${futureDate}`
+        sql`${claimedTerritories.expirationDate} BETWEEN ${nowStr} AND ${futureDateStr}`
       )
     )
     .orderBy(claimedTerritories.expirationDate);
@@ -1633,8 +1644,8 @@ export async function updateTerritoryStatus(
   if (!db) throw new Error("Database not available");
   
   const updateData: Record<string, unknown> = { status };
-  if (renewalDate) updateData.renewalDate = renewalDate;
-  if (expirationDate) updateData.expirationDate = expirationDate;
+  if (renewalDate) updateData.renewalDate = renewalDate.toISOString();
+  if (expirationDate) updateData.expirationDate = expirationDate.toISOString();
   
   await db.update(claimedTerritories)
     .set(updateData)
@@ -1674,8 +1685,8 @@ export async function activateTerritoryFromApplication(
     city: application.city || null,
     state: application.state || null,
     status: "active",
-    renewalDate,
-    expirationDate,
+    renewalDate: renewalDate.toISOString(),
+    expirationDate: expirationDate.toISOString(),
   };
   
   const result = await createClaimedTerritory(claimedData);
@@ -2187,7 +2198,7 @@ export async function updateReferralStatus(referralCode: string, status: "pendin
 /**
  * Convert referral to customer
  */
-export async function convertReferralToCustomer(referralCode: string, orderId: number, customerEmail: string, customerName: string) {
+export async function convertReferralToCustomer(referralCode: string, id: number, customerEmail: string, customerName: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
@@ -3140,7 +3151,7 @@ async function recalculateAutoshipTotals(autoshipId: number) {
   }
   
   await db.update(distributorAutoships)
-    .set({ totalPv, totalPrice })
+    .set({ totalPV, totalPrice })
     .where(eq(distributorAutoships.id, autoshipId));
 }
 
@@ -3186,7 +3197,7 @@ export async function getAutoshipOrderHistory(autoshipId: number, limit: number 
  * Update autoship order status
  */
 export async function updateAutoshipOrderStatus(
-  orderId: number,
+  id: number,
   status: "pending" | "processing" | "completed" | "failed" | "refunded",
   additionalData?: Partial<InsertAutoshipOrder>
 ) {
@@ -3884,7 +3895,7 @@ export async function recordCustomerReferral(
  */
 export async function completeCustomerReferral(
   referredId: number,
-  orderId: number,
+  id: number,
   purchaseAmount: string
 ): Promise<void> {
   const db = await getDb();
@@ -3956,7 +3967,7 @@ export async function getCustomerRewards(userId: number) {
  */
 export async function redeemCustomerReward(
   rewardId: number,
-  orderId: number
+  id: number
 ): Promise<boolean> {
   const db = await getDb();
   if (!db) return false;
@@ -4554,7 +4565,7 @@ export async function savePushSubscription(data: {
         auth: data.auth,
         userAgent: data.userAgent || null,
         isActive: 1,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString().toISOString(),
       })
       .where(eq(pushSubscriptions.id, existing[0].id));
     return existing[0].id;
@@ -4794,7 +4805,7 @@ export async function upsertUserProfile(data: {
         twitter: data.twitter || null,
         youtube: data.youtube || null,
         linkedin: data.linkedin || null,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString().toISOString(),
       })
       .where(eq(userProfiles.id, existing[0].id));
     return existing[0].id;
@@ -4844,7 +4855,7 @@ export async function updateUserSlug(userId: number, newSlug: string): Promise<b
 
   if (existing[0]) {
     await db.update(userProfiles)
-      .set({ customSlug: normalizedSlug, updatedAt: new Date().toISOString() })
+      .set({ customSlug: normalizedSlug, updatedAt: new Date().toISOString().toISOString() })
       .where(eq(userProfiles.id, existing[0].id));
     return true;
   }
@@ -4866,7 +4877,7 @@ export async function updateProfilePhoto(userId: number, photoUrl: string): Prom
 
   if (existing[0]) {
     await db.update(userProfiles)
-      .set({ profilePhotoUrl: photoUrl, updatedAt: new Date().toISOString() })
+      .set({ profilePhotoUrl: photoUrl, updatedAt: new Date().toISOString().toISOString() })
       .where(eq(userProfiles.id, existing[0].id));
     return true;
   }
@@ -5073,7 +5084,7 @@ export async function updatePersonalizedProfile(userId: number, data: {
       displayName: data.displayName || undefined,
       bio: data.bio || undefined,
       location: data.location || undefined,
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString().toISOString(),
     })
     .where(eq(userProfiles.id, existing[0].id));
   
@@ -5329,7 +5340,7 @@ export async function createVendingOrder(data: Omit<InsertVendingMachineOrder, "
   return { id: Number(result[0].insertId) };
 }
 
-export async function getVendingOrderById(orderId: number) {
+export async function getVendingOrderById(id: number) {
   const db = await getDb();
   if (!db) return null;
   
@@ -5372,7 +5383,7 @@ export async function getAllVendingOrders(options: { status?: string; limit?: nu
   return { orders, total };
 }
 
-export async function updateVendingOrderStatus(orderId: number, data: {
+export async function updateVendingOrderStatus(id: number, data: {
   status?: string;
   adminNotes?: string;
   estimatedDelivery?: Date;
@@ -5403,7 +5414,7 @@ export async function recordVendingPayment(data: Omit<InsertVendingPaymentHistor
   return { id: Number(result[0].insertId) };
 }
 
-export async function getVendingPaymentHistory(orderId: number) {
+export async function getVendingPaymentHistory(id: number) {
   const db = await getDb();
   if (!db) return [];
   
@@ -5636,7 +5647,7 @@ export async function updateDistributorApplicationInfo(
         ssnLast4: data.taxIdLast4 || null,
         agreedToPoliciesAt: data.agreedToPolicies ? (data.agreedAt || new Date().toISOString()) : null,
         agreedToTermsAt: data.agreedToTerms ? (data.agreedAt || new Date().toISOString()) : null,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString().toISOString(),
       })
       .where(eq(distributors.id, distributorId));
     
@@ -5977,7 +5988,7 @@ export async function updateNotificationPreferences(
       .update(notificationPreferences)
       .set({
         ...preferences,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString().toISOString(),
       })
       .where(eq(notificationPreferences.userId, userId));
   } else {

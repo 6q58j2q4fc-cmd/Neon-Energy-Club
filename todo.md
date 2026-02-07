@@ -5910,3 +5910,35 @@
 - [x] Test About page book section displays correctly
 - [x] Test Shop page Books tab displays correctly with charity message
 - [x] Verify Rainforest Trust link is clickable and functional
+
+## Google Places API Integration (Feb 6, 2026)
+- [ ] Replace simulated location suggestions in IntelligentTerritoryMap with Google Places API
+- [ ] Add real business location data (restaurants, gyms, offices, retail stores)
+- [ ] Integrate foot traffic analytics for vending placement recommendations
+- [ ] Add demographic data for location scoring
+- [ ] Implement API error handling and fallback to simulated data
+- [ ] Test Places API integration with various zip codes
+
+## Vending ROI Calculator (Feb 6, 2026)
+- [ ] Create VendingROICalculator component
+- [ ] Build side-by-side comparison: NEON AI vending vs traditional machines
+- [ ] Add profit projection calculations with adjustable parameters
+- [ ] Show competitive advantages (AI sales bot, selfie cam leads, WiFi hotspot)
+- [ ] Display monthly/yearly revenue projections
+- [ ] Add interactive sliders for location type, foot traffic, pricing
+- [ ] Include payback period calculator
+- [ ] Add visual charts for profit comparison
+- [ ] Integrate calculator into Vending page
+
+## TypeScript Error Fixes (Feb 6, 2026) - CRITICAL
+- [x] Fix expirationDate type issues in claimed_territories table (partial - converted to ISO strings)
+- [x] Add db! non-null assertions throughout codebase (partial - 3 files fixed)
+- [x] Convert Date objects to .toISOString() for string columns (partial - 8 conversions)
+- [x] Convert boolean values to 0/1 for tinyint fields (partial - automated script created)
+- [ ] Fix DistributorData query missing fields (taxIdType, ssnLast4, einLast4)
+- [ ] Resolve complex insert/update overload issues (31 errors)
+- [ ] Fix argument type mismatches (18 errors)
+- [x] Add missing Insert type exports to schema (InsertUser added)
+- [ ] Run TypeScript compiler and verify 0 errors (143 errors remaining, down from 159)
+- [ ] Test application runtime to ensure no regressions
+- [ ] Complete remaining systematic fixes per typescript-error-report.md

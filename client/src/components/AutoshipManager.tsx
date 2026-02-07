@@ -37,7 +37,7 @@ interface Autoship {
   name: string | null;
   status: "active" | "paused" | "cancelled";
   processDay: number;
-  totalPv: number;
+  totalPV: number;
   totalPrice: number;
   paymentMethodId: string | null;
   shippingAddress1: string | null;
@@ -384,7 +384,7 @@ export function AutoshipManager() {
                 {/* Stats */}
                 <div className="grid grid-cols-4 gap-4 mb-6">
                   <div className="bg-gray-800/50 rounded-lg p-3 text-center">
-                    <p className="text-2xl font-bold text-[#39FF14]">{autoship.totalPv}</p>
+                    <p className="text-2xl font-bold text-[#39FF14]">{autoship.totalPV}</p>
                     <p className="text-xs text-gray-400">Total PV</p>
                   </div>
                   <div className="bg-gray-800/50 rounded-lg p-3 text-center">
@@ -402,14 +402,14 @@ export function AutoshipManager() {
                 </div>
 
                 {/* PV Status */}
-                {autoship.totalPv < 48 && autoship.status === "active" && (
+                {autoship.totalPV < 48 && autoship.status === "active" && (
                   <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 mb-4">
                     <p className="text-yellow-500 text-sm">
-                      ⚠️ Your autoship has {autoship.totalPv} PV. Add more products to meet the 48 PV activity requirement.
+                      ⚠️ Your autoship has {autoship.totalPV} PV. Add more products to meet the 48 PV activity requirement.
                     </p>
                   </div>
                 )}
-                {autoship.totalPv >= 48 && autoship.status === "active" && (
+                {autoship.totalPV >= 48 && autoship.status === "active" && (
                   <div className="bg-[#39FF14]/10 border border-[#39FF14]/30 rounded-lg p-3 mb-4">
                     <p className="text-[#39FF14] text-sm">
                       ✓ Your autoship meets the 48 PV activity requirement!

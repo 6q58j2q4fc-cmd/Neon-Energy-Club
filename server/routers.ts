@@ -296,7 +296,7 @@ export const appRouter = router({
               await sendShippingNotification({
                 customerName: preorder.name,
                 customerEmail: preorder.email,
-                orderId: preorder.id,
+                id: preorder.id,
                 orderType: "preorder",
                 shippingAddress: `${preorder.address}, ${preorder.city}, ${preorder.state} ${preorder.postalCode}`,
                 trackingNumber: preorder.trackingNumber || undefined,
@@ -306,7 +306,7 @@ export const appRouter = router({
               await sendDeliveryNotification({
                 customerName: preorder.name,
                 customerEmail: preorder.email,
-                orderId: preorder.id,
+                id: preorder.id,
                 orderType: "preorder",
               });
             }
@@ -321,7 +321,7 @@ export const appRouter = router({
     // Get NFT details for a specific order
     getNft: publicProcedure
       .input(z.object({
-        orderId: z.number().int(),
+        id: z.number().int(),
       }))
       .query(async ({ input }) => {
         const { getPreorderNft } = await import("./db");
@@ -1001,7 +1001,7 @@ export const appRouter = router({
     redeemCoupon: protectedProcedure
       .input(z.object({
         couponCode: z.string().min(1),
-        orderId: z.number().int(),
+        id: z.number().int(),
       }))
       .mutation(async ({ input }) => {
         const { redeemCouponCode } = await import("./db");
@@ -2845,8 +2845,8 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
     // Mint NFT for a new order (called internally when order is placed)
     mint: publicProcedure
       .input(z.object({
-        orderId: z.number().int().optional(),
-        preorderId: z.number().int().optional(),
+        id: z.number().int().optional(),
+        preid: z.number().int().optional(),
         crowdfundingId: z.number().int().optional(),
         ownerEmail: z.string().email(),
         ownerName: z.string(),
@@ -3030,7 +3030,7 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
       .input(z.object({ phone: z.string().min(10) }))
       .mutation(async ({ input }) => {
         const { updateSMSOptIn } = await import("./db");
-        await updateSMSOptIn(input.phone, { optedIn: 0, optOutDate: new Date().toISOString() });
+        await updateSMSOptIn(input.phone, { optedIn: 0, optOutDate: new Date().toISOString().toISOString() });
         return { success: true };
       }),
 
@@ -3147,7 +3147,7 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
       .input(
         z.object({
           referralCode: z.string(),
-          orderId: z.number().int(),
+          id: z.number().int(),
           customerEmail: z.string().email(),
           customerName: z.string(),
         })
@@ -3471,7 +3471,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
     // Complete a referral (when referred user makes a purchase)
     completeReferral: protectedProcedure
       .input(z.object({
-        orderId: z.number(),
+        id: z.number(),
         purchaseAmount: z.string(),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -3484,7 +3484,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
     redeemReward: protectedProcedure
       .input(z.object({
         rewardId: z.number(),
-        orderId: z.number(),
+        id: z.number(),
       }))
       .mutation(async ({ input }) => {
         const { redeemCustomerReward } = await import("./db");
@@ -3603,7 +3603,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
             await sendShippingNotification({
               customerName: redemption.name,
               customerEmail: redemption.email,
-              orderId: redemption.id,
+              id: redemption.id,
               orderType: 'preorder', // Using preorder type for reward shipments
               shippingAddress: `${redemption.addressLine1}, ${redemption.city}, ${redemption.state} ${redemption.postalCode}`,
               trackingNumber: input.trackingNumber,
@@ -3617,7 +3617,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
             await sendDeliveryNotification({
               customerName: redemption.name,
               customerEmail: redemption.email,
-              orderId: redemption.id,
+              id: redemption.id,
               orderType: 'preorder', // Using preorder type for reward deliveries
             });
           } catch (emailError) {
@@ -3826,7 +3826,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
             userType: 'distributor' as const,
             pageViews: 0,
             createdAt: new Date(distributorProfile.joinDate),
-            updatedAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString().toISOString(),
             instagram: distributorProfile.instagram,
             tiktok: distributorProfile.tiktok,
             facebook: distributorProfile.facebook,
@@ -4205,7 +4205,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
           const { createVendingCheckout } = await import("./stripe");
           const origin = ctx.req.headers.origin || "https://neonenergydrink.manus.space";
           const checkoutResult = await createVendingCheckout({
-            orderId: order.id,
+            id: order.id,
             amount: input.paymentType === "full" ? input.totalPriceCents : input.depositAmountCents,
             machineModel: input.machineModel,
             quantity: input.quantity,
@@ -4235,7 +4235,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
 
     // Get order by ID
     getOrder: protectedProcedure
-      .input(z.object({ orderId: z.number() }))
+      .input(z.object({ id: z.number() }))
       .query(async ({ ctx, input }) => {
         const { getVendingOrderById } = await import("./db");
         const order = await getVendingOrderById(input.orderId);
@@ -4267,7 +4267,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
     // Admin: Update order status
     adminUpdateOrderStatus: protectedProcedure
       .input(z.object({
-        orderId: z.number(),
+        id: z.number(),
         status: z.enum(["pending", "deposit_paid", "in_production", "ready_for_delivery", "delivered", "cancelled", "refunded"]),
         adminNotes: z.string().optional(),
         estimatedDelivery: z.string().optional(),

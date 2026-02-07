@@ -374,7 +374,12 @@ export async function getImpactHistory(
  * @returns Lifetime impact totals
  */
 export async function getLifetimeImpact(distributorId: number): Promise<ImpactCalculation> {
-  const history = await db
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const history = await db!
     .select()
     .from(charityImpactTracking)
     .where(eq(charityImpactTracking.distributorId, distributorId));
@@ -418,6 +423,11 @@ export async function getImpactLeaderboard(
   metric: 'trees' | 'habitat' | 'species' | 'animals',
   limit: number = 10
 ): Promise<any[]> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
   // Get current month
   const now = new Date();
   const periodStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
@@ -433,7 +443,7 @@ export async function getImpactLeaderboard(
 
   const column = `${type}${columnMap[metric]}`;
 
-  const leaders = await db
+  const leaders = await db!
     .select()
     .from(charityImpactTracking)
     .where(

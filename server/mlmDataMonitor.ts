@@ -228,7 +228,7 @@ export async function validateRankEligibility(distributorId: number): Promise<In
 export async function runFullIntegrityCheck(): Promise<DataIntegrityReport> {
   const db = await getDb();
   const report: DataIntegrityReport = {
-    timestamp: new Date().toISOString(),
+    timestamp: new Date().toISOString().toISOString(),
     checksPerformed: 0,
     issuesFound: 0,
     issuesFixed: 0,
@@ -355,7 +355,7 @@ export async function autoFixIssues(issues: IntegrityIssue[]): Promise<number> {
 /**
  * Process real-time commission calculation for a new order
  */
-export async function processOrderCommissions(orderId: number): Promise<void> {
+export async function processOrderCommissions(id: number): Promise<void> {
   const db = await getDb();
   if (!db) return;
   
