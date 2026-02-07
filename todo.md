@@ -6346,3 +6346,32 @@
 - [ ] Run load tests to verify no runtime regressions
 - [ ] Save final checkpoint with zero TypeScript errors
 - [ ] Deploy to production via Management UI Publish button
+
+## Phase 13: Elite TypeScript Cleanup Sprint - FINAL ZERO-ERROR PUSH
+
+### Root Cause #1: Schema Drift (40+ TS2339 errors)
+- [ ] Analyze all TS2339 "property does not exist" errors
+- [ ] Identify missing properties: businessName, businessEntityType, taxIdType, ssnLast4, einLast4, displayName
+- [ ] Add missing properties to drizzle/schema.ts
+- [ ] Run `pnpm db:push` to sync schema
+- [ ] Verify TS2339 errors eliminated
+
+### Root Cause #2: Return Type Patterns (30+ TS2740/TS2739 errors)
+- [ ] Find all `return []` statements with type mismatch errors
+- [ ] Add proper type assertions: `return [] as unknown as ReturnType`
+- [ ] Fix replicatedWebsiteSystem.ts return types (3 errors)
+- [ ] Fix teamPerformanceAlerts.ts return types (1 error)
+- [ ] Verify TS2740/TS2739 errors eliminated
+
+### Root Cause #3: Date/String Confusion (20+ TS2322 errors)
+- [ ] Create utility functions: toISOString(), fromISOString()
+- [ ] Replace all `new Date()` → `toISOString()` in database inserts
+- [ ] Replace all `.getTime()` on strings → `fromISOString().getTime()`
+- [ ] Update server/db.ts Date handling
+- [ ] Verify TS2322 errors eliminated
+
+### Verification
+- [ ] Run `pnpm exec tsc --noEmit` - verify 0 errors
+- [ ] Run `pnpm test` - verify 97.6%+ pass rate maintained
+- [ ] Test dev server - verify no runtime errors
+- [ ] Save final zero-error checkpoint
