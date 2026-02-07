@@ -296,7 +296,7 @@ export const appRouter = router({
               await sendShippingNotification({
                 customerName: preorder.name,
                 customerEmail: preorder.email,
-                id: preorder.id,
+                orderId: preorder.id,
                 orderType: "preorder",
                 shippingAddress: `${preorder.address}, ${preorder.city}, ${preorder.state} ${preorder.postalCode}`,
                 trackingNumber: preorder.trackingNumber || undefined,
@@ -306,7 +306,7 @@ export const appRouter = router({
               await sendDeliveryNotification({
                 customerName: preorder.name,
                 customerEmail: preorder.email,
-                id: preorder.id,
+                orderId: preorder.id,
                 orderType: "preorder",
               });
             }
@@ -1624,7 +1624,7 @@ export const appRouter = router({
           shippingPostalCode: input.shippingPostalCode,
           shippingCountry: input.shippingCountry,
           paymentMethodId: input.paymentMethodId || null,
-          nextProcessDate,
+          nextProcessDate: nextProcessDate.toISOString(),
         });
       }),
 
@@ -3604,7 +3604,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
             await sendShippingNotification({
               customerName: redemption.name,
               customerEmail: redemption.email,
-              id: redemption.id,
+              orderId: redemption.id,
               orderType: 'preorder', // Using preorder type for reward shipments
               shippingAddress: `${redemption.addressLine1}, ${redemption.city}, ${redemption.state} ${redemption.postalCode}`,
               trackingNumber: input.trackingNumber,
@@ -3618,7 +3618,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
             await sendDeliveryNotification({
               customerName: redemption.name,
               customerEmail: redemption.email,
-              id: redemption.id,
+              orderId: redemption.id,
               orderType: 'preorder', // Using preorder type for reward deliveries
             });
           } catch (emailError) {
@@ -4040,7 +4040,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
       }))
       .query(async ({ input }) => {
         const { getBookedMeetingSlots } = await import("./db");
-        return await getBookedMeetingSlots(new Date(input.startDate), new Date(input.endDate));
+        return await getBookedMeetingSlots(input.startDate, input.endDate);
       }),
 
     // Schedule a new meeting
@@ -4063,7 +4063,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
           email: input.email,
           phone: input.phone,
           meetingType: input.meetingType,
-          scheduledAt: new Date(input.scheduledAt),
+          scheduledAt: input.scheduledAt,
           timezone: input.timezone,
           notes: input.notes || null,
         });
@@ -4075,7 +4075,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
             name: input.name,
             email: input.email,
             meetingType: input.meetingType,
-            scheduledAt: new Date(input.scheduledAt),
+            scheduledAt: input.scheduledAt,
             timezone: input.timezone,
           });
         } catch (emailError) {
