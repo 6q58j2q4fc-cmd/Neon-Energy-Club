@@ -4,6 +4,7 @@
  */
 
 import { makeRequest } from "./_core/map";
+import type { GeocodeResponse, PlacesSearchResponse } from "./placesApiTypes";
 
 export interface PlaceSearchResult {
   id: string;
@@ -48,7 +49,7 @@ export async function searchBusinessLocations(
     // First, geocode the zip code to get coordinates
     const geocodeResponse = await makeRequest(
       `/geocode/json?address=${encodeURIComponent(zipCode)}&components=country:US`
-    );
+    ) as GeocodeResponse;
 
     if (geocodeResponse.status !== 'OK' || !geocodeResponse.results?.[0]) {
       throw new Error(`Geocoding failed: ${geocodeResponse.status}`);
@@ -63,10 +64,10 @@ export async function searchBusinessLocations(
     for (const type of businessTypes) {
       const searchResponse = await makeRequest(
         `/place/nearbysearch/json?location=${lat},${lng}&radius=8000&type=${type}`
-      );
+      ) as PlacesSearchResponse;
 
       if (searchResponse.status === 'OK' && searchResponse.results) {
-        const places = searchResponse.results.slice(0, 5).map((place: any) => ({
+        const places = searchResponse.results.slice(0, 5).map((place) => ({
           id: place.place_id,
           name: place.name,
           address: place.vicinity || place.formatted_address || 'Address not available',
