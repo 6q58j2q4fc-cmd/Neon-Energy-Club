@@ -53,11 +53,7 @@ export default function SelectPackage() {
 
   const handleSelectPackage = () => {
     if (!selectedPackageId) {
-      toast({
-        title: "No Package Selected",
-        description: "Please select an enrollment package to continue.",
-        variant: "destructive",
-      });
+      toast.error("Please select an enrollment package to continue.");
       return;
     }
 

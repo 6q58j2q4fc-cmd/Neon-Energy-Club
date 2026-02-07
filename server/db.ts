@@ -291,9 +291,9 @@ export async function createSmsVerification(userId: number, phoneNumber: string)
     return { error: "Too many verification attempts. Please try again in an hour." };
   }
 
-  const code = generateVerificationCode();
+  const code = generateVerificationToken();
   // Code expires in 15 minutes
-  const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
   // Reset attempts if last SMS was more than 1 hour ago
   const newAttempts = (lastSmsDate && lastSmsDate > oneHourAgo) 
     ? user.smsVerificationAttempts + 1 
@@ -3938,7 +3938,7 @@ export async function completeCustomerReferral(
       referralCount: 3,
       status: "available",
       redemptionCode: rewardCode,
-      expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(), // 90 days
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
     });
   }
 }

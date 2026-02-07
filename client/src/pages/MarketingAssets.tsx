@@ -23,7 +23,7 @@ export default function MarketingAssets() {
   // In production, you may want to restrict to distributors only
   const distributorName = user.name || 'Distributor';
   const distributorCode = 'DEMO123'; // TODO: Get from user profile
-  const distributorEmail = user.email;
+  const distributorEmail = user.email ?? undefined;
   const distributorPhone = '(555) 123-4567'; // TODO: Get from user profile
   const replicatedWebsiteUrl = `https://neonenergyclub.com/${distributorCode}`;
 
