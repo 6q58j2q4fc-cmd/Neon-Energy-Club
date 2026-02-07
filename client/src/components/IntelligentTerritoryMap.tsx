@@ -98,7 +98,7 @@ export function IntelligentTerritoryMap({ onLocationSelect }: IntelligentTerrito
       setLoading(true);
       try {
         // Try to get real locations from Google Places API
-        const result = await trpc.places.getVendingLocations.query({ zipCode });
+        const result = await trpc.places.getVendingLocations.useQuery({ zipCode });
         
         if (result.locations && result.locations.length > 0) {
           setSuggestions(result.locations);

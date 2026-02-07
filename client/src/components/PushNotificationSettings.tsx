@@ -83,7 +83,7 @@ export default function PushNotificationSettings({ className }: PushNotification
       // Save subscription to server
       await subscribeMutation.mutateAsync({
         endpoint: subscription.endpoint,
-        p256dh: subscriptionJson.keys?.p256dh || "",
+        p256Dh: subscriptionJson.keys?.p256Dh || "",
         auth: subscriptionJson.keys?.auth || "",
         userAgent: navigator.userAgent,
       });

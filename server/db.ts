@@ -917,7 +917,7 @@ export async function validateCouponCode(couponCode: string) {
 }
 
 // Redeem a coupon code (mark as used)
-export async function redeemCouponCode(couponCode: string, id: number) {
+export async function redeemCouponCode(couponCode: string, orderId: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -1021,10 +1021,6 @@ export async function enrollDistributor(input: {
     businessEntityType: input.entityType,
     businessName: input.businessName,
     businessEin: input.businessEin,
-    businessAddress: input.businessAddress,
-    businessCity: input.businessCity,
-    businessState: input.businessState,
-    businessZipCode: input.businessZipCode,
     // Emergency contact
     emergencyContactName: input.emergencyContactName,
     emergencyContactPhone: input.emergencyContactPhone,

@@ -158,7 +158,7 @@ export default function Orders() {
     country: string;
     status: string;
     notes: string | null;
-    createdAt: Date;
+    createdAt: string;
     updatedAt: Date;
   }>;
   const crowdfunding = (ordersData && 'crowdfunding' in ordersData ? ordersData.crowdfunding : []) as Array<{
@@ -169,7 +169,7 @@ export default function Orders() {
     rewardTier: string | null;
     status: string;
     message: string | null;
-    createdAt: Date;
+    createdAt: string;
   }>;
   const nfts = nftsData || [];
 

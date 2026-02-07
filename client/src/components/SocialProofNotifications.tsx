@@ -240,7 +240,7 @@ export default function SocialProofNotifications() {
     
     // Add real crowdfunding contributions
     if (recentContributions.data) {
-      recentContributions.data.forEach((contribution: { id: number; name: string | null; email: string | null; amount: number; tier: string | null; createdAt: Date }) => {
+      recentContributions.data.forEach((contribution: { id: number; name: string | null; email: string | null; amount: number; tier: string | null; createdAt: string }) => {
         notifications.push({
           id: `crowdfund-${contribution.id}`,
           type: "crowdfunding",
@@ -255,7 +255,7 @@ export default function SocialProofNotifications() {
     
     // Add real distributor enrollments
     if (recentDistributors.data) {
-      recentDistributors.data.forEach((distributor: { id: number; name: string | null; city: string | null; state: string | null; createdAt: Date }) => {
+      recentDistributors.data.forEach((distributor: { id: number; name: string | null; city: string | null; state: string | null; createdAt: string }) => {
         notifications.push({
           id: `distributor-${distributor.id}`,
           type: "distributor",

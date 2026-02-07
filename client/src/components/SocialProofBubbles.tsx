@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 interface JoinedUser {
   id: number;
   name: string;
-  createdAt: Date | null;
+  createdAt: string | null;
   profilePhotoUrl: string | null;
   location: string | null;
 }

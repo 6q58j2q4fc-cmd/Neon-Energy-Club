@@ -53,7 +53,7 @@ interface Order {
   customerEmail: string;
   status: string;
   totalAmount: string;
-  createdAt: Date;
+  createdAt: string;
   trackingNumber: string | null;
   nftImageUrl: string | null;
   shippingAddress: string;

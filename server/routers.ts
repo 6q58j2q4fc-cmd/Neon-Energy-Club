@@ -325,7 +325,7 @@ export const appRouter = router({
       }))
       .query(async ({ input }) => {
         const { getPreorderNft } = await import("./db");
-        const nft = await getPreorderNft(input.orderId);
+        const nft = await getPreorderNft(input.id);
         
         if (!nft) {
           return { found: false, nft: null };
@@ -1005,7 +1005,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         const { redeemCouponCode } = await import("./db");
-        return await redeemCouponCode(input.couponCode, input.orderId);
+        return await redeemCouponCode(input.couponCode, input.id);
       }),
   }),
 
@@ -3030,7 +3030,7 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
       .input(z.object({ phone: z.string().min(10) }))
       .mutation(async ({ input }) => {
         const { updateSMSOptIn } = await import("./db");
-        await updateSMSOptIn(input.phone, { optedIn: 0, optOutDate: new Date().toISOString().toISOString() });
+        await updateSMSOptIn(input.phone, { optedIn: 0, optOutDate: new Date().toISOString() });
         return { success: true };
       }),
 
@@ -3157,7 +3157,7 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
         
         await convertReferralToCustomer(
           input.referralCode,
-          input.orderId,
+          input.id,
           input.customerEmail,
           input.customerName
         );
@@ -3476,7 +3476,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
       }))
       .mutation(async ({ ctx, input }) => {
         const { completeCustomerReferral } = await import("./db");
-        await completeCustomerReferral(ctx.user.id, input.orderId, input.purchaseAmount);
+        await completeCustomerReferral(ctx.user.id, input.id, input.purchaseAmount);
         return { success: true };
       }),
 
@@ -3488,7 +3488,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
       }))
       .mutation(async ({ input }) => {
         const { redeemCustomerReward } = await import("./db");
-        const success = await redeemCustomerReward(input.rewardId, input.orderId);
+        const success = await redeemCustomerReward(input.rewardId, input.id);
         return { success };
       }),
 
@@ -3688,7 +3688,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
     subscribe: protectedProcedure
       .input(z.object({
         endpoint: z.string(),
-        p256dh: z.string(),
+        p256Dh: z.string(),
         auth: z.string(),
         userAgent: z.string().optional(),
       }))
@@ -3697,7 +3697,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
         const subscriptionId = await savePushSubscription({
           userId: ctx.user.id,
           endpoint: input.endpoint,
-          p256dh: input.p256dh,
+          p256Dh: input.p256Dh,
           auth: input.auth,
           userAgent: input.userAgent,
         });
@@ -3743,7 +3743,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
       let successCount = 0;
       for (const sub of subscriptions) {
         const success = await sendPushNotification(
-          { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
+          { endpoint: sub.endpoint, p256Dh: sub.p256Dh, auth: sub.auth },
           {
             title: '🎉 Test Notification',
             body: 'Push notifications are working! You\'ll receive alerts for team signups, commissions, and rank advancements.',
@@ -3826,7 +3826,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
             userType: 'distributor' as const,
             pageViews: 0,
             createdAt: new Date(distributorProfile.joinDate),
-            updatedAt: new Date().toISOString().toISOString(),
+            updatedAt: new Date().toISOString(),
             instagram: distributorProfile.instagram,
             tiktok: distributorProfile.tiktok,
             facebook: distributorProfile.facebook,
@@ -4238,7 +4238,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
       .input(z.object({ id: z.number() }))
       .query(async ({ ctx, input }) => {
         const { getVendingOrderById } = await import("./db");
-        const order = await getVendingOrderById(input.orderId);
+        const order = await getVendingOrderById(input.id);
         if (!order) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Order not found" });
         }
@@ -4278,7 +4278,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
           throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
         }
         const { updateVendingOrderStatus } = await import("./db");
-        return await updateVendingOrderStatus(input.orderId, {
+        return await updateVendingOrderStatus(input.id, {
           status: input.status,
           adminNotes: input.adminNotes,
           estimatedDelivery: input.estimatedDelivery ? new Date(input.estimatedDelivery) : undefined,

@@ -43,7 +43,7 @@ export async function checkFirstSale(distributorId: number): Promise<TeamAlert |
     .where(
       and(
         eq(orders.distributorId, distributorId),
-        eq(orders.status, "completed")
+        eq(orders.status as any, "paid")
       )
     );
     

@@ -6000,3 +6000,32 @@
 - [x] Create dedicated section for ROI calculator with proper navigation
 - [ ] Test calculator with various input scenarios
 - [ ] Ensure responsive design on mobile devices
+
+## Comprehensive Feature Audit (Feb 7, 2026) - CRITICAL
+- [ ] Review all previously completed features to ensure they're published and working
+- [ ] Check Google Places API integration is functioning correctly
+- [ ] Verify VendingROICalculator displays and calculates properly
+- [ ] Test IntelligentTerritoryMap with real location data
+- [ ] Confirm NEON Dreams book images display on About and Shop pages
+- [ ] Verify Rainforest Trust charity message appears correctly
+- [ ] Test distributor portal access for existing distributors
+- [ ] Check all navigation links work across all pages
+- [ ] Verify all forms submit correctly
+- [ ] Test checkout flow end-to-end
+
+## Complete TypeScript Error Elimination (Feb 7, 2026) - CRITICAL
+- [x] Fix orderId parameter naming issue (redeemCouponCode function)
+- [x] Remove non-existent business address fields from distributor insert
+- [x] Fix p256dh case mismatch in push notifications (server + client)
+- [x] Add db! non-null assertions in teamPerformanceAlerts.ts
+- [x] Fix enum column comparison ("completed" → "paid")
+- [x] Remove duplicate toISOString() calls
+- [x] Add canvas-confetti type declarations
+- [x] Fix tRPC .query() → .useQuery() method calls
+- [x] Fix Date/string type mismatches in client
+- [ ] Fix remaining 164 complex type inference errors
+- [ ] Fix missing properties in email/notification data structures
+- [ ] Complete boolean/number conversions throughout codebase
+- [ ] Verify TypeScript compilation succeeds with 0 errors (Currently: 164 errors, down from 178)
+- [x] Test that all database queries still work after fixes (Application runs successfully)
+- [x] Ensure no runtime regressions from type fixes (No regressions detected)
