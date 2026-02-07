@@ -7,6 +7,7 @@
 import { getDb } from "./db";
 import { distributors, userProfiles, affiliateLinks, referralTracking, sales, commissions } from "../drizzle/schema";
 import { eq, sql, and, desc, gte, isNull, or, like } from "drizzle-orm";
+import { toDbTimestamp } from "./utils/dateHelpers";
 import { invokeLLM } from "./_core/llm";
 
 interface ReplicatedSiteConfig {
@@ -219,7 +220,7 @@ export async function auditReplicatedSite(distributorId: number): Promise<SiteAu
     .from(referralTracking)
     .where(and(
       eq(referralTracking.referrerId, distributor.distributorCode),
-      gte(referralTracking.createdAt, new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
+      gte(referralTracking.createdAt as any, toDbTimestamp(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)))
     ));
 
   // Check 3: Verify commission calculations

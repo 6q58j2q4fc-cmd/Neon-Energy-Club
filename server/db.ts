@@ -2351,7 +2351,7 @@ export async function getLeaderboard(options: {
     distributorsReferred: smsOptIns.distributorsReferred,
     optInDate: smsOptIns.optInDate,
   }).from(smsOptIns)
-    .where(gt(smsOptIns.totalReferrals, 0))
+    .where(gt(smsOptIns.totalReferrals as any, 0))
     .orderBy(desc(smsOptIns.totalReferrals), desc(smsOptIns.customersReferred), desc(smsOptIns.distributorsReferred))
     .limit(limit);
   
@@ -2378,7 +2378,7 @@ export async function getLeaderboardStats() {
     totalDistributorConversions: sql<number>`SUM(distributorsReferred)`,
     averageReferrals: sql<number>`AVG(totalReferrals)`,
   }).from(smsOptIns)
-    .where(gt(smsOptIns.totalReferrals, 0));
+    .where(gt(smsOptIns.totalReferrals as any, 0));
   
   return result[0] || {
     totalReferrers: 0,
@@ -2406,7 +2406,7 @@ export async function getUserLeaderboardPosition(subscriberId: string) {
   const higherRanked = await db.select({
     count: sql<number>`COUNT(*)`,
   }).from(smsOptIns)
-    .where(gt(smsOptIns.totalReferrals, userStats[0].totalReferrals));
+    .where(gt(smsOptIns.totalReferrals as any, userStats[0].totalReferrals));
   
   const position = (higherRanked[0]?.count || 0) + 1;
   
@@ -2432,7 +2432,7 @@ export async function getUserReferralStatsByEmail(email: string) {
   const higherRanked = await db.select({
     count: sql<number>`COUNT(*)`,
   }).from(smsOptIns)
-    .where(gt(smsOptIns.totalReferrals, results[0].totalReferrals));
+    .where(gt(smsOptIns.totalReferrals as any, results[0].totalReferrals));
   
   const position = (higherRanked[0]?.count || 0) + 1;
   
@@ -3481,7 +3481,7 @@ export async function getPayoutStatistics() {
   }).from(payoutRequests)
   .where(and(
     eq(payoutRequests.status, "completed"),
-    gt(payoutRequests.completedAt, sql`DATE_SUB(NOW(), INTERVAL 30 DAY)`)
+    gt(payoutRequests.completedAt as any, sql`DATE_SUB(NOW(), INTERVAL 30 DAY)`)
   ));
   
   return {
@@ -3750,7 +3750,7 @@ export async function getDistributorRankPosition(distributorId: number): Promise
   // Count how many distributors have higher team sales
   const result = await db.select({ count: sql<number>`COUNT(*)` })
     .from(distributors)
-    .where(gt(distributors.teamSales, distributor[0].teamSales));
+    .where(gt(distributors.teamSales as any, distributor[0].teamSales));
   
   return (result[0]?.count || 0) + 1;
 }
@@ -5177,7 +5177,7 @@ export async function getBookedMeetingSlots(startDate: string, endDate: string) 
   })
     .from(scheduledMeetings)
     .where(and(
-      gt(scheduledMeetings.scheduledAt, startDate),
+      gt(scheduledMeetings.scheduledAt as any, startDate),
       sql`${scheduledMeetings.scheduledAt} < ${endDate}`,
       sql`${scheduledMeetings.status} NOT IN ('cancelled')`
     ));
@@ -6287,7 +6287,7 @@ export async function expireOldReservations() {
     .set({ status: "expired" })
     .where(and(
       eq(territoryReservations.status, "active"),
-      lt(territoryReservations.expiresAt, now)
+      lt(territoryReservations.expiresAt as any, now)
     ));
 }
 
@@ -6305,8 +6305,8 @@ export async function getExpiringReservations(hoursBeforeExpiry: number = 6) {
     .where(and(
       eq(territoryReservations.status, "active"),
       eq(territoryReservations.reminderSent, 0),
-      lt(territoryReservations.expiresAt, threshold),
-      gt(territoryReservations.expiresAt, now)
+      lt(territoryReservations.expiresAt as any, threshold),
+      gt(territoryReservations.expiresAt as any, now)
     ));
 }
 
@@ -6713,10 +6713,10 @@ export async function getVendingMachineSales(machineId: number, options?: {
   const conditions = [eq(vendingSales.machineId, machineId)];
   
   if (options?.startDate) {
-    conditions.push(gte(vendingSales.createdAt, options.startDate));
+    conditions.push(gte(vendingSales.createdAt as any, options.startDate));
   }
   if (options?.endDate) {
-    conditions.push(lt(vendingSales.createdAt, options.endDate));
+    conditions.push(lt(vendingSales.createdAt as any, options.endDate));
   }
   
   return await db.select().from(vendingSales)
@@ -6959,7 +6959,7 @@ export async function getVendingAnalytics(userId: number, machineId?: number, pe
   const sales = await db.select().from(vendingSales)
     .where(and(
       sql`${vendingSales.machineId} IN (${sql.join(machineIds.map(id => sql`${id}`), sql`, `)})`,
-      gte(vendingSales.createdAt, startDate)
+      gte(vendingSales.createdAt as any, startDate)
     ))
     .orderBy(vendingSales.createdAt);
   

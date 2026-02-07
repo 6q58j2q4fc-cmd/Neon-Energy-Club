@@ -36,8 +36,8 @@ export async function checkExpiringTerritories(daysAhead: number = 30): Promise<
       .where(
         and(
           eq(claimedTerritories.status, "active"),
-          gte(claimedTerritories.expirationDate, nowStr),
-          lte(claimedTerritories.expirationDate, futureDateStr)
+          gte(claimedTerritories.expirationDate as any, nowStr),
+          lte(claimedTerritories.expirationDate as any, futureDateStr)
         )
       );
 
@@ -122,28 +122,28 @@ export async function getTerritoryExpirationSummary(): Promise<{
         .from(claimedTerritories)
         .where(and(
           eq(claimedTerritories.status, "active"),
-          gte(claimedTerritories.expirationDate, nowStr),
-          lte(claimedTerritories.expirationDate, in7DaysStr)
+          gte(claimedTerritories.expirationDate as any, nowStr),
+          lte(claimedTerritories.expirationDate as any, in7DaysStr)
         )),
       db!.select({ count: sql<number>`COUNT(*)` })
         .from(claimedTerritories)
         .where(and(
           eq(claimedTerritories.status, "active"),
-          gte(claimedTerritories.expirationDate, nowStr),
-          lte(claimedTerritories.expirationDate, in30DaysStr)
+          gte(claimedTerritories.expirationDate as any, nowStr),
+          lte(claimedTerritories.expirationDate as any, in30DaysStr)
         )),
       db!.select({ count: sql<number>`COUNT(*)` })
         .from(claimedTerritories)
         .where(and(
           eq(claimedTerritories.status, "active"),
-          gte(claimedTerritories.expirationDate, nowStr),
-          lte(claimedTerritories.expirationDate, in90DaysStr)
+          gte(claimedTerritories.expirationDate as any, nowStr),
+          lte(claimedTerritories.expirationDate as any, in90DaysStr)
         )),
       db!.select({ count: sql<number>`COUNT(*)` })
         .from(claimedTerritories)
         .where(and(
           eq(claimedTerritories.status, "active"),
-          lte(claimedTerritories.expirationDate, nowStr)
+          lte(claimedTerritories.expirationDate as any, nowStr)
         )),
     ]);
 

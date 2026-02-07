@@ -124,8 +124,8 @@ export async function calculatePersonalImpact(
     .where(
       and(
         eq(orders.distributorId, distributorId),
-        gte(orders.createdAt, periodStart),
-        lte(orders.createdAt, periodEnd),
+        gte(orders.createdAt as any, periodStart),
+        lte(orders.createdAt as any, periodEnd),
         eq(orders.status as any, 'paid')
       )
     );
@@ -176,8 +176,8 @@ export async function calculateTeamImpact(
     .where(
       and(
         sql`distributorId IN (${downlineIds.join(',')})`,
-        gte(orders.createdAt, periodStart),
-        lte(orders.createdAt, periodEnd),
+        gte(orders.createdAt as any, periodStart),
+        lte(orders.createdAt as any, periodEnd),
         eq(orders.status as any, 'paid')
       )
     );

@@ -86,7 +86,7 @@ export async function notifyAllDistributors(payload: PushNotificationPayload): P
     const success = await sendPushNotification(
       {
         endpoint: sub.endpoint,
-        p256dh: sub.p256dh,
+        p256dh: sub.p256Dh,
         auth: sub.auth,
       },
       payload

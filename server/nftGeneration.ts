@@ -222,7 +222,7 @@ export function generateNftMetadata(
     ],
     createdAt: new Date(),
     mintStatus: 'pending',
-    mintEligibleAfter: prelaunchEndDate,
+    mintEligibleAfter: prelaunchEndDate, // string (ISO timestamp)
   };
 }
 
@@ -246,8 +246,9 @@ export function checkMintEligibility(
 ): { eligible: boolean; reason?: string } {
   const now = new Date();
   
-  if (now < prelaunchEndDate) {
-    const daysRemaining = Math.ceil((prelaunchEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  const endDate = new Date(prelaunchEndDate);
+  if (now < endDate) {
+    const daysRemaining = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     return {
       eligible: false,
       reason: `NFT minting will begin after the 90-day pre-launch period ends (${daysRemaining} days remaining).`,
