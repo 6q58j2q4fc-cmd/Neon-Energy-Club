@@ -33,6 +33,7 @@ import { Breadcrumb, breadcrumbConfigs } from "@/components/Breadcrumb";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
 import { AIVendingTutorial } from "@/components/AIVendingTutorial";
 import { IntelligentTerritoryMap } from "@/components/IntelligentTerritoryMap";
+import { VendingROICalculator } from "@/components/VendingROICalculator";
 
 export default function VendingMachines() {
   // Initialize hash navigation
@@ -296,122 +297,8 @@ export default function VendingMachines() {
         </section>
 
         {/* ROI Calculator */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
-                <Calculator className="w-12 h-12 inline-block text-[#c8ff00] mr-4" />
-                ROI <span className="neon-text-glow">CALCULATOR</span>
-              </h2>
-              <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                See how quickly you can recoup your investment and start profiting
-              </p>
-            </div>
-            
-            <div className="max-w-4xl mx-auto">
-              <Card className="bg-[#0a0a0a] border-[#c8ff00]/30">
-                <CardContent className="p-8">
-                  <div className="grid md:grid-cols-2 gap-8">
-                    {/* Inputs */}
-                    <div className="space-y-6">
-                      <div>
-                        <Label className="text-gray-300 mb-2 block">Daily Sales (cans)</Label>
-                        <div className="flex items-center gap-4">
-                          <Slider
-                            value={[dailySales]}
-                            onValueChange={(v) => setDailySales(v[0])}
-                            min={5}
-                            max={50}
-                            step={1}
-                            className="flex-1"
-                          />
-                          <span className="text-2xl font-bold text-[#c8ff00] w-16 text-right">{dailySales}</span>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <Label className="text-gray-300 mb-2 block">Price per Can ($)</Label>
-                        <div className="flex items-center gap-4">
-                          <Slider
-                            value={[pricePerCan * 10]}
-                            onValueChange={(v) => setPricePerCan(v[0] / 10)}
-                            min={25}
-                            max={50}
-                            step={5}
-                            className="flex-1"
-                          />
-                          <span className="text-2xl font-bold text-[#c8ff00] w-20 text-right">${pricePerCan.toFixed(2)}</span>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <Label className="text-gray-300 mb-2 block">Cost per Can ($)</Label>
-                        <div className="flex items-center gap-4">
-                          <Slider
-                            value={[costPerCan * 10]}
-                            onValueChange={(v) => setCostPerCan(v[0] / 10)}
-                            min={10}
-                            max={25}
-                            step={5}
-                            className="flex-1"
-                          />
-                          <span className="text-2xl font-bold text-white w-20 text-right">${costPerCan.toFixed(2)}</span>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <Label className="text-gray-300 mb-2 block">Machine Investment ($)</Label>
-                        <div className="flex items-center gap-4">
-                          <Slider
-                            value={[machineInvestment / 100]}
-                            onValueChange={(v) => setMachineInvestment(v[0] * 100)}
-                            min={35}
-                            max={80}
-                            step={5}
-                            className="flex-1"
-                          />
-                          <span className="text-2xl font-bold text-white w-24 text-right">${machineInvestment.toLocaleString()}</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Results */}
-                    <div className="bg-gradient-to-b from-[#c8ff00]/20 to-[#c8ff00]/5 rounded-2xl p-6 border border-[#c8ff00]/30">
-                      <h3 className="text-2xl font-bold text-white mb-6 text-center">Your Projected Earnings</h3>
-                      
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-center p-4 bg-black/50 rounded-xl">
-                          <span className="text-gray-300">Daily Profit</span>
-                          <span className="text-2xl font-black text-[#c8ff00]">${dailyProfit.toFixed(2)}</span>
-                        </div>
-                        
-                        <div className="flex justify-between items-center p-4 bg-black/50 rounded-xl">
-                          <span className="text-gray-300">Monthly Profit</span>
-                          <span className="text-3xl font-black text-[#c8ff00]">${monthlyProfit.toFixed(0)}</span>
-                        </div>
-                        
-                        <div className="flex justify-between items-center p-4 bg-black/50 rounded-xl">
-                          <span className="text-gray-300">Yearly Profit</span>
-                          <span className="text-2xl font-black text-[#c8ff00]">${yearlyProfit.toLocaleString()}</span>
-                        </div>
-                        
-                        <div className="flex justify-between items-center p-4 bg-[#c8ff00] rounded-xl">
-                          <span className="text-black font-semibold">Payback Period</span>
-                          <span className="text-3xl font-black text-black">{paybackMonths} months</span>
-                        </div>
-                        
-                        {/* Income Disclaimer */}
-                        <p className="text-xs text-gray-500 mt-4 text-center italic">
-                          *Results May Vary. Actual earnings depend on location, foot traffic, operating hours, and market conditions. 
-                          These projections are estimates based on average performance data and are not guaranteed.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+        <section className="py-20" id="roi-calculator">
+          <VendingROICalculator />
         </section>
 
         {/* Location Recommendations */}

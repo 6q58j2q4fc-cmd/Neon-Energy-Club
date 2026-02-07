@@ -5942,3 +5942,61 @@
 - [ ] Run TypeScript compiler and verify 0 errors (143 errors remaining, down from 159)
 - [ ] Test application runtime to ensure no regressions
 - [ ] Complete remaining systematic fixes per typescript-error-report.md
+
+## Complete TypeScript Error Elimination (Feb 7, 2026) - Phase 1
+- [ ] Apply db! non-null assertions to all remaining files with 'db is possibly null' errors
+- [ ] Convert all boolean database writes to 0/1 across entire codebase
+- [ ] Add Boolean() wrappers to all boolean database reads
+- [ ] Test Phase 1 fixes and verify error reduction
+
+## Complete TypeScript Error Elimination - Phase 2
+- [ ] Identify all timestamp fields in schema that need Date↔String conversion
+- [ ] Create helper functions for consistent Date/String conversions
+- [ ] Apply conversions systematically to all database operations
+- [ ] Fix all remaining Date/String type mismatches
+- [ ] Test Phase 2 fixes and verify error reduction
+
+## Complete TypeScript Error Elimination - Phase 3 & 4
+- [ ] Review and fix Drizzle ORM insert/update overload errors individually
+- [ ] Fix teamPerformanceAlerts missing property errors (distributorId, activeDistributors, totalCustomers)
+- [ ] Fix DistributorData missing field errors (taxIdType, ssnLast4, einLast4)
+- [ ] Resolve remaining complex type inference issues
+- [ ] Fix NotificationPreferences boolean/number issues
+- [ ] Fix AutoshipManager type issues
+- [ ] Run final TypeScript compilation and verify 0 errors
+
+## Google Places API Integration (Feb 7, 2026)
+- [ ] Create server-side tRPC procedure for Google Places API search
+- [ ] Implement Places API search by zip code with business type filtering
+- [ ] Add foot traffic estimation based on place ratings and user_ratings_total
+- [ ] Integrate demographic data from Places API
+- [ ] Update IntelligentTerritoryMap to call real API instead of simulated data
+- [ ] Add error handling and fallback to simulated data on API failure
+- [ ] Test Places API with various zip codes and verify real location data
+- [ ] Add loading states and error messages to UI
+
+## Vending ROI Calculator (Feb 7, 2026)
+- [ ] Create VendingROICalculator.tsx component
+- [ ] Design side-by-side comparison layout (NEON AI vs Traditional)
+- [ ] Add input sliders for: location type, foot traffic, pricing, operating costs
+- [ ] Calculate monthly/yearly revenue projections for both machine types
+- [ ] Show NEON AI competitive advantages (AI sales bot, selfie cam, WiFi hotspot)
+- [ ] Display payback period calculation
+- [ ] Add visual charts using recharts for profit comparison
+- [ ] Create detailed breakdown of costs vs revenue
+- [ ] Integrate calculator into Vending page
+- [ ] Add export/share functionality for calculations
+- [ ] Test calculator with various input scenarios
+
+## CRITICAL: Distributor Authentication Bug (Feb 7, 2026)
+- [x] Fix database query error in distributor portal access (added db! non-null assertion)
+- [ ] Ensure distributors can access portal after initial signup without re-registering
+- [x] Fix "Failed query" error showing all distributor columns
+- [ ] Test distributor login and portal access flow end-to-end
+- [ ] Verify distributor data persists across sessions
+
+## Vending ROI Calculator Integration
+- [x] Add VendingROICalculator component to VendingMachines page
+- [x] Create dedicated section for ROI calculator with proper navigation
+- [ ] Test calculator with various input scenarios
+- [ ] Ensure responsive design on mobile devices

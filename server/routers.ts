@@ -5413,6 +5413,20 @@ Provide step-by-step instructions with specific button names and locations. Keep
       }),
   }),
 
+  // Google Places API for vending machine location suggestions
+  places: router({
+    // Get enriched business locations for vending machine placement
+    getVendingLocations: publicProcedure
+      .input(z.object({
+        zipCode: z.string().length(5, "Zip code must be 5 digits"),
+      }))
+      .query(async ({ input }) => {
+        const { getVendingLocations } = await import('./placesApi');
+        const locations = await getVendingLocations(input.zipCode);
+        return { locations };
+      }),
+  }),
+
 });
 
 // Helper function to anonymize names for privacy on public leaderboard

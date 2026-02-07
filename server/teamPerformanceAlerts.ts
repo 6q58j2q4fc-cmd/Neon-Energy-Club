@@ -11,7 +11,7 @@ export interface TeamAlert {
   title: string;
   message: string;
   data: Record<string, any>;
-  timestamp: Date;
+  timestamp: string; // ISO 8601 timestamp string
   read: boolean;
 }
 
@@ -28,10 +28,10 @@ export async function checkFirstSale(distributorId: number): Promise<TeamAlert |
   const db = await getDb();
   
   // Get distributor info
-  const [distributor] = await db
+  const [distributor] = await db!
     .select()
     .from(distributors)
-    .where(eq(distributors.distributorId, distributorId))
+    .where(eq(distributors.id, distributorId))
     .limit(1);
     
   if (!distributor) return null;
@@ -81,10 +81,10 @@ export async function checkRankAdvancement(
 ): Promise<TeamAlert | null> {
   const db = await getDb();
   
-  const [distributor] = await db
+  const [distributor] = await db!
     .select()
     .from(distributors)
-    .where(eq(distributors.distributorId, distributorId))
+    .where(eq(distributors.id, distributorId))
     .limit(1);
     
   if (!distributor) return null;
@@ -127,17 +127,17 @@ export async function checkVolumeThreshold(
 ): Promise<TeamAlert | null> {
   const db = await getDb();
   
-  const [distributor] = await db
+  const [distributor] = await db!
     .select()
     .from(distributors)
-    .where(eq(distributors.distributorId, distributorId))
+    .where(eq(distributors.id, distributorId))
     .limit(1);
     
   if (!distributor) return null;
   
   const currentVolume = volumeType === "personal" 
-    ? distributor.totalPv || 0
-    : distributor.teamVolume || 0;
+    ? distributor.monthlyPv || 0
+    : distributor.teamSales || 0;
   
   // Check if just crossed threshold (within 10% margin)
   const justCrossed = currentVolume >= threshold && currentVolume < threshold * 1.1;
@@ -174,10 +174,10 @@ export async function checkTeamMilestone(
 ): Promise<TeamAlert | null> {
   const db = await getDb();
   
-  const [distributor] = await db
+  const [distributor] = await db!
     .select()
     .from(distributors)
-    .where(eq(distributors.distributorId, distributorId))
+    .where(eq(distributors.id, distributorId))
     .limit(1);
     
   if (!distributor) return null;
@@ -187,11 +187,12 @@ export async function checkTeamMilestone(
   
   switch (milestoneType) {
     case "active_distributors":
-      currentCount = distributor.activeDistributors || 0;
+      currentCount = distributor.activeDownlineCount || 0;
       milestoneLabel = "active distributors";
       break;
     case "total_customers":
-      currentCount = distributor.totalCustomers || 0;
+      // Calculate from orders or use personalSales as proxy
+      currentCount = distributor.personalSales || 0;
       milestoneLabel = "customers";
       break;
     case "team_sales":

@@ -1046,7 +1046,7 @@ export async function getDistributorByUserId(userId: number) {
     throw new Error("Database not available");
   }
   
-  const result = await db.select().from(distributors).where(eq(distributors.userId, userId)).limit(1);
+  const result = await db!.select().from(distributors).where(eq(distributors.userId, userId)).limit(1);
   return result[0] || null;
 }
 

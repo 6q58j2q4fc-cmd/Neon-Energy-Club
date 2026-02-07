@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from "react";
 import { MapPin, Zap, Sun, TrendingUp, DollarSign, Users, AlertCircle } from 'lucide-react';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
+import { trpc } from '@/lib/trpc';
+import { toast } from 'sonner';
 
 interface BusinessLocation {
   id: string;
@@ -91,15 +93,31 @@ export function IntelligentTerritoryMap({ onLocationSelect }: IntelligentTerrito
     });
   };
 
-  const handleZipCodeSubmit = () => {
+  const handleZipCodeSubmit = async () => {
     if (zipCode.length === 5) {
       setLoading(true);
-      // Simulate API call
-      setTimeout(() => {
+      try {
+        // Try to get real locations from Google Places API
+        const result = await trpc.places.getVendingLocations.query({ zipCode });
+        
+        if (result.locations && result.locations.length > 0) {
+          setSuggestions(result.locations);
+          toast.success(`Found ${result.locations.length} potential locations!`);
+        } else {
+          // Fallback to simulated data if no results
+          const locations = generateSuggestions(zipCode);
+          setSuggestions(locations.sort((a, b) => b.score - a.score));
+          toast.info('Showing simulated locations (no real data available)');
+        }
+      } catch (error) {
+        console.error('Error fetching locations:', error);
+        // Fallback to simulated data on error
         const locations = generateSuggestions(zipCode);
         setSuggestions(locations.sort((a, b) => b.score - a.score));
+        toast.warning('Using simulated data (API unavailable)');
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     }
   };
 
