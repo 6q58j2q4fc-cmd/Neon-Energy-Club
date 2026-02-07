@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import {
   Popover,
@@ -10,101 +10,83 @@ interface HeaderSoundControlProps {
   accentColor?: string;
 }
 
-// The exact jungle audio URL that was on the site
+// Working jungle audio URL from AmbientSoundToggle
 const JUNGLE_AUDIO_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663234433834/RuVzsuSkJvAbHtJf.mp3";
 
 export function HeaderSoundControl({ accentColor = "#c8ff00" }: HeaderSoundControlProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.35);
-  const [isLoading, setIsLoading] = useState(false);
+  const [volume, setVolume] = useState(0.3);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
-  const hasAttemptedAutoPlay = useRef(false);
 
-  // Initialize audio and attempt auto-play immediately
+  // Initialize audio with working logic from AmbientSoundToggle
   useEffect(() => {
-    const audio = new Audio();
-    audio.src = JUNGLE_AUDIO_URL;
-    audio.loop = true;
-    audio.preload = "auto";
-    audio.crossOrigin = "anonymous";
-    
-    // iOS Safari specific
-    (audio as any).playsInline = true;
-    (audio as any).webkitPlaysInline = true;
-    
-    // Get saved volume
+    // Create audio element on mount
+    audioRef.current = new Audio(JUNGLE_AUDIO_URL);
+    audioRef.current.loop = true;
+    audioRef.current.volume = volume;
+
+    // Check localStorage for saved preferences
     const savedVolume = localStorage.getItem("neon-ambient-volume");
+    
     if (savedVolume) {
       const vol = parseFloat(savedVolume);
       setVolume(vol);
-      audio.volume = vol;
-    } else {
-      audio.volume = 0.35;
+      if (audioRef.current) {
+        audioRef.current.volume = vol;
+      }
     }
-    
-    audioRef.current = audio;
 
-    // Auto-play immediately when audio is ready
-    const handleCanPlay = async () => {
-      if (hasAttemptedAutoPlay.current) return;
-      hasAttemptedAutoPlay.current = true;
+    // Auto-play function - tries to play immediately
+    const attemptAutoPlay = async () => {
+      if (!audioRef.current) return;
       
       try {
-        await audio.play();
+        await audioRef.current.play();
         setIsPlaying(true);
+        setHasUserInteracted(true);
         localStorage.setItem("neon-ambient-sound", "enabled");
       } catch (error) {
-        // Auto-play blocked by browser - this is expected
-        // We'll play on first user interaction
-        console.log("Auto-play blocked, will play on user interaction");
+        // Auto-play was blocked - wait for user interaction
+        console.log("Auto-play blocked, waiting for user interaction");
+        
+        // Set up one-time click listener to enable audio
+        const enableAudio = async () => {
+          if (audioRef.current && !hasUserInteracted) {
+            try {
+              await audioRef.current.play();
+              setIsPlaying(true);
+              setHasUserInteracted(true);
+              localStorage.setItem("neon-ambient-sound", "enabled");
+            } catch (e) {
+              console.error("Audio playback failed:", e);
+            }
+          }
+          document.removeEventListener("click", enableAudio);
+          document.removeEventListener("touchstart", enableAudio);
+          document.removeEventListener("keydown", enableAudio);
+        };
+        
+        document.addEventListener("click", enableAudio, { once: true });
+        document.addEventListener("touchstart", enableAudio, { once: true });
+        document.addEventListener("keydown", enableAudio, { once: true });
       }
     };
 
-    audio.addEventListener('canplaythrough', handleCanPlay);
-    
-    // Also try to play immediately
-    audio.load();
+    // Attempt auto-play after a short delay
+    const timer = setTimeout(attemptAutoPlay, 500);
 
     return () => {
-      audio.removeEventListener('canplaythrough', handleCanPlay);
+      clearTimeout(timer);
       if (audioRef.current) {
         audioRef.current.pause();
-        audioRef.current.src = "";
         audioRef.current = null;
       }
     };
   }, []);
 
-  // Play audio on ANY user interaction with the page
-  const playOnInteraction = useCallback(async () => {
-    if (!audioRef.current || isPlaying) return;
-    
-    try {
-      await audioRef.current.play();
-      setIsPlaying(true);
-      localStorage.setItem("neon-ambient-sound", "enabled");
-    } catch (e) {
-      // Still blocked
-    }
-  }, [isPlaying]);
-
-  // Listen for user interactions to unlock audio
-  useEffect(() => {
-    const events = ['touchstart', 'touchend', 'click', 'keydown', 'mousedown'];
-    
-    events.forEach(event => {
-      document.addEventListener(event, playOnInteraction, { once: false, passive: true });
-    });
-
-    return () => {
-      events.forEach(event => {
-        document.removeEventListener(event, playOnInteraction);
-      });
-    };
-  }, [playOnInteraction]);
-
-  // Update volume
+  // Update volume when changed
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
@@ -114,8 +96,6 @@ export function HeaderSoundControl({ accentColor = "#c8ff00" }: HeaderSoundContr
 
   const toggleSound = async () => {
     if (!audioRef.current) return;
-    
-    setIsLoading(true);
 
     try {
       if (isPlaying) {
@@ -123,16 +103,13 @@ export function HeaderSoundControl({ accentColor = "#c8ff00" }: HeaderSoundContr
         setIsPlaying(false);
         localStorage.setItem("neon-ambient-sound", "disabled");
       } else {
-        audioRef.current.load();
-        await new Promise(resolve => setTimeout(resolve, 100));
         await audioRef.current.play();
         setIsPlaying(true);
+        setHasUserInteracted(true);
         localStorage.setItem("neon-ambient-sound", "enabled");
       }
     } catch (error) {
       console.error("Audio playback failed:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -161,7 +138,7 @@ export function HeaderSoundControl({ accentColor = "#c8ff00" }: HeaderSoundContr
             isPlaying 
               ? "w-10 h-10 sm:w-12 sm:h-12 bg-[#c8ff00]/20 border-2 border-[#c8ff00] shadow-[0_0_15px_rgba(200,255,0,0.4)]" 
               : "w-10 h-10 sm:w-12 sm:h-12 bg-white/10 border-2 border-white/30 hover:bg-white/15"
-          } ${isLoading ? "opacity-50" : ""}`}
+          }`}
           aria-label="Volume"
           style={{ 
             WebkitTapHighlightColor: 'transparent',
@@ -189,15 +166,14 @@ export function HeaderSoundControl({ accentColor = "#c8ff00" }: HeaderSoundContr
           {/* Toggle Button */}
           <button
             onClick={toggleSound}
-            disabled={isLoading}
             className={`w-full py-4 px-4 rounded-xl font-bold text-base transition-all duration-300 touch-manipulation active:scale-95 ${
               isPlaying 
                 ? "bg-[#c8ff00] text-black" 
                 : "bg-white/10 text-white border border-white/30"
-            } ${isLoading ? "opacity-50" : ""}`}
+            }`}
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
-            {isLoading ? "..." : isPlaying ? "🔊 Sound On" : "🔇 Sound Off"}
+            {isPlaying ? "🔊 Jungle Sounds On" : "🔇 Jungle Sounds Off"}
           </button>
 
           {/* Volume Slider */}

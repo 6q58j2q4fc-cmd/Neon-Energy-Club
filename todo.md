@@ -6444,3 +6444,11 @@
 ### TypeScript Error Elimination Progress
 - [x] Fix AutoshipManager.tsx (4 errors) - Removed totalPV property
 - [ ] Continue fixing remaining errors (~50 remaining)
+
+## URGENT FIX: Volume Control Replacement
+
+- [x] Replace broken HeaderSoundControl with working AmbientSoundToggle functionality
+- [x] Keep AmbientSoundToggle's working audio logic (auto-play, volume slider, localStorage)
+- [x] Position it in top menu where HeaderSoundControl was
+- [x] Use top menu's visual styling but bottom-left's working functionality
+- [x] Test that jungle sounds play automatically and volume control works
