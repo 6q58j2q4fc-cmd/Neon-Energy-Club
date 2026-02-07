@@ -4279,8 +4279,8 @@ Provide step-by-step instructions with specific button names and locations. Keep
         return await updateVendingOrderStatus(input.id, {
           status: input.status,
           adminNotes: input.adminNotes,
-          estimatedDelivery: input.estimatedDelivery ? new Date(input.estimatedDelivery) : undefined,
-          installationDate: input.installationDate ? new Date(input.installationDate) : undefined,
+          estimatedDelivery: input.estimatedDelivery,
+          installationDate: input.installationDate,
         });
       }),
   }),
@@ -5094,8 +5094,8 @@ Provide step-by-step instructions with specific button names and locations. Keep
           throw new TRPCError({ code: "FORBIDDEN", message: "Not authorized" });
         }
         return await getVendingMachineSales(input.machineId, {
-          startDate: input.startDate ? new Date(input.startDate) : undefined,
-          endDate: input.endDate ? new Date(input.endDate) : undefined,
+          startDate: input.startDate,
+          endDate: input.endDate,
           limit: input.limit,
         });
       }),

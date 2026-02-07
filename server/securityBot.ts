@@ -239,7 +239,7 @@ export function validateRequest(
       ip,
       userAgent,
       path,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       severity: 'medium',
       blocked: true,
     });
@@ -257,7 +257,7 @@ export function validateRequest(
       userAgent,
       path,
       payload: bodyStr.substring(0, 500),
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       severity: 'high',
       blocked: true,
     });
@@ -281,7 +281,7 @@ export function validateRequest(
       userAgent,
       path,
       payload: bodyStr.substring(0, 500),
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       severity: 'high',
       blocked: true,
     });
@@ -296,7 +296,7 @@ export function validateRequest(
       ip,
       userAgent,
       path,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       severity: 'medium',
       blocked: true,
     });
@@ -364,7 +364,7 @@ export async function analyzeSecurityAnomaly(
     ip: e.ip,
     path: e.path,
     severity: e.severity,
-    time: e.timestamp.toISOString(),
+    time: e.timestamp,
   }));
   
   try {

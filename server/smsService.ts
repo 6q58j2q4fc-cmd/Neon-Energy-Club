@@ -209,7 +209,7 @@ export async function sendAutoShipReminderSMS(params: {
   }
 
   const formattedPhone = formatPhoneNumber(phoneNumber);
-  const dateStr = renewalDate.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const dateStr = new Date(renewalDate).toLocaleDateString("en-US", { month: "short", day: "numeric" });
   const message = `Hi ${customerName}! Your NEON Energy auto-ship ($${amount.toFixed(2)}) renews on ${dateStr}. Manage your subscription in your customer portal.`;
   
   const success = await sendTwilioSMS(formattedPhone, message);
