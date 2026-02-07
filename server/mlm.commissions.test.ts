@@ -216,12 +216,23 @@ describe('MLM Commission Calculations', () => {
 
   describe('Unilevel Commission Calculations', () => {
     it('should calculate correct commission for direct referral (Level 1)', async () => {
-      const sponsor = {
+      const buyer = createMockDistributor({
+        id: 2,
+        sponsorId: 1,
+        distributorCode: 'BUYER001',
+        rank: 'distributor',
+        status: 'active',
+        totalPv: 50,
+      });
+
+      const sponsor = createMockDistributor({
         id: 1,
+        sponsorId: null,
         distributorCode: 'SPONSOR001',
         rank: 'distributor',
+        status: 'active',
         totalPv: 100,
-      };
+      });
 
       const sale = {
         id: 101,
@@ -230,7 +241,11 @@ describe('MLM Commission Calculations', () => {
         pv: 50,
       };
 
-      vi.mocked(db.getDistributorById).mockResolvedValue(sponsor as any);
+      vi.mocked(db.getDistributorById).mockImplementation(async (id) => {
+        if (id === 2) return buyer as any;
+        if (id === 1) return sponsor as any;
+        return null;
+      });
       vi.mocked(db.createCommission).mockResolvedValue({ id: 1 } as any);
 
       const result = await calculateCommissions(sale.id, sale.distributorId, sale.totalPriceCents, sale.pv);
@@ -291,11 +306,12 @@ describe('MLM Commission Calculations', () => {
         createMockDistributor({ id: 3, sponsorId: 2, rank: 'gold' }),
         createMockDistributor({ id: 4, sponsorId: 3, rank: 'silver' }),
         createMockDistributor({ id: 5, sponsorId: 4, rank: 'bronze' }),
+        createMockDistributor({ id: 6, sponsorId: 5, rank: 'distributor' }), // Buyer with 5 levels of upline
       ];
 
       const sale = {
         id: 301,
-        distributorId: 5,
+        distributorId: 6, // Changed from 5 to 6 (buyer with 5 upline levels)
         totalPriceCents: 10000, // $100.00
         pv: 100,
       };
