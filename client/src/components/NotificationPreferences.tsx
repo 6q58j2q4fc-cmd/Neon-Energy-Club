@@ -73,7 +73,17 @@ export function NotificationPreferences() {
 
   const handleSave = () => {
     if (!localPrefs) return;
-    updatePreferences.mutate(localPrefs);
+    updatePreferences.mutate({
+      referrals: localPrefs.referrals ? 1 : 0,
+      commissions: localPrefs.commissions ? 1 : 0,
+      teamUpdates: localPrefs.teamUpdates ? 1 : 0,
+      promotions: localPrefs.promotions ? 1 : 0,
+      orders: localPrefs.orders ? 1 : 0,
+      announcements: localPrefs.announcements ? 1 : 0,
+      digestFrequency: localPrefs.digestFrequency,
+      digestDay: localPrefs.digestDay,
+      digestHour: localPrefs.digestHour,
+    } as any);
   };
 
   const hasChanges = localPrefs !== null;

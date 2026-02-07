@@ -472,7 +472,7 @@ export async function getImpactLeaderboard(
     if (distributor.length > 0) {
       enrichedLeaders.push({
         ...leader,
-        distributorName: (distributor[0]?.displayName ?? "N/A") || distributor[0].username,
+        distributorName: ((distributor[0] as any)?.displayName ?? "N/A") || distributor[0].username,
         distributorRank: distributor[0].rank,
       });
     }

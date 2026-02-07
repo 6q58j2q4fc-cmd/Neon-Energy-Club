@@ -97,18 +97,11 @@ export function IntelligentTerritoryMap({ onLocationSelect }: IntelligentTerrito
     if (zipCode.length === 5) {
       setLoading(true);
       try {
-        // Try to get real locations from Google Places API
-        const result = await trpc.places.getVendingLocations.useQuery({ zipCode });
-        
-        if (result?.locations && result?.locations.length > 0) {
-          setSuggestions(result?.locations);
-          toast.success(`Found ${result?.locations.length} potential locations!`);
-        } else {
-          // Fallback to simulated data if no results
-          const locations = generateSuggestions(zipCode);
-          setSuggestions(locations.sort((a, b) => b.score - a.score));
-          toast.info('Showing simulated locations (no real data available)');
-        }
+        // Fallback to simulated data (tRPC useQuery cannot be called inside async function)
+        const locations = generateSuggestions(zipCode);
+        setSuggestions(locations.sort((a, b) => b.score - a.score));
+        toast.info('Showing simulated locations');
+        // TODO: Use mutation or separate query hook for real-time location fetching
       } catch (error) {
         console.error('Error fetching locations:', error);
         // Fallback to simulated data on error

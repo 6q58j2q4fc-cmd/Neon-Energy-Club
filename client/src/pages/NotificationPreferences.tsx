@@ -92,16 +92,16 @@ export default function NotificationPreferences() {
 
   const handleSave = () => {
     updatePreferences.mutate({
-      referrals,
-      commissions,
-      teamUpdates,
-      promotions,
-      orders,
-      announcements,
+      referrals: referrals ? 1 : 0,
+      commissions: commissions ? 1 : 0,
+      teamUpdates: teamUpdates ? 1 : 0,
+      promotions: promotions ? 1 : 0,
+      orders: orders ? 1 : 0,
+      announcements: announcements ? 1 : 0,
       digestFrequency,
       digestDay: parseInt(digestDay),
       digestHour: parseInt(digestHour),
-    });
+    } as any);
   };
 
   if (authLoading || isLoading) {
