@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO distributors (userId, email, distributorCode, rank, status, isActive, totalPv, monthlyPv, subdomain, createdAt, updatedAt) VALUES (1, 'dakotarea@me.com', 'DAKOTA001', 'master_distributor', 'active', 1, 0, 0, 'dakota', NOW(), NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute INSERT INTO distributors (userId, email, distributorCode, rank, status, isActive, totalPv, monthlyPv, subdomain, createdAt, updatedAt) VALUES (1, 'dakotarea@me.com', 'DAKOTA001', 'master_distributor', 'active', 1, 0, 0, 'dakota', NOW(), NOW());",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1064 (42000) at line 1: You have an error in your SQL syntax; check the manual that corresponds to your TiDB version for the right syntax to use line 1 column 62 near \"rank, status, isActive, totalPv, monthlyPv, subdomain, createdAt, updatedAt) VALUES (1, 'dakotarea@me.com', 'DAKOTA001', 'master_distributor', 'active', 1, 0, 0, 'dakota', NOW(), NOW())\""
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE distributors SET distributorCode = 'DAKOTA001', `rank` = 'royal_diamond', status = 'active', isActive = 1, subdomain = 'dakota' WHERE userId = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute UPDATE distributors SET distributorCode = 'DAKOTA001', `rank` = 'royal_diamond', status = 'active', isActive = 1, subdomain = 'dakota' WHERE userId = 1;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 69
+}

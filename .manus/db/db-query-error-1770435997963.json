@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO distributors (userId, distributorCode, `rank`, status, isActive, subdomain) VALUES (1, 'DAKOTA001', 'royal_diamond', 'active', 1, 'dakota');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute INSERT INTO distributors (userId, distributorCode, `rank`, status, isActive, subdomain) VALUES (1, 'DAKOTA001', 'royal_diamond', 'active', 1, 'dakota');",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1062 (23000) at line 1: Duplicate entry '?' for key 'distributors.distributors_userId_unique'"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, email, name FROM users WHERE email LIKE '%dakota%' OR name LIKE '%Dakota%' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT id, email, name FROM users WHERE email LIKE '%dakota%' OR name LIKE '%Dakota%' LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "name": "Dakota Rea"
+    },
+    {
+      "id": "510004",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "name": "Dakota Rea"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\n1\tb4429bc6tn@privaterelay.appleid.com\tDakota Rea\n510004\tb4429bc6tn@privaterelay.appleid.com\tDakota Rea\n",
+  "stderr": "",
+  "execution_time_ms": 131
+}

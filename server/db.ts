@@ -936,7 +936,6 @@ export async function redeemCouponCode(couponCode: string, orderId: number) {
     .set({
       couponUsed: 1,
       couponUsedAt: new Date().toISOString(),
-       orderId,
     })
     .where(eq(newsletterSubscriptions.couponCode, normalizedCode));
   
@@ -3891,7 +3890,7 @@ export async function recordCustomerReferral(
  */
 export async function completeCustomerReferral(
   referredId: number,
-  id: number,
+  orderId: number,
   purchaseAmount: string
 ): Promise<void> {
   const db = await getDb();
@@ -3912,7 +3911,6 @@ export async function completeCustomerReferral(
   await db.update(customerReferrals)
     .set({
       purchaseCompleted: 1,
-      orderId,
       purchaseAmount,
       purchaseCompletedAt: new Date().toISOString(),
     })
@@ -6397,7 +6395,7 @@ export async function enableMfa(userId: number) {
   
   await db.update(mfaSettings)
     .set({
-      isEnabled: true,
+      isEnabled: 1,
       lastVerifiedAt: new Date().toISOString(),
     })
     .where(eq(mfaSettings.userId, userId));
@@ -6414,7 +6412,7 @@ export async function disableMfa(userId: number) {
   
   await db.update(mfaSettings)
     .set({
-      isEnabled: false,
+      isEnabled: 0,
       totpSecret: '',
       backupCodes: null,
       backupCodesRemaining: 0,
@@ -6631,7 +6629,7 @@ export async function completeMfaRecovery(recoveryId: number, userId: number) {
   // Disable MFA for the user
   await db.update(mfaSettings)
     .set({
-      isEnabled: false,
+      isEnabled: 0,
       totpSecret: '',
       backupCodes: null,
       backupCodesRemaining: 0,

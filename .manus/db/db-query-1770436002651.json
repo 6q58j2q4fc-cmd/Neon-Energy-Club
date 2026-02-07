@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, userId, distributorCode, `rank`, status, isActive FROM distributors WHERE userId = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT id, userId, distributorCode, `rank`, status, isActive FROM distributors WHERE userId = 1;",
+  "rows": [
+    {
+      "id": "1110001",
+      "userId": "1",
+      "distributorCode": "DIST19HI09V",
+      "rank": "starter",
+      "status": "active",
+      "isActive": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tdistributorCode\trank\tstatus\tisActive\n1110001\t1\tDIST19HI09V\tstarter\tactive\t1\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

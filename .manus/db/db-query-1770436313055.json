@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, email, name, openId FROM users WHERE id = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT id, email, name, openId FROM users WHERE id = 1;",
+  "rows": [
+    {
+      "id": "1",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "name": "Dakota Rea",
+      "openId": "KM4owryiZuvTGq7hhYe5tH"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\topenId\n1\tb4429bc6tn@privaterelay.appleid.com\tDakota Rea\tKM4owryiZuvTGq7hhYe5tH\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}
