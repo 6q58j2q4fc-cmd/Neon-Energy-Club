@@ -1176,7 +1176,10 @@ export const appRouter = router({
     // Get current distributor info
     me: protectedProcedure.query(async ({ ctx }) => {
       const { getDistributorByUserId } = await import("./db");
-      return await getDistributorByUserId(ctx.user.id);
+      console.log('[distributor.me] Looking up distributor for userId:', ctx.user.id);
+      const distributor = await getDistributorByUserId(ctx.user.id);
+      console.log('[distributor.me] Found distributor:', distributor ? `ID ${distributor.id}` : 'null');
+      return distributor;
     }),
 
     // Get distributor dashboard stats

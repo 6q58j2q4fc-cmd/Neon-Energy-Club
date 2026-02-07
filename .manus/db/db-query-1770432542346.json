@@ -1,0 +1,28 @@
+{
+  "query": "SELECT u.id as user_id, u.name, u.email, d.id as dist_id, d.userId as dist_userId, d.firstName, d.lastName FROM users u LEFT JOIN distributors d ON u.id = d.userId WHERE u.name LIKE '%Dakota%' OR u.name LIKE '%Rea%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT u.id as user_id, u.name, u.email, d.id as dist_id, d.userId as dist_userId, d.firstName, d.lastName FROM users u LEFT JOIN distributors d ON u.id = d.userId WHERE u.name LIKE '%Dakota%' OR u.name LIKE '%Rea%';",
+  "rows": [
+    {
+      "user_id": "1",
+      "name": "Dakota Rea",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "dist_id": "1110001",
+      "dist_userId": "1",
+      "firstName": "NULL",
+      "lastName": "NULL"
+    },
+    {
+      "user_id": "510004",
+      "name": "Dakota Rea",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "dist_id": "NULL",
+      "dist_userId": "NULL",
+      "firstName": "NULL",
+      "lastName": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "user_id\tname\temail\tdist_id\tdist_userId\tfirstName\tlastName\n1\tDakota Rea\tb4429bc6tn@privaterelay.appleid.com\t1110001\t1\tNULL\tNULL\n510004\tDakota Rea\tb4429bc6tn@privaterelay.appleid.com\tNULL\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 67
+}

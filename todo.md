@@ -6066,3 +6066,63 @@
 - [ ] Verify 0 TypeScript errors after all fixes
 - [ ] Test application runtime to ensure no regressions
 - [ ] Create prevention checklist for future development
+
+## CRITICAL: Distributor Portal Access Bug Fix (Feb 7, 2026)
+- [ ] Diagnose why `trpc.distributor.me.useQuery()` returns null for existing distributors
+- [ ] Check if `getDistributorByUserId` is correctly querying the database
+- [ ] Verify distributor record exists in database for logged-in user
+- [ ] Fix query to properly return distributor profile
+- [ ] Test distributor portal access after login
+- [ ] Ensure existing distributors can access dashboard without re-enrollment
+
+## Set Dakota Rea as Permanent Master Distributor (Feb 7, 2026)
+- [ ] Create database migration to set Dakota Rea as master distributor
+- [ ] Set Dakota Rea's rank to highest level permanently
+- [ ] Mark Dakota Rea as always active and qualified
+- [ ] Ensure Dakota Rea automatically earns commissions on all sales
+- [ ] Add system check to prevent accidental modification of master distributor status
+- [ ] Test commission calculations flow to Dakota Rea
+
+## Replace Manus OAuth with Custom Native Authentication (Feb 7, 2026)
+- [ ] Create custom username/password authentication system
+- [ ] Build login page with email/password fields
+- [ ] Implement password hashing (bcrypt)
+- [ ] Create JWT token generation for sessions
+- [ ] Build registration flow with email verification
+- [ ] Add "Forgot Password" functionality
+- [ ] Keep Manus OAuth only for admin access
+- [ ] Update all login/logout buttons to use custom auth
+- [ ] Migrate existing users to custom auth system
+- [ ] Test login/logout flow end-to-end
+
+## Complete All TypeScript Error Fixes (Feb 7, 2026)
+- [ ] Fix 60 invalid div prop errors (remove `as={true}`, `any={true}`)
+- [ ] Fix 19 missing orderId errors (define variable in scope)
+- [ ] Fix 17 boolean/number conversion errors (MySQL tinyint)
+- [ ] Fix remaining Date/string mismatches
+- [ ] Verify 0 TypeScript errors after all fixes
+- [ ] Test application runtime to ensure no regressions
+
+## Real-Time Distributor Notifications (Feb 7, 2026)
+- [ ] Design notification database schema (type, title, content, read status)
+- [ ] Create tRPC procedures for notification CRUD
+- [ ] Implement push notification system for commission payouts
+- [ ] Add push notifications for referral sign-ups
+- [ ] Add push notifications for team milestones
+- [ ] Build notification preferences page (enable/disable by type)
+- [ ] Add email digest option (daily/weekly summary)
+- [ ] Create notification center UI in distributor portal
+- [ ] Test push notifications end-to-end
+- [ ] Test email digest delivery
+
+## Automated Social Media Content Generator (Feb 7, 2026)
+- [ ] Design social media posts database schema
+- [ ] Create LLM-powered content generation function
+- [ ] Generate Instagram post templates (distributor success stories)
+- [ ] Generate TikTok post ideas (product benefits, testimonials)
+- [ ] Add image generation for social media graphics
+- [ ] Implement scheduled posting system (daily cron job)
+- [ ] Create admin dashboard to review/approve generated content
+- [ ] Add distributor portal section to view/share generated content
+- [ ] Test content generation quality
+- [ ] Test scheduled posting functionality

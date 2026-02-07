@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, name, email, openId FROM users WHERE name = 'Dakota' OR name LIKE '%Rea%' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT id, name, email, openId FROM users WHERE name = 'Dakota' OR name LIKE '%Rea%' LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Dakota Rea",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "openId": "KM4owryiZuvTGq7hhYe5tH"
+    },
+    {
+      "id": "510004",
+      "name": "Dakota Rea",
+      "email": "b4429bc6tn@privaterelay.appleid.com",
+      "openId": "ZVD7RcFJMYovKDnnuKq7o4"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\topenId\n1\tDakota Rea\tb4429bc6tn@privaterelay.appleid.com\tKM4owryiZuvTGq7hhYe5tH\n510004\tDakota Rea\tb4429bc6tn@privaterelay.appleid.com\tZVD7RcFJMYovKDnnuKq7o4\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

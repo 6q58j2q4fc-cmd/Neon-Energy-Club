@@ -1,0 +1,42 @@
+{
+  "query": "SELECT id, userId, firstName, lastName, email, status FROM distributors LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT id, userId, firstName, lastName, email, status FROM distributors LIMIT 10;",
+  "rows": [
+    {
+      "id": "1050001",
+      "userId": "1650938",
+      "firstName": "NULL",
+      "lastName": "NULL",
+      "email": "NULL",
+      "status": "active"
+    },
+    {
+      "id": "1080001",
+      "userId": "2190047",
+      "firstName": "NULL",
+      "lastName": "NULL",
+      "email": "NULL",
+      "status": "active"
+    },
+    {
+      "id": "1080002",
+      "userId": "2190048",
+      "firstName": "NULL",
+      "lastName": "NULL",
+      "email": "NULL",
+      "status": "active"
+    },
+    {
+      "id": "1110001",
+      "userId": "1",
+      "firstName": "NULL",
+      "lastName": "NULL",
+      "email": "NULL",
+      "status": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tfirstName\tlastName\temail\tstatus\n1050001\t1650938\tNULL\tNULL\tNULL\tactive\n1080001\t2190047\tNULL\tNULL\tNULL\tactive\n1080002\t2190048\tNULL\tNULL\tNULL\tactive\n1110001\t1\tNULL\tNULL\tNULL\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

@@ -1,0 +1,42 @@
+{
+  "query": "SELECT d.id as dist_id, d.userId, d.firstName, d.lastName, u.id as user_id, u.name FROM distributors d LEFT JOIN users u ON d.userId = u.id LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user mexMZK3NDs3KsAz.root --database dR9ACUM3ZN4eERDeqzMEq8 --execute SELECT d.id as dist_id, d.userId, d.firstName, d.lastName, u.id as user_id, u.name FROM distributors d LEFT JOIN users u ON d.userId = u.id LIMIT 10;",
+  "rows": [
+    {
+      "dist_id": "1050001",
+      "userId": "1650938",
+      "firstName": "NULL",
+      "lastName": "NULL",
+      "user_id": "1650938",
+      "name": "I.S."
+    },
+    {
+      "dist_id": "1080001",
+      "userId": "2190047",
+      "firstName": "NULL",
+      "lastName": "NULL",
+      "user_id": "2190047",
+      "name": "Test Distributor"
+    },
+    {
+      "dist_id": "1080002",
+      "userId": "2190048",
+      "firstName": "NULL",
+      "lastName": "NULL",
+      "user_id": "2190048",
+      "name": "Test Distributor"
+    },
+    {
+      "dist_id": "1110001",
+      "userId": "1",
+      "firstName": "NULL",
+      "lastName": "NULL",
+      "user_id": "1",
+      "name": "Dakota Rea"
+    }
+  ],
+  "messages": [],
+  "stdout": "dist_id\tuserId\tfirstName\tlastName\tuser_id\tname\n1050001\t1650938\tNULL\tNULL\t1650938\tI.S.\n1080001\t2190047\tNULL\tNULL\t2190047\tTest Distributor\n1080002\t2190048\tNULL\tNULL\t2190048\tTest Distributor\n1110001\t1\tNULL\tNULL\t1\tDakota Rea\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}
