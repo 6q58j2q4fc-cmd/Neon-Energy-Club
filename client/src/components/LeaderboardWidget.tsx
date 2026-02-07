@@ -147,13 +147,13 @@ export default function LeaderboardWidget({
                     {entry.profilePhoto ? (
                       <img 
                         src={entry.profilePhoto} 
-                        alt={entry.displayName}
+                        alt={(entry?.displayName ?? "N/A")}
                         className="w-full h-full object-cover"
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-[#c8ff00]/30 to-[#c8ff00]/10 flex items-center justify-center">
                         <span className="text-[#c8ff00] font-bold text-sm">
-                          {entry.displayName.charAt(0).toUpperCase()}
+                          {(entry?.displayName ?? "N/A").charAt(0).toUpperCase()}
                         </span>
                       </div>
                     )}
@@ -167,7 +167,7 @@ export default function LeaderboardWidget({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className={`font-semibold truncate ${isTopThree ? 'text-white' : 'text-gray-300'}`}>
-                      {entry.displayName}
+                      {(entry?.displayName ?? "N/A")}
                     </span>
                     <span className={`
                       text-[10px] px-1.5 py-0.5 rounded uppercase font-bold

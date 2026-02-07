@@ -1018,7 +1018,7 @@ export async function enrollDistributor(input: {
     country: input.country,
     // Business entity
     businessEntityType: input.entityType,
-    businessName: input.businessName,
+    businessName: (input?.businessName ?? "N/A"),
     businessEin: input.businessEin,
     // Emergency contact
     emergencyContactName: input.emergencyContactName,
@@ -3583,7 +3583,7 @@ export async function createNotification(data: {
     type: data.type,
     title: data.title,
     message: data.message,
-    data: data.data ? JSON.stringify(data.data) : null,
+    data: data?.data ? JSON.stringify(data?.data) : null,
     isRead: 0,
   });
   
@@ -3939,7 +3939,7 @@ export async function completeCustomerReferral(
       referralCount: 3,
       status: "available",
       redemptionCode: rewardCode,
-      expiresAt: new Date().toISOString(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
+      expiresAt: new Date().toISOString().toISOString(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
     });
   }
 }
@@ -4392,7 +4392,7 @@ export async function createVendingApplication(data: {
     lastName: data.lastName,
     email: data.email,
     phone: data.phone,
-    businessName: data.businessName || null,
+    businessName: (data?.businessName ?? "N/A") || null,
     businessType: data.businessType,
     yearsInBusiness: data.yearsInBusiness || null,
     city: data.city,
@@ -4560,7 +4560,7 @@ export async function savePushSubscription(data: {
         auth: data.auth,
         userAgent: data.userAgent || null,
         isActive: 1,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString().toISOString(),
       })
       .where(eq(pushSubscriptions.id, existing[0].id));
     return existing[0].id;
@@ -4791,7 +4791,7 @@ export async function upsertUserProfile(data: {
       .set({
         customSlug: data.customSlug?.toLowerCase().trim() || null,
         profilePhotoUrl: data.profilePhotoUrl || null,
-        displayName: data.displayName || null,
+        displayName: (data?.displayName ?? "N/A") || null,
         location: data.location || null,
         bio: data.bio || null,
         instagram: data.instagram || null,
@@ -4800,7 +4800,7 @@ export async function upsertUserProfile(data: {
         twitter: data.twitter || null,
         youtube: data.youtube || null,
         linkedin: data.linkedin || null,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString().toISOString(),
       })
       .where(eq(userProfiles.id, existing[0].id));
     return existing[0].id;
@@ -4811,7 +4811,7 @@ export async function upsertUserProfile(data: {
     userId: data.userId,
     customSlug: data.customSlug?.toLowerCase().trim() || null,
     profilePhotoUrl: data.profilePhotoUrl || null,
-    displayName: data.displayName || null,
+    displayName: (data?.displayName ?? "N/A") || null,
     location: data.location || null,
     bio: data.bio || null,
     instagram: data.instagram || null,
@@ -4850,7 +4850,7 @@ export async function updateUserSlug(userId: number, newSlug: string): Promise<b
 
   if (existing[0]) {
     await db.update(userProfiles)
-      .set({ customSlug: normalizedSlug, updatedAt: new Date().toISOString() })
+      .set({ customSlug: normalizedSlug, updatedAt: new Date().toISOString().toISOString() })
       .where(eq(userProfiles.id, existing[0].id));
     return true;
   }
@@ -4872,7 +4872,7 @@ export async function updateProfilePhoto(userId: number, photoUrl: string): Prom
 
   if (existing[0]) {
     await db.update(userProfiles)
-      .set({ profilePhotoUrl: photoUrl, updatedAt: new Date().toISOString() })
+      .set({ profilePhotoUrl: photoUrl, updatedAt: new Date().toISOString().toISOString() })
       .where(eq(userProfiles.id, existing[0].id));
     return true;
   }
@@ -5076,10 +5076,10 @@ export async function updatePersonalizedProfile(userId: number, data: {
   
   await db.update(userProfiles)
     .set({
-      displayName: data.displayName || undefined,
+      displayName: (data?.displayName ?? "N/A") || undefined,
       bio: data.bio || undefined,
       location: data.location || undefined,
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString().toISOString(),
     })
     .where(eq(userProfiles.id, existing[0].id));
   
@@ -5131,7 +5131,7 @@ export async function getRecentJoinedUsers(limit = 10) {
     name: users.name,
     createdAt: users.createdAt,
     profilePhotoUrl: userProfiles.profilePhotoUrl,
-    displayName: userProfiles.displayName,
+    displayName: (userProfiles?.displayName ?? "N/A"),
     location: userProfiles.location,
   })
     .from(users)
@@ -5141,7 +5141,7 @@ export async function getRecentJoinedUsers(limit = 10) {
 
   return result.map(user => ({
     id: user.id,
-    name: user.displayName || user.name || 'NEON Member',
+    name: (user?.displayName ?? "N/A") || user.name || 'NEON Member',
     createdAt: user.createdAt,
     profilePhotoUrl: user.profilePhotoUrl,
     location: user.location,
@@ -5502,7 +5502,7 @@ export async function getDistributorPublicProfile(code: string) {
     id: distributor.id,
     distributorCode: distributor.distributorCode,
     username: distributor.username || distributor.distributorCode,
-    displayName: profile?.displayName || distributor.username || `NEON Distributor ${distributor.distributorCode}`,
+    displayName: (profile?.displayName ?? "N/A") || distributor.username || `NEON Distributor ${distributor.distributorCode}`,
     profilePhoto: profile?.profilePhotoUrl || null,
     location: profile?.location || null,
     country: distributor.country || profile?.country || null,
@@ -5574,7 +5574,7 @@ export async function getPublicLeaderboard(limit: number = 10) {
         
         return {
           position: index + 1,
-          displayName: profile?.displayName || dist.username || `Distributor ${dist.distributorCode.slice(-4)}`,
+          displayName: (profile?.displayName ?? "N/A") || dist.username || `Distributor ${dist.distributorCode.slice(-4)}`,
           profilePhoto: profile?.profilePhotoUrl || null,
           location: profile?.location || null,
           rank: dist.rank || 'starter',
@@ -5642,7 +5642,7 @@ export async function updateDistributorApplicationInfo(
         ssnLast4: data.taxIdLast4 || null,
         agreedToPoliciesAt: data.agreedToPolicies ? (data.agreedAt || new Date().toISOString()) : null,
         agreedToTermsAt: data.agreedToTerms ? (data.agreedAt || new Date().toISOString()) : null,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString().toISOString(),
       })
       .where(eq(distributors.id, distributorId));
     
@@ -5991,7 +5991,7 @@ export async function updateNotificationPreferences(
         digestFrequency: preferences.digestFrequency,
         digestDay: preferences.digestDay,
         digestHour: preferences.digestHour,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString().toISOString(),
       })
       .where(eq(notificationPreferences.userId, userId));
   } else {

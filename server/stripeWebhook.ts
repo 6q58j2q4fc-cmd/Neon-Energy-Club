@@ -50,11 +50,11 @@ export async function handleStripeWebhook(req: Request, res: Response): Promise<
   try {
     switch (event.type) {
       case 'checkout.session.completed':
-        await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
+        await handleCheckoutCompleted(event?.data.object as Stripe.Checkout.Session);
         break;
         
       case 'payment_intent.succeeded':
-        await handlePaymentSucceeded(event.data.object as Stripe.PaymentIntent);
+        await handlePaymentSucceeded(event?.data.object as Stripe.PaymentIntent);
         break;
         
       default:

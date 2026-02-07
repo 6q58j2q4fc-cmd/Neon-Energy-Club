@@ -100,9 +100,9 @@ export function IntelligentTerritoryMap({ onLocationSelect }: IntelligentTerrito
         // Try to get real locations from Google Places API
         const result = await trpc.places.getVendingLocations.useQuery({ zipCode });
         
-        if (result.locations && result.locations.length > 0) {
-          setSuggestions(result.locations);
-          toast.success(`Found ${result.locations.length} potential locations!`);
+        if (result?.locations && result?.locations.length > 0) {
+          setSuggestions(result?.locations);
+          toast.success(`Found ${result?.locations.length} potential locations!`);
         } else {
           // Fallback to simulated data if no results
           const locations = generateSuggestions(zipCode);

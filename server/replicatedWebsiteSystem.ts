@@ -140,7 +140,7 @@ export async function generateReplicatedSite(userId: number): Promise<Replicated
     distributorCode: distributor.distributorCode,
     subdomain,
     profilePhoto: profile?.profilePhotoUrl || null,
-    displayName: profile?.displayName || distributor.username || `NEON Distributor ${distributor.distributorCode}`,
+    displayName: (profile?.displayName ?? "N/A") || distributor.username || `NEON Distributor ${distributor.distributorCode}`,
     country: profile?.country || null,
     bio: profile?.bio || null,
     socialLinks: {

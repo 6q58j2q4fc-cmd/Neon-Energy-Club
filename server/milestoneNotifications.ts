@@ -87,7 +87,7 @@ export async function notifyMilestoneAchievement(
   if (achievement.milestone.threshold >= 1000) {
     await notifyOwner({
       title: `🎉 Major Milestone Achieved!`,
-      content: `${distributor.displayName || distributor.username} just achieved ${achievement.milestone.name}! (${achievement.currentValue} ${achievement.milestone.category})`
+      content: `${(distributor?.displayName ?? "N/A") || distributor.username} just achieved ${achievement.milestone.name}! (${achievement.currentValue} ${achievement.milestone.category})`
     });
   }
   

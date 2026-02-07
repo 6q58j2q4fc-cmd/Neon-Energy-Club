@@ -67,7 +67,7 @@ export function NftPreview({ orderId, nftId, showMintingNotice = true }: NftPrev
       enabled: !!orderId,
       refetchInterval: (query) => {
         // Stop polling once we have the NFT image
-        const queryData = query.state.data;
+        const queryData = query.state?.data;
         if (queryData?.nft?.nftImageUrl) return false;
         // Poll every 5 seconds for up to 2 minutes
         if (pollCount < 24) return 5000;

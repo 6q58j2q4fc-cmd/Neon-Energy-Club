@@ -26,7 +26,7 @@ export interface AlertTrigger {
  */
 export async function checkFirstSale(distributorId: number): Promise<TeamAlert | null> {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) return null;
   
   // Get distributor info
   const [distributor] = await db!
@@ -81,7 +81,7 @@ export async function checkRankAdvancement(
   newRank: string
 ): Promise<TeamAlert | null> {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) return null;
   
   const [distributor] = await db!
     .select()
@@ -128,7 +128,7 @@ export async function checkVolumeThreshold(
   threshold: number
 ): Promise<TeamAlert | null> {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) return null;
   
   const [distributor] = await db!
     .select()
@@ -176,7 +176,7 @@ export async function checkTeamMilestone(
   threshold: number
 ): Promise<TeamAlert | null> {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) return null;
   
   const [distributor] = await db!
     .select()
@@ -315,7 +315,7 @@ export async function getDistributorAlerts(
 ): Promise<TeamAlert[]> {
   // In a production system, these would be stored in a database table
   // For now, returning empty array as alerts are generated in real-time
-  return [];
+  return null;
 }
 
 /**

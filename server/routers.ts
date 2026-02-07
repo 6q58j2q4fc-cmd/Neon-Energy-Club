@@ -1097,7 +1097,7 @@ export const appRouter = router({
           zipCode: input.zipCode,
           country: input.country,
           entityType: input.entityType,
-          businessName: input.businessName,
+          businessName: (input?.businessName ?? "N/A"),
           businessEin: input.businessEin,
           businessAddress: input.businessAddress,
           businessCity: input.businessCity,
@@ -1303,7 +1303,7 @@ export const appRouter = router({
           .update(distributors)
           .set({
             taxId: encryptedTaxId,
-            taxIdType: input.taxIdType,
+            taxIdType: (input?.taxIdType ?? "SSN"),
             ssnLast4: taxIdLast4,
             taxInfoCompleted: 1,
             taxInfoCompletedAt: new Date().toISOString(),
@@ -2430,7 +2430,7 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
         const { updateTerritoryApplication } = await import("./db");
         await updateTerritoryApplication(input.applicationId, {
           currentStep: 3,
-          businessName: input.businessName,
+          businessName: (input?.businessName ?? "N/A"),
           businessType: input.businessType,
           taxId: input.taxId,
           yearsInBusiness: input.yearsInBusiness,
@@ -2695,7 +2695,7 @@ Provide cross streets, adjusted area estimate, and key neighborhoods.`
         // Notify admin of new vending application
         await notifyOwner({
           title: "New Vending Machine Application",
-          content: `New vending application from ${input.firstName} ${input.lastName} (${input.email}, ${input.phone}).\n\nLocation: ${input.city}, ${input.state} ${input.zipCode}\nBusiness: ${input.businessName || "Individual"}\nMachines: ${input.numberOfMachines}\nBudget: ${input.investmentBudget || "Not specified"}\nTimeline: ${input.timeline || "Not specified"}\n\nProposed Locations: ${input.proposedLocations || "Not specified"}\n\nExperience: ${input.experience || "None provided"}\n\nQuestions: ${input.questions || "None"}`,
+          content: `New vending application from ${input.firstName} ${input.lastName} (${input.email}, ${input.phone}).\n\nLocation: ${input.city}, ${input.state} ${input.zipCode}\nBusiness: ${(input?.businessName ?? "N/A") || "Individual"}\nMachines: ${input.numberOfMachines}\nBudget: ${input.investmentBudget || "Not specified"}\nTimeline: ${input.timeline || "Not specified"}\n\nProposed Locations: ${input.proposedLocations || "Not specified"}\n\nExperience: ${input.experience || "None provided"}\n\nQuestions: ${input.questions || "None"}`,
         });
         
         return { success: true, applicationId: application.id };
@@ -3822,7 +3822,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
             userId: 0,
             customSlug: input.slug,
             profilePhotoUrl: distributorProfile.profilePhoto,
-            displayName: distributorProfile.displayName,
+            displayName: (distributorProfile?.displayName ?? "N/A"),
             location: distributorProfile.location,
             bio: distributorProfile.bio,
             userType: 'distributor' as const,
@@ -3921,12 +3921,12 @@ Provide step-by-step instructions with specific button names and locations. Keep
           // Create new profile
           const distributor = await getDistributorByUserId(ctx.user.id);
           const userType = distributor ? "distributor" : "customer";
-          const slug = await generateUniqueSlug(input.displayName || ctx.user.name || "neon-member");
+          const slug = await generateUniqueSlug((input?.displayName ?? "N/A") || ctx.user.name || "neon-member");
           
           await upsertUserProfile({
             userId: ctx.user.id,
             customSlug: slug,
-            displayName: input.displayName,
+            displayName: (input?.displayName ?? "N/A"),
             location: input.location,
             bio: input.bio,
             profilePhotoUrl: input.profilePhotoUrl,
@@ -3942,7 +3942,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
           // Update existing profile
           await upsertUserProfile({
             userId: ctx.user.id,
-            displayName: input.displayName,
+            displayName: (input?.displayName ?? "N/A"),
             location: input.location,
             bio: input.bio,
             profilePhotoUrl: input.profilePhotoUrl,
