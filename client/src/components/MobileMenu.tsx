@@ -156,6 +156,19 @@ export default function MobileMenu({ isOpen, onClose, onNavigate, currentPath = 
             </div>
           )}
 
+          {/* Prominent Login Button - Only when not logged in */}
+          {!user && (
+            <div className="px-3 pt-4 pb-2">
+              <button
+                onClick={handleLogin}
+                className="w-full py-3.5 px-4 bg-gradient-to-r from-[#00ffff] to-[#c8ff00] text-[#0a1a1a] font-bold text-base tracking-wide rounded-xl hover:shadow-[0_0_25px_rgba(0,255,255,0.6)] transition-all duration-200 active:scale-95 flex items-center justify-center gap-2"
+              >
+                <User className="w-5 h-5" />
+                LOGIN TO YOUR ACCOUNT
+              </button>
+            </div>
+          )}
+
           {/* Navigation - scrollable */}
           <nav className="flex-1 overflow-y-auto py-4 px-3">
             {/* Portal Access Section - Only when logged in */}

@@ -14,7 +14,7 @@ describe('Genealogy Tree Enhancement', () => {
         leftLegVolume: 0,
         rightLegVolume: 0,
         monthlyPv: 0,
-        isActive: 1,
+        isActive: true,
       },
       tree: [], // No team members
       totalDownline: 0,
@@ -58,7 +58,7 @@ describe('Genealogy Tree Enhancement', () => {
       leftLegVolume: 0,
       rightLegVolume: 0,
       monthlyPv: 50,
-      isActive: 1,
+      isActive: true,
     };
 
     // Verify all required fields are present

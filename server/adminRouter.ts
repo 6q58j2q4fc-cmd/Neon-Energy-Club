@@ -648,7 +648,7 @@ export const adminRouter = router({
       // Build where conditions
       const conditions = [];
       if (input.status !== "all") {
-        conditions.push(eq(orders.status, input.status));
+        conditions.push(eq(orders.status as any, input.status));
       }
       if (input.search) {
         conditions.push(

@@ -38,7 +38,7 @@ interface SecurityEvent {
   userAgent?: string;
   path?: string;
   payload?: string;
-  timestamp: Date;
+  timestamp: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   blocked: boolean;
 }

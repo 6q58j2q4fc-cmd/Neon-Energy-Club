@@ -58,7 +58,7 @@ export default function DistributorData() {
   const filteredDistributors = distributors?.filter((d) =>
     d.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     d.distributorCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (d.businessName ?? "N/A").toLowerCase().includes(searchTerm.toLowerCase())
+    ((d as any).businessName ?? "N/A").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -89,7 +89,7 @@ export default function DistributorData() {
         </TabsList>
 
         <TabsContent value="distributors" className="mt-6">
-          <Card>
+          <Card as any>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -229,7 +229,7 @@ export default function DistributorData() {
         </TabsContent>
 
         <TabsContent value="customers" className="mt-6">
-          <Card>
+          <Card as any>
             <CardHeader>
               <CardTitle>Customer Database</CardTitle>
               <CardDescription>

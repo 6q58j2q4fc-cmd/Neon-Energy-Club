@@ -10,7 +10,7 @@ import { distributors, commissions, orders, referralTracking, affiliateLinks, sa
 import { eq, sql, and, gte, desc } from "drizzle-orm";
 
 interface DataIntegrityReport {
-  timestamp: Date;
+  timestamp: string;
   checksPerformed: number;
   issuesFound: number;
   issuesFixed: number;
@@ -149,7 +149,7 @@ export async function validateVolumeCalculations(distributorId: number): Promise
     .from(orders)
     .where(and(
       eq(orders.distributorId, distributorId),
-      eq(orders.status, 'paid')
+      eq(orders.status as any, 'paid')
     ));
   
   const calculatedPersonalSales = personalSalesResult[0]?.total || 0;
@@ -240,7 +240,7 @@ export async function runFullIntegrityCheck(): Promise<DataIntegrityReport> {
   // Get all active distributors
   const activeDistributors = await db!.select()
     .from(distributors)
-    .where(eq(distributors.status, 'active'))
+    .where(eq(distributors.status as any, 'active'))
     .limit(100);
   
   // Run checks for each distributor
@@ -317,7 +317,7 @@ export async function autoFixIssues(issues: IntegrityIssue[]): Promise<number> {
             .from(orders)
             .where(and(
               eq(orders.distributorId, issue.affectedRecordId),
-              eq(orders.status, 'paid')
+              eq(orders.status as any, 'paid')
             ));
           
           await db!.update(distributors)

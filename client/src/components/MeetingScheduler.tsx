@@ -104,7 +104,7 @@ export default function MeetingScheduler({ meetingType, onSuccess, onClose }: Me
   }, [currentWeekStart]);
 
   // Check if a slot is available
-  const isSlotBooked = (date: Date, time: string) => {
+  const isSlotBooked = (date: string, time: string) => {
     if (!bookedSlots) return false;
     const [hours, minutes] = time.split(":").map(Number);
     const slotDate = setMinutes(setHours(date, hours), minutes);
@@ -115,14 +115,14 @@ export default function MeetingScheduler({ meetingType, onSuccess, onClose }: Me
   };
 
   // Check if a date is in the past
-  const isDatePast = (date: Date) => {
+  const isDatePast = (date: string) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return date < today;
   };
 
   // Check if a time slot is in the past for today
-  const isTimePast = (date: Date, time: string) => {
+  const isTimePast = (date: string, time: string) => {
     if (!isSameDay(date, new Date())) return false;
     const [hours, minutes] = time.split(":").map(Number);
     const slotTime = setMinutes(setHours(new Date(), hours), minutes);
@@ -180,7 +180,7 @@ export default function MeetingScheduler({ meetingType, onSuccess, onClose }: Me
     const title = `NEON Energy - ${meetingTypeLabels[meetingType]}`;
     const description = `Your ${meetingTypeLabels[meetingType]} with NEON Energy team.\n\nContact: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\n\nNotes: ${formData.notes || "None"}`;
     
-    const formatICSDate = (date: Date) => {
+    const formatICSDate = (date: string) => {
       return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
     };
     
@@ -220,7 +220,7 @@ export default function MeetingScheduler({ meetingType, onSuccess, onClose }: Me
     const details = encodeURIComponent(`Your ${meetingTypeLabels[meetingType]} with NEON Energy team.\n\nContact: ${formData.name}\nEmail: ${formData.email}`);
     const location = encodeURIComponent("Video Call (link will be sent via email)");
     
-    const formatGoogleDate = (date: Date) => {
+    const formatGoogleDate = (date: string) => {
       return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
     };
     

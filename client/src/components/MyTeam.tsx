@@ -102,7 +102,7 @@ export default function MyTeam() {
     <div className="space-y-6">
       {/* Team Overview Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
+        <Card as any>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Team Members</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -115,7 +115,7 @@ export default function MyTeam() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card as any>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Members</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
@@ -128,7 +128,7 @@ export default function MyTeam() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card as any>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Team Sales</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -141,7 +141,7 @@ export default function MyTeam() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card as any>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Top Performer</CardTitle>
             <Award className="h-4 w-4 text-muted-foreground" />
@@ -156,7 +156,7 @@ export default function MyTeam() {
       </div>
 
       {/* View Switcher */}
-      <Card>
+      <Card as any>
         <CardHeader>
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
@@ -330,7 +330,7 @@ export default function MyTeam() {
       </Card>
 
       {/* Team Performance Chart */}
-      <Card>
+      <Card as any>
         <CardHeader>
           <CardTitle>Team Growth</CardTitle>
           <CardDescription>Track your team's growth over time</CardDescription>

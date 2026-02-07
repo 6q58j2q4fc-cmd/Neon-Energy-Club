@@ -218,80 +218,15 @@ export default function Header() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="text-[#00ffff] border-[#00ffff]/50 hover:bg-[#00ffff]/10 hover:border-[#00ffff] hover:shadow-[0_0_15px_rgba(0,255,255,0.3)] font-bold transition-all duration-200"
-                      >
-                        <User className="w-4 h-4 mr-2" />
-                        LOGIN
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-64 bg-[#0a1a1a] border-[#c8ff00]/30">
-                      {/* Login Header */}
-                      <div className="px-3 py-2 border-b border-[#c8ff00]/20">
-                        <p className="text-sm font-bold text-white">Welcome to NEON</p>
-                        <p className="text-xs text-white/50">Choose how you'd like to sign in</p>
-                      </div>
-                      
-                      {/* Customer Login */}
-                      <DropdownMenuItem 
-                        onClick={() => window.location.href = '/login'}
-                        className="text-white hover:text-[#c8ff00] hover:bg-[#c8ff00]/10 cursor-pointer py-3"
-                      >
-                        <Heart className="w-4 h-4 mr-2 text-[#c8ff00]" />
-                        <div className="flex flex-col">
-                          <span className="font-semibold">Customer</span>
-                          <span className="text-[10px] text-white/50">Shop, earn rewards, refer friends</span>
-                        </div>
-                      </DropdownMenuItem>
-                      
-                      {/* Distributor Login */}
-                      <DropdownMenuItem 
-                        onClick={() => window.location.href = '/login'}
-                        className="text-white hover:text-[#00ffff] hover:bg-[#00ffff]/10 cursor-pointer py-3"
-                      >
-                        <Users className="w-4 h-4 mr-2 text-[#00ffff]" />
-                        <div className="flex flex-col">
-                          <span className="font-semibold">Distributor</span>
-                          <span className="text-[10px] text-white/50">Build your team, earn commissions</span>
-                        </div>
-                      </DropdownMenuItem>
-                      
-                      {/* Franchise Owner Login */}
-                      <DropdownMenuItem 
-                        onClick={() => window.location.href = '/login'}
-                        className="text-white hover:text-[#ff0080] hover:bg-[#ff0080]/10 cursor-pointer py-3"
-                      >
-                        <Building2 className="w-4 h-4 mr-2 text-[#ff0080]" />
-                        <div className="flex flex-col">
-                          <span className="font-semibold">Franchise Owner</span>
-                          <span className="text-[10px] text-white/50">Manage territory & vending machines</span>
-                        </div>
-                      </DropdownMenuItem>
-                      
-                      <DropdownMenuSeparator className="bg-[#c8ff00]/20" />
-                      
-                      {/* Sign Up Options */}
-                      <div className="p-2 space-y-1">
-                        <DropdownMenuItem 
-                          onClick={() => setLocation("/join")}
-                          className="text-[#c8ff00] hover:bg-[#c8ff00]/10 cursor-pointer font-semibold justify-center"
-                        >
-                          Create Account
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => setLocation("/franchise")}
-                          className="text-[#ff0080] hover:bg-[#ff0080]/10 cursor-pointer font-semibold justify-center"
-                        >
-                          <MapPin className="w-4 h-4 mr-1" />
-                          Explore Franchise
-                        </DropdownMenuItem>
-                      </div>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-              )}
+                  <Button
+                    onClick={() => window.location.href = '/login'}
+                    className="relative px-6 py-2.5 bg-gradient-to-r from-[#00ffff] to-[#c8ff00] text-[#0a1a1a] font-bold text-sm tracking-wide rounded-lg hover:shadow-[0_0_20px_rgba(0,255,255,0.5)] transition-all duration-200 hover:scale-105"
+                  >
+                    <User className="w-4 h-4 mr-2 inline" />
+                    LOGIN
+                  </Button>
+                )}
+
               <Button
                 onClick={() => setLocation("/join")}
                 variant="outline"

@@ -149,7 +149,7 @@ export type BadgeId = keyof typeof BADGES;
 
 interface Badge {
   id: string;
-  earnedAt?: Date;
+  earnedAt?: string;
   progress?: number;
   maxProgress?: number;
 }
@@ -157,7 +157,7 @@ interface Badge {
 interface BadgeDisplayProps {
   badge: typeof BADGES[BadgeId];
   earned: boolean;
-  earnedAt?: Date;
+  earnedAt?: string;
   progress?: number;
   maxProgress?: number;
   size?: "sm" | "md" | "lg";
@@ -279,7 +279,7 @@ export function BadgeShowcase({
   const totalCount = allBadges.length;
 
   return (
-    <Card>
+    <Card as any>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>

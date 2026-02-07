@@ -186,9 +186,9 @@ export interface NftMetadata {
     trait_type: string;
     value: string | number;
   }>;
-  createdAt: Date;
+  createdAt: string;
   mintStatus: 'pending' | 'ready' | 'minted';
-  mintEligibleAfter: Date; // 90 days after pre-launch
+  mintEligibleAfter: string; // 90 days after pre-launch
 }
 
 /**
@@ -241,7 +241,7 @@ function getRarityTier(orderNumber: number): string {
  * Check if NFT minting is eligible (after 90-day period and goals met)
  */
 export function checkMintEligibility(
-  prelaunchEndDate: Date,
+  prelaunchEndDate: string,
   crowdfundingGoalMet: boolean
 ): { eligible: boolean; reason?: string } {
   const now = new Date();

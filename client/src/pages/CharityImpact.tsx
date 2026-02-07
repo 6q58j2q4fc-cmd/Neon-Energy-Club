@@ -89,7 +89,7 @@ export default function CharityImpact() {
                 </p>
 
                 <div className="grid gap-4 md:grid-cols-3">
-                  <Card>
+                  <Card as any>
                     <CardHeader className="pb-3">
                       <CardDescription>Trees Protected</CardDescription>
                       <CardTitle className="text-3xl flex items-center gap-2">
@@ -115,7 +115,7 @@ export default function CharityImpact() {
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card as any>
                     <CardHeader className="pb-3">
                       <CardDescription>Habitat Protected</CardDescription>
                       <CardTitle className="text-3xl flex items-center gap-2">
@@ -141,7 +141,7 @@ export default function CharityImpact() {
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card as any>
                     <CardHeader className="pb-3">
                       <CardDescription>Species Lives Saved</CardDescription>
                       <CardTitle className="text-3xl flex items-center gap-2">
@@ -181,7 +181,7 @@ export default function CharityImpact() {
                 </p>
 
                 <div className="grid gap-4 md:grid-cols-1">
-                  <Card>
+                  <Card as any>
                     <CardHeader className="pb-3">
                       <CardDescription>Animal Lives Saved</CardDescription>
                       <CardTitle className="text-4xl flex items-center gap-2">
@@ -212,7 +212,7 @@ export default function CharityImpact() {
               </div>
 
               {/* Cans Consumed */}
-              <Card>
+              <Card as any>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="h-5 w-5" />
@@ -248,7 +248,7 @@ export default function CharityImpact() {
           {lifetime && (
             <>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
+                <Card as any>
                   <CardHeader className="pb-3">
                     <CardDescription>Lifetime Trees Protected</CardDescription>
                     <CardTitle className="text-3xl flex items-center gap-2">
@@ -263,7 +263,7 @@ export default function CharityImpact() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card as any>
                   <CardHeader className="pb-3">
                     <CardDescription>Lifetime Habitat Protected</CardDescription>
                     <CardTitle className="text-3xl flex items-center gap-2">
@@ -278,7 +278,7 @@ export default function CharityImpact() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card as any>
                   <CardHeader className="pb-3">
                     <CardDescription>Lifetime Species Saved</CardDescription>
                     <CardTitle className="text-3xl flex items-center gap-2">
@@ -293,7 +293,7 @@ export default function CharityImpact() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card as any>
                   <CardHeader className="pb-3">
                     <CardDescription>Lifetime Animals Saved</CardDescription>
                     <CardTitle className="text-3xl flex items-center gap-2">
@@ -309,7 +309,7 @@ export default function CharityImpact() {
                 </Card>
               </div>
 
-              <Card>
+              <Card as any>
                 <CardHeader>
                   <CardTitle>Total Lifetime Impact</CardTitle>
                   <CardDescription>

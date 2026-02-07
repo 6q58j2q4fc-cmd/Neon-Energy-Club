@@ -109,7 +109,7 @@ describe('Analytics LLM System', () => {
           personalSales: 5000,
           teamSales: 10000,
           monthlyPv: 48,
-          isActive: 1,
+          isActive: true,
           joinDate: new Date(),
         },
         {
@@ -119,7 +119,7 @@ describe('Analytics LLM System', () => {
           personalSales: 0,
           teamSales: 0,
           monthlyPv: 0,
-          isActive: 0,
+          isActive: false,
           joinDate: new Date(),
         },
         {
@@ -129,7 +129,7 @@ describe('Analytics LLM System', () => {
           personalSales: 8000,
           teamSales: 15000,
           monthlyPv: 96,
-          isActive: 1,
+          isActive: true,
           joinDate: new Date(),
         },
       ];

@@ -20,7 +20,7 @@ interface ChatMessage {
   id: string;
   role: "user" | "assistant" | "system";
   content: string;
-  timestamp: Date;
+  timestamp: string;
 }
 
 type ChatMode = "general" | "sales" | "support" | "training" | "tutorial";

@@ -37,7 +37,7 @@ export async function checkFirstSale(distributorId: number): Promise<TeamAlert |
   if (!distributor) return null;
   
   // Count total sales
-  const result = await db
+  const result = await db!
     .select({ count: sql<number>`count(*)` })
     .from(orders)
     .where(

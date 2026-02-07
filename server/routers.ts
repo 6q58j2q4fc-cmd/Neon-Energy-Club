@@ -374,7 +374,6 @@ export const appRouter = router({
         return {
           found: true,
           order: {
-            id: order.id,
             orderNumber: order.nftOrderNumber || `NEON-${String(order.id).padStart(5, '0')}`,
             status: order.status || 'pending',
             statusTimeline,
@@ -461,7 +460,6 @@ export const appRouter = router({
             const trackingStatus = getTrackingStatus(order.status || 'pending');
             
             return {
-              id: order.id,
               orderNumber: order.nftId || `NEON-${String(order.id).padStart(5, '0')}`,
               status: order.status || 'pending',
               quantity: order.quantity,
@@ -3743,7 +3741,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
       let successCount = 0;
       for (const sub of subscriptions) {
         const success = await sendPushNotification(
-          { endpoint: sub.endpoint, p256Dh: sub.p256Dh, auth: sub.auth },
+          { endpoint: sub.endpoint, p256dh: sub.p256Dh, auth: sub.auth },
           {
             title: '🎉 Test Notification',
             body: 'Push notifications are working! You\'ll receive alerts for team signups, commissions, and rank advancements.',
@@ -4205,7 +4203,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
           const { createVendingCheckout } = await import("./stripe");
           const origin = ctx.req.headers.origin || "https://neonenergydrink.manus.space";
           const checkoutResult = await createVendingCheckout({
-            id: order.id,
+            orderId: order.id,
             amount: input.paymentType === "full" ? input.totalPriceCents : input.depositAmountCents,
             machineModel: input.machineModel,
             quantity: input.quantity,
@@ -4643,7 +4641,7 @@ Provide step-by-step instructions with specific button names and locations. Keep
         // Store the secret (not enabled yet)
         await createOrUpdateMfaSettings(ctx.user.id, {
           totpSecret: secret,
-          isEnabled: 0,
+          isEnabled: false,
         });
         
         return {

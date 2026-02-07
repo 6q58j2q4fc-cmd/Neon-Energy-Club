@@ -198,7 +198,7 @@ export async function sendCommissionEarnedSMS(params: {
 export async function sendAutoShipReminderSMS(params: {
   phoneNumber: string;
   customerName: string;
-  renewalDate: Date;
+  renewalDate: string;
   amount: number;
 }): Promise<boolean> {
   const { phoneNumber, customerName, renewalDate, amount } = params;

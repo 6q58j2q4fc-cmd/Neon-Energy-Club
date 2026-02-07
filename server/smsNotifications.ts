@@ -77,8 +77,8 @@ export interface SMSOptIn {
   email?: string;
   subscriberId: string;
   optedIn: boolean;
-  optInDate?: Date;
-  optOutDate?: Date;
+  optInDate?: string;
+  optOutDate?: string;
   referralCode: string;
   referredBy?: string;
   preferences: {

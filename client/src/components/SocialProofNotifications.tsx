@@ -14,7 +14,7 @@ interface Notification {
   tier?: string;
   product?: string;
   quantity?: number;
-  timestamp: Date;
+  timestamp: string;
   isSimulated?: boolean;
 }
 
@@ -63,7 +63,7 @@ const CROWDFUNDING_TIERS = [
   { tier: "Founding Member", amount: 2500 }
 ];
 
-function getTimeAgo(date: Date): string {
+function getTimeAgo(date: string): string {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
   
   if (seconds < 60) return "just now";

@@ -6029,3 +6029,25 @@
 - [ ] Verify TypeScript compilation succeeds with 0 errors (Currently: 164 errors, down from 178)
 - [x] Test that all database queries still work after fixes (Application runs successfully)
 - [x] Ensure no runtime regressions from type fixes (No regressions detected)
+
+## Fix ALL Remaining TypeScript Errors (Feb 7, 2026) - CRITICAL
+- [ ] Fix p256Dh property mismatch in server/routers.ts:3746
+- [ ] Fix missing 'id' property in vending checkout (server/routers.ts:4208)
+- [ ] Fix number to boolean conversion (server/routers.ts:4646)
+- [ ] Fix db possibly null in teamPerformanceAlerts.ts:40
+- [ ] Fix all remaining 160 complex type inference errors
+- [ ] Verify 0 TypeScript errors after all fixes
+
+## Dedicated Login Button Implementation (Feb 7, 2026) - HIGH PRIORITY
+- [x] Add dedicated "Login" button to desktop navigation header
+- [x] Add dedicated "Login" button to mobile hamburger menu
+- [x] Style login button to stand out from other navigation items (gradient cyan-to-yellow, glow effect)
+- [x] Connect login button to native Manus OAuth flow (window.location.href = '/login')
+- [x] Implement persistent authentication state (Manus OAuth handles session cookies automatically)
+- [x] Ensure login redirects to correct portal based on user type (OAuth handles routing)
+- [ ] Test login flow for regular users
+- [ ] Test login flow for distributors
+- [ ] Test login flow for franchise owners
+- [ ] Test login flow for vending machine owners
+- [ ] Verify no login issues across all user types
+- [ ] Test logout and re-login functionality

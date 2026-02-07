@@ -32,7 +32,7 @@ interface SiteAuditResult {
   distributorCode: string;
   status: 'healthy' | 'warning' | 'error';
   issues: SiteIssue[];
-  lastAuditedAt: Date;
+  lastAuditedAt: string;
 }
 
 interface SiteIssue {
@@ -44,7 +44,7 @@ interface SiteIssue {
 }
 
 interface DataIntegrityReport {
-  timestamp: Date;
+  timestamp: string;
   sitesAudited: number;
   issuesFound: number;
   issuesFixed: number;
@@ -329,7 +329,7 @@ export async function runDailyDataAudit(): Promise<DataIntegrityReport> {
   // Get all active distributors
   const activeDistributors = await db!.select()
     .from(distributors)
-    .where(eq(distributors.status, 'active'))
+    .where(eq(distributors.status as any, 'active'))
     .orderBy(desc(distributors.createdAt));
 
   console.log(`[DailyAudit] Auditing ${activeDistributors.length} active distributors`);
@@ -513,12 +513,12 @@ export async function getReplicatedSiteStats(): Promise<{
 
   const activeResult = await db!.select({ count: sql<number>`COUNT(*)` })
     .from(distributors)
-    .where(eq(distributors.status, 'active'));
+    .where(eq(distributors.status as any, 'active'));
 
   const withSubdomainResult = await db!.select({ count: sql<number>`COUNT(*)` })
     .from(distributors)
     .where(and(
-      eq(distributors.status, 'active'),
+      eq(distributors.status as any, 'active'),
       isNull(distributors.subdomain)
     ));
 

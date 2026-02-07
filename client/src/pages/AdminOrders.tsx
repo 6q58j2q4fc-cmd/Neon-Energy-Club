@@ -61,7 +61,7 @@ interface Order {
   distributorId: number | null;
   packageId: number;
   paymentStatus: string;
-  updatedAt: Date;
+  updatedAt: string;
 }
 
 export default function AdminOrders() {

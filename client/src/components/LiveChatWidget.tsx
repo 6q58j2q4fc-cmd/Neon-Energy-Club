@@ -17,7 +17,7 @@ interface Message {
   id: string;
   content: string;
   sender: "user" | "agent" | "bot";
-  timestamp: Date;
+  timestamp: string;
   status?: "sending" | "sent" | "delivered" | "read";
   agentName?: string;
   agentAvatar?: string;

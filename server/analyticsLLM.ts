@@ -16,7 +16,7 @@ interface DistributorAnalytics {
   totalDownline: number;
   activeDownline: number;
   commissionTotal: number;
-  joinDate: Date;
+  joinDate: string;
 }
 
 interface TeamMember {
@@ -27,7 +27,7 @@ interface TeamMember {
   teamSales: number;
   monthlyPv: number;
   isActive: number;
-  joinDate: Date;
+  joinDate: string;
 }
 
 interface AnalyticsInsight {

@@ -169,7 +169,7 @@ export default function TaxInformation() {
       </Card>
 
       {/* Tax Information Form */}
-      <Card>
+      <Card as any>
         <CardHeader>
           <CardTitle>Submit Tax Information</CardTitle>
           <CardDescription>

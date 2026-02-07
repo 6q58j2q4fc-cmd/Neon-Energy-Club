@@ -1004,7 +1004,7 @@ export async function enrollDistributor(input: {
     totalEarnings: 0,
     availableBalance: 0,
     status: "active",
-    isActive: 1,
+    isActive: true,
     // Personal information
     firstName: input.firstName,
     lastName: input.lastName,
@@ -1633,7 +1633,7 @@ export async function getTerritoriesDueForRenewal(daysAhead: number = 30) {
 export async function updateTerritoryStatus(
   territoryId: number, 
   status: "pending" | "active" | "expired",
-  renewalDate?: Date,
+  renewalDate?: string,
   expirationDate?: Date
 ) {
   const db = await getDb();
@@ -2935,8 +2935,8 @@ export async function listAllDistributors(options?: {
   
   // Apply filters
   const conditions = [];
-  if (status) conditions.push(eq(distributors.status, status));
-  if (rank) conditions.push(eq(distributors.rank, rank as any));
+  if (status) conditions.push(eq(distributors.status as any, status));
+  if (rank) conditions.push(eq(distributors.rank as any, rank as any));
   
   if (conditions.length > 0) {
     return await db.select({
@@ -3786,7 +3786,7 @@ export async function generateCustomerReferralCode(userId: number): Promise<stri
     code,
     usageCount: 0,
     successfulReferrals: 0,
-    isActive: 1,
+    isActive: true,
   });
 
   return code;
@@ -4383,7 +4383,7 @@ export async function createVendingApplication(data: {
   experience?: string;
   questions?: string;
   status: "pending" | "under_review" | "approved" | "rejected";
-  submittedAt: Date;
+  submittedAt: string;
 }): Promise<{ id: number }> {
   const db = await getDb();
   if (!db) return { id: 0 };
@@ -4434,7 +4434,7 @@ export async function createFranchiseApplication(data: {
   timeline: string;
   questions?: string;
   status: "pending" | "under_review" | "approved" | "rejected";
-  submittedAt: Date;
+  submittedAt: string;
 }): Promise<{ id: number }> {
   const db = await getDb();
   if (!db) return { id: 0 };
@@ -4560,7 +4560,7 @@ export async function savePushSubscription(data: {
         p256Dh: data.p256Dh,
         auth: data.auth,
         userAgent: data.userAgent || null,
-        isActive: 1,
+        isActive: true,
         updatedAt: new Date().toISOString().toISOString(),
       })
       .where(eq(pushSubscriptions.id, existing[0].id));
@@ -4574,7 +4574,7 @@ export async function savePushSubscription(data: {
     p256Dh: data.p256Dh,
     auth: data.auth,
     userAgent: data.userAgent || null,
-    isActive: 1,
+    isActive: true,
   });
 
   return result[0]?.insertId || null;
@@ -4627,7 +4627,7 @@ export async function deactivatePushSubscription(endpoint: string): Promise<void
   if (!db) return;
 
   await db.update(pushSubscriptions)
-    .set({ isActive: 0 })
+    .set({ isActive: false })
     .where(eq(pushSubscriptions.endpoint, endpoint));
 }
 
@@ -5168,7 +5168,7 @@ export async function getTotalUserCount(): Promise<number> {
 /**
  * Get booked meeting slots for a date range
  */
-export async function getBookedMeetingSlots(startDate: Date, endDate: Date) {
+export async function getBookedMeetingSlots(startDate: string, endDate: string) {
   const db = await getDb();
   if (!db) return [];
   
@@ -5196,7 +5196,7 @@ export async function createScheduledMeeting(data: {
   email: string;
   phone: string;
   meetingType: "franchise" | "vending" | "general";
-  scheduledAt: Date;
+  scheduledAt: string;
   timezone: string;
   notes: string | null;
 }) {
@@ -5382,12 +5382,12 @@ export async function getAllVendingOrders(options: { status?: string; limit?: nu
 export async function updateVendingOrderStatus(id: number, data: {
   status?: string;
   adminNotes?: string;
-  estimatedDelivery?: Date;
-  installationDate?: Date;
+  estimatedDelivery?: string;
+  installationDate?: string;
   amountPaidCents?: number;
   remainingBalanceCents?: number;
   paymentsMade?: number;
-  nextPaymentDue?: Date;
+  nextPaymentDue?: string;
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
   stripePaymentIntentId?: string;
@@ -5552,7 +5552,7 @@ export async function getPublicLeaderboard(limit: number = 10) {
       userId: distributors.userId,
     })
       .from(distributors)
-      .where(eq(distributors.status, 'active'))
+      .where(eq(distributors.status as any, 'active'))
       .orderBy(
         desc(distributors.totalEarnings),
         desc(distributors.teamSales),
@@ -5622,7 +5622,7 @@ export async function updateDistributorApplicationInfo(
     taxIdLast4?: string;
     agreedToPolicies?: boolean;
     agreedToTerms?: boolean;
-    agreedAt?: Date;
+    agreedAt?: string;
   }
 ): Promise<boolean> {
   const db = await getDb();
@@ -5841,8 +5841,8 @@ export async function recordVendingCommission(data: {
   amountCents: number;
   cvAmount: number;
   commissionRate: number;
-  periodStart: Date;
-  periodEnd: Date;
+  periodStart: string;
+  periodEnd: string;
 }): Promise<{ id: number } | null> {
   const db = await getDb();
   if (!db) return null;
@@ -6396,7 +6396,7 @@ export async function enableMfa(userId: number) {
   
   await db.update(mfaSettings)
     .set({
-      isEnabled: 1,
+      isEnabled: true,
       lastVerifiedAt: new Date().toISOString(),
     })
     .where(eq(mfaSettings.userId, userId));
@@ -6413,7 +6413,7 @@ export async function disableMfa(userId: number) {
   
   await db.update(mfaSettings)
     .set({
-      isEnabled: 0,
+      isEnabled: false,
       totpSecret: '',
       backupCodes: null,
       backupCodesRemaining: 0,
@@ -6630,7 +6630,7 @@ export async function completeMfaRecovery(recoveryId: number, userId: number) {
   // Disable MFA for the user
   await db.update(mfaSettings)
     .set({
-      isEnabled: 0,
+      isEnabled: false,
       totpSecret: '',
       backupCodes: null,
       backupCodesRemaining: 0,
@@ -6704,8 +6704,8 @@ export async function getVendingMachineInventory(machineId: number) {
  * Get machine sales history
  */
 export async function getVendingMachineSales(machineId: number, options?: {
-  startDate?: Date;
-  endDate?: Date;
+  startDate?: string;
+  endDate?: string;
   limit?: number;
 }) {
   const db = await getDb();
@@ -6940,7 +6940,7 @@ export async function getVendingAnalytics(userId: number, machineId?: number, pe
   
   // Calculate date range
   const now = new Date();
-  let startDate: Date;
+  let startDate: string;
   switch (period) {
     case "day":
       startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);

@@ -159,7 +159,7 @@ export default function Orders() {
     status: string;
     notes: string | null;
     createdAt: string;
-    updatedAt: Date;
+    updatedAt: string;
   }>;
   const crowdfunding = (ordersData && 'crowdfunding' in ordersData ? ordersData.crowdfunding : []) as Array<{
     id: number;

@@ -39,7 +39,7 @@ interface VendingMachine {
   name: string;
   location: string;
   status: 'online' | 'offline' | 'maintenance';
-  lastPing: Date;
+  lastPing: string;
   temperature: number;
   humidity: number;
   batteryBackup: number;
@@ -66,7 +66,7 @@ interface Alert {
   type: 'low_stock' | 'temperature' | 'offline' | 'maintenance' | 'error';
   severity: 'low' | 'medium' | 'high' | 'critical';
   message: string;
-  timestamp: Date;
+  timestamp: string;
   acknowledged: boolean;
 }
 
@@ -74,7 +74,7 @@ interface SaleRecord {
   id: string;
   product: string;
   amount: number;
-  timestamp: Date;
+  timestamp: string;
   paymentMethod: 'card' | 'cash' | 'mobile';
 }
 

@@ -766,7 +766,7 @@ export async function sendMeetingConfirmation(data: {
   name: string;
   email: string;
   meetingType: "franchise" | "vending" | "general";
-  scheduledAt: Date;
+  scheduledAt: string;
   timezone: string;
 }): Promise<boolean> {
   const meetingTypeLabels = {
@@ -949,7 +949,7 @@ interface MfaEmailData {
   eventType: 'enabled' | 'disabled' | 'backup_used';
   ipAddress?: string;
   userAgent?: string;
-  timestamp: Date;
+  timestamp: string;
   backupCodesRemaining?: number;
 }
 
@@ -1852,7 +1852,7 @@ export async function sendDeliveryConfirmationEmail(data: {
   customerName: string;
   customerEmail: string;
   orderNumber: string;
-  deliveredAt: Date;
+  deliveredAt: string;
   nftImageUrl?: string;
 }): Promise<boolean> {
   const htmlContent = `
