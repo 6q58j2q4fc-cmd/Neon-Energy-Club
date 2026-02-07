@@ -58,7 +58,7 @@ export async function generateDistributorInsights(
 - Total Downline: ${analytics.totalDownline}
 - Active Downline: ${analytics.activeDownline}
 - Total Commissions Earned: $${(analytics.commissionTotal / 100).toFixed(2)}
-- Days in Business: ${Math.floor((Date.now() - analytics.joinDate.getTime()) / (1000 * 60 * 60 * 24))}
+- Days in Business: ${Math.floor((Date.now() - new Date(analytics.joinDate).getTime()) / (1000 * 60 * 60 * 24))}
 
 **Team Overview:**
 ${teamMembers.slice(0, 10).map(member => `- ${member.name || "Anonymous"}: ${member.rank}, PV: ${member.monthlyPv}, ${member.isActive ? "Active" : "Inactive"}`).join("\n")}

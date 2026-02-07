@@ -82,7 +82,7 @@ export async function getAllDownline(distributorId: number): Promise<number[]> {
  */
 export async function getDirectChildren(distributorId: number): Promise<TreePosition[]> {
   const db = await getDb();
-  if (!db) return { parentId: 0, position: "left" as PlacementPosition, depthLevel: 0 };
+  if (!db) return [];
   
   try {
     const children = await db
@@ -105,7 +105,7 @@ export async function getDirectChildren(distributorId: number): Promise<TreePosi
  */
 export async function getUplinePath(distributorId: number): Promise<number[]> {
   const db = await getDb();
-  if (!db) return { parentId: 0, position: "left" as PlacementPosition, depthLevel: 0 };
+  if (!db) return [];
   
   try {
     const upline: number[] = [];
@@ -141,7 +141,7 @@ export async function getUplinePath(distributorId: number): Promise<number[]> {
  */
 export async function calculateLegVolumes(distributorId: number): Promise<LegVolumes> {
   const db = await getDb();
-  if (!db) return { parentId: 0, position: "left" as PlacementPosition, depthLevel: 0 };
+  if (!db) return { leftLegVolume: 0, rightLegVolume: 0 };
   
   try {
     // Get direct children
@@ -194,7 +194,7 @@ export async function getTeamSize(distributorId: number): Promise<number> {
  */
 export async function getTreeDepth(distributorId: number): Promise<number> {
   const db = await getDb();
-  if (!db) return { parentId: 0, position: "left" as PlacementPosition, depthLevel: 0 };
+  if (!db) return 0;
   
   try {
     const children = await getDirectChildren(distributorId);
@@ -390,7 +390,7 @@ export async function placeDistributorInTree(
   preferredPosition?: PlacementPosition
 ): Promise<TreePosition> {
   const db = await getDb();
-  if (!db) return { parentId: 0, position: "left" as PlacementPosition, depthLevel: 0 };
+  if (!db) throw new Error('Database connection not available');
   
   try {
     // Find optimal placement

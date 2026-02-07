@@ -78,12 +78,12 @@ export default function NotificationPreferences() {
   // Load preferences into form
   useEffect(() => {
     if (preferences) {
-      setReferrals(preferences.referrals);
-      setCommissions(preferences.commissions);
-      setTeamUpdates(preferences.teamUpdates);
-      setPromotions(preferences.promotions);
-      setOrders(preferences.orders);
-      setAnnouncements(preferences.announcements);
+      setReferrals(Boolean(preferences.referrals));
+      setCommissions(Boolean(preferences.commissions));
+      setTeamUpdates(Boolean(preferences.teamUpdates));
+      setPromotions(Boolean(preferences.promotions));
+      setOrders(Boolean(preferences.orders));
+      setAnnouncements(Boolean(preferences.announcements));
       setDigestFrequency(preferences.digestFrequency);
       setDigestDay(preferences.digestDay?.toString() || "1");
       setDigestHour(preferences.digestHour?.toString() || "9");

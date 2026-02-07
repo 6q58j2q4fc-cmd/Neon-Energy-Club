@@ -116,7 +116,7 @@ export async function calculatePersonalImpact(
   periodEnd: string
 ): Promise<ImpactCalculation> {
   const db = await getDb();
-  if (!db) return ;
+  if (!db) return { cansOriginal: 0, cansPink: 0, treesProtected: 0, habitatProtected: 0, speciesSaved: 0, animalLivesSaved: 0 };
   
   // Get all orders by this distributor in the period
   const distributorOrders = await db
@@ -161,7 +161,7 @@ export async function calculateTeamImpact(
   periodEnd: string
 ): Promise<ImpactCalculation> {
   const db = await getDb();
-  if (!db) return ;
+  if (!db) return { cansOriginal: 0, cansPink: 0, treesProtected: 0, habitatProtected: 0, speciesSaved: 0, animalLivesSaved: 0 };
   
   // Get all downline distributors using binary tree
   const { getAllDownline } = await import('./binaryTree');
@@ -360,7 +360,7 @@ export async function getImpactHistory(
   limit: number = 12
 ): Promise<any[]> {
   const db = await getDb();
-  if (!db) return ;
+  if (!db) return [];
   
   const history = await db
     .select()

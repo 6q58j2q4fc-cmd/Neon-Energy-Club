@@ -61,7 +61,7 @@ export default function DistributorSite() {
       // Store distributor code in localStorage with 30-day expiration for order attribution
       const referralData = {
         distributorCode,
-        expiry: new Date(Date.now().toISOString() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
+        expiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
         visitedAt: new Date().toISOString(),
       };
       localStorage.setItem('neon_referral', JSON.stringify(referralData));

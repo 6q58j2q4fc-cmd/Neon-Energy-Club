@@ -782,7 +782,7 @@ export async function sendMeetingConfirmation(data: {
     day: "numeric",
   });
   
-  const formattedTime = data.scheduledAt.toLocaleTimeString("en-US", {
+  const formattedTime = new Date(data.scheduledAt).toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
@@ -1942,7 +1942,7 @@ export async function sendDeliveryConfirmationEmail(data: {
   try {
     await notifyOwner({
       title: `Order ${data.orderNumber} Delivered`,
-      content: `Customer: ${data.customerName} (${data.customerEmail})\nDelivered: ${data.deliveredAt.toISOString()}`,
+      content: `Customer: ${data.customerName} (${data.customerEmail})\nDelivered: ${data.deliveredAt}`,
     });
     
     console.log(`[Email] Delivery confirmation sent to ${data.customerEmail}`);
