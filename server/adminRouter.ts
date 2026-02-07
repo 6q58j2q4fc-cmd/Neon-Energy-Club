@@ -242,7 +242,7 @@ export const adminRouter = router({
       await db
         .update(users)
         .set({ 
-          emailVerified: input.verified,
+          emailVerified: input.verified ? 1 : 0,
           emailVerificationToken: null,
           emailVerificationExpiry: null,
           updatedAt: new Date().toISOString(),

@@ -129,7 +129,7 @@ export async function createEmailVerification(userId: number): Promise<{ token: 
 
   const token = generateVerificationToken();
   // Token expires in 24 hours
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
   await db.update(users)
     .set({
@@ -291,10 +291,9 @@ export async function createSmsVerification(userId: number, phoneNumber: string)
     return { error: "Too many verification attempts. Please try again in an hour." };
   }
 
-  const code = generateSmsCode();
-  // Code expires in 10 minutes
-  const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-
+  const code = generateVerificationCode();
+  // Code expires in 15 minutes
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
   // Reset attempts if last SMS was more than 1 hour ago
   const newAttempts = (lastSmsDate && lastSmsDate > oneHourAgo) 
     ? user.smsVerificationAttempts + 1 
