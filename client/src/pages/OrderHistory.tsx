@@ -29,7 +29,7 @@ type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancell
 const mockOrders = [
   {
     id: "ORD-2026-001",
-    date: new Date("2026-01-15"),
+    date: new Date("2026-01-15").toISOString(),
     status: "delivered" as OrderStatus,
     total: 149.97,
     items: [
@@ -49,7 +49,7 @@ const mockOrders = [
   },
   {
     id: "ORD-2026-002",
-    date: new Date("2026-01-28"),
+    date: new Date("2026-01-28").toISOString(),
     status: "shipped" as OrderStatus,
     total: 59.99,
     items: [
@@ -68,7 +68,7 @@ const mockOrders = [
   },
   {
     id: "ORD-2026-003",
-    date: new Date("2026-01-30"),
+    date: new Date("2026-01-30").toISOString(),
     status: "processing" as OrderStatus,
     total: 89.98,
     items: [

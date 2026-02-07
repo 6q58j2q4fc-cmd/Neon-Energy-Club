@@ -338,7 +338,6 @@ export const distributors = mysqlTable("distributors", {
 	lastName: varchar({ length: 255 }),
 	email: varchar({ length: 255 }),
 	ssnLast4: varchar({ length: 4 }),
-	einLast4: varchar({ length: 4 }),
 	businessEntityType: varchar({ length: 100 }),
 	businessEin: varchar({ length: 50 }),
 },

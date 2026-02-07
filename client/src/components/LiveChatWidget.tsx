@@ -76,7 +76,7 @@ export default function LiveChatWidget() {
         id: "greeting",
         content: `Hi${user?.name ? ` ${user.name}` : ""}! 👋 Welcome to NEON Energy support. How can I help you today?`,
         sender: "bot",
-        timestamp: new Date(),
+        timestamp: new Date().toISOString().toISOString(),
       };
       setMessages([greeting]);
     }
@@ -89,7 +89,7 @@ export default function LiveChatWidget() {
       id: Date.now().toString(),
       content: inputValue,
       sender: "user",
-      timestamp: new Date(),
+      timestamp: new Date().toISOString().toISOString(),
       status: "sending",
     };
 
@@ -129,7 +129,7 @@ export default function LiveChatWidget() {
             id: Date.now().toString(),
             content: "Hi! I'm Sarah from the NEON Energy support team. I'm here to help you. What can I assist you with today?",
             sender: "agent",
-            timestamp: new Date(),
+            timestamp: new Date().toISOString().toISOString(),
             agentName: "Sarah",
             agentAvatar: "",
           };
@@ -141,7 +141,7 @@ export default function LiveChatWidget() {
         id: Date.now().toString(),
         content: BOT_RESPONSES[responseKey],
         sender: agentConnected ? "agent" : "bot",
-        timestamp: new Date(),
+        timestamp: new Date().toISOString().toISOString(),
         agentName: agentConnected ? "Sarah" : undefined,
       };
 

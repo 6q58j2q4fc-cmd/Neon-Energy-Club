@@ -247,7 +247,7 @@ export default function SocialProofNotifications() {
           name: anonymizeName(contribution.name, contribution.email),
           amount: contribution.amount,
           tier: contribution.tier ?? undefined,
-          timestamp: new Date(contribution.createdAt),
+          timestamp: new Date(contribution.createdAt).toISOString(),
           isSimulated: false,
         });
       });
@@ -263,7 +263,7 @@ export default function SocialProofNotifications() {
           location: distributor.city && distributor.state 
             ? `${distributor.city}, ${distributor.state}` 
             : undefined,
-          timestamp: new Date(distributor.createdAt),
+          timestamp: new Date(distributor.createdAt).toISOString(),
           isSimulated: false,
         });
       });
@@ -323,7 +323,7 @@ export default function SocialProofNotifications() {
     if (notification.isSimulated) {
       notification = {
         ...notification,
-        timestamp: new Date(Date.now() - Math.random() * 5 * 60 * 1000), // Within last 5 minutes
+        timestamp: new Date(Date.now().toISOString() - Math.random() * 5 * 60 * 1000), // Within last 5 minutes
       };
       
       // Record simulated contribution to crowdfunding goal
