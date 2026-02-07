@@ -136,8 +136,8 @@ export function HeaderSoundControl({ accentColor = "#c8ff00" }: HeaderSoundContr
         <button
           className={`relative flex items-center justify-center rounded-xl transition-all duration-200 touch-manipulation ${
             isPlaying 
-              ? "w-10 h-10 sm:w-12 sm:h-12 bg-[#c8ff00]/20 border-2 border-[#c8ff00] shadow-[0_0_15px_rgba(200,255,0,0.4)]" 
-              : "w-10 h-10 sm:w-12 sm:h-12 bg-white/10 border-2 border-white/30 hover:bg-white/15"
+              ? "w-12 h-12 bg-[#c8ff00]/20 border-2 border-[#c8ff00] shadow-[0_0_15px_rgba(200,255,0,0.4)]" 
+              : "w-12 h-12 bg-white/10 border-2 border-white/30 hover:bg-white/15"
           }`}
           aria-label="Volume"
           style={{ 
@@ -147,9 +147,9 @@ export function HeaderSoundControl({ accentColor = "#c8ff00" }: HeaderSoundContr
           }}
         >
           {isPlaying ? (
-            <Volume2 className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} style={{ color: accentColor }} />
+            <Volume2 className="w-6 h-6" strokeWidth={2.5} style={{ color: accentColor }} />
           ) : (
-            <VolumeX className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} style={{ color: 'rgba(255,255,255,0.7)' }} />
+            <VolumeX className="w-6 h-6" strokeWidth={2.5} style={{ color: 'rgba(255,255,255,0.7)' }} />
           )}
           {/* Playing indicator */}
           {isPlaying && (
