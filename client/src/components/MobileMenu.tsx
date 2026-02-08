@@ -93,7 +93,7 @@ export default function MobileMenu({ isOpen, onClose, onNavigate, currentPath = 
     <>
       {/* Backdrop - always rendered but visibility controlled */}
       <div
-        className={`fixed inset-0 bg-black/90 z-[100] transition-opacity duration-200 ${
+        className={`fixed inset-0 bg-black/90 z-[100] lg:hidden transition-opacity duration-200 ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         onClick={onClose}
@@ -101,7 +101,7 @@ export default function MobileMenu({ isOpen, onClose, onNavigate, currentPath = 
 
       {/* Menu panel - fixed position, no transform to avoid rendering issues */}
       <div
-        className={`fixed top-0 right-0 bottom-0 w-[85vw] max-w-[320px] z-[101] transition-all duration-200 ease-out ${
+        className={`fixed top-0 right-0 bottom-0 w-[85vw] max-w-[320px] z-[101] lg:hidden transition-all duration-200 ease-out ${
           isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
         }`}
         style={{ 
