@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "buildCommand": "pnpm install && pnpm build",
+  "devCommand": "pnpm dev",
+  "installCommand": "pnpm install",
+  "framework": null,
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "@vercel/node@3.0.7"
+    }
+  },
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
