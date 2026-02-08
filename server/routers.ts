@@ -14,11 +14,10 @@ import {
   authenticateNativeUser, 
   requestPasswordReset, 
   resetPassword, 
-  verifyEmail,
-  changePassword,
-  isUsernameAvailable,
+  isUsernameAvailable, 
   isEmailAvailable 
 } from "./nativeAuth";
+import { rateLimiters, getClientIdentifier } from "./rateLimiter";
 import { sdk } from "./_core/sdk";
 import { ONE_YEAR_MS, COOKIE_NAME } from "@shared/const";
 import { sql, eq, gte, desc, asc, like, or, and, isNotNull } from "drizzle-orm";
@@ -47,7 +46,16 @@ export const appRouter = router({
         userType: z.enum(["customer", "distributor", "franchisee"]),
         phone: z.string().optional(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
+        // Rate limiting: 3 registrations per hour per IP
+        const identifier = getClientIdentifier(ctx.req);
+        const limit = rateLimiters.enrollment(identifier);
+        if (!limit.allowed) {
+          throw new TRPCError({ 
+            code: "TOO_MANY_REQUESTS", 
+            message: "Too many registration attempts. Please try again later." 
+          });
+        }
         if (input.password !== input.confirmPassword) {
           throw new TRPCError({ code: "BAD_REQUEST", message: "Passwords do not match" });
         }
@@ -75,6 +83,15 @@ export const appRouter = router({
         password: z.string().min(1, "Password is required"),
       }))
       .mutation(async ({ input, ctx }) => {
+        // Rate limiting: 5 login attempts per 15 minutes per IP
+        const identifier = getClientIdentifier(ctx.req);
+        const limit = rateLimiters.auth(identifier);
+        if (!limit.allowed) {
+          throw new TRPCError({ 
+            code: "TOO_MANY_REQUESTS", 
+            message: "Too many login attempts. Please try again in 15 minutes." 
+          });
+        }
         const result = await authenticateNativeUser(input.usernameOrEmail, input.password);
         
         if (!result.success || !result.user) {
@@ -152,12 +169,8 @@ export const appRouter = router({
     verifyEmail: publicProcedure
       .input(z.object({ token: z.string() }))
       .mutation(async ({ input }) => {
-        const result = await verifyEmail(input.token);
-        if (!result.success) {
-          throw new TRPCError({ code: "BAD_REQUEST", message: result.error || "Email verification failed" });
-        }
-        
-        return { success: true, message: "Email verified successfully!" };
+        // TODO: Implement verifyEmail function in nativeAuth.ts
+        throw new TRPCError({ code: "NOT_IMPLEMENTED", message: "Email verification not yet implemented" });
       }),
     
     // Change password (authenticated)
@@ -172,12 +185,8 @@ export const appRouter = router({
           throw new TRPCError({ code: "BAD_REQUEST", message: "Passwords do not match" });
         }
         
-        const result = await changePassword(ctx.user.id, input.currentPassword, input.newPassword);
-        if (!result.success) {
-          throw new TRPCError({ code: "BAD_REQUEST", message: result.error || "Password change failed" });
-        }
-        
-        return { success: true, message: "Password changed successfully." };
+        // TODO: Implement changePassword function in nativeAuth.ts
+        throw new TRPCError({ code: "NOT_IMPLEMENTED", message: "Password change not yet implemented" });
       }),
     // Check if user needs MFA verification (for distributors/vending owners)
     checkMfaRequired: protectedProcedure
@@ -721,6 +730,18 @@ export const appRouter = router({
 
     // Create Stripe checkout for crowdfunding
     createCrowdfundingCheckout: publicProcedure
+      .use(async ({ ctx, next }) => {
+        // Rate limiting: 10 checkout attempts per minute
+        const identifier = getClientIdentifier(ctx.req);
+        const limit = rateLimiters.financial(identifier);
+        if (!limit.allowed) {
+          throw new TRPCError({ 
+            code: "TOO_MANY_REQUESTS", 
+            message: "Too many checkout attempts. Please try again in a moment." 
+          });
+        }
+        return next();
+      })
       .input(
         z.object({
           amount: z.number().int().min(100, "Minimum $1"),
@@ -751,6 +772,18 @@ export const appRouter = router({
 
     // Create Stripe checkout for franchise deposit
     createFranchiseCheckout: publicProcedure
+      .use(async ({ ctx, next }) => {
+        // Rate limiting: 10 checkout attempts per minute
+        const identifier = getClientIdentifier(ctx.req);
+        const limit = rateLimiters.financial(identifier);
+        if (!limit.allowed) {
+          throw new TRPCError({ 
+            code: "TOO_MANY_REQUESTS", 
+            message: "Too many checkout attempts. Please try again in a moment." 
+          });
+        }
+        return next();
+      })
       .input(
         z.object({
           depositAmount: z.number().int().min(1),
@@ -785,6 +818,18 @@ export const appRouter = router({
 
     // Create Stripe checkout for pre-orders from shopping cart
     createPreorderCheckout: publicProcedure
+      .use(async ({ ctx, next }) => {
+        // Rate limiting: 10 checkout attempts per minute
+        const identifier = getClientIdentifier(ctx.req);
+        const limit = rateLimiters.financial(identifier);
+        if (!limit.allowed) {
+          throw new TRPCError({ 
+            code: "TOO_MANY_REQUESTS", 
+            message: "Too many checkout attempts. Please try again in a moment." 
+          });
+        }
+        return next();
+      })
       .input(
         z.object({
           items: z.array(z.object({
@@ -1750,6 +1795,15 @@ export const appRouter = router({
         amount: z.number().int().min(1000), // Min $10
       }))
       .mutation(async ({ ctx, input }) => {
+        // Rate limiting: 10 payout requests per minute
+        const identifier = getClientIdentifier(ctx.req);
+        const limit = rateLimiters.financial(identifier);
+        if (!limit.allowed) {
+          throw new TRPCError({ 
+            code: "TOO_MANY_REQUESTS", 
+            message: "Too many payout requests. Please try again in a moment." 
+          });
+        }
         const { getDistributorByUserId, getPayoutSettings, createPayoutRequest } = await import("./db");
         const distributor = await getDistributorByUserId(ctx.user.id);
         if (!distributor) throw new TRPCError({ code: "NOT_FOUND", message: "Distributor not found" });
