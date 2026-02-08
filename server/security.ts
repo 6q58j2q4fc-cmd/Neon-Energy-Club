@@ -114,10 +114,31 @@ export function securityHeaders() {
     // Referrer Policy
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     
-    // Permissions Policy (formerly Feature Policy)
-    res.setHeader('Permissions-Policy', 
-      'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()'
-    );
+    // Permissions Policy (formerly Feature Policy) - Comprehensive OWASP-compliant directives
+    res.setHeader('Permissions-Policy', [
+      'accelerometer=()',
+      'ambient-light-sensor=()',
+      'autoplay=()',
+      'battery=()',
+      'camera=()',
+      'display-capture=()',
+      'document-domain=()',
+      'encrypted-media=()',
+      'fullscreen=(self)',
+      'geolocation=()',
+      'gyroscope=()',
+      'magnetometer=()',
+      'microphone=()',
+      'midi=()',
+      'payment=()',
+      'picture-in-picture=()',
+      'publickey-credentials-get=()',
+      'screen-wake-lock=()',
+      'sync-xhr=()',
+      'usb=()',
+      'web-share=()',
+      'xr-spatial-tracking=()',
+    ].join(', '));
     
     // Content Security Policy
     const csp = [
